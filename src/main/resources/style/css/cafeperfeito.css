@@ -1,3 +1,16 @@
+.menu-bar {
+  -fx-background-color: derive(#1d1d1d, 20%); }
 
+.context-menu {
+  -fx-background-color: derive(#1d1d1d, 50%); }
+
+.menu-bar .label {
+  -fx-font-size: 14pt;
+  -fx-font-family: "Segoe UI Light";
+  -fx-text-fill: white;
+  -fx-opacity: 0.9; }
+
+.menu .left-container {
+  -fx-background-color: black; }
 
 /*# sourceMappingURL=cafeperfeito.css.map */

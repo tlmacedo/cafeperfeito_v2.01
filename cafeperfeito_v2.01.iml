@@ -20,7 +20,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -114,5 +114,13 @@
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-java:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm:7.0-beta" level="project" />
     <orderEntry type="library" name="Maven: com.thoughtworks.qdox:qdox:2.0-M9" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:13-ea+7" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:mac:13-ea+7" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:13-ea+7" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:mac:13-ea+7" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:13-ea+7" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:mac:13-ea+7" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:13-ea+7" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:mac:13-ea+7" level="project" />
   </component>
 </module>
