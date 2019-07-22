@@ -69,13 +69,23 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>10</source>
-                    <target>10</target>
+                    <source>12</source>
+                    <target>12</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
     <dependencies>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>13-ea+7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>13-ea+7</version>
+        </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
@@ -87,19 +97,14 @@
             <version>5.4.2.Final</version>
         </dependency>
         <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.16</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.maven.surefire</groupId>
             <artifactId>maven-surefire-common</artifactId>
             <version>3.0.0-M3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>13-ea+7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>13-ea+7</version>
         </dependency>
 
     </dependencies>
@@ -107,23 +112,21 @@
 </project>
 
 
-
-
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.css=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene.input=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene.text=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene.traversal=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.util=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.util.Utils=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.beans=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.binding=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.collections=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED-->
-<!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.logging=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.css=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene.input=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene.text=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.scene.traversal=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.util=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.graphics/com.sun.javafx.util.Utils=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.beans=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.binding=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.collections=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED-->
+        <!--                                                &#45;&#45;add-exports=javafx.base/com.sun.javafx.logging=ALL-UNNAMED-->
