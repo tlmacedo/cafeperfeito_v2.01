@@ -1,16 +1,25 @@
-.menu-bar {
-  -fx-background-color: derive(#1d1d1d, 20%); }
+.vbox {
+  -fx-background-color: #1d1d1d;
+  -fx-border-width: 2px;
+  -fx-padding: 10;
+  -fx-spacing: 8; }
 
-.context-menu {
-  -fx-background-color: derive(#1d1d1d, 50%); }
-
-.menu-bar .label {
-  -fx-font-size: 14pt;
-  -fx-font-family: "Segoe UI Light";
+.label {
+  -fx-font-size: 11pt;
+  -fx-font-family: "Segoe UI Semibold";
   -fx-text-fill: white;
-  -fx-opacity: 0.9; }
+  -fx-opacity: 0.6; }
 
-.menu .left-container {
-  -fx-background-color: black; }
+.password-field {
+  -fx-background-color: yelow; }
+
+.combo-box {
+  -fx-background-color: #1d1d1d;
+  -fx-font-family: sans-serif;
+  -fx-text-fill: #eee;
+  -fx-font-size: 10px;
+  -fx-font-style: normal; }
+  .view-login .combo-box {
+    -fx-font-size: 12px; }
 
 /*# sourceMappingURL=cafeperfeito.css.map */

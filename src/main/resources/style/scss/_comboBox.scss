@@ -1,14 +1,14 @@
 .combo-box {
+
+  -fx-background-color: #1d1d1d;
   -fx-font-family: $fontFamily;
-  -fx-text-fill: $sisColor_black;
+  -fx-text-fill: #eee;
   -fx-font-size: $fontSizeh6;
   -fx-font-style: normal;
-
-  -jfx-focus-color: $corJFX-Focus;
-  -jfx-unfocus-color: $corJFX-Unforcus;
-  -jfx-label-float: true;
 
   .view-login & { //view-cadastro-empresa &, .view-cadastro-produto & {
     -fx-font-size: $fontSizeh5;
   }
 }
+
+

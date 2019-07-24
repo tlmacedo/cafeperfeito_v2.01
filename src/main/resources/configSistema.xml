@@ -45,7 +45,7 @@
     <personalizacao>
         <tema>principal</tema>
         <style-sheets>/style/css/cafeperfeito.css</style-sheets>
-        <style-sheets-min>/style/css/cafeperfeito.css</style-sheets-min>
+        <style-sheets-min>/style/min/cafeperfeito.min.css</style-sheets-min>
         <splash-imagens>
             <image>/image/splash/img_splash_coffe_0.gif</image>
             <image>/image/splash/img_splash_coffe_1.gif</image>

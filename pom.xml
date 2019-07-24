@@ -106,7 +106,6 @@
             <artifactId>maven-surefire-common</artifactId>
             <version>3.0.0-M3</version>
         </dependency>
-
     </dependencies>
 
 </project>
