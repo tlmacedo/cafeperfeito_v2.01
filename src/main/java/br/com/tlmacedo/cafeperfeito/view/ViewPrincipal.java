@@ -37,7 +37,7 @@ public class ViewPrincipal {
         stage.setResizable(false);
         stage.setScene(scene);
         stage.getIcons().setAll(new Image(getClass().getResource(TCONFIG.getFxml().getPrincipal().getIconeDesativo()).toString()));
-        //scene.getStylesheets().setAll(getClass().getResource(TCONFIG.getPersonalizacao().getStyleSheetsMin()).toString());
+        scene.getStylesheets().setAll(getClass().getResource(TCONFIG.getPersonalizacao().getStyleSheetsMin()).toString());
 
         new ServiceOpenView(stage, false);
     }

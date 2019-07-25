@@ -12,9 +12,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         new ServiceVariaveisSistema().getVariaveisSistema();
 
-        new ViewLogin().openViewLogin(false);
+//        new ViewLogin().openViewLogin(false);
 
-//        new ViewPrincipal().openViewPrincipal();
+        new ViewPrincipal().openViewPrincipal();
 
     }
 }
