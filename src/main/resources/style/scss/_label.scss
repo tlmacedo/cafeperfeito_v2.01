@@ -5,9 +5,15 @@
   -fx-opacity: 0.6;
 
 
-  &.titulo{
+  &.lbl_titulo {
     -fx-font-size: $fontSizeh1;
     -fx-font-weight: bold;
     -fx-alignment: center;
+  }
+
+  &.img-background-principal {
+    -fx-background-color: transparent;
+    -fx-background-size: cover;
+    -fx-background-image: url("../../image/painel/principal.png") no-repeat center;
   }
 }

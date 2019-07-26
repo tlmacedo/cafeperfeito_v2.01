@@ -3,12 +3,15 @@ package br.com.tlmacedo.cafeperfeito.controller;
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.MenuPrincipalDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.MenuPrincipal;
-import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
+import br.com.tlmacedo.cafeperfeito.service.ServiceComandoTecladoMouse;
 import br.com.tlmacedo.cafeperfeito.view.ViewPrincipal;
+import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -16,9 +19,11 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.*;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 
@@ -38,8 +43,11 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
 
     private Stage principalStage = ViewPrincipal.getStage();
     public static ControllerPrincipal ctrlPrincipal;
+    private List<MenuPrincipal> menuPrincipalList = new ArrayList<>();
     private String tabSelecionada = "";
     private EventHandler<KeyEvent> eventHandlerPrincipal;
+    private Image icoJanelaAtivado = new Image(getClass().getResource(TCONFIG.getFxml().getPrincipal().getIconeAtivo()).toString());
+    private Image icoJanelaDesativado = new Image(getClass().getResource(TCONFIG.getFxml().getPrincipal().getIconeDesativo()).toString());
 
 
     @Override
@@ -54,12 +62,12 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
 
     @Override
     public void fechar() {
-        principalStage.close();
+        getPrincipalStage().close();
     }
 
     @Override
     public void criarObjetos() {
-
+        getLblImageLogoViewPrincipal().setVisible(true);
     }
 
     @Override
@@ -74,8 +82,51 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
 
     @Override
     public void escutarTecla() {
-        imgMenuPrincipalExpande.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(true));
-        imgMenuPrincipalRetrair.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(false));
+        getImgMenuPrincipalExpande().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(true));
+        getImgMenuPrincipalRetrair().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(false));
+
+        setEventHandlerPrincipal(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (CODE_KEY_SHIFT_CTRL_POSITIVO.match(event) || CHAR_KEY_SHIFT_CTRL_POSITIVO.match(event))
+                    getImgMenuPrincipalExpande().fireEvent(ServiceComandoTecladoMouse.clickMouse(1));
+                if (CODE_KEY_SHIFT_CTRL_NEGATIVO.match(event) || CHAR_KEY_SHIFT_CTRL_NEGATIVO.match(event))
+                    getImgMenuPrincipalRetrair().fireEvent(ServiceComandoTecladoMouse.clickMouse(1));
+                if (event.getCode() == KeyCode.F12)
+                    if (getTabPaneViewPrincipal().getTabs().size() == 0)
+                        fechar();
+                if (event.isShiftDown() && event.isControlDown()) {
+                    addTab(
+                            getMenuPrincipalList().stream()
+                                    .filter(mn -> mn.teclaAtalhoProperty().get().equals("ctrl+shift+" + event.getCode().toString().toLowerCase()))
+                                    .findFirst().orElse(null)
+                    );
+                }
+            }
+        });
+        getPainelViewPrincipal().addEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerPrincipal());
+
+        getTabPaneViewPrincipal().getTabs().addListener((ListChangeListener<? super Tab>) c -> {
+            if (c.getList().size() > 0)
+                getPrincipalStage().getIcons().setAll(getIcoJanelaAtivado());
+            else
+                getPrincipalStage().getIcons().setAll(getIcoJanelaDesativado());
+        });
+
+        getTreeMenuViewPrincipal().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            MenuPrincipal menuClicado;
+            if ((menuClicado = getTreeMenuViewPrincipal().getSelectionModel().getSelectedItem().getValue()) == null)
+                return;
+            System.out.printf("menu: [%s]\n", menuClicado.menuLabelProperty().get().toLowerCase());
+            if (event.getClickCount() == 1) {
+                if (menuClicado.menuLabelProperty().get().toLowerCase().equals("sair"))
+                    fechar();
+            } else {
+                if (!menuClicado.menuLabelProperty().get().toLowerCase().equals("sair"))
+                    addTab(menuClicado);
+            }
+        });
+
     }
 
 
@@ -97,12 +148,14 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
                 LocalDate.now().getYear()
         ));
         String path = TCONFIG.getPaths().getPathIconeSistema();
-        List<MenuPrincipal> menuPrincipalList = new MenuPrincipalDAO()
-                .getAll(MenuPrincipal.class, null, null, null, null);
-        TreeItem[] treeItems = new TreeItem[menuPrincipalList.size() + 1];
+        setMenuPrincipalList(
+                new MenuPrincipalDAO()
+                        .getAll(MenuPrincipal.class, null, null, null, null)
+        );
+        TreeItem[] treeItems = new TreeItem[getMenuPrincipalList().size() + 1];
         treeItems[0] = new TreeItem();
         int i = 0;
-        for (MenuPrincipal menu : menuPrincipalList) {
+        for (MenuPrincipal menu : getMenuPrincipalList()) {
             i = menu.idProperty().intValue();
             treeItems[i] = new TreeItem(menu);
             if (!menu.icoMenuProperty().get().equals(menu))
@@ -112,6 +165,34 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
         }
         getTreeMenuViewPrincipal().setRoot(treeItems[0]);
         getTreeMenuViewPrincipal().setShowRoot(false);
+    }
+
+    private void addTab(MenuPrincipal menu) {
+        if (menu == null) return;
+        int tabId;
+        if ((tabId = tabAberta(menu.menuLabelProperty().get())) < 0) {
+            System.out.printf("tentando adicionar menu: [%s]\n", menu.menuLabelProperty().get());
+            Tab tab = null;
+            switch (menu.menuProperty().get().toLowerCase()) {
+                case "sair":
+                    fechar();
+                    break;
+                case "empresa":
+                    //
+                    break;
+            }
+            if (tab != null) {
+                tabId = getTabPaneViewPrincipal().getTabs().size();
+                getTabPaneViewPrincipal().getTabs().add(tab);
+            }
+        }
+        if (getTabPaneViewPrincipal().getTabs().size() > 0) {
+            getTabPaneViewPrincipal().getSelectionModel().select(tabId);
+
+            getTabPaneViewPrincipal().getSelectionModel().getSelectedItem().setOnCloseRequest(event -> {
+
+            });
+        }
     }
 
 
@@ -219,6 +300,14 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
         ControllerPrincipal.ctrlPrincipal = ctrlPrincipal;
     }
 
+    public List<MenuPrincipal> getMenuPrincipalList() {
+        return menuPrincipalList;
+    }
+
+    public void setMenuPrincipalList(List<MenuPrincipal> menuPrincipalList) {
+        this.menuPrincipalList = menuPrincipalList;
+    }
+
     public String getTabSelecionada() {
         return tabSelecionada;
     }
@@ -233,5 +322,21 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
 
     public void setEventHandlerPrincipal(EventHandler<KeyEvent> eventHandlerPrincipal) {
         this.eventHandlerPrincipal = eventHandlerPrincipal;
+    }
+
+    public Image getIcoJanelaAtivado() {
+        return icoJanelaAtivado;
+    }
+
+    public void setIcoJanelaAtivado(Image icoJanelaAtivado) {
+        this.icoJanelaAtivado = icoJanelaAtivado;
+    }
+
+    public Image getIcoJanelaDesativado() {
+        return icoJanelaDesativado;
+    }
+
+    public void setIcoJanelaDesativado(Image icoJanelaDesativado) {
+        this.icoJanelaDesativado = icoJanelaDesativado;
     }
 }

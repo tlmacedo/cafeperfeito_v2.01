@@ -3,10 +3,17 @@
   -fx-font-family: "Segoe UI Semibold";
   -fx-text-fill: white;
   -fx-opacity: 0.6; }
-  .label.titulo {
+
+.label.lbl_titulo {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
     -fx-alignment: center; }
+
+.label.img-background-principal {
+    -fx-background-color: transparent;
+    -fx-background-size: cover;
+    -fx-background-image: url("../../image/painel/principal.png") no-repeat center;
+}
 
 .combo-box {
   -fx-font-family: sans-serif;
