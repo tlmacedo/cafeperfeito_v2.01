@@ -5,6 +5,7 @@ import br.com.tlmacedo.cafeperfeito.model.dao.MenuPrincipalDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.MenuPrincipal;
 import br.com.tlmacedo.cafeperfeito.service.ServiceComandoTecladoMouse;
 import br.com.tlmacedo.cafeperfeito.view.ViewPrincipal;
+import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -111,6 +112,7 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
                 getPrincipalStage().getIcons().setAll(getIcoJanelaAtivado());
             else
                 getPrincipalStage().getIcons().setAll(getIcoJanelaDesativado());
+            getLblImageLogoViewPrincipal().setVisible(getTabPaneViewPrincipal().getTabs().size() == 0);
         });
 
         getTreeMenuViewPrincipal().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -175,11 +177,11 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
             System.out.printf("tentando adicionar menu: [%s]\n", menu.menuLabelProperty().get());
             Tab tab = null;
             switch (menu.menuProperty().get().toLowerCase()) {
-                case "sair":
-                    fechar();
-                    break;
                 case "empresa":
                     //
+                    break;
+                case "saidaproduto":
+                    tab = new ViewSaidaProduto().tabSaidaProduto(menu.menuLabelProperty().get());
                     break;
             }
             if (tab != null) {
@@ -193,6 +195,7 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
             getTabPaneViewPrincipal().getSelectionModel().getSelectedItem().setOnCloseRequest(event -> {
 
             });
+            getTabPaneViewPrincipal().getSelectionModel().select(tabId);
         }
     }
 
