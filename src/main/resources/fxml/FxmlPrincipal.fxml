@@ -11,19 +11,25 @@
             fx:controller="br.com.tlmacedo.cafeperfeito.controller.ControllerPrincipal">
 
     <center>
-        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="810.0" prefWidth="1350.0" BorderPane.alignment="TOP_LEFT">
+        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                    prefHeight="810.0" prefWidth="1350.0" BorderPane.alignment="TOP_LEFT">
             <children>
-                <TabPane fx:id="tabPaneViewPrincipal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="810.0" prefWidth="1350.0" tabMaxHeight="20.0" tabMinHeight="20.0" />
+                <TabPane fx:id="tabPaneViewPrincipal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                         minWidth="-Infinity" prefHeight="810.0" prefWidth="1350.0" tabMaxHeight="20.0"
+                         tabMinHeight="20.0"/>
                 <!--AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"-->
                 <!--AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>-->
-                <Label fx:id="lblImageLogoViewPrincipal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="810.0" prefWidth="1350.0" styleClass="img-background-principal" />
+                <Label fx:id="lblImageLogoViewPrincipal" maxHeight="-Infinity" maxWidth="-Infinity"
+                       minHeight="-Infinity" minWidth="-Infinity" prefHeight="810.0" prefWidth="1350.0"
+                       styleClass="img_background_principal"/>
                 <!--AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"-->
                 <!--AnchorPane.topAnchor="0.0"/>-->
             </children>
         </AnchorPane>
     </center>
     <left>
-        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="810.0" prefWidth="250.0" BorderPane.alignment="TOP_LEFT">
+        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                    prefHeight="810.0" prefWidth="250.0" BorderPane.alignment="TOP_LEFT">
             <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity"
                             minHeight="-Infinity" minWidth="-Infinity" prefHeight="810.0" prefWidth="250.0"
@@ -63,10 +69,17 @@
         </AnchorPane>
     </left>
     <bottom>
-        <ToolBar fx:id="statusBar_ViewPrincipal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="1600.0" BorderPane.alignment="BOTTOM_LEFT">
-            <Label fx:id="stbLogadoInf" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="250.0" styleClass="status-bar-logado-inf" text="Usuário" BorderPane.alignment="CENTER_LEFT" />
-            <Label fx:id="stbTeclas" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="1150.0" styleClass="status-bar-teclas" text="" BorderPane.alignment="CENTER_LEFT" />
-            <Label fx:id="stbRelogio" alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="90.0" styleClass="status-bar-horario" text="Relogio" BorderPane.alignment="CENTER_LEFT" />
+        <ToolBar fx:id="statusBar_ViewPrincipal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                 minWidth="-Infinity" prefHeight="20.0" prefWidth="1600.0" BorderPane.alignment="BOTTOM_LEFT">
+            <Label fx:id="stbLogadoInf" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                   minWidth="-Infinity" prefHeight="20.0" prefWidth="250.0" styleClass="status-bar-logado-inf"
+                   text="Usuário" BorderPane.alignment="CENTER_LEFT"/>
+            <Label fx:id="stbTeclas" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                   minWidth="-Infinity" prefHeight="20.0" prefWidth="1150.0" styleClass="status-bar-teclas" text=""
+                   BorderPane.alignment="CENTER_LEFT"/>
+            <Label fx:id="stbRelogio" alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity"
+                   minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="90.0"
+                   styleClass="status-bar-horario" text="Relogio" BorderPane.alignment="CENTER_LEFT"/>
         </ToolBar>
     </bottom>
     <!--   <bottom>-->

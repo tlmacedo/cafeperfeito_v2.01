@@ -31,7 +31,7 @@
         <id>1</id>
         <cnpj>08009246000136</cnpj>
         <titulo>Café Perfeito</titulo>
-        <copyright>Café Perfeito ©</copyright>
+        <copyright>© Copyright 2006 -</copyright>
         <uf>AM</uf>
         <cUF>13</cUF>
         <municipio>Manaus</municipio>
@@ -45,7 +45,7 @@
     <personalizacao>
         <tema>principal</tema>
         <style-sheets>/style/css/cafeperfeito.css</style-sheets>
-        <style-sheets-min>/style/min/cafeperfeito.min.css</style-sheets-min>
+        <style-sheets-min>/style/css/cafeperfeito.css</style-sheets-min>
         <splash-imagens>
             <image>/image/splash/img_splash_coffe_0.gif</image>
             <image>/image/splash/img_splash_coffe_1.gif</image>
@@ -72,12 +72,12 @@
         <tpAmb>2</tpAmb>
         <finNFe>1</finNFe>
         <procEmi>0</procEmi>
-        <verProc>v1.05</verProc>
+        <verProc>v1.03</verProc>
         <infRespTec>
             <cnpj>08009246000136</cnpj>
             <xContato>THIAGO LEIROS MACEDO</xContato>
             <email>tl.macedo@hotmail.com</email>
-            <fone>92981686148</fone>
+            <fone>92 98168-6148</fone>
         </infRespTec>
     </nfe>
     <paths>

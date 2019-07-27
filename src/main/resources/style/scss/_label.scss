@@ -1,6 +1,6 @@
 .label {
-  -fx-font-size: $fontSizeh5;
-  -fx-font-family: "Segoe UI Semibold";
+  -fx-font-size: $fontSizeh6;
+  -fx-font-family: $fontFamily;
   -fx-text-fill: white;
   -fx-opacity: 0.6;
 
@@ -11,9 +11,14 @@
     -fx-alignment: center;
   }
 
-  &.img-background-principal {
+  &.img_background_principal {
     -fx-background-color: transparent;
     -fx-background-size: cover;
     -fx-background-image: url("../../image/painel/principal.png") no-repeat center;
+  }
+
+  &.copyright {
+    -fx-text-fill: #ff6600;
+    -fx-font-size: $fontSizeh5;
   }
 }

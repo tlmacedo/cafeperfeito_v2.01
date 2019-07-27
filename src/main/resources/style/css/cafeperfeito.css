@@ -1,5 +1,5 @@
 .label {
-  -fx-font-size: 12px;
+    -fx-font-size: 10px;
   -fx-font-family: "Segoe UI Semibold";
   -fx-text-fill: white;
   -fx-opacity: 0.6; }
@@ -9,18 +9,21 @@
     -fx-font-weight: bold;
     -fx-alignment: center; }
 
-.label.img-background-principal {
+.label.img_background_principal {
     -fx-background-color: transparent;
     -fx-background-size: cover;
     -fx-background-image: url("../../image/painel/principal.png") no-repeat center;
 }
 
+.label.copyright {
+    -fx-text-fill: #ff6600;
+    -fx-font-size: 12px;
+}
+
 .combo-box {
-  -fx-font-family: sans-serif;
+    -fx-font-family: "Segoe UI Semibold";
   -fx-font-size: 10px;
   -fx-font-style: normal; }
-  .view-login .combo-box {
-    -fx-font-size: 12px; }
 
 .root {
   -fx-base: #323232;

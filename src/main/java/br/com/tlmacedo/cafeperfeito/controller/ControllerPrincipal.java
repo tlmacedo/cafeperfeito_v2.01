@@ -143,9 +143,10 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
     }
 
     private void carregaMenuPrincipal() {
-        getLblCopyRight().setText(String.format("%s %d",
+        getLblCopyRight().setText(String.format("%s %d %s",
                 TCONFIG.getInfLoja().getCopyright(),
-                LocalDate.now().getYear()
+                LocalDate.now().getYear(),
+                TCONFIG.getInfLoja().getTitulo()
         ));
         String path = TCONFIG.getPaths().getPathIconeSistema();
         setMenuPrincipalList(

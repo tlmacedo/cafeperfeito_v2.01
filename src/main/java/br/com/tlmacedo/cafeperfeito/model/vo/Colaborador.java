@@ -3,10 +3,12 @@ package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.ColaboradorSituacao;
 import javafx.beans.property.*;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.time.LocalDateTime;
 
 @Entity(name = "Colaborador")
@@ -22,6 +24,8 @@ public class Colaborador implements Serializable {
     private ObjectProperty<LocalDateTime> dataAdmisao = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> salario = new SimpleObjectProperty<>();
     private IntegerProperty ativo = new SimpleIntegerProperty();
+
+    private Blob imagem, imagemBack;
 
 
     public Colaborador() {
@@ -126,6 +130,25 @@ public class Colaborador implements Serializable {
 
     public void setAtivo(ColaboradorSituacao ativo) {
         this.ativo.set(ativo.getCod());
+    }
+
+    @JsonIgnore
+    @SuppressWarnings("JpaAttributeTypeInspection")
+    public Blob getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(Blob imagem) {
+        this.imagem = imagem;
+    }
+
+    @Transient
+    public Blob getImagemBack() {
+        return imagemBack;
+    }
+
+    public void setImagemBack(Blob imagemBack) {
+        this.imagemBack = imagemBack;
     }
 
     @Override
