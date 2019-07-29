@@ -25,9 +25,9 @@
                                 <Image url="@../image/ico/ic_usuario_dp32.png"/>
                             </image>
                         </ImageView>
-                        <VBox alignment="CENTER_LEFT" prefWidth="400.0" spacing="3.0">
+                        <VBox alignment="CENTER_LEFT" prefWidth="400.0">
                             <children>
-                                <Label text="Usuário">
+                                <Label prefWidth="434.0" styleClass="float" text="Usuário">
                                     <VBox.margin>
                                         <Insets/>
                                     </VBox.margin>
@@ -57,9 +57,9 @@
                                 <Image url="@../image/ico/ic_password_dp32.png"/>
                             </image>
                         </ImageView>
-                        <VBox prefHeight="47.0" prefWidth="423.0" spacing="3.0">
+                        <VBox prefWidth="423.0">
                             <children>
-                                <Label text="Senha">
+                                <Label prefWidth="395.0" styleClass="float" text="Senha">
                                     <padding>
                                         <Insets left="5.0"/>
                                     </padding>

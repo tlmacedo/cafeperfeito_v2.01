@@ -8,6 +8,12 @@
   -fx-background-color: linear-gradient(to top, -fx-base, derive(-fx-base,30%));
 }
 
+.titled-pane {
+  > .content {
+    -fx-background-color: linear-gradient(to top, -fx-base, derive(-fx-base, 35%));
+  }
+}
+
 .menu-bar {
   -fx-background-color: linear-gradient(to bottom, -fx-base, derive(-fx-base,30%));
 }

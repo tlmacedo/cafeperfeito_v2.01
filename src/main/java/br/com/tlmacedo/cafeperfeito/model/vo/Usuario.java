@@ -1,15 +1,16 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.AccessGuest;
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Entity(name = "Usuario")
@@ -22,13 +23,6 @@ public class Usuario extends Colaborador implements Serializable {
     private IntegerProperty accessGuest = new SimpleIntegerProperty();
 
     public Usuario() {
-    }
-
-    public Usuario(StringProperty nome, StringProperty apelido, StringProperty ctps, ObjectProperty<LocalDateTime> dataAdmisao, ObjectProperty<BigDecimal> salario, IntegerProperty ativo, StringProperty email, StringProperty senha, IntegerProperty accessGuest) {
-        super(nome, apelido, ctps, dataAdmisao, salario, ativo);
-        this.email = email;
-        this.senha = senha;
-        this.accessGuest = accessGuest;
     }
 
     @Transient

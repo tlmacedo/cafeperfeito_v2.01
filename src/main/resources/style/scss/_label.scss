@@ -2,7 +2,15 @@
   -fx-font-size: $fontSizeh6;
   -fx-font-family: $fontFamily;
   -fx-text-fill: white;
-  -fx-opacity: 0.6;
+  //-fx-opacity: 0.6;
+  &.float {
+    -fx-font-size: $fontSizeh5;
+    -fx-background-color: #ff6600;
+    //-fx-border-radius: 10 10 0 0;
+    -fx-background-radius: 8 8 0 0;
+    -fx-background-insets: 0 0 0 0;
+    -fx-text-fill: #ffffff;
+  }
 
 
   &.lbl_titulo {

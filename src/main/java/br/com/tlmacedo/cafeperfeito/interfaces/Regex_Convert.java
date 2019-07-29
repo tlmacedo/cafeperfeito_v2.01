@@ -20,8 +20,16 @@ public interface Regex_Convert {
     KeyCombination CHAR_KEY_SHIFT_CTRL_NEGATIVO = new KeyCharacterCombination("-", KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN);
 
 
-
-
+    RadialGradient FUNDO_RADIAL_GRADIENT =
+            new RadialGradient(0,
+                    0,
+                    0.5056179775280899,
+                    0.5,
+                    1.0,
+                    true, CycleMethod.REFLECT,
+                    new Stop(0.0, Color.color(1.0f, 0.4f, 0.0f, 1.0)),
+                    new Stop(1.0, Color.color(1.0f, 1.0f, 1.0f, 1.0))
+            );
     /**
      *
      *
@@ -140,16 +148,6 @@ public interface Regex_Convert {
     KeyCombination CODE_KEY_SHIFT_CTRL_S = new KeyCodeCombination(KeyCode.S, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN);
     KeyCombination CHAR_KEY_SHIFT_CTRL_S = new KeyCharacterCombination("s", KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN);
 
-    RadialGradient FUNDO_RADIAL_GRADIENT =
-            new RadialGradient(0,
-                    0,
-                    0.5056179775280899,
-                    0.5,
-                    1.0,
-                    true, CycleMethod.REFLECT,
-                    new Stop(0.0, Color.color(1.0f, 0.4f, 0.0f, 1.0)),
-                    new Stop(1.0, Color.color(1.0f, 1.0f, 1.0f, 1.0))
-            );
 
     /*
      *

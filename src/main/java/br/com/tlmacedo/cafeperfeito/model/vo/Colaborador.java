@@ -21,7 +21,7 @@ public class Colaborador implements Serializable {
     private StringProperty nome = new SimpleStringProperty();
     private StringProperty apelido = new SimpleStringProperty();
     private StringProperty ctps = new SimpleStringProperty();
-    private ObjectProperty<LocalDateTime> dataAdmisao = new SimpleObjectProperty<>();
+    private ObjectProperty<LocalDateTime> dtAdmisao = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> salario = new SimpleObjectProperty<>();
     private IntegerProperty ativo = new SimpleIntegerProperty();
 
@@ -29,15 +29,6 @@ public class Colaborador implements Serializable {
 
 
     public Colaborador() {
-    }
-
-    public Colaborador(StringProperty nome, StringProperty apelido, StringProperty ctps, ObjectProperty<LocalDateTime> dataAdmisao, ObjectProperty<BigDecimal> salario, IntegerProperty ativo) {
-        this.nome = nome;
-        this.apelido = apelido;
-        this.ctps = ctps;
-        this.dataAdmisao = dataAdmisao;
-        this.salario = salario;
-        this.ativo = ativo;
     }
 
     @Id
@@ -94,16 +85,16 @@ public class Colaborador implements Serializable {
     }
 
     @Column(nullable = false)
-    public LocalDateTime getDataAdmisao() {
-        return dataAdmisao.get();
+    public LocalDateTime getDtAdmisao() {
+        return dtAdmisao.get();
     }
 
-    public ObjectProperty<LocalDateTime> dataAdmisaoProperty() {
-        return dataAdmisao;
+    public ObjectProperty<LocalDateTime> dtAdmisaoProperty() {
+        return dtAdmisao;
     }
 
-    public void setDataAdmisao(LocalDateTime dataAdmisao) {
-        this.dataAdmisao.set(dataAdmisao);
+    public void setDtAdmisao(LocalDateTime dtAdmisao) {
+        this.dtAdmisao.set(dtAdmisao);
     }
 
     @Column(length = 19, scale = 2, nullable = false)
@@ -158,7 +149,7 @@ public class Colaborador implements Serializable {
                 ", nome=" + nome +
                 ", apelido=" + apelido +
                 ", ctps=" + ctps +
-                ", dataAdmisao=" + dataAdmisao +
+                ", dataAdmisao=" + dtAdmisao +
                 ", salario=" + salario +
                 ", ativo=" + ativo +
                 '}';
