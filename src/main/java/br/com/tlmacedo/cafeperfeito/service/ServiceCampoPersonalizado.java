@@ -128,10 +128,13 @@ public class ServiceCampoPersonalizado {
 
     public static void fieldTextFormat(Node node) {
         HashMap<String, String> hashMap = null;
-        if (node.getAccessibleText() != null)
+        if (node.getAccessibleText() != null) {
             hashMap = ServiceMascara.getFieldFormatMap(node.getAccessibleText());
 
-
+            if (hashMap.containsKey("binding"))
+                if (hashMap.get("binding").equals("true"))
+                    return;
+        }
         if (node instanceof TextField) {
             if (hashMap.containsKey("seteditable"))
                 ((TextField) node).setEditable(!hashMap.get("seteditable").equals("false"));
@@ -165,7 +168,6 @@ public class ServiceCampoPersonalizado {
                     case "valor":
                     case "peso":
                         mascara = ServiceMascara.getNumeroMask(len, decimal);
-
                         ((TextField) node).setStyle("-fx-alignment: center-right;");
                         break;
                     case "cnpj":

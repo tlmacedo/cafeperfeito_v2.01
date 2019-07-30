@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "Empresa")
 @Table(name = "empresa")
@@ -30,6 +32,8 @@ public class Empresa implements Serializable {
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
     private Usuario usuarioAtualizacao = new Usuario();
     private ObjectProperty<LocalDateTime> dtAtualizacao = new SimpleObjectProperty<>();
+
+    private List<Endereco> enderecoList = new ArrayList<>();
 
     public Empresa() {
     }
@@ -210,6 +214,15 @@ public class Empresa implements Serializable {
 
     public void setDtAtualizacao(LocalDateTime dtAtualizacao) {
         this.dtAtualizacao.set(dtAtualizacao);
+    }
+
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<Endereco> getEnderecoList() {
+        return enderecoList;
+    }
+
+    public void setEnderecoList(List<Endereco> enderecoList) {
+        this.enderecoList = enderecoList;
     }
 
     @Override

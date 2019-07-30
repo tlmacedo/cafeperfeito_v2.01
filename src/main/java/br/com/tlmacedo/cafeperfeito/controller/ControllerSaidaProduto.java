@@ -3,7 +3,9 @@ package br.com.tlmacedo.cafeperfeito.controller;
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
+import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
 import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -26,13 +28,14 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     public TextField txtLimiteUtilizado;
     public TextField txtLimiteDisponivel;
     public TextField txtPrazo;
-    public ComboBox cboEndereco;
+    public ComboBox<Endereco> cboEndereco;
     public TextField txtLogradoruro;
     public TextField txtNumero;
     public TextField txtBairro;
     public TextField txtComplemento;
     public ComboBox cboTelefone;
 
+    private Endereco endereco = new Endereco();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -40,7 +43,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         preencherObjetos();
         fatorarObjetos();
         escutarTecla();
-        ServiceCampoPersonalizado.fieldClear(getPainelViewSaidaProduto());
         ServiceCampoPersonalizado.fieldTextFormat(getPainelViewSaidaProduto());
     }
 
@@ -67,7 +69,24 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     @Override
     public void escutarTecla() {
+        getCboEmpresa().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
+            if (n == null) return;
+            getCboEndereco().setItems(n.getEnderecoList().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
+        });
 
+        getCboEndereco().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
+            if (n == null) return;
+            setEndereco(n);
+        });
+
+        getTxtLogradoruro().textProperty().bind(
+                Bindings.createStringBinding(() -> {
+                            if (getCboEndereco().getSelectionModel().getSelectedItem() == null)
+                                return "";
+                            else
+                                return getCboEndereco().getSelectionModel().getSelectedItem().logradouroProperty().get();
+                        }, getCboEndereco().getSelectionModel().selectedItemProperty()
+                ));
     }
 
 
@@ -101,5 +120,85 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setTxtLimite(TextField txtLimite) {
         this.txtLimite = txtLimite;
+    }
+
+    public TextField getTxtLimiteUtilizado() {
+        return txtLimiteUtilizado;
+    }
+
+    public void setTxtLimiteUtilizado(TextField txtLimiteUtilizado) {
+        this.txtLimiteUtilizado = txtLimiteUtilizado;
+    }
+
+    public TextField getTxtLimiteDisponivel() {
+        return txtLimiteDisponivel;
+    }
+
+    public void setTxtLimiteDisponivel(TextField txtLimiteDisponivel) {
+        this.txtLimiteDisponivel = txtLimiteDisponivel;
+    }
+
+    public TextField getTxtPrazo() {
+        return txtPrazo;
+    }
+
+    public void setTxtPrazo(TextField txtPrazo) {
+        this.txtPrazo = txtPrazo;
+    }
+
+    public ComboBox<Endereco> getCboEndereco() {
+        return cboEndereco;
+    }
+
+    public void setCboEndereco(ComboBox<Endereco> cboEndereco) {
+        this.cboEndereco = cboEndereco;
+    }
+
+    public TextField getTxtLogradoruro() {
+        return txtLogradoruro;
+    }
+
+    public void setTxtLogradoruro(TextField txtLogradoruro) {
+        this.txtLogradoruro = txtLogradoruro;
+    }
+
+    public TextField getTxtNumero() {
+        return txtNumero;
+    }
+
+    public void setTxtNumero(TextField txtNumero) {
+        this.txtNumero = txtNumero;
+    }
+
+    public TextField getTxtBairro() {
+        return txtBairro;
+    }
+
+    public void setTxtBairro(TextField txtBairro) {
+        this.txtBairro = txtBairro;
+    }
+
+    public TextField getTxtComplemento() {
+        return txtComplemento;
+    }
+
+    public void setTxtComplemento(TextField txtComplemento) {
+        this.txtComplemento = txtComplemento;
+    }
+
+    public ComboBox getCboTelefone() {
+        return cboTelefone;
+    }
+
+    public void setCboTelefone(ComboBox cboTelefone) {
+        this.cboTelefone = cboTelefone;
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
     }
 }
