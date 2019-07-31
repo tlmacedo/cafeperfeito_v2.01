@@ -119,7 +119,6 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
             MenuPrincipal menuClicado;
             if ((menuClicado = getTreeMenuViewPrincipal().getSelectionModel().getSelectedItem().getValue()) == null)
                 return;
-            System.out.printf("menu: [%s]\n", menuClicado.menuLabelProperty().get().toLowerCase());
             if (event.getClickCount() == 1) {
                 if (menuClicado.menuLabelProperty().get().toLowerCase().equals("sair"))
                     fechar();
@@ -174,7 +173,6 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
         if (menu == null) return;
         int tabId;
         if ((tabId = tabAberta(menu.menuLabelProperty().get())) < 0) {
-            System.out.printf("tentando adicionar menu: [%s]\n", menu.menuLabelProperty().get());
             Tab tab = null;
             switch (menu.menuProperty().get().toLowerCase()) {
                 case "empresa":

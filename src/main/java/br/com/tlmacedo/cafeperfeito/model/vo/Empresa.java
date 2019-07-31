@@ -225,6 +225,11 @@ public class Empresa implements Serializable {
         this.enderecoList = enderecoList;
     }
 
+//    @Override
+//    public String toString() {
+//        return razaoProperty().get();
+//    }
+
     @Override
     public String toString() {
         return String.format(

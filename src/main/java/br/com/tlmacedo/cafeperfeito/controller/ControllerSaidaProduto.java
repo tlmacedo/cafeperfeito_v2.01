@@ -5,6 +5,7 @@ import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
 import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
+import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.fxml.Initializable;
@@ -87,6 +88,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 return getCboEndereco().getSelectionModel().getSelectedItem().logradouroProperty().get();
                         }, getCboEndereco().getSelectionModel().selectedItemProperty()
                 ));
+
+
+        new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
+
     }
 
 
