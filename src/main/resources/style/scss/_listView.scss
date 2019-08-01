@@ -1,23 +1,32 @@
 
 .list-view {
-  -fx-background-color: -fx-box-border, -fx-control-inner-background;
+  //-fx-background-color: linear-gradient(to bottom, -fx-base, derive(-fx-base, 30%));
+  //-fx-background-color: -fx-box-border, -fx-control-inner-background;
+  -fx-background-color: -fx-base;
 
   &:focused {
     -fx-border-color: $corPricipal;
   }
 
   .list-cell {
-    -fx-background-color: -fx-control-inner-background;
+    //-fx-background-color: -fx-control-inner-background;
+    -fx-background-color: linear-gradient(to right, -fx-base, derive(-fx-base, 35%));
     -fx-alignment: center-left;
     -fx-font-family: $fontFamily;
     -fx-font-size: $fontSizeh5;
-    -fx-text-fill: $sisColor_black;
+    -fx-text-fill: $sisColor_white;
     -fx-padding: 5;
 
     &:odd {
-      -fx-background-color: derive(-fx-control-inner-background, -20%);
+      -fx-background-color: derive(-fx-control-inner-background, -35%);
     }
 
+    //  &:odd {
+    //    //-fx-background-color: derive(-fx-control-inner-background, -40%);
+    //    //-fx-background-color: linear-gradient(to right, -fx-base, derive(-fx-base, 35%));
+    //    -fx-background-color: linear-gradient(to bottom, derive(-fx-base, +50%), derive(-fx-base, -40%), derive(-fx-base, -20%));;
+    //  }
+    //
     &:filled:selected {
       -fx-background-color: -fx-selection-bar;
       -fx-text-fill: -fx-selection-bar-text;
@@ -34,41 +43,41 @@
     }
   }
 
-  &.endereco {
-    .list-cell {
-      -fx-pref-height: 25;
-      -fx-background-color: -fx-control-inner-background;
-      -fx-text-fill: $sisColor_black;
-      -fx-padding: 0 0 0 3;
-
-      &:odd {
-        -fx-background-color: derive(-fx-control-inner-background, -20%);
-      }
-
-      &:filled:selected {
-        -fx-background-color: -fx-selection-bar;
-        -fx-text-fill: -fx-selection-bar-text;
-      }
-    }
-  }
-
-  &.produtoCodBarra {
-    .list-cell {
-      -fx-pref-height: 60;
-      -fx-background-colobr: -fx-control-inner-background;
-      -fx-text-fill: $sisColor_black;
-      -fx-padding: 0 0 0 3;
-
-      &:odd {
-        -fx-background-color: derive(-fx-control-inner-background, -20%);
-      }
-
-      &:filled:selected {
-        -fx-background-color: -fx-selection-bar;
-        -fx-text-fill: -fx-selection-bar-text;
-      }
-    }
-  }
+  //&.endereco {
+  //  .list-cell {
+  //    -fx-pref-height: 25;
+  //    -fx-background-color: -fx-control-inner-background;
+  //    -fx-text-fill: $sisColor_black;
+  //    -fx-padding: 0 0 0 3;
+  //
+  //    &:odd {
+  //      -fx-background-color: derive(-fx-control-inner-background, -20%);
+  //    }
+  //
+  //    &:filled:selected {
+  //      -fx-background-color: -fx-selection-bar;
+  //      -fx-text-fill: -fx-selection-bar-text;
+  //    }
+  //  }
+  //}
+  //
+  //&.produtoCodBarra {
+  //  .list-cell {
+  //    -fx-pref-height: 60;
+  //    -fx-background-colobr: -fx-control-inner-background;
+  //    -fx-text-fill: $sisColor_black;
+  //    -fx-padding: 0 0 0 3;
+  //
+  //    &:odd {
+  //      -fx-background-color: derive(-fx-control-inner-background, -20%);
+  //    }
+  //
+  //    &:filled:selected {
+  //      -fx-background-color: -fx-selection-bar;
+  //      -fx-text-fill: -fx-selection-bar-text;
+  //    }
+  //  }
+  //}
 
 }
 

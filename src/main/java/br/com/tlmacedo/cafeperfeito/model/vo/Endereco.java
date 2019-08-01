@@ -12,7 +12,6 @@ public class Endereco implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private Empresa empresa = new Empresa();
     private IntegerProperty tipo = new SimpleIntegerProperty();
     private StringProperty cep = new SimpleStringProperty();
     private StringProperty logradouro = new SimpleStringProperty();
@@ -138,15 +137,6 @@ public class Endereco implements Serializable {
 
     public void setMunicipio(Municipio municipio) {
         this.municipio = municipio;
-    }
-
-    @ManyToOne
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
     }
 
     @Override

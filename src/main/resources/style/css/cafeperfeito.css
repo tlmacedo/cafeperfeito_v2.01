@@ -7,7 +7,7 @@
   -fx-background-color: linear-gradient(to top, -fx-base, derive(-fx-base, 30%)); }
 
 .titled-pane > .content {
-    -fx-background-color: linear-gradient(to top, -fx-base, derive(-fx-base, 35%));
+    -fx-background-color: linear-gradient(to bottom, -fx-base, derive(-fx-base, 35%));
 }
 
 .menu-bar {
@@ -99,7 +99,7 @@
 }
 
 .list-view {
-    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-color: -fx-base;
 }
 
 .list-view:focused {
@@ -107,16 +107,16 @@
 }
 
 .list-view .list-cell {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: linear-gradient(to right, -fx-base, derive(-fx-base, 35%));
     -fx-alignment: center-left;
     -fx-font-family: "Segoe UI Semibold";
     -fx-font-size: 12px;
-    -fx-text-fill: #000000;
+    -fx-text-fill: #ffffff;
     -fx-padding: 5;
 }
 
 .list-view .list-cell:odd {
-    -fx-background-color: derive(-fx-control-inner-background, -20%);
+    -fx-background-color: derive(-fx-control-inner-background, -35%);
 }
 
 .list-view .list-cell:filled:selected {
@@ -132,38 +132,6 @@
 .list-view .list-cell:filled:hover {
     -fx-background-color: -fx-cell-hover-color;
     -fx-text-fill: -fx-text-inner-color;
-}
-
-.list-view.endereco .list-cell {
-    -fx-pref-height: 25;
-    -fx-background-color: -fx-control-inner-background;
-    -fx-text-fill: #000000;
-    -fx-padding: 0 0 0 3;
-}
-
-.list-view.endereco .list-cell:odd {
-    -fx-background-color: derive(-fx-control-inner-background, -20%);
-}
-
-.list-view.endereco .list-cell:filled:selected {
-    -fx-background-color: -fx-selection-bar;
-    -fx-text-fill: -fx-selection-bar-text;
-}
-
-.list-view.produtoCodBarra .list-cell {
-    -fx-pref-height: 60;
-    -fx-background-colobr: -fx-control-inner-background;
-    -fx-text-fill: #000000;
-    -fx-padding: 0 0 0 3;
-}
-
-.list-view.produtoCodBarra .list-cell:odd {
-    -fx-background-color: derive(-fx-control-inner-background, -20%);
-}
-
-.list-view.produtoCodBarra .list-cell:filled:selected {
-    -fx-background-color: -fx-selection-bar;
-    -fx-text-fill: -fx-selection-bar-text;
 }
 
 /*# sourceMappingURL=cafeperfeito.css.map */

@@ -29,12 +29,18 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     public TextField txtLimiteUtilizado;
     public TextField txtLimiteDisponivel;
     public TextField txtPrazo;
+    public TextField txtUltimoPedidoDt;
+    public TextField txtUltimoPedidoDias;
+    public TextField txtUltimoPedidoVlr;
+    public TextField txtQtdPedidos;
+    public TextField txtTicketMedioVlr;
     public ComboBox<Endereco> cboEndereco;
     public TextField txtLogradoruro;
     public TextField txtNumero;
     public TextField txtBairro;
     public TextField txtComplemento;
     public ComboBox cboTelefone;
+
 
     private Endereco endereco = new Endereco();
 

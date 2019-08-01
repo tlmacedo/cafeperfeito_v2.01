@@ -34,6 +34,7 @@ public class Empresa implements Serializable {
     private ObjectProperty<LocalDateTime> dtAtualizacao = new SimpleObjectProperty<>();
 
     private List<Endereco> enderecoList = new ArrayList<>();
+    private List<Telefone> telefoneList = new ArrayList<>();
 
     public Empresa() {
     }
@@ -216,7 +217,7 @@ public class Empresa implements Serializable {
         this.dtAtualizacao.set(dtAtualizacao);
     }
 
-    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Endereco> getEnderecoList() {
         return enderecoList;
     }
@@ -225,7 +226,16 @@ public class Empresa implements Serializable {
         this.enderecoList = enderecoList;
     }
 
-//    @Override
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<Telefone> getTelefoneList() {
+        return telefoneList;
+    }
+
+    public void setTelefoneList(List<Telefone> telefoneList) {
+        this.telefoneList = telefoneList;
+    }
+
+    //    @Override
 //    public String toString() {
 //        return razaoProperty().get();
 //    }

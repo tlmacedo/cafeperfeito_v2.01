@@ -8,7 +8,7 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.Cargo</class>-->
-                <class>br.com.tlmacedo.cafeperfeito.model.vo.Colaborador</class>
+        <class>br.com.tlmacedo.cafeperfeito.model.vo.Colaborador</class>
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber</class>-->
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.Contato</class>-->
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.EmailHomePage</class>-->
@@ -38,10 +38,10 @@
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto</class>-->
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe</class>-->
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoProduto</class>-->
-        <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.Telefone</class>-->
-        <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.TelefoneOperadora</class>-->
+        <class>br.com.tlmacedo.cafeperfeito.model.vo.Telefone</class>
+        <class>br.com.tlmacedo.cafeperfeito.model.vo.TelefoneOperadora</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.Uf</class>
-                <class>br.com.tlmacedo.cafeperfeito.model.vo.Usuario</class>
+        <class>br.com.tlmacedo.cafeperfeito.model.vo.Usuario</class>
 
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>

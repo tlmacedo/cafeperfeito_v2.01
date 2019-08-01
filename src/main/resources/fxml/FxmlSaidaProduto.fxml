@@ -46,6 +46,9 @@
                                     <VBox.margin>
                                         <Insets/>
                                     </VBox.margin>
+                                    <tooltip>
+                                        <Tooltip text="empresa destinatária."/>
+                                    </tooltip>
                                 </ComboBox>
                             </children>
                         </VBox>
@@ -63,7 +66,7 @@
                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
                                            text="0,00">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="limite de pedidos em aberto da empresa destinatária."/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -82,7 +85,7 @@
                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
                                            text="0,00">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="valor utilizado do limite da empresa destinatária"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -101,7 +104,7 @@
                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
                                            text="0,00">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="limite disponivél para utilização da empresa destinatária"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -117,10 +120,10 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtPrazo"
-                                           accessibleText="len::12;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
+                                           accessibleText="len::2;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="prazo de dias para pagamento."/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -136,10 +139,10 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtUltimoPedidoDt"
-                                           accessibleText="len::12;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
+                                           accessibleText="len::10;type::data;decimal::;value::;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="data do último pedido feito pela empresa destinatária"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -155,10 +158,10 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtUltimoPedidoDias"
-                                           accessibleText="len::12;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
+                                           accessibleText="len::5;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="quantidade de dias do último pedido"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -174,10 +177,10 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtUltimoPedidoVlr"
-                                           accessibleText="len::12;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
+                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="valor do último pedido"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -193,10 +196,10 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtQtdPedidos"
-                                           accessibleText="len::12;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
+                                           accessibleText="len::5;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="quantidade de pedidos feito pela empresa no ano corrente"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -212,10 +215,10 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtTicketMedioVlr"
-                                           accessibleText="len::12;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
+                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="valor do ticket médio da empresa"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -236,6 +239,9 @@
                                     <VBox.margin>
                                         <Insets/>
                                     </VBox.margin>
+                                    <tooltip>
+                                        <Tooltip text="endereço para entrega"/>
+                                    </tooltip>
                                 </ComboBox>
                             </children>
                         </VBox>
@@ -253,7 +259,7 @@
                                            accessibleText="len::120;type::TEXTO;decimal::;value::;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="logradouro do endereço de entrega"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -272,7 +278,7 @@
                                            accessibleText="len::10;type::numero;decimal::;value::;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="número do endereço de entrega"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -291,7 +297,7 @@
                                            accessibleText="len::50;type::TEXTO;decimal::;value::;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="bairro do endereço de entrega"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -310,7 +316,7 @@
                                            accessibleText="len::80;type::TEXTO;decimal::;value::;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
-                                        <Tooltip text="natureza da operação"/>
+                                        <Tooltip text="complemento do endereço de entrega"/>
                                     </tooltip>
                                 </TextField>
                             </children>
@@ -326,7 +332,7 @@
                                     </padding>
                                 </Label>
                                 <ComboBox fx:id="cboTelefone"
-                                          accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                          accessibleText="len::;type::telefone;value::;seteditable::false;binding::true;"
                                           prefWidth="434.0"/>
                             </children>
                         </VBox>
