@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -7,6 +8,8 @@ import javafx.beans.property.StringProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
+
+import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 @Entity(name = "Telefone")
 @Table(name = "telefone")
@@ -59,10 +62,16 @@ public class Telefone implements Serializable {
 
     @Override
     public String toString() {
-        return "Telefone{" +
-                "id=" + id +
-                ", descricao=" + descricao +
-                ", telefoneOperadora=" + telefoneOperadora +
-                '}';
+        try {
+            return String.format("%14s\t(%s)",
+                    ServiceMascara.getTelefone(
+                            Integer.valueOf(descricaoProperty().get().substring(0, 2)) == Integer.valueOf(TCONFIG.getInfLoja().getDdd())
+                                    ? descricaoProperty().get().substring(2)
+                                    : descricaoProperty().get()
+                    ),
+                    getTelefoneOperadora());
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

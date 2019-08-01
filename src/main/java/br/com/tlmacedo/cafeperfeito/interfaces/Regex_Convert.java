@@ -32,40 +32,7 @@ public interface Regex_Convert {
             );
     /**
      *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
      */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     String REGEX_PONTUACAO = "[ !\"$%&'()*+,-./:;_`{|}]";
@@ -93,7 +60,8 @@ public interface Regex_Convert {
 
     String MASK_TELEFONE = "(##) ####-####";
     String REGEX_TELEFONE_FS = "($1) $2-$3";
-    String REGEX_TELEFONE = "(\\d{2}?\\d{4,5}-\\d{4})";
+    String REGEX_TELEFONE = "(\\d{2})?(\\d{4,5})-(\\d{4})";
+    String REGEX_TELEFONE_BD = "(\\d{2})?(\\d{4,5})(\\d{4})";
 
     String MASK_CEP = "##.###-###";
     String REGEX_CEP_FS = "$1.$2-$3";

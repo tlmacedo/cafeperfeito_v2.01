@@ -122,8 +122,9 @@ public class ServiceCampoPersonalizado {
     }
 
     public static void fieldTextFormat(AnchorPane anchorPane) {
-        for (Node node : anchorPane.getChildren())
+        for (Node node : anchorPane.getChildren()) {
             fieldTextFormat(node);
+        }
     }
 
     public static void fieldTextFormat(Node node) {
@@ -131,13 +132,17 @@ public class ServiceCampoPersonalizado {
         if (node.getAccessibleText() != null) {
             hashMap = ServiceMascara.getFieldFormatMap(node.getAccessibleText());
 
-            if (hashMap.containsKey("binding"))
-                if (hashMap.get("binding").equals("true"))
-                    return;
+//            if (hashMap.containsKey("binding"))
+//                if (hashMap.get("binding").equals("true"))
+//                    return;
         }
         if (node instanceof TextField) {
+            ((TextField) node).setEditable(true);
             if (hashMap.containsKey("seteditable"))
                 ((TextField) node).setEditable(!hashMap.get("seteditable").equals("false"));
+            if (hashMap.containsKey("binding"))
+                if (hashMap.get("binding").equals("true"))
+                    ((TextField) node).setEditable(false);
 
             int len = 0, decimal = 0;
             String type = "", mascara = null;
@@ -164,6 +169,7 @@ public class ServiceCampoPersonalizado {
                         mascara = ServiceMascara.getTextoMask(len, TCONFIG.getSis().getMaskCaracter().getUpper());
                         break;
                     case "numero":
+                    case "número":
                     case "moeda":
                     case "valor":
                     case "peso":
@@ -200,8 +206,11 @@ public class ServiceCampoPersonalizado {
                         mascara = MASK_FISCAL_DOC_ORIGEM;
                         break;
                 }
-                if (mascara != null)
-                    new ServiceMascara().fieldMask((TextField) node, mascara);
+                if (mascara == null) return;
+                if (hashMap.containsKey("binding"))
+                    if (hashMap.get("binding").equals("true"))
+                        return;
+                new ServiceMascara().fieldMask((TextField) node, mascara);
             }
         } else if (node instanceof TextArea) {
             if (hashMap.containsKey("seteditable"))

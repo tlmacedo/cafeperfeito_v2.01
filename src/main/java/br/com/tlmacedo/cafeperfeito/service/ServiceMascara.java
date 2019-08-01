@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.REGEX_PONTUACAO;
-import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.REGEX_TELEFONE;
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.REGEX_TELEFONE_BD;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 public class ServiceMascara {
@@ -72,7 +72,7 @@ public class ServiceMascara {
     public static String getTelefone(String value) {
         String strValue = value.replaceAll("\\D", "").trim();
         if (strValue.length() > 11) strValue = strValue.substring(0, 11);
-        pattern = Pattern.compile(REGEX_TELEFONE);
+        pattern = Pattern.compile(REGEX_TELEFONE_BD);
         matcher = pattern.matcher(strValue);
         if (matcher.find()) {
             return String.format("%s%s%s",

@@ -120,7 +120,7 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtPrazo"
-                                           accessibleText="len::2;type::numero;decimal::0;value::0;seteditable::false;binding::true;"
+                                           accessibleText="len::2;type::numero;decimal::;value::0;seteditable::false;binding::true;"
                                            text="0">
                                     <tooltip>
                                         <Tooltip text="prazo de dias para pagamento."/>
@@ -140,7 +140,7 @@
                                 </Label>
                                 <TextField fx:id="txtUltimoPedidoDt"
                                            accessibleText="len::10;type::data;decimal::;value::;seteditable::false;binding::true;"
-                                           text="0">
+                                           text="">
                                     <tooltip>
                                         <Tooltip text="data do último pedido feito pela empresa destinatária"/>
                                     </tooltip>
@@ -178,7 +178,7 @@
                                 </Label>
                                 <TextField fx:id="txtUltimoPedidoVlr"
                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
-                                           text="0">
+                                           text="0,00">
                                     <tooltip>
                                         <Tooltip text="valor do último pedido"/>
                                     </tooltip>
@@ -216,7 +216,7 @@
                                 </Label>
                                 <TextField fx:id="txtTicketMedioVlr"
                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
-                                           text="0">
+                                           text="0,00">
                                     <tooltip>
                                         <Tooltip text="valor do ticket médio da empresa"/>
                                     </tooltip>
@@ -256,8 +256,7 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtLogradoruro"
-                                           accessibleText="len::120;type::TEXTO;decimal::;value::;seteditable::false;binding::true;"
-                                           text="0">
+                                           accessibleText="len::120;type::TEXTO;decimal::;value::;seteditable::false;binding::true;">
                                     <tooltip>
                                         <Tooltip text="logradouro do endereço de entrega"/>
                                     </tooltip>
@@ -294,15 +293,14 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtBairro"
-                                           accessibleText="len::50;type::TEXTO;decimal::;value::;seteditable::false;binding::true;"
-                                           text="0">
+                                           accessibleText="len::50;type::TEXTO;decimal::;value::;seteditable::false;binding::true;">
                                     <tooltip>
                                         <Tooltip text="bairro do endereço de entrega"/>
                                     </tooltip>
                                 </TextField>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="845.0" layoutY="50.0" prefWidth="360.0">
+                        <VBox alignment="CENTER_LEFT" layoutX="845.0" layoutY="50.0" prefWidth="300.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Complemento">
                                     <VBox.margin>
@@ -313,15 +311,14 @@
                                     </padding>
                                 </Label>
                                 <TextField fx:id="txtComplemento"
-                                           accessibleText="len::80;type::TEXTO;decimal::;value::;seteditable::false;binding::true;"
-                                           text="0">
+                                           accessibleText="len::80;type::TEXTO;decimal::;value::;seteditable::false;binding::true;">
                                     <tooltip>
                                         <Tooltip text="complemento do endereço de entrega"/>
                                     </tooltip>
                                 </TextField>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="1210.0" layoutY="50.0" prefWidth="120.0">
+                        <VBox alignment="CENTER_LEFT" layoutX="1150.0" layoutY="50.0" prefWidth="180.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Telefone">
                                     <VBox.margin>
@@ -336,6 +333,599 @@
                                           prefWidth="434.0"/>
                             </children>
                         </VBox>
+                    </children>
+                </AnchorPane>
+            </content>
+        </TitledPane>
+        <TitledPane fx:id="tpnNfe" animated="false" layoutX="5.0" layoutY="130.0" minHeight="0.0" minWidth="0.0"
+                    prefWidth="1340.0" text="Nf-e">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0">
+                    <children>
+                        <TabPane prefWidth="1338.0" tabClosingPolicy="UNAVAILABLE">
+                            <tabs>
+                                <Tab fx:id="tpnNfeDados" text="Dados">
+                                    <content>
+                                        <AnchorPane minHeight="0.0" minWidth="0.0">
+                                            <children>
+                                                <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="5.0"
+                                                      prefWidth="150.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Natureza da operação">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeNaturezaOperacao"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="160.0" layoutY="5.0"
+                                                      prefWidth="70.0">
+                                                    <children>
+                                                        <Label prefWidth="400.0" styleClass="float" text="Número">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <TextField fx:id="txtNfeNumero"
+                                                                   accessibleText="len::11;type::nfe_numero;decimal::;value::;seteditable::;binding::;"
+                                                                   text="0">
+                                                            <tooltip>
+                                                                <Tooltip text="prazo de dias para pagamento."/>
+                                                            </tooltip>
+                                                        </TextField>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="235.0" layoutY="5.0"
+                                                      prefWidth="40.0">
+                                                    <children>
+                                                        <Label prefWidth="400.0" styleClass="float" text="Série">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <TextField fx:id="txtNfeSerie"
+                                                                   accessibleText="len::11;type::nfe_numero;decimal::;value::;seteditable::;binding::;"
+                                                                   text="0">
+                                                            <tooltip>
+                                                                <Tooltip text="prazo de dias para pagamento."/>
+                                                            </tooltip>
+                                                        </TextField>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="280.0" layoutY="5.0"
+                                                      prefWidth="60.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float" text="Modelo">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeModelo"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="345.0" layoutY="5.0"
+                                                      prefWidth="95.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float" text="Dt. emissão">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <DatePicker fx:id="dtpNfeEmissao"/>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="445.0" layoutY="5.0"
+                                                      prefWidth="45.0">
+                                                    <children>
+                                                        <Label prefWidth="400.0" styleClass="float" text="Hora">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <TextField fx:id="txtNfeHoraEmissao"
+                                                                   accessibleText="len::11;type::nfe_numero;decimal::;value::;seteditable::;binding::;"
+                                                                   text="0">
+                                                            <tooltip>
+                                                                <Tooltip text="prazo de dias para pagamento."/>
+                                                            </tooltip>
+                                                        </TextField>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="495.0" layoutY="5.0"
+                                                      prefWidth="95.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float" text="Dt. saída">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <DatePicker fx:id="dtpNfeSaida"/>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="595.0" layoutY="5.0"
+                                                      prefWidth="45.0">
+                                                    <children>
+                                                        <Label prefWidth="400.0" styleClass="float" text="Hora">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <TextField fx:id="txtNfeHoraSaida"
+                                                                   accessibleText="len::11;type::nfe_numero;decimal::;value::;seteditable::;binding::;"
+                                                                   text="0">
+                                                            <tooltip>
+                                                                <Tooltip text="prazo de dias para pagamento."/>
+                                                            </tooltip>
+                                                        </TextField>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="645.0" layoutY="5.0"
+                                                      prefWidth="150.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Destino da operação">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeDestinoOperacao"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="800.0" layoutY="5.0"
+                                                      prefWidth="70.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float" text="Cons. final">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeConsumidorFinal"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="875.0" layoutY="5.0"
+                                                      prefWidth="185.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Tipo atendimento">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeTipoAtendimento"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </AnchorPane>
+                                    </content>
+                                </Tab>
+                                <Tab fx:id="tpnNfeImpressao" text="Impressão">
+                                    <content>
+                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                            <children>
+                                                <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="5.0"
+                                                      prefWidth="195.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Formato de impressão do DANFE">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeTpImp"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="205.0" layoutY="5.0"
+                                                      prefWidth="195.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Tipo de emissão da NF-e">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeTpEmis"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="405.0" layoutY="5.0"
+                                                      prefWidth="195.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Finalidade de emissão da NF-e">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeFinNFe"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </AnchorPane>
+                                    </content>
+                                </Tab>
+                                <Tab fx:id="tpnNfeTransporta" text="Transporte">
+                                    <content>
+                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                            <children>
+                                                <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="5.0"
+                                                      prefWidth="350.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Modalidade do frete">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeModFrete"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </AnchorPane>
+                                    </content>
+                                </Tab>
+                                <Tab fx:id="tpnNfeCobranca" text="Cobrança">
+                                    <content>
+                                        <AnchorPane minHeight="0.0" minWidth="0.0">
+                                            <children>
+                                                <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="5.0"
+                                                      prefWidth="150.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Natureza da operação">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeNaturezaOperacao1"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="160.0" layoutY="5.0"
+                                                      prefWidth="70.0">
+                                                    <children>
+                                                        <Label prefWidth="400.0" styleClass="float" text="Número">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <TextField fx:id="txtNfeNumero1"
+                                                                   accessibleText="len::11;type::nfe_numero;decimal::;value::;seteditable::;binding::;"
+                                                                   text="0">
+                                                            <tooltip>
+                                                                <Tooltip text="prazo de dias para pagamento."/>
+                                                            </tooltip>
+                                                        </TextField>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="235.0" layoutY="5.0"
+                                                      prefWidth="40.0">
+                                                    <children>
+                                                        <Label prefWidth="400.0" styleClass="float" text="Série">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <TextField fx:id="txtNfeSerie1"
+                                                                   accessibleText="len::11;type::nfe_numero;decimal::;value::;seteditable::;binding::;"
+                                                                   text="0">
+                                                            <tooltip>
+                                                                <Tooltip text="prazo de dias para pagamento."/>
+                                                            </tooltip>
+                                                        </TextField>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="280.0" layoutY="5.0"
+                                                      prefWidth="60.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float" text="Modelo">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeModelo1"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="345.0" layoutY="5.0"
+                                                      prefWidth="95.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float" text="Dt. emissão">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <DatePicker fx:id="dtpNfeEmissao1"/>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="445.0" layoutY="5.0"
+                                                      prefWidth="45.0">
+                                                    <children>
+                                                        <Label prefWidth="400.0" styleClass="float" text="Hora">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <TextField fx:id="txtNfeHoraEmissao1"
+                                                                   accessibleText="len::11;type::nfe_numero;decimal::;value::;seteditable::;binding::;"
+                                                                   text="0">
+                                                            <tooltip>
+                                                                <Tooltip text="prazo de dias para pagamento."/>
+                                                            </tooltip>
+                                                        </TextField>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="495.0" layoutY="5.0"
+                                                      prefWidth="95.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float" text="Dt. saída">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <DatePicker fx:id="dtpNfeSaida1"/>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="595.0" layoutY="5.0"
+                                                      prefWidth="45.0">
+                                                    <children>
+                                                        <Label prefWidth="400.0" styleClass="float" text="Hora">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <TextField fx:id="txtNfeHoraSaida1"
+                                                                   accessibleText="len::11;type::nfe_numero;decimal::;value::;seteditable::;binding::;"
+                                                                   text="0">
+                                                            <tooltip>
+                                                                <Tooltip text="prazo de dias para pagamento."/>
+                                                            </tooltip>
+                                                        </TextField>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="645.0" layoutY="5.0"
+                                                      prefWidth="150.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Destino da operação">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeDestinoOperacao1"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="800.0" layoutY="5.0"
+                                                      prefWidth="70.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float" text="Cons. final">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeConsumidorFinal1"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" layoutX="875.0" layoutY="5.0"
+                                                      prefWidth="185.0">
+                                                    <children>
+                                                        <Label prefWidth="434.0" styleClass="float"
+                                                               text="Tipo atendimento">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </Label>
+                                                        <ComboBox fx:id="cboNfeTipoAtendimento1"
+                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  prefWidth="434.0">
+                                                            <VBox.margin>
+                                                                <Insets/>
+                                                            </VBox.margin>
+                                                            <tooltip>
+                                                                <Tooltip text="endereço para entrega"/>
+                                                            </tooltip>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </AnchorPane>
+                                    </content>
+                                </Tab>
+                            </tabs>
+                        </TabPane>
                     </children>
                 </AnchorPane>
             </content>

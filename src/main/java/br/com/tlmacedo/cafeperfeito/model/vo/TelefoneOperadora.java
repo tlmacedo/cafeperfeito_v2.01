@@ -62,10 +62,11 @@ public class TelefoneOperadora implements Serializable {
 
     @Override
     public String toString() {
-        return "TelefoneOperadora{" +
-                "id=" + id +
-                ", descricao=" + descricao +
-                ", codWSPortabilidade=" + codWSPortabilidade +
-                '}';
+        return descricaoProperty().get();
+//        return "TelefoneOperadora{" +
+//                "id=" + id +
+//                ", descricao=" + descricao +
+//                ", codWSPortabilidade=" + codWSPortabilidade +
+//                '}';
     }
 }
