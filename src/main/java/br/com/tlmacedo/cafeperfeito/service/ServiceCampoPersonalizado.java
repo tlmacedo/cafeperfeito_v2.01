@@ -46,7 +46,7 @@ public class ServiceCampoPersonalizado {
                 else if (node instanceof ImageView)
                     ((ImageView) node).setImage(null);
                 else if (node instanceof DatePicker) {
-                    if (value.equals(""))
+                    if (value.equals("") || value.equals("now"))
                         ((DatePicker) node).setValue(LocalDate.now());
                     else if (value.contains("-"))
                         ((DatePicker) node).setValue(LocalDate.now().minusDays(Integer.parseInt(value)));
@@ -122,21 +122,20 @@ public class ServiceCampoPersonalizado {
     }
 
     public static void fieldTextFormat(AnchorPane anchorPane) {
-        for (Node node : anchorPane.getChildren()) {
+        //System.out.printf("AnchorPane: [%s]\n", anchorPane.getId());
+        for (Node node : anchorPane.getChildren())
+            //System.out.printf("\t\tnode: [%s]\n", node.getId());
             fieldTextFormat(node);
-        }
     }
 
     public static void fieldTextFormat(Node node) {
+        //System.out.printf("\t\t\tnodee: [%s]\n\t\t\t\taccessibleText: [%s]\n", node.getId(), node.getAccessibleText());
         HashMap<String, String> hashMap = null;
-        if (node.getAccessibleText() != null) {
+        if (node.getAccessibleText() != null)
             hashMap = ServiceMascara.getFieldFormatMap(node.getAccessibleText());
 
-//            if (hashMap.containsKey("binding"))
-//                if (hashMap.get("binding").equals("true"))
-//                    return;
-        }
         if (node instanceof TextField) {
+            if (hashMap == null) return;
             ((TextField) node).setEditable(true);
             if (hashMap.containsKey("seteditable"))
                 ((TextField) node).setEditable(!hashMap.get("seteditable").equals("false"));
@@ -206,11 +205,8 @@ public class ServiceCampoPersonalizado {
                         mascara = MASK_FISCAL_DOC_ORIGEM;
                         break;
                 }
-                if (mascara == null) return;
-                if (hashMap.containsKey("binding"))
-                    if (hashMap.get("binding").equals("true"))
-                        return;
-                new ServiceMascara().fieldMask((TextField) node, mascara);
+                if (mascara != null)
+                    new ServiceMascara().fieldMask((TextField) node, mascara);
             }
         } else if (node instanceof TextArea) {
             if (hashMap.containsKey("seteditable"))
@@ -218,6 +214,7 @@ public class ServiceCampoPersonalizado {
         } else if (node instanceof DatePicker) {
             if (hashMap.containsKey("seteditable"))
                 ((DatePicker) node).setEditable(!hashMap.get("seteditable").equals("false"));
+            new ServiceMascara().fieldMask(((DatePicker) node).getEditor(), "##/##/####");
         } else if (node instanceof AnchorPane)
             fieldTextFormat((AnchorPane) node);
         else if (node instanceof TitledPane)

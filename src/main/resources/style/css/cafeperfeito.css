@@ -58,6 +58,18 @@
     -fx-text-fill: #ffffff;
 }
 
+.label.lbl_informacao {
+    -fx-border-base: black;
+    -fx-border-shadow: -fx-base;
+    -fx-light-border: derive(-fx-border-base, 25%);
+    -fx-border-color: -fx-light-border -fx-border-base -fx-border-base -fx-light-border;
+    -fx-border-insets: 0 1 1 0;
+    -fx-background-color: -fx-border-shadow, -fx-background;
+    -fx-background-insets: 1 0 0 1, 2;
+    -fx-background-radius: 4;
+    -fx-padding: 2;
+}
+
 .label.lbl_titulo {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
@@ -144,7 +156,6 @@
     -fx-font-weight: bold;
     -fx-font-style: italic;
 }
-
 .dialog-pane .content {
     -fx-alignment: center-left;
 }
@@ -154,13 +165,48 @@
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
-
 .dialog-pane.alertMsg_progress {
     -fx-background-image: none !important;
 }
 
 .dialog-pane.alertMsg_progress .content {
     -fx-alignment: center;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-opacity: 0;
+    -fx-background-insets: 0, 0 0 1 0;
+    /* -fx-padding: 0.416667em 0.166667em 0.0em 0.833em; /* 5 2 0 10 */
+    -fx-padding: 0.416667em 0.166667em 0.0em 0.0em;
+    /* overridden as 5 2 0 0 */
+}
+
+.tab-pane {
+    -fx-tab-min-width: 90px;
+}
+
+.tab {
+    -fx-background-insets: 0 1 0 1, 0, 0;
+}
+
+.tab-pane .tab {
+    -fx-background-color: linear-gradient(to bottom, -fx-base, derive(-fx-base, 35%));
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: rgba(255, 102, 0, 0.56);
+}
+
+.tab .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.tab:selected .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: white;
 }
 
 /*# sourceMappingURL=cafeperfeito.css.map */

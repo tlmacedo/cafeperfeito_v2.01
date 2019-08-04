@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,10 @@ public class Empresa implements Serializable {
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
     private Usuario usuarioAtualizacao = new Usuario();
     private ObjectProperty<LocalDateTime> dtAtualizacao = new SimpleObjectProperty<>();
+    private StringProperty observacoes = new SimpleStringProperty();
+    private ObjectProperty<BigDecimal> limite = new SimpleObjectProperty<>();
+    private IntegerProperty prazo = new SimpleIntegerProperty();
+    private BooleanProperty prazoDiaUtil = new SimpleBooleanProperty();
 
     private List<Endereco> enderecoList = new ArrayList<>();
     private List<Telefone> telefoneList = new ArrayList<>();
@@ -215,6 +220,58 @@ public class Empresa implements Serializable {
 
     public void setDtAtualizacao(LocalDateTime dtAtualizacao) {
         this.dtAtualizacao.set(dtAtualizacao);
+    }
+
+    @Column(length = 1500)
+    public String getObservacoes() {
+        return observacoes.get();
+    }
+
+    public StringProperty observacoesProperty() {
+        return observacoes;
+    }
+
+    public void setObservacoes(String observacoes) {
+        this.observacoes.set(observacoes);
+    }
+
+    @Column(length = 19, scale = 2, nullable = false)
+    public BigDecimal getLimite() {
+        return limite.get();
+    }
+
+    public ObjectProperty<BigDecimal> limiteProperty() {
+        return limite;
+    }
+
+    public void setLimite(BigDecimal limite) {
+        this.limite.set(limite);
+    }
+
+    @Column(length = 2, nullable = false)
+    public int getPrazo() {
+        return prazo.get();
+    }
+
+    public IntegerProperty prazoProperty() {
+        return prazo;
+    }
+
+    public void setPrazo(int prazo) {
+        this.prazo.set(prazo);
+    }
+
+    @Column(length = 1, nullable = false)
+    public boolean isPrazoDiaUtil() {
+        return prazoDiaUtil.get();
+    }
+
+    public BooleanProperty prazoDiaUtilProperty() {
+        return prazoDiaUtil;
+    }
+
+    public void setPrazoDiaUtil(boolean prazoDiaUtil) {
+        this.prazoDiaUtil.set(prazoDiaUtil);
     }
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

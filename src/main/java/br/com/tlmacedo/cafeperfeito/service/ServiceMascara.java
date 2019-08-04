@@ -22,7 +22,7 @@ public class ServiceMascara {
         if (len == 0) len = 120;
         if (caractere == null || caractere.equals(""))
             caractere = TCONFIG.getSis().getMaskCaracter().getUpper();
-        return String.format("%s" + len + "d", 0).replace("0", caractere);
+        return String.format("%0" + len + "d", 0).replace("0", caractere);
     }
 
     public static String getNumeroMask(int len, int decimal) {
