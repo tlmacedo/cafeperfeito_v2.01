@@ -11,7 +11,7 @@ public enum SituacaoProduto {
     ATIVO(1, "Ativo"),
     TESTE(2, "Teste"),
     AMOSTRA(3, "Amostra"),
-    SUSPENSO(4, "Suspenso"),
+    DESCONTINUADO(4, "Descontinuado"),
     PROPRIO(5, "Próprio"),
     CANCELADO(6, "Cancelado");
 

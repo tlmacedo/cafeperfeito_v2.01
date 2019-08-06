@@ -1,0 +1,43 @@
+.label {
+  -fx-font-size: $fontSizeh6;
+  -fx-font-family: $fontFamily;
+  -fx-text-fill: white;
+  //-fx-opacity: 0.6;
+  &.float {
+    -fx-font-size: $fontSizeh5;
+    -fx-background-color: #ff6600;
+    //-fx-border-radius: 10 10 0 0;
+    -fx-background-radius: 8 8 0 0;
+    -fx-background-insets: 0 0 0 0;
+    -fx-text-fill: #ffffff;
+  }
+
+  &.lbl_informacao {
+    -fx-border-base: black;
+    -fx-border-shadow: -fx-base;
+    -fx-light-border: derive(-fx-border-base, 25%);
+    -fx-border-color: -fx-light-border -fx-border-base -fx-border-base -fx-light-border;
+    -fx-border-insets: 0 1 1 0;
+    -fx-background-color: -fx-border-shadow, -fx-background;
+    -fx-background-insets: 1 0 0 1, 2;
+    -fx-background-radius: 4;
+    -fx-padding: 2;
+  }
+
+  &.lbl_titulo {
+    -fx-font-size: $fontSizeh1;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+  }
+
+  &.img_background_principal {
+    -fx-background-color: transparent;
+    -fx-background-size: cover;
+    -fx-background-image: url("../../image/painel/principal.png") no-repeat center;
+  }
+
+  &.copyright {
+    -fx-text-fill: #ff6600;
+    -fx-font-size: $fontSizeh5;
+  }
+}
