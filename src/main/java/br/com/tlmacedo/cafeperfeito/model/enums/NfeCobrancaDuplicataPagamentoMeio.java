@@ -7,6 +7,7 @@ import java.util.List;
 
 public enum NfeCobrancaDuplicataPagamentoMeio {
 
+    NULL(0, null),
     DINHEIRO(1, "Dinheiro"),
     CHEQUE(2, "Cheque"),
     CREDITO(3, "Cartão de Crédido"),

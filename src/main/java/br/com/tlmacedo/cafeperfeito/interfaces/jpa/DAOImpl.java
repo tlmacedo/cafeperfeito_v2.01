@@ -35,18 +35,23 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
 
     @Override
     public List<T> getAll(Class<T> classe, String campo, String operador, String busca, String orderBy) {
-        Query select;
-        String sql = String.format("from %s%s%s",
-                classe.getSimpleName(),
-                (campo != null && operador != null && busca != null)
-                        ? String.format(" where %s %s %s", campo, operador, busca) : "",
-                orderBy != null
-                        ? String.format(" order by %s", orderBy) : ""
-        );
-        select = conexao.getEntityManager().createQuery(sql);
+        try {
+            Query select;
+            String sql = String.format("from %s%s%s",
+                    classe.getSimpleName(),
+                    (campo != null && operador != null && busca != null)
+                            ? String.format(" where %s %s %s", campo, operador, busca) : "",
+                    orderBy != null
+                            ? String.format(" order by %s", orderBy) : ""
+            );
+            select = conexao.getEntityManager().createQuery(sql);
 //        List<T> list = select.getResultList();
 //        return list;
-        return select.getResultList();
+            return select.getResultList();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override

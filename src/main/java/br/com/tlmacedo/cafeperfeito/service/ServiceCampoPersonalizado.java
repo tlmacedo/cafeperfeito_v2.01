@@ -52,8 +52,9 @@ public class ServiceCampoPersonalizado {
                         ((DatePicker) node).setValue(LocalDate.now().minusDays(Integer.parseInt(value)));
                     else
                         ((DatePicker) node).setValue(LocalDate.now().plusDays(Integer.parseInt(value)));
-                } else if (node instanceof TreeTableView)
-                    ((TableView) node).getColumns().clear();
+                }
+//                else if (node instanceof TreeTableView)
+//                    ((TableView) node).getColumns().clear();
                 else if (node instanceof TableView)
                     ((TableView) node).getItems().clear();
                 else if (node instanceof Circle)

@@ -2,9 +2,12 @@ package br.com.tlmacedo.cafeperfeito.controller;
 
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
+import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
+import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
+import br.com.tlmacedo.cafeperfeito.model.vo.Produto;
 import br.com.tlmacedo.cafeperfeito.model.vo.Telefone;
 import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
 import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
@@ -14,6 +17,8 @@ import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -21,7 +26,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Pair;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -99,15 +103,19 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
 
     private boolean tabCarregada = false;
-    private List<Pair> listaTarefa = new ArrayList<>();
+    private List<EnumsTasks> enumsTasksList = new ArrayList<>();
 
-    private Tab saidaProdutoTab = ViewSaidaProduto.getTab();
     private String nomeTab = ViewSaidaProduto.getTitulo();
     private String nomeController = "saidaProduto";
-
     private Task<Void> taskSaidaProduto = newTaskSaidaProduto();
     private EventHandler eventHandlerSaidaProduto;
     private ServiceAlertMensagem alertMensagem;
+
+    private Tab saidaProdutoTab = ViewSaidaProduto.getTab();
+    private TmodelProduto tmodelProduto;
+    private ObservableList<Produto> produtoObservableList = FXCollections.observableArrayList(new ProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
+    private FilteredList<Produto> produtoFilteredList = new FilteredList<>(getProdutoObservableList());
+
 
     private Endereco endereco = new Endereco();
 
@@ -129,15 +137,18 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     @Override
     public void criarObjetos() {
-        //getListaTarefa().add(new Pair());
+        getEnumsTasksList().add(EnumsTasks.TABELA_CRIAR);
     }
 
     @Override
     public void preencherObjetos() {
+        getEnumsTasksList().add(EnumsTasks.TABELA_VINCULAR);
 
-        getListaTarefa().add(new Pair("preencherCombo", "carregando informações do cadastro"));
+        getEnumsTasksList().add(EnumsTasks.TABELA_PREENCHER);
 
-        setTabCarregada(new ServiceSegundoPlano().abrindoCadastro(getTaskSaidaProduto(), "Abrindo saida de produtos!"));
+        getEnumsTasksList().add(EnumsTasks.COMBOS_PREENCHER);
+
+        setTabCarregada(new ServiceSegundoPlano().abrindoCadastro(getTaskSaidaProduto(), String.format("Abrindo %s!", getNomeTab())));
 
     }
 
@@ -244,17 +255,34 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
      */
 
     private Task newTaskSaidaProduto() {
-        int qtdTarefas = getListaTarefa().size();
+        int qtdTasks = getEnumsTasksList().size();
+        final int[] cont = {1};
         return new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 updateMessage("Loading...");
-                for (Pair tarefa : getListaTarefa()) {
-                    updateProgress(getListaTarefa().indexOf(tarefa), qtdTarefas);
+                for (EnumsTasks tasks : getEnumsTasksList()) {
+                    updateProgress(cont[0]++, qtdTasks);
                     Thread.sleep(200);
-                    updateMessage(tarefa.getValue().toString());
-                    switch (tarefa.getKey().toString().toLowerCase()) {
-                        case "preenchercombo":
+                    updateMessage(String.format("%s%s", tasks.getDescricao(),
+                            tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
+                    switch (tasks) {
+                        case TABELA_CRIAR:
+                            setTmodelProduto(new TmodelProduto(TModelTipo.PROD_VENDA));
+                            getTmodelProduto().criaTabela();
+
+                            break;
+
+                        case TABELA_VINCULAR:
+                            getTmodelProduto().setLblRegistrosLocalizados(getLblRegistrosLocalizados());
+                            getTmodelProduto().setTtvProduto(getTtvProdutos());
+                            getTmodelProduto().setTxtPesquisa(getTxtPesquisa());
+                            getTmodelProduto().setProdutoObservableList(getProdutoObservableList());
+                            getTmodelProduto().setProdutoFilteredList(getProdutoFilteredList());
+
+                            break;
+
+                        case COMBOS_PREENCHER:
                             getCboEmpresa().setItems(
                                     new EmpresaDAO().getAll(Empresa.class, null, null, null, "razao")
                                             .stream().filter(Empresa::isCliente)
@@ -262,10 +290,14 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             );
 
                             break;
+
+                        case TABELA_PREENCHER:
+                            getTmodelProduto().preencheTabela();
+                            break;
                     }
                 }
-                updateMessage("Carregamento concluido!!!");
-                updateProgress(qtdTarefas, qtdTarefas);
+                updateMessage("tarefa concluída!!!");
+                updateProgress(qtdTasks, qtdTasks);
                 return null;
             }
         };
@@ -757,12 +789,12 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.tabCarregada = tabCarregada;
     }
 
-    public List<Pair> getListaTarefa() {
-        return listaTarefa;
+    public List<EnumsTasks> getEnumsTasksList() {
+        return enumsTasksList;
     }
 
-    public void setListaTarefa(List<Pair> listaTarefa) {
-        this.listaTarefa = listaTarefa;
+    public void setEnumsTasksList(List<EnumsTasks> enumsTasksList) {
+        this.enumsTasksList = enumsTasksList;
     }
 
     public Tab getSaidaProdutoTab() {
@@ -819,5 +851,29 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
+    }
+
+    public TmodelProduto getTmodelProduto() {
+        return tmodelProduto;
+    }
+
+    public void setTmodelProduto(TmodelProduto tmodelProduto) {
+        this.tmodelProduto = tmodelProduto;
+    }
+
+    public ObservableList<Produto> getProdutoObservableList() {
+        return produtoObservableList;
+    }
+
+    public void setProdutoObservableList(ObservableList<Produto> produtoObservableList) {
+        this.produtoObservableList = produtoObservableList;
+    }
+
+    public FilteredList<Produto> getProdutoFilteredList() {
+        return produtoFilteredList;
+    }
+
+    public void setProdutoFilteredList(FilteredList<Produto> produtoFilteredList) {
+        this.produtoFilteredList = produtoFilteredList;
     }
 }

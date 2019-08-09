@@ -5,43 +5,41 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public enum TipoEndereco {
+public enum EnumsTasks {
 
-    PRINCIPAL(1, "Principal"),
-    ENTREGA(2, "Entrega"),
-    COBRANCA(3, "Cobrança"),
-    CORRESPONDENCIA(4, "Correspondência"),
-    RESIDENCIAL(5, "Residencial"),
-    RECADO(6, "Recado");
+    TABELA_CRIAR(0, "criando tabela de "),
+    TABELA_VINCULAR(1, "vinculando tModel"),
+    TABELA_PREENCHER(2, "preenchendo tabela de "),
+    COMBOS_PREENCHER(3, "carregando informações do cadastro");
 
-    private Integer cod;
+    private int cod;
     private String descricao;
 
-    private TipoEndereco(Integer cod, String descricao) {
+    private EnumsTasks(int cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
 
-    public static TipoEndereco toEnum(Integer cod) {
+    public static EnumsTasks toEnum(Integer cod) {
         if (cod == null) return null;
-        for (TipoEndereco tipo : TipoEndereco.getList())
-            if (cod == tipo.getCod())
+        for (EnumsTasks tipo : EnumsTasks.values())
+            if (cod.equals(tipo.getCod()))
                 return tipo;
         throw new IllegalArgumentException("Id inválido");
     }
 
-    public static List<TipoEndereco> getList() {
-        List list = Arrays.asList(TipoEndereco.values());
-        Collections.sort(list, new Comparator<TipoEndereco>() {
+    public static List<EnumsTasks> getList() {
+        List list = Arrays.asList(EnumsTasks.values());
+        Collections.sort(list, new Comparator<EnumsTasks>() {
             @Override
-            public int compare(TipoEndereco e1, TipoEndereco e2) {
+            public int compare(EnumsTasks e1, EnumsTasks e2) {
                 return e1.getDescricao().compareTo(e2.getDescricao());
             }
         });
         return list;
     }
 
-    public Integer getCod() {
+    public int getCod() {
         return cod;
     }
 

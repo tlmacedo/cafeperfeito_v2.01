@@ -32,8 +32,8 @@
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.OrcamentoEntrada</class>-->
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.OrcamentoSaida</class>-->
         <class>br.com.tlmacedo.cafeperfeito.model.vo.Produto</class>
-        <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.ProdutoCodigoBarra</class>-->
-        <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.ProdutoEstoque</class>-->
+                <class>br.com.tlmacedo.cafeperfeito.model.vo.ProdutoCodigoBarra</class>
+        <class>br.com.tlmacedo.cafeperfeito.model.vo.ProdutoEstoque</class>
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.Recebimento</class>-->
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto</class>-->
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe</class>-->

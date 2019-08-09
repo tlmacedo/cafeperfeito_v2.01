@@ -1,0 +1,82 @@
+.tree-table-view {
+  -fx-background-color: linear-gradient(to top, -fx-base, derive(-fx-base, 30%));
+
+  .column-header {
+    -fx-pref-height: 22px;
+
+    .label {
+      -fx-alignment: center-left;
+      -fx-text-fill: $corPricipal;
+      -fx-font-size: $fontSizeh5;
+      -fx-padding: 0 4;
+    }
+  }
+
+  //&:row-selection .tree-table-row-cell:selected .cell , &:cell-selection .cell:selected {
+  //  -fx-background-color: -fx-selection-bar;
+  //  -fx-text-fill: -fx-selection-bar-text;
+  //}
+  //
+
+  //&:selected {
+  //  -fx-background-color: -fx-selection-bar;
+  //  -fx-text-fill: -fx-selection-bar-text;
+  //}
+
+  //&:empty {
+  //  -fx-background-color: transparent;
+  //}
+  .tree-table-row-cell {
+    -fx-pref-height: 20px;
+    -fx-text-fill: $sisColor_whiteblack;
+    -fx-font-size: $fontSizeh6;
+
+    .cell {
+      -fx-padding: 0 4;
+      -fx-border-style: solid;
+      -fx-border-color: #a4a4a4;
+    }
+
+    -fx-background-color: -fx-base;
+
+    &:odd {
+      -fx-background-color: -fx-base, derive(-fx-base, 35%);
+      -fx-background-insets: 0, 0 0 1 0;
+      -fx-padding: 0.0em;
+    }
+
+    &:selected {
+      -fx-background-color: -fx-selection-bar;
+      -fx-text-fill: -fx-selection-bar-text;
+    }
+
+    &:empty {
+      -fx-background-color: transparent;
+    }
+
+    &.produto-estoque {
+      -fx-background-color: $corPricipal;
+
+      &:odd {
+        -fx-background-color: $corPricipal, derive($corPricipal, -12%);
+      }
+
+      &:selected {
+        -fx-background-color: -fx-selection-bar, derive($corPricipal, -30%);
+        -fx-text-fill: -fx-selection-bar-text;
+      }
+
+      &:empty {
+        -fx-background-color: transparent;
+
+        .table-cell {
+          -fx-border-width: 0;
+        }
+      }
+    }
+
+  }
+
+
+}
+

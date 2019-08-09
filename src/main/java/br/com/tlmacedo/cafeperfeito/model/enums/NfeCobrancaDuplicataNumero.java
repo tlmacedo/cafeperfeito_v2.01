@@ -7,6 +7,7 @@ import java.util.List;
 
 public enum NfeCobrancaDuplicataNumero {
 
+    NULL(0, null),
     N001(1, "1"),
     N002(2, "2"),
     N003(3, "3"),

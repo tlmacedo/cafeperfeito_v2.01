@@ -110,25 +110,19 @@
     -fx-fill: orange;
 }
 
-.list-view {
-    -fx-background-color: -fx-base;
-}
-
-.list-view:focused {
-    -fx-border-color: #FF6600;
-}
-
 .list-view .list-cell {
-    -fx-background-color: linear-gradient(to right, -fx-base, derive(-fx-base, 35%));
+    -fx-padding: 0 4;
+    -fx-border-style: solid;
     -fx-alignment: center-left;
     -fx-font-family: "Segoe UI Semibold";
-    -fx-font-size: 12px;
-    -fx-text-fill: #ffffff;
+    -fx-font-size: 10px;
+    -fx-text-fill: white;
+    -fx-border-color: #a4a4a4;
     -fx-padding: 5;
 }
 
 .list-view .list-cell:odd {
-    -fx-background-color: derive(-fx-control-inner-background, -35%);
+    -fx-background-color: -fx-base, derive(-fx-base, 35%);
 }
 
 .list-view .list-cell:filled:selected {
@@ -137,13 +131,77 @@
 }
 
 .list-view .list-cell:filled:selected:hover {
-    -fx-background-color: -fx-selection-bar;
-    -fx-text-fill: -fx-selection-bar-text;
+    -fx-background-color: -fx-cell-hover-color;
+    -fx-text-fill: black;
 }
 
 .list-view .list-cell:filled:hover {
     -fx-background-color: -fx-cell-hover-color;
-    -fx-text-fill: -fx-text-inner-color;
+    -fx-text-fill: black;
+}
+
+.tree-table-view {
+    -fx-background-color: linear-gradient(to top, -fx-base, derive(-fx-base, 30%));
+}
+
+.tree-table-view .column-header {
+    -fx-pref-height: 22px;
+}
+
+.tree-table-view .column-header .label {
+    -fx-alignment: center-left;
+    -fx-text-fill: #FF6600;
+    -fx-font-size: 12px;
+    -fx-padding: 0 4;
+}
+
+.tree-table-view .tree-table-row-cell {
+    -fx-pref-height: 20px;
+    -fx-text-fill: #e9e9e9;
+    -fx-font-size: 10px;
+    -fx-background-color: -fx-base;
+}
+
+.tree-table-view .tree-table-row-cell .cell {
+    -fx-padding: 0 4;
+    -fx-border-style: solid;
+    -fx-border-color: #a4a4a4;
+}
+
+.tree-table-view .tree-table-row-cell:odd {
+    -fx-background-color: -fx-base, derive(-fx-base, 35%);
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+}
+
+.tree-table-view .tree-table-row-cell:selected {
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.tree-table-view .tree-table-row-cell:empty {
+    -fx-background-color: transparent;
+}
+
+.tree-table-view .tree-table-row-cell.produto-estoque {
+    -fx-background-color: #FF6600;
+}
+
+.tree-table-view .tree-table-row-cell.produto-estoque:odd {
+    -fx-background-color: #FF6600, derive(#FF6600, -12%);
+}
+
+.tree-table-view .tree-table-row-cell.produto-estoque:selected {
+    -fx-background-color: -fx-selection-bar, derive(#FF6600, -30%);
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.tree-table-view .tree-table-row-cell.produto-estoque:empty {
+    -fx-background-color: transparent;
+}
+
+.tree-table-view .tree-table-row-cell.produto-estoque:empty .table-cell {
+    -fx-border-width: 0;
 }
 
 .dialog-pane .header-panel {

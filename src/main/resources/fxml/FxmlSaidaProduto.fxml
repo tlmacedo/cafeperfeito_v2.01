@@ -927,7 +927,7 @@
                                        styleClass="lbl_informacao"/>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" prefHeight="130.0"
+                        <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" prefHeight="120.0"
                               prefWidth="1328.0">
                             <children>
                                 <Label prefWidth="1328.0" styleClass="float" text="Produtos">
@@ -938,12 +938,7 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <TreeTableView fx:id="ttvProdutos">
-                                    <columns>
-                                        <TreeTableColumn prefWidth="75.0" text="C1"/>
-                                        <TreeTableColumn prefWidth="75.0" text="C2"/>
-                                    </columns>
-                                </TreeTableView>
+                                <TreeTableView fx:id="ttvProdutos"/>
                             </children>
                         </VBox>
                     </children>

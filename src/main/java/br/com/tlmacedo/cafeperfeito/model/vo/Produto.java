@@ -2,16 +2,24 @@ package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoProduto;
 import br.com.tlmacedo.cafeperfeito.model.enums.UndComercialProduto;
+import br.com.tlmacedo.cafeperfeito.service.ServiceImageUtil;
 import javafx.beans.property.*;
+import javafx.scene.image.Image;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.sql.rowset.serial.SerialBlob;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Blob;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "Produto")
 @Table(name = "produto")
@@ -22,10 +30,10 @@ public class Produto implements Serializable {
     private StringProperty codigo = new SimpleStringProperty();
     private StringProperty descricao = new SimpleStringProperty();
     private ObjectProperty<BigDecimal> peso = new SimpleObjectProperty<>();
-    private IntegerProperty unidadeComercial = new SimpleIntegerProperty();
-    private IntegerProperty situacao = new SimpleIntegerProperty();
-    private ObjectProperty<BigDecimal> precoFabrica = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> precoConsumidor = new SimpleObjectProperty<>();
+    private UndComercialProduto unidadeComercial;
+    private SituacaoProduto situacao;
+    private ObjectProperty<BigDecimal> precoCompra = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> precoVenda = new SimpleObjectProperty<>();
     private IntegerProperty varejo = new SimpleIntegerProperty();
     private ObjectProperty<BigDecimal> ultImpostoSefaz = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> ultFrete = new SimpleObjectProperty<>();
@@ -47,13 +55,30 @@ public class Produto implements Serializable {
 
     private Blob imgProduto, imgProdutoBack;
 
-//    private LongProperty estoque_id = new SimpleLongProperty();
-//    private IntegerProperty estoque = new SimpleIntegerProperty();
-//    private StringProperty lote = new SimpleStringProperty();
-//    private ObjectProperty<LocalDate> validade = new SimpleObjectProperty<>();
-//    private StringProperty notaEntrada = new SimpleStringProperty();
+    private LongProperty tblEstoque_id = new SimpleLongProperty();
+    private IntegerProperty tblEstoque = new SimpleIntegerProperty();
+    private StringProperty tblLote = new SimpleStringProperty();
+    private ObjectProperty<LocalDate> tblValidade = new SimpleObjectProperty<>();
+    private StringProperty tblDocEntrada = new SimpleStringProperty();
+
+    private List<ProdutoCodigoBarra> produtoCodigoBarraList = new ArrayList<>();
+
+    private List<ProdutoEstoque> produtoEstoqueList = new ArrayList<>();
 
     public Produto() {
+    }
+
+    public Produto(ProdutoEstoque produtoEstoque) {
+        this.tblEstoque_id = new SimpleLongProperty(produtoEstoque.getId());
+        this.tblEstoque = new SimpleIntegerProperty(produtoEstoque.getQtd());
+        this.tblLote = new SimpleStringProperty(produtoEstoque.getLote());
+        this.tblValidade = new SimpleObjectProperty<>(produtoEstoque.getValidade());
+        this.tblDocEntrada = new SimpleStringProperty(produtoEstoque.getDocEntrada());
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     @Id
@@ -63,6 +88,7 @@ public class Produto implements Serializable {
     }
 
     public LongProperty idProperty() {
+        if (id == null) id = new SimpleLongProperty(0);
         return id;
     }
 
@@ -109,56 +135,48 @@ public class Produto implements Serializable {
         this.peso.set(peso);
     }
 
-    @Column(length = 2, nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     public UndComercialProduto getUnidadeComercial() {
-        return UndComercialProduto.toEnum(unidadeComercial.get());
-    }
-
-    public IntegerProperty unidadeComercialProperty() {
         return unidadeComercial;
     }
 
     public void setUnidadeComercial(UndComercialProduto unidadeComercial) {
-        this.unidadeComercial.set(unidadeComercial.getCod());
+        this.unidadeComercial = unidadeComercial;
     }
 
-    @Column(length = 2, nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     public SituacaoProduto getSituacao() {
-        return SituacaoProduto.toEnum(situacao.get());
-    }
-
-    public IntegerProperty situacaoProperty() {
         return situacao;
     }
 
     public void setSituacao(SituacaoProduto situacao) {
-        this.situacao.set(situacao.getCod());
+        this.situacao = situacao;
     }
 
     @Column(length = 19, scale = 2, nullable = false)
-    public BigDecimal getPrecoFabrica() {
-        return precoFabrica.get();
+    public BigDecimal getPrecoCompra() {
+        return precoCompra.get();
     }
 
-    public ObjectProperty<BigDecimal> precoFabricaProperty() {
-        return precoFabrica;
+    public ObjectProperty<BigDecimal> precoCompraProperty() {
+        return precoCompra;
     }
 
-    public void setPrecoFabrica(BigDecimal precoFabrica) {
-        this.precoFabrica.set(precoFabrica);
+    public void setPrecoCompra(BigDecimal precoCompra) {
+        this.precoCompra.set(precoCompra);
     }
 
     @Column(length = 19, scale = 2, nullable = false)
-    public BigDecimal getPrecoConsumidor() {
-        return precoConsumidor.get();
+    public BigDecimal getPrecoVenda() {
+        return precoVenda.get();
     }
 
-    public ObjectProperty<BigDecimal> precoConsumidorProperty() {
-        return precoConsumidor;
+    public ObjectProperty<BigDecimal> precoVendaProperty() {
+        return precoVenda;
     }
 
-    public void setPrecoConsumidor(BigDecimal precoConsumidor) {
-        this.precoConsumidor.set(precoConsumidor);
+    public void setPrecoVenda(BigDecimal precoVenda) {
+        this.precoVenda.set(precoVenda);
     }
 
     @Column(length = 2, nullable = false)
@@ -214,7 +232,6 @@ public class Produto implements Serializable {
     }
 
     @ManyToOne
-    @Column(nullable = false)
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro;
     }
@@ -345,6 +362,7 @@ public class Produto implements Serializable {
     }
 
     @JsonIgnore
+    @Transient
     @SuppressWarnings("JpaAttributeTypeInspection")
     public Blob getImgProdutoBack() {
         return imgProdutoBack;
@@ -352,5 +370,131 @@ public class Produto implements Serializable {
 
     public void setImgProdutoBack(Blob imgProdutoBack) {
         this.imgProdutoBack = imgProdutoBack;
+    }
+
+    @JsonIgnore
+    @Transient
+    public Image getImagemProduto() {
+        try {
+            return ServiceImageUtil.getImageFromInputStream(getImgProduto().getBinaryStream());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void setImagemProduto(Image imagemProduto) {
+        try {
+            this.imgProduto = new SerialBlob(ServiceImageUtil.getInputStreamFromImage(imagemProduto).readAllBytes());
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @JsonIgnore
+    @Transient
+    public Image getImagemProdutoBack() {
+        try {
+            return ServiceImageUtil.getImageFromInputStream(getImgProdutoBack().getBinaryStream());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void setImagemProdutoBack(Image imagemProdutoBack) {
+        try {
+            this.imgProdutoBack = new SerialBlob(ServiceImageUtil.getInputStreamFromImage(imagemProdutoBack).readAllBytes());
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Transient
+    public long getTblEstoque_id() {
+        return tblEstoque_id.get();
+    }
+
+    public LongProperty tblEstoque_idProperty() {
+        return tblEstoque_id;
+    }
+
+    public void setTblEstoque_id(long tblEstoque_id) {
+        this.tblEstoque_id.set(tblEstoque_id);
+    }
+
+    @Transient
+    public int getTblEstoque() {
+        return tblEstoque.get();
+    }
+
+    public IntegerProperty tblEstoqueProperty() {
+        return tblEstoque;
+    }
+
+    public void setTblEstoque(int tblEstoque) {
+        this.tblEstoque.set(tblEstoque);
+    }
+
+    @Transient
+    public String getTblLote() {
+        return tblLote.get();
+    }
+
+    public StringProperty tblLoteProperty() {
+        return tblLote;
+    }
+
+    public void setTblLote(String tblLote) {
+        this.tblLote.set(tblLote);
+    }
+
+    @Transient
+    public LocalDate getTblValidade() {
+        return tblValidade.get();
+    }
+
+    public ObjectProperty<LocalDate> tblValidadeProperty() {
+        return tblValidade;
+    }
+
+    public void setTblValidade(LocalDate tblValidade) {
+        this.tblValidade.set(tblValidade);
+    }
+
+    @Transient
+    public String getTblDocEntrada() {
+        return tblDocEntrada.get();
+    }
+
+    public StringProperty tblDocEntradaProperty() {
+        return tblDocEntrada;
+    }
+
+    public void setTblDocEntrada(String tblDocEntrada) {
+        this.tblDocEntrada.set(tblDocEntrada);
+    }
+
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<ProdutoEstoque> getProdutoEstoqueList() {
+        return produtoEstoqueList;
+    }
+
+    public void setProdutoEstoqueList(List<ProdutoEstoque> produtoEstoqueList) {
+        this.produtoEstoqueList = produtoEstoqueList;
+    }
+
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<ProdutoCodigoBarra> getProdutoCodigoBarraList() {
+        return produtoCodigoBarraList;
+    }
+
+    public void setProdutoCodigoBarraList(List<ProdutoCodigoBarra> produtoCodigoBarraList) {
+        this.produtoCodigoBarraList = produtoCodigoBarraList;
+    }
+
+    @Override
+    public String toString() {
+        return descricaoProperty().get();
     }
 }
