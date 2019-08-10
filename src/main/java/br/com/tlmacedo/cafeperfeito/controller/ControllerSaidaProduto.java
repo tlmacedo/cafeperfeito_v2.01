@@ -280,12 +280,20 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             getTmodelProduto().setProdutoObservableList(getProdutoObservableList());
                             getTmodelProduto().setProdutoFilteredList(getProdutoFilteredList());
 
+                            getTmodelProduto().escutaLista();
+
                             break;
 
                         case COMBOS_PREENCHER:
                             getCboEmpresa().setItems(
                                     new EmpresaDAO().getAll(Empresa.class, null, null, null, "razao")
                                             .stream().filter(Empresa::isCliente)
+                                            .collect(Collectors.toCollection(FXCollections::observableArrayList))
+                            );
+
+                            getCboNfeDadosNaturezaOperacao().setItems(
+                                    NfeDadosNaturezaOperacao.getList()
+                                            .stream()
                                             .collect(Collectors.toCollection(FXCollections::observableArrayList))
                             );
 

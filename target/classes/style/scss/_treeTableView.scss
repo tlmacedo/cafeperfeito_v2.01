@@ -57,21 +57,23 @@
     &.produto-estoque {
       -fx-background-color: $corPricipal;
 
-      &:odd {
-        -fx-background-color: $corPricipal, derive($corPricipal, -12%);
-      }
+      //.cell {
+      //  -fx-padding: 0 4;
+      //  -fx-border-style: solid;
+      //  -fx-border-color: #ff6600;
+      //}
 
       &:selected {
-        -fx-background-color: -fx-selection-bar, derive($corPricipal, -30%);
-        -fx-text-fill: -fx-selection-bar-text;
+        -fx-background-color: linear-gradient(to right, -fx-selection-bar, derive(-fx-selection-bar, 50%));
+        //-fx-text-fill: -fx-selection-bar-text;
+        //-fx-border-style: solid;
+        -fx-border-color: #ff6600;
+        -fx-background-insets: 0, 0 0 1 0;
+        -fx-padding: 0.0em;
       }
 
       &:empty {
         -fx-background-color: transparent;
-
-        .table-cell {
-          -fx-border-width: 0;
-        }
       }
     }
 

@@ -187,21 +187,15 @@
     -fx-background-color: #FF6600;
 }
 
-.tree-table-view .tree-table-row-cell.produto-estoque:odd {
-    -fx-background-color: #FF6600, derive(#FF6600, -12%);
-}
-
 .tree-table-view .tree-table-row-cell.produto-estoque:selected {
-    -fx-background-color: -fx-selection-bar, derive(#FF6600, -30%);
-    -fx-text-fill: -fx-selection-bar-text;
+    -fx-background-color: linear-gradient(to right, -fx-selection-bar, derive(-fx-selection-bar, 50%));
+    -fx-border-color: #ff6600;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
 }
 
 .tree-table-view .tree-table-row-cell.produto-estoque:empty {
     -fx-background-color: transparent;
-}
-
-.tree-table-view .tree-table-row-cell.produto-estoque:empty .table-cell {
-    -fx-border-width: 0;
 }
 
 .dialog-pane .header-panel {

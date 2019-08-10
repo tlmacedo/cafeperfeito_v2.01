@@ -7,9 +7,9 @@ import java.util.List;
 
 public enum NfeDadosNaturezaOperacao {
 
-    INTERNA(0, "VENDA DENTRO DO ESTADO"),
-    EXTERNA(1, "VENDA PARA FORA DO ESTADO"),
-    EXTERIOR(2, "VENDA PARA FORA DO PAÍS");
+    INTERNA(0, "DENTRO DO ESTADO"),
+    EXTERNA(1, "FORA DO ESTADO"),
+    EXTERIOR(2, "FORA DO PAÍS");
 
     private int cod;
     private String descricao;
