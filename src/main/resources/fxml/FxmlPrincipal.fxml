@@ -72,14 +72,15 @@
         <ToolBar fx:id="statusBar_ViewPrincipal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                  minWidth="-Infinity" prefHeight="20.0" prefWidth="1600.0" BorderPane.alignment="BOTTOM_LEFT">
             <Label fx:id="stbLogadoInf" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                   minWidth="-Infinity" prefHeight="20.0" prefWidth="250.0" styleClass="status-bar-logado-inf"
+                   minWidth="-Infinity" prefHeight="20.0" prefWidth="240.0" styleClass="status-bar-logado-inf"
                    text="Usuário" BorderPane.alignment="CENTER_LEFT"/>
             <Label fx:id="stbTeclas" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                   minWidth="-Infinity" prefHeight="20.0" prefWidth="1150.0" styleClass="status-bar-teclas" text=""
+                   minWidth="-Infinity" prefHeight="20.0" prefWidth="1200.0" styleClass="status-bar-teclas" text=""
                    BorderPane.alignment="CENTER_LEFT"/>
             <Label fx:id="stbRelogio" alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity"
-                   minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="90.0"
-                   styleClass="status-bar-horario" text="Relogio" BorderPane.alignment="CENTER_LEFT"/>
+                   minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="135.0"
+                   styleClass="status-bar-horario" text="Relogio" textAlignment="RIGHT"
+                   BorderPane.alignment="CENTER_LEFT"/>
         </ToolBar>
     </bottom>
     <!--   <bottom>-->

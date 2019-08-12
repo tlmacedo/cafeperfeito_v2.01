@@ -923,8 +923,10 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <Label fx:id="lblRegistrosLocalizados" prefHeight="21.0" prefWidth="100.0"
-                                       styleClass="lbl_informacao"/>
+                                <Label fx:id="lblRegistrosLocalizados"
+                                       accessibleText="len::5;type::numero;value::0;seteditable::;binding::true;"
+                                       alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="100.0"
+                                       styleClass="lbl_informacao" textAlignment="RIGHT"/>
                             </children>
                         </VBox>
                         <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" prefHeight="120.0"

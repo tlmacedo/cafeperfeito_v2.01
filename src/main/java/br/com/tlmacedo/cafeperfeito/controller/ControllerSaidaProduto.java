@@ -16,6 +16,8 @@ import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComb
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -23,6 +25,7 @@ import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -94,7 +97,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     public TitledPane tpnProdutos;
     public TextField txtPesquisa;
     public Label lblRegistrosLocalizados;
-    public TreeTableView ttvProdutos;
+    public TreeTableView<Produto> ttvProdutos;
 
     public TitledPane tpnItensPedido;
     public TreeTableView ttvItensPedido;
@@ -107,11 +110,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private String nomeTab = ViewSaidaProduto.getTitulo();
     private String nomeController = "saidaProduto";
+    private ObjectProperty<StatusBarSaidaProduto> statusBar = new SimpleObjectProperty<>();
     private Task<Void> taskSaidaProduto = newTaskSaidaProduto();
     private EventHandler eventHandlerSaidaProduto;
     private ServiceAlertMensagem alertMensagem;
 
-    private Tab saidaProdutoTab = ViewSaidaProduto.getTab();
     private TmodelProduto tmodelProduto;
     private ObservableList<Produto> produtoObservableList = FXCollections.observableArrayList(new ProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
     private FilteredList<Produto> produtoFilteredList = new FilteredList<>(getProdutoObservableList());
@@ -131,8 +134,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     @Override
     public void fechar() {
-        ControllerPrincipal.ctrlPrincipal.tabPaneViewPrincipal.getTabs().remove(getSaidaProdutoTab());
-        ControllerPrincipal.ctrlPrincipal.painelViewPrincipal.removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
+        ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getTabs().remove(
+                ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getTabs().stream()
+                        .filter(tab -> tab.textProperty().get().equals(getNomeTab()))
+                        .findFirst().orElse(null)
+        );
+        ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal()
+                .removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
     }
 
     @Override
@@ -178,6 +186,22 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     @Override
     public void escutarTecla() {
 
+        statusBarProperty().addListener((ov, o, n) -> {
+            if (n == null) return;
+            ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(n.getDescricao());
+        });
+
+        if (statusBarProperty().get() == null)
+            setStatusBar(StatusBarSaidaProduto.DIGITACAO);
+
+        getTtvProdutos().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode() != KeyCode.ENTER
+                    || getTtvProdutos().getSelectionModel().getSelectedItem().getValue().tblEstoqueProperty().get() <= 0
+                    || getTtvProdutos().getSelectionModel().getSelectedItem() == null) return;
+
+
+        });
+
         setEventHandlerSaidaProduto(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -186,13 +210,15 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 if (!ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().getSelectedItem().getText().equals(getNomeTab()))
                     return;
                 switch (event.getCode()) {
-
+                    case F7:
+                        getTxtPesquisa().requestFocus();
+                        break;
                 }
             }
         });
 
         ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-            if (ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().getSelectedItem() == getSaidaProdutoTab())
+            if (n.getText().equals(getNomeTab()))
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().addEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
             else
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
@@ -241,12 +267,24 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             getTpnItensPedido().setLayoutY(getTpnItensPedido().getLayoutY() + diff);
             getTtvItensPedido().setPrefHeight(getTtvItensPedido().getPrefHeight() + (diff * -1));
             getvBoxTotalLiquido().setLayoutY(getvBoxTotalLiquido().getLayoutY() + (diff * -1));
+        });
 
-            //getTtvItens().setPrefHeight(getTtvItens().getPrefWidth() + diff);
-//            if (n)
-//                getTpnNfe().setPrefHeight(getTpnNfe().getPrefHeight() + 21);
-//            else
-//                getTpnNfe().setPrefHeight(getTpnNfe().getPrefHeight() - 21);
+        getTpnNfe().expandedProperty().addListener((ov, o, n) -> {
+            int diff = 85;
+            if (!n) diff = (diff * (-1));
+            getTpnProdutos().setLayoutY(getTpnProdutos().getLayoutY() + diff);
+            getTpnItensPedido().setPrefHeight(getTpnItensPedido().getPrefHeight() + (diff * -1));
+            getTpnItensPedido().setLayoutY(getTpnItensPedido().getLayoutY() + diff);
+            getTtvItensPedido().setPrefHeight(getTtvItensPedido().getPrefHeight() + (diff * -1));
+            getvBoxTotalLiquido().setLayoutY(getvBoxTotalLiquido().getLayoutY() + (diff * -1));
+        });
+
+        //getTpnNfe().setExpanded(false);
+
+        getTxtPesquisa().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode() != KeyCode.ENTER) return;
+            getTtvProdutos().requestFocus();
+            getTtvProdutos().getSelectionModel().selectFirst();
         });
     }
 
@@ -746,11 +784,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.lblRegistrosLocalizados = lblRegistrosLocalizados;
     }
 
-    public TreeTableView getTtvProdutos() {
+    public TreeTableView<Produto> getTtvProdutos() {
         return ttvProdutos;
     }
 
-    public void setTtvProdutos(TreeTableView ttvProdutos) {
+    public void setTtvProdutos(TreeTableView<Produto> ttvProdutos) {
         this.ttvProdutos = ttvProdutos;
     }
 
@@ -803,14 +841,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setEnumsTasksList(List<EnumsTasks> enumsTasksList) {
         this.enumsTasksList = enumsTasksList;
-    }
-
-    public Tab getSaidaProdutoTab() {
-        return saidaProdutoTab;
-    }
-
-    public void setSaidaProdutoTab(Tab saidaProdutoTab) {
-        this.saidaProdutoTab = saidaProdutoTab;
     }
 
     public String getNomeTab() {
@@ -883,5 +913,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setProdutoFilteredList(FilteredList<Produto> produtoFilteredList) {
         this.produtoFilteredList = produtoFilteredList;
+    }
+
+    public StatusBarSaidaProduto getStatusBar() {
+        return statusBar.get();
+    }
+
+    public ObjectProperty<StatusBarSaidaProduto> statusBarProperty() {
+        return statusBar;
+    }
+
+    public void setStatusBar(StatusBarSaidaProduto statusBar) {
+        this.statusBar.set(statusBar);
     }
 }

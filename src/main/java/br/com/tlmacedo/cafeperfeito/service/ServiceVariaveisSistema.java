@@ -2,6 +2,9 @@ package br.com.tlmacedo.cafeperfeito.service;
 
 //import br.com.tlmacedo.cafeperfeito.xsd.sistema.config.TConfig;
 
+import br.com.tlmacedo.cafeperfeito.model.dao.UsuarioDAO;
+import br.com.tlmacedo.cafeperfeito.model.vo.Usuario;
+import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import br.com.tlmacedo.cafeperfeito.xsd.sistema.config.TConfig;
 import javafx.scene.image.Image;
 
@@ -23,12 +26,12 @@ public class ServiceVariaveisSistema {
     public ServiceVariaveisSistema() throws FileNotFoundException {
         System.setProperty("senhaDoCertificado", "4879");
         arqConfgSistema = new FileReader(getClass().getClassLoader().getResource("configSistema.xml").getFile());
-//        if (LogadoInf.getUserLog() == null) {
-//            UsuarioDAO usuarioDAO = new UsuarioDAO();
-//            LogadoInf.setUserLog(usuarioDAO.getById(Usuario.class, 1L));
-//            LogadoInf.getUserLog().setApelido(StringUtils.capitalize(LogadoInf.getUserLog().getApelido()));
-//            LogadoInf.setLojaUser(new EmpresaDAO().getById(Empresa.class, Long.valueOf(1)));
-//        }
+        if (UsuarioLogado.getUsuario() == null) {
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            UsuarioLogado.setUsuario(usuarioDAO.getById(Usuario.class, 1L));
+//            UsuarioLogado.getUsuario().setApelido(StringUtils.capitalize(UsuarioLogado.getUserLog().getApelido()));
+//            UsuarioLogado.setLojaUser(new EmpresaDAO().getById(Empresa.class, Long.valueOf(1)));
+        }
 
     }
 

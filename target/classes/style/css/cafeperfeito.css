@@ -197,4 +197,24 @@
   -fx-alignment: CENTER;
   -fx-text-fill: white; }
 
+.jfx-tool-bar, .tool-bar {
+  -fx-background-color: transparent;
+  -fx-font-family: "Segoe UI Semibold";
+  -fx-text-fill: #000000;
+  -fx-font-size: 12px;
+  -fx-alignment: center-left; }
+  .jfx-tool-bar .status-bar-logado-inf, .tool-bar .status-bar-logado-inf {
+    -fx-padding: 2 10 2 5;
+    -fx-font-size: 12px;
+    -fx-alignment: center-left; }
+  .jfx-tool-bar .status-bar-teclas, .tool-bar .status-bar-teclas {
+    -fx-padding: 2 10 2 10;
+    -fx-font-size: 10px;
+    -fx-alignment: center-left; }
+  .jfx-tool-bar .status-bar-horario, .tool-bar .status-bar-horario {
+    -fx-padding: 2 6;
+    -fx-font-size: 10px;
+    -fx-alignment: center-right;
+    -fx-graphic: url("../../image/ico/principal/ic_relogio_dp16.png") no-repeat center; }
+
 /*# sourceMappingURL=cafeperfeito.css.map */

@@ -3,7 +3,9 @@ package br.com.tlmacedo.cafeperfeito.model.tm;
 import br.com.tlmacedo.cafeperfeito.model.enums.TModelTipo;
 import br.com.tlmacedo.cafeperfeito.model.vo.Produto;
 import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.*;
@@ -173,6 +175,35 @@ public class TmodelProduto {
             };
             return row;
         });
+
+        getTxtPesquisa().textProperty().addListener((ov, o, n) -> {
+            String strFind = n.toLowerCase().trim();
+            getProdutoFilteredList().setPredicate(produto -> {
+                if (produto.idProperty().toString().contains(strFind))
+                    return true;
+                if (produto.codigoProperty().get().toLowerCase().contains(strFind))
+                    return true;
+                if (produto.descricaoProperty().get().toLowerCase().contains(strFind))
+                    return true;
+                if (produto.ncmProperty().get().contains(strFind))
+                    return true;
+                if (produto.cestProperty().get().contains(strFind))
+                    return true;
+                if (produto.getProdutoCodigoBarraList().stream()
+                        .filter(codBarra -> codBarra.getCodigoBarra().contains(strFind))
+                        .findFirst().orElse(null) != null)
+                    return true;
+                return false;
+            });
+        });
+
+        getProdutoFilteredList().addListener((ListChangeListener<? super Produto>) change -> {
+            preencheTabela();
+        });
+
+        getLblRegistrosLocalizados().textProperty().bind(Bindings.createStringBinding(() ->
+                String.format("%5d", getProdutoFilteredList().size()), getProdutoFilteredList()
+        ));
     }
 
 

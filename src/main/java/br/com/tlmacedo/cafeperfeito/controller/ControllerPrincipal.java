@@ -4,6 +4,7 @@ import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.MenuPrincipalDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.MenuPrincipal;
 import br.com.tlmacedo.cafeperfeito.service.ServiceComandoTecladoMouse;
+import br.com.tlmacedo.cafeperfeito.service.ServiceStatusBar;
 import br.com.tlmacedo.cafeperfeito.view.ViewPrincipal;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import javafx.collections.ListChangeListener;
@@ -49,6 +50,7 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
     private EventHandler<KeyEvent> eventHandlerPrincipal;
     private Image icoJanelaAtivado = new Image(getClass().getResource(TCONFIG.getFxml().getPrincipal().getIconeAtivo()).toString());
     private Image icoJanelaDesativado = new Image(getClass().getResource(TCONFIG.getFxml().getPrincipal().getIconeDesativo()).toString());
+    private ServiceStatusBar serviceStatusBar;
 
 
     @Override
@@ -74,6 +76,7 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
     @Override
     public void preencherObjetos() {
         carregaMenuPrincipal();
+        setServiceStatusBar(new ServiceStatusBar(getStatusBar_ViewPrincipal(), getStbLogadoInf(), getStbTeclas(), getStbRelogio()));
     }
 
     @Override
@@ -340,5 +343,13 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
 
     public void setIcoJanelaDesativado(Image icoJanelaDesativado) {
         this.icoJanelaDesativado = icoJanelaDesativado;
+    }
+
+    public ServiceStatusBar getServiceStatusBar() {
+        return serviceStatusBar;
+    }
+
+    public void setServiceStatusBar(ServiceStatusBar serviceStatusBar) {
+        this.serviceStatusBar = serviceStatusBar;
     }
 }
