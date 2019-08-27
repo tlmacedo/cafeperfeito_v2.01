@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -201,6 +202,7 @@ public class ProdutoEstoque implements Serializable {
         this.docEntradaChaveNFe.set(docEntradaChaveNFe);
     }
 
+    @JsonIgnore
     @ManyToOne()
     public Produto getProduto() {
         return produto;
@@ -208,5 +210,25 @@ public class ProdutoEstoque implements Serializable {
 
     public void setProduto(Produto produto) {
         this.produto = produto;
+    }
+
+    @Override
+    public String toString() {
+        return "ProdutoEstoque{" +
+                "id=" + id +
+                ", qtd=" + qtd +
+                ", lote=" + lote +
+                ", validade=" + validade +
+                ", vlrBruto=" + vlrBruto +
+                ", vlrImpostoNaEntrada=" + vlrImpostoNaEntrada +
+                ", vlrImpostoFreteNaEntrada=" + vlrImpostoFreteNaEntrada +
+                ", vlrImpostoDentroFrete=" + vlrImpostoDentroFrete +
+                ", vlrFreteBruto=" + vlrFreteBruto +
+                ", usuarioCadastro=" + usuarioCadastro +
+                ", dtCadastro=" + dtCadastro +
+                ", docEntrada=" + docEntrada +
+                ", docEntradaChaveNFe=" + docEntradaChaveNFe +
+                ", produto=" + produto +
+                '}';
     }
 }

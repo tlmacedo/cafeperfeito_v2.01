@@ -2,8 +2,8 @@ package br.com.tlmacedo.cafeperfeito.model.vo;
 
 
 import br.com.tlmacedo.cafeperfeito.model.enums.ColaboradorSituacao;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -133,6 +133,7 @@ public class Colaborador implements Serializable {
         this.imagem = imagem;
     }
 
+    @JsonIgnore
     @Transient
     public Blob getImagemBack() {
         return imagemBack;

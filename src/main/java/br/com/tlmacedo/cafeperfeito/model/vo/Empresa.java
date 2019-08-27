@@ -1,7 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -37,6 +37,8 @@ public class Empresa implements Serializable {
     private ObjectProperty<BigDecimal> limite = new SimpleObjectProperty<>();
     private IntegerProperty prazo = new SimpleIntegerProperty();
     private BooleanProperty prazoDiaUtil = new SimpleBooleanProperty();
+
+    private List<EmpresaCondicoes> empresaCondicoes = new ArrayList<>();
 
     private List<Endereco> enderecoList = new ArrayList<>();
     private List<Telefone> telefoneList = new ArrayList<>();
@@ -274,6 +276,16 @@ public class Empresa implements Serializable {
         this.prazoDiaUtil.set(prazoDiaUtil);
     }
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<EmpresaCondicoes> getEmpresaCondicoes() {
+        return empresaCondicoes;
+    }
+
+    public void setEmpresaCondicoes(List<EmpresaCondicoes> empresaCondicoes) {
+        this.empresaCondicoes = empresaCondicoes;
+    }
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Endereco> getEnderecoList() {
         return enderecoList;
@@ -299,10 +311,13 @@ public class Empresa implements Serializable {
 
     @Override
     public String toString() {
-        return String.format(
-                "%s (%s)",
-                razaoProperty().get(),
-                fantasiaProperty().get()
-        );
+        if (razaoProperty().get() == null)
+            return "";
+        else
+            return String.format(
+                    "%s (%s)",
+                    razaoProperty().get(),
+                    fantasiaProperty().get()
+            );
     }
 }

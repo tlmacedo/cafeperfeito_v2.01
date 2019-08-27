@@ -5,19 +5,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public enum TipoSaidaProduto {
+public enum PagamentoSituacao {
 
-    VENDA(0, "venda"),
-    BONIFICACAO(1, "bonificação"),
-    RETIRADA(2, "retirada"),
-    CORTESIA(3, "cortesia"),
-    AMOSTRA(4, "amostra"),
-    TESTE(5, "teste");
+    PENDENTE(0, "Pendente"),
+    QUITADO(1, "Quitado"),
+    CANCELADO(2, "Cancelado");
 
     private Integer cod;
     private String descricao;
 
-    private TipoSaidaProduto(Integer cod, String descricao) {
+    private PagamentoSituacao(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -30,11 +27,11 @@ public enum TipoSaidaProduto {
 //        throw new IllegalArgumentException("Id inválido");
 //    }
 
-    public static List<TipoSaidaProduto> getList() {
-        List list = Arrays.asList(TipoSaidaProduto.values());
-        Collections.sort(list, new Comparator<TipoSaidaProduto>() {
+    public static List<PagamentoSituacao> getList() {
+        List list = Arrays.asList(PagamentoSituacao.values());
+        Collections.sort(list, new Comparator<PagamentoSituacao>() {
             @Override
-            public int compare(TipoSaidaProduto e1, TipoSaidaProduto e2) {
+            public int compare(PagamentoSituacao e1, PagamentoSituacao e2) {
                 return e1.getDescricao().compareTo(e2.getDescricao());
             }
         });

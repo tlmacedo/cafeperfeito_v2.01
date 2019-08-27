@@ -1,12 +1,12 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.service.ServiceImageUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;

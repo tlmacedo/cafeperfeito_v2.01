@@ -60,7 +60,9 @@ public class ServiceAutoCompleteComboBox<T> {
             switch (getClasse().getSimpleName().toLowerCase()) {
                 case "empresa":
                     getFilteredList().setPredicate(flist -> {
-                        if (((Empresa) flist).getRazao().toLowerCase().contains(
+                        if (((Empresa) flist).getRazao() == null)
+                            return true;
+                        else if (((Empresa) flist).getRazao().toLowerCase().contains(
                                 ServiceAutoCompleteComboBox.this.
                                         getComboBox().getEditor().getText().toLowerCase()))
                             return true;

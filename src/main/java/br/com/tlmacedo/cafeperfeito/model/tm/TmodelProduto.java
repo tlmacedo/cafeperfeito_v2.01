@@ -1,17 +1,24 @@
 package br.com.tlmacedo.cafeperfeito.model.tm;
 
+import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.TModelTipo;
 import br.com.tlmacedo.cafeperfeito.model.vo.Produto;
-import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
+import br.com.tlmacedo.cafeperfeito.model.vo.ProdutoEstoque;
+import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 
 public class TmodelProduto {
 
@@ -19,9 +26,9 @@ public class TmodelProduto {
     private Label lblRegistrosLocalizados;
     private TextField txtPesquisa;
     private TreeTableView<Produto> ttvProduto;
-    private ObservableList<Produto> produtoObservableList;
-    private FilteredList<Produto> produtoFilteredList;
-    private ServiceAlertMensagem alertMensagem;
+    private ProdutoDAO produtoDAO = new ProdutoDAO();
+    private ObservableList<Produto> produtoObservableList = FXCollections.observableArrayList(getProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
+    private FilteredList<Produto> produtoFilteredList = new FilteredList<>(getProdutoObservableList());
 
     private TreeItem<Produto> produtoTreeItem;
     private TreeTableColumn<Produto, String> colId;
@@ -29,12 +36,14 @@ public class TmodelProduto {
     private TreeTableColumn<Produto, String> colDescricao;
     private TreeTableColumn<Produto, String> colVarejo;
     private TreeTableColumn<Produto, String> colUndCom;
-    private TreeTableColumn<Produto, BigDecimal> colPrecoCompra;
-    private TreeTableColumn<Produto, BigDecimal> colPrecoVenda;
+    private TreeTableColumn<Produto, String> colPrecoCompra;
+    private TreeTableColumn<Produto, String> colPrecoVenda;
     private TreeTableColumn<Produto, Integer> colEstoque;
     private TreeTableColumn<Produto, String> colLote;
-    private TreeTableColumn<Produto, LocalDate> colValidade;
-    private TreeTableColumn<Produto, String> colNFeEntrada;
+    private TreeTableColumn<Produto, String> colValidade;
+//    private TreeTableColumn<Produto, String> colNFeEntrada;
+
+//    private TreeTableColumn<Produto, String> colEstoqueId;
 
 
     public TmodelProduto(TModelTipo tModelTipo) {
@@ -88,12 +97,22 @@ public class TmodelProduto {
             setColPrecoCompra(new TreeTableColumn<>("preço compra"));
             getColPrecoCompra().setPrefWidth(90);
             getColPrecoCompra().setStyle("-fx-alignment: center-right;");
-            getColPrecoCompra().setCellValueFactory(param -> param.getValue().getValue().precoCompraProperty());
+            getColPrecoCompra().setCellValueFactory(param -> {
+                if (param.getValue().getValue().precoCompraProperty().getValue() == null)
+                    return new SimpleStringProperty("");
+                else
+                    return new SimpleStringProperty(ServiceMascara.getMoeda(param.getValue().getValue().precoCompraProperty().getValue(), 2));
+            });
 
             setColPrecoVenda(new TreeTableColumn<>("preço venda"));
             getColPrecoVenda().setPrefWidth(90);
             getColPrecoVenda().setStyle("-fx-alignment: center-right;");
-            getColPrecoVenda().setCellValueFactory(param -> param.getValue().getValue().precoVendaProperty());
+            getColPrecoVenda().setCellValueFactory(param -> {
+                if (param.getValue().getValue().precoVendaProperty().getValue() == null)
+                    return new SimpleStringProperty("");
+                else
+                    return new SimpleStringProperty(ServiceMascara.getMoeda(param.getValue().getValue().precoVendaProperty().getValue(), 2));
+            });
 
             setColEstoque(new TreeTableColumn<>("estoque"));
             getColEstoque().setPrefWidth(65);
@@ -108,13 +127,22 @@ public class TmodelProduto {
             setColValidade(new TreeTableColumn<>("validade"));
             getColValidade().setPrefWidth(105);
             getColValidade().setStyle("-fx-alignment: center-right;");
-            getColValidade().setCellValueFactory(param -> param.getValue().getValue().tblValidadeProperty());
+            getColValidade().setCellValueFactory(param -> {
+                if (param.getValue().getValue().tblValidadeProperty().getValue() == null)
+                    return new SimpleStringProperty("");
+                else
+                    return new SimpleStringProperty(param.getValue().getValue().tblValidadeProperty().get().format(DTF_DATA));
+            });
 
-            setColNFeEntrada(new TreeTableColumn<>("doc. ent."));
-            getColNFeEntrada().setPrefWidth(100);
-            getColNFeEntrada().setStyle("-fx-alignment: center-right;");
-            getColNFeEntrada().setCellValueFactory(param -> param.getValue().getValue().tblDocEntradaProperty());
+//            setColNFeEntrada(new TreeTableColumn<>("doc. ent."));
+//            getColNFeEntrada().setPrefWidth(100);
+//            getColNFeEntrada().setStyle("-fx-alignment: center-right;");
+//            getColNFeEntrada().setCellValueFactory(param -> param.getValue().getValue().tblDocEntradaProperty());
 
+//            setColEstoqueId(new TreeTableColumn<>("ID"));
+//            getColEstoqueId().setPrefWidth(60);
+//            getColEstoqueId().setStyle("-fx-alignment: center-right;");
+//            getColEstoqueId().setCellValueFactory(param -> param.getValue().getValue().tblEstoque_idProperty().asString());
 
         } catch (
                 Exception ex) {
@@ -131,10 +159,18 @@ public class TmodelProduto {
                     TreeItem<Produto> prodTree = new TreeItem<>(produtoTreeItem);
                     getProdutoTreeItem().getChildren().add(prodTree);
                     produtoTreeItem.getProdutoEstoqueList().stream()
-                            .forEach(produtoEstoque -> {
-                                estq[0] += produtoEstoque.getQtd();
-                                if (produtoEstoque.getQtd() > 0)
-                                    prodTree.getChildren().add(new TreeItem<>(new Produto(produtoEstoque)));
+                            .filter(produtoEstoque -> produtoEstoque.qtdProperty().getValue().compareTo(0) > 0)
+                            .sorted(Comparator.comparing(ProdutoEstoque::getValidade))
+                            .collect(Collectors.groupingBy(ProdutoEstoque::getLote,
+                                    LinkedHashMap::new,
+                                    Collectors.toList()))
+                            .forEach((s, produtoEstoques) -> {
+                                ProdutoEstoque estoque = new ProdutoEstoque();
+                                estoque.qtdProperty().setValue(produtoEstoques.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
+                                estoque.loteProperty().setValue(s);
+                                estoque.validadeProperty().setValue(produtoEstoques.stream().findFirst().orElse(null).validadeProperty().getValue());
+                                estq[0] += estoque.qtdProperty().getValue();
+                                prodTree.getChildren().add(new TreeItem<>(new Produto(estoque)));
                             });
                     prodTree.getValue().setTblEstoque(estq[0]);
                 }
@@ -143,7 +179,8 @@ public class TmodelProduto {
 
         getTtvProduto().getColumns().setAll(
                 getColId(), getColCodigo(), getColDescricao(), getColVarejo(), getColUndCom(), getColPrecoCompra(),
-                getColPrecoVenda(), getColEstoque(), getColLote(), getColValidade(), getColNFeEntrada()
+                getColPrecoVenda(), getColEstoque(), getColLote(), getColValidade()//, getColNFeEntrada()
+                //, getColEstoqueId()
         );
 
         if (gettModelTipo().equals(TModelTipo.PROD_VENDA)) {
@@ -198,7 +235,10 @@ public class TmodelProduto {
         });
 
         getProdutoFilteredList().addListener((ListChangeListener<? super Produto>) change -> {
-            preencheTabela();
+            Platform.runLater(() -> {
+                preencheTabela();
+                getTtvProduto().refresh();
+            });
         });
 
         getLblRegistrosLocalizados().textProperty().bind(Bindings.createStringBinding(() ->
@@ -206,6 +246,11 @@ public class TmodelProduto {
         ));
     }
 
+//    public void atualizarProdutos() {
+//        //System.out.printf("getProdutoDAO(): [%s]\n" ,getProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
+//        getProdutoObservableList().setAll(getProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
+//        getTtvProduto().refresh();
+//    }
 
     /**
      * END Voids
@@ -259,14 +304,6 @@ public class TmodelProduto {
         this.produtoFilteredList = produtoFilteredList;
     }
 
-    public ServiceAlertMensagem getAlertMensagem() {
-        return alertMensagem;
-    }
-
-    public void setAlertMensagem(ServiceAlertMensagem alertMensagem) {
-        this.alertMensagem = alertMensagem;
-    }
-
     public TreeItem<Produto> getProdutoTreeItem() {
         return produtoTreeItem;
     }
@@ -315,19 +352,19 @@ public class TmodelProduto {
         this.colUndCom = colUndCom;
     }
 
-    public TreeTableColumn<Produto, BigDecimal> getColPrecoCompra() {
+    public TreeTableColumn<Produto, String> getColPrecoCompra() {
         return colPrecoCompra;
     }
 
-    public void setColPrecoCompra(TreeTableColumn<Produto, BigDecimal> colPrecoCompra) {
+    public void setColPrecoCompra(TreeTableColumn<Produto, String> colPrecoCompra) {
         this.colPrecoCompra = colPrecoCompra;
     }
 
-    public TreeTableColumn<Produto, BigDecimal> getColPrecoVenda() {
+    public TreeTableColumn<Produto, String> getColPrecoVenda() {
         return colPrecoVenda;
     }
 
-    public void setColPrecoVenda(TreeTableColumn<Produto, BigDecimal> colPrecoVenda) {
+    public void setColPrecoVenda(TreeTableColumn<Produto, String> colPrecoVenda) {
         this.colPrecoVenda = colPrecoVenda;
     }
 
@@ -347,21 +384,29 @@ public class TmodelProduto {
         this.colLote = colLote;
     }
 
-    public TreeTableColumn<Produto, LocalDate> getColValidade() {
+    public TreeTableColumn<Produto, String> getColValidade() {
         return colValidade;
     }
 
-    public void setColValidade(TreeTableColumn<Produto, LocalDate> colValidade) {
+    public void setColValidade(TreeTableColumn<Produto, String> colValidade) {
         this.colValidade = colValidade;
     }
 
-    public TreeTableColumn<Produto, String> getColNFeEntrada() {
-        return colNFeEntrada;
+    public ProdutoDAO getProdutoDAO() {
+        return produtoDAO;
     }
 
-    public void setColNFeEntrada(TreeTableColumn<Produto, String> colNFeEntrada) {
-        this.colNFeEntrada = colNFeEntrada;
+    public void setProdutoDAO(ProdutoDAO produtoDAO) {
+        this.produtoDAO = produtoDAO;
     }
+
+    //    public TreeTableColumn<Produto, String> getColEstoqueId() {
+//        return colEstoqueId;
+//    }
+//
+//    public void setColEstoqueId(TreeTableColumn<Produto, String> colEstoqueId) {
+//        this.colEstoqueId = colEstoqueId;
+//    }
 
     /**
      * END Gets and Setters

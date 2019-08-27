@@ -1,6 +1,8 @@
 package br.com.tlmacedo.cafeperfeito.interfaces.jpa;
 
+
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.List;
@@ -9,28 +11,64 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
     private ConnectionFactory conexao;
 
     public DAOImpl() {
-        if (conexao == null)
-            conexao = new ConnectionFactory();
+        if (getConexao() == null)
+            setConexao(new ConnectionFactory());
+    }
+
+//    @Override
+//    public T merger(T entity) {
+//        try {
+//            getConexao().getEntityManager().getTransaction().begin();
+//            T saved = getConexao().getEntityManager().merge(entity);
+//            getConexao().getEntityManager().getTransaction().commit();
+//            return saved;
+//        } catch (Exception ex) {
+//                transactionRollback(ex);
+//            return null;
+//        }
+//    }
+
+    @Override
+    public void transactionBegin() {
+        getTransaction().begin();
     }
 
     @Override
-    public T persiste(T entity) {
-        conexao.getEntityManager().getTransaction().begin();
-        T saved = conexao.getEntityManager().merge(entity);
-        conexao.getEntityManager().getTransaction().commit();
+    public T setTransactionPersist(T entity) {
+//        try {
+        T saved = getConexao().getEntityManager().merge(entity);
         return saved;
+//        } catch (Exception ex) {
+//            transactionRollback();
+//            return null;
+//        }
+    }
+
+    @Override
+    public void transactionCommit() {
+//        try {
+        getTransaction().commit();
+//        } catch (Exception ex) {
+//            transactionRollback(ex);
+//        }
+    }
+
+    @Override
+    public void transactionRollback() {
+        if (getTransaction() == null)
+            getTransaction().rollback();
     }
 
     @Override
     public void remove(T entity) {
-        conexao.getEntityManager().getTransaction().begin();
-        conexao.getEntityManager().remove(entity);
-        conexao.getEntityManager().getTransaction().commit();
+        getConexao().getEntityManager().getTransaction().begin();
+        getConexao().getEntityManager().remove(entity);
+        getConexao().getEntityManager().getTransaction().commit();
     }
 
     @Override
     public T getById(Class<T> classe, I pk) {
-        return conexao.getEntityManager().find(classe, pk);
+        return getConexao().getEntityManager().find(classe, pk);
     }
 
     @Override
@@ -44,7 +82,7 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
                     orderBy != null
                             ? String.format(" order by %s", orderBy) : ""
             );
-            select = conexao.getEntityManager().createQuery(sql);
+            select = getConexao().getEntityManager().createQuery(sql);
 //        List<T> list = select.getResultList();
 //        return list;
             return select.getResultList();
@@ -56,8 +94,22 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
 
     @Override
     public EntityManager getEntityManager() {
-        if (conexao == null)
-            conexao = new ConnectionFactory();
-        return conexao.getEntityManager();
+        if (getConexao() == null)
+            setConexao(new ConnectionFactory());
+        return getConexao().getEntityManager();
+    }
+
+    @Override
+    public EntityTransaction getTransaction() {
+        return getConexao().getEntityManager().getTransaction();
+    }
+
+
+    public ConnectionFactory getConexao() {
+        return conexao;
+    }
+
+    public void setConexao(ConnectionFactory conexao) {
+        this.conexao = conexao;
     }
 }

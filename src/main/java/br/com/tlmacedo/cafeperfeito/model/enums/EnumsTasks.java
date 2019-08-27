@@ -10,7 +10,8 @@ public enum EnumsTasks {
     TABELA_CRIAR(0, "criando tabela de "),
     TABELA_VINCULAR(1, "vinculando tModel"),
     TABELA_PREENCHER(2, "preenchendo tabela de "),
-    COMBOS_PREENCHER(3, "carregando informações do cadastro");
+    COMBOS_PREENCHER(3, "carregando informações do cadastro"),
+    SALVAR_SAIDA(4, "salvando");
 
     private int cod;
     private String descricao;

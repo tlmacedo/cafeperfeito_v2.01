@@ -1,6 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.AccessGuest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -25,6 +26,7 @@ public class Usuario extends Colaborador implements Serializable {
     public Usuario() {
     }
 
+    @JsonIgnore
     @Transient
     public String getDetalhe() {
         StringBuilder detalhe = new StringBuilder();

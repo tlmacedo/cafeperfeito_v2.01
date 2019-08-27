@@ -62,6 +62,20 @@
     -fx-background-insets: 1 0 0 1, 2;
     -fx-background-radius: 4;
     -fx-padding: 2; }
+  .label.label-total-valor {
+    -fx-border-base: black;
+    -fx-border-shadow: -fx-base;
+    -fx-light-border: derive(-fx-border-base, 25%);
+    -fx-border-color: -fx-light-border -fx-border-base -fx-border-base -fx-light-border;
+    -fx-border-insets: 0 1 1 0;
+    -fx-background-color: -fx-border-shadow, -fx-background;
+    -fx-background-insets: 1 0 0 1, 2;
+    -fx-background-radius: 4;
+    -fx-padding: 2;
+    -fx-text-fill: white;
+    -fx-alignment: center-right;
+    -fx-font-weight: bold;
+    -fx-font-size: 22px; }
   .label.lbl_titulo {
     -fx-font-size: 24px;
     -fx-font-weight: bold;

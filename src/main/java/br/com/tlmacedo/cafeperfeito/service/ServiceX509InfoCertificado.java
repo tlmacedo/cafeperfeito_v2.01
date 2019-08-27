@@ -3,20 +3,15 @@ package br.com.tlmacedo.cafeperfeito.service;
 //import org.bouncycastle.asn1.*;
 //import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
-import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 
 public class ServiceX509InfoCertificado {

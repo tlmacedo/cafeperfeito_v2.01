@@ -3,6 +3,8 @@ package br.com.tlmacedo.cafeperfeito.service;
 import com.google.common.base.Splitter;
 import javafx.scene.control.TextField;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +71,23 @@ public class ServiceMascara {
         return sinal + value;
     }
 
+    public static String getMoeda(String value, int decimal) {
+        return formataNumeroDecimal(value, decimal);
+    }
+
+    public static String getMoeda(BigDecimal value, int decimal) {
+        if (value.toString().contains(".") || value.toString().contains(","))
+            return formataNumeroDecimal(value.setScale(decimal).toString(), decimal);
+        else
+            return formataNumeroDecimal(value.toString(), decimal);
+    }
+
+    public static BigDecimal getBigDecimalFromTextField(String value, int decimal) {
+        if (value.equals("") || value == null) return BigDecimal.ZERO.setScale(decimal);
+        BigDecimal result = new BigDecimal(formataNumeroDecimal(value, decimal).replace(".", "")
+                .replace(",", ".")).setScale(decimal, RoundingMode.HALF_UP);
+        return result.toString() != "0.00" ? result : BigDecimal.ZERO;
+    }
     public static String getTelefone(String value) {
         String strValue = value.replaceAll("\\D", "").trim();
         if (strValue.length() > 11) strValue = strValue.substring(0, 11);

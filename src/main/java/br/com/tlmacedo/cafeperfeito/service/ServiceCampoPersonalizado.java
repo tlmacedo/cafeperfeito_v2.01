@@ -8,6 +8,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.*;
@@ -33,6 +35,26 @@ public class ServiceCampoPersonalizado {
                 if (hashMap.containsKey("binding"))
                     if (hashMap.get("binding").equals("true"))
                         return;
+                if (hashMap.containsKey("type")) {
+                    if (value.equals("now"))
+                        switch (hashMap.get("type")) {
+                            case "timeHMS":
+                                value = LocalTime.now().format(DTF_HORA_HMS);
+                                break;
+                            case "timeHM":
+                                value = LocalTime.now().format(DTF_HORA_HM);
+                                break;
+                            case "date":
+                                value = LocalDate.now().format(DTF_DATA);
+                                break;
+                            case "dateTimeHMS":
+                                value = LocalDateTime.now().format(DTF_DATAHORA_HMS);
+                                break;
+                            case "dateTimeHM":
+                                value = LocalDateTime.now().format(DTF_DATAHORA_HM);
+                                break;
+                        }
+                }
                 if (node instanceof Label)
                     ((Label) node).setText(value);
                 else if (node instanceof TextField)
@@ -204,6 +226,12 @@ public class ServiceCampoPersonalizado {
                         break;
                     case "fiscal_doc_origem":
                         mascara = MASK_FISCAL_DOC_ORIGEM;
+                        break;
+                    case "timeHMS":
+                        mascara = MASK_HORA_HMS;
+                        break;
+                    case "timeHM":
+                        mascara = MASK_HORA_HM;
                         break;
                 }
                 if (mascara != null)

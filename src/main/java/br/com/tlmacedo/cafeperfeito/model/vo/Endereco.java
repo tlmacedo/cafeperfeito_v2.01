@@ -1,7 +1,10 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.TipoEndereco;
-import javafx.beans.property.*;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,7 +15,7 @@ public class Endereco implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private IntegerProperty tipo = new SimpleIntegerProperty();
+    private TipoEndereco tipo;
     private StringProperty cep = new SimpleStringProperty();
     private StringProperty logradouro = new SimpleStringProperty();
     private StringProperty numero = new SimpleStringProperty();
@@ -39,17 +42,13 @@ public class Endereco implements Serializable {
         this.id.set(id);
     }
 
-    @Column(length = 2, nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     public TipoEndereco getTipo() {
-        return TipoEndereco.toEnum(tipo.get());
-    }
-
-    public IntegerProperty tipoProperty() {
         return tipo;
     }
 
     public void setTipo(TipoEndereco tipo) {
-        this.tipo.set(tipo.getCod());
+        this.tipo = tipo;
     }
 
     @Column(length = 8, nullable = false)
@@ -141,6 +140,6 @@ public class Endereco implements Serializable {
 
     @Override
     public String toString() {
-        return TipoEndereco.toEnum(tipoProperty().get()).getDescricao();
+        return getTipo().getDescricao();
     }
 }

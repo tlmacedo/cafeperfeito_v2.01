@@ -127,6 +127,16 @@
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-java:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm:7.0-beta" level="project" />
     <orderEntry type="library" name="Maven: com.thoughtworks.qdox:qdox:2.0-M9" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.0.pr1" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.10.0.pr1" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.10.0.pr1" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.10.0.pr1" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.10.0.pr1" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.2" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.activation:jakarta.activation-api:1.2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.woodstox:stax2-api:4.2" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.woodstox:woodstox-core:6.0.0.pr2" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20190722" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.main.extras:glassfish-embedded-all:4.0.1-b05" level="project" />
     <orderEntry type="library" name="Maven: net.sourceforge.barbecue:barbecue:1.5-beta1" level="project" />
   </component>

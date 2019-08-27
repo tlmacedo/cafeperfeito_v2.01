@@ -1,8 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.view;
 
 import br.com.tlmacedo.cafeperfeito.service.ServiceOpenView;
-import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
-import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;

@@ -51,6 +51,7 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
     private Image icoJanelaAtivado = new Image(getClass().getResource(TCONFIG.getFxml().getPrincipal().getIconeAtivo()).toString());
     private Image icoJanelaDesativado = new Image(getClass().getResource(TCONFIG.getFxml().getPrincipal().getIconeDesativo()).toString());
     private ServiceStatusBar serviceStatusBar;
+    public static String lastKey;
 
 
     @Override
@@ -351,5 +352,13 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
 
     public void setServiceStatusBar(ServiceStatusBar serviceStatusBar) {
         this.serviceStatusBar = serviceStatusBar;
+    }
+
+    public static String getLastKey() {
+        return lastKey;
+    }
+
+    public static void setLastKey(String lastKey) {
+        ControllerPrincipal.lastKey = lastKey;
     }
 }

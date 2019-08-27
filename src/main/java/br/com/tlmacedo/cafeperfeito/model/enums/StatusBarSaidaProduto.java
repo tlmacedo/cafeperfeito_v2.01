@@ -2,7 +2,7 @@ package br.com.tlmacedo.cafeperfeito.model.enums;
 
 public enum StatusBarSaidaProduto {
 
-    DIGITACAO(0, "[F1-Novo]  [F2-Finalizar venda]  [F3-]  [F4-]  [F5-]  [F6-Cliente]  [F7-Pesquisa produto]  [F8-Itens venda]  [F9-nfe]  [F10-]  [F11-]  [F12-Sair]"),
+    DIGITACAO(0, "[F1-Novo]  [F2-Finalizar venda]  [F6-Cliente]  [F7-Pesquisa produto]  [F8-Itens venda]  [F9-nfe]  [F12-Sair]"),
     FINALIZADA(1, "[F12-Sair]");
 
     private Integer cod;

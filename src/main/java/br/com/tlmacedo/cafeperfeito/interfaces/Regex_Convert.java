@@ -85,6 +85,8 @@ public interface Regex_Convert {
 
     String REGEX_DTF_DATA = "(\\d{2}/\\d{2}/\\d{4})";
     String REGEX_DTF_DATA_FS = "$1/$2/$3";
+    String MASK_HORA_HMS = "##:##:##";
+    String MASK_HORA_HM = "##:##";
 
 
     String PATH_CLASS_ARQ_NFE_CACERT = "/Volumes/150GB-Development/cafeperfeito/cafeperfeito/src/main/resources/certificado/cacertttt";
@@ -97,8 +99,10 @@ public interface Regex_Convert {
     LocalDateTime DATAHORA_LOCAL = LocalDateTime.now().atZone(MY_ZONE_TIME).toLocalDateTime();
     DataFormat DT_DATA = new DataFormat("dd/MM/yyyy");
     DateTimeFormatter DTF_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    DateTimeFormatter DTF_HORA = DateTimeFormatter.ofPattern("HH:mm:ss", LOCALE);
-    DateTimeFormatter DTF_DATAHORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", LOCALE);
+    DateTimeFormatter DTF_HORA_HM = DateTimeFormatter.ofPattern("HH:mm:ss", LOCALE);
+    DateTimeFormatter DTF_HORA_HMS = DateTimeFormatter.ofPattern("HH:mm", LOCALE);
+    DateTimeFormatter DTF_DATAHORA_HM = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", LOCALE);
+    DateTimeFormatter DTF_DATAHORA_HMS = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", LOCALE);
     DateTimeFormatter DTF_NFE_TO_LOCAL_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX", LOCALE);
     DateTimeFormatter DTF_DATAHORAFUSO = DateTimeFormatter.ofPattern("dd/MM/yyyy'T'HH:mm:ssXXX", LOCALE);
     DateTimeFormatter DTF_MYSQL_DATA = DateTimeFormatter.ofPattern("yyyy-MM-dd");

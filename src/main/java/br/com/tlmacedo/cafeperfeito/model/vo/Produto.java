@@ -3,9 +3,9 @@ package br.com.tlmacedo.cafeperfeito.model.vo;
 import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoProduto;
 import br.com.tlmacedo.cafeperfeito.model.enums.UndComercialProduto;
 import br.com.tlmacedo.cafeperfeito.service.ServiceImageUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 import javafx.scene.image.Image;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -55,11 +55,9 @@ public class Produto implements Serializable {
 
     private Blob imgProduto, imgProdutoBack;
 
-    private LongProperty tblEstoque_id = new SimpleLongProperty();
     private IntegerProperty tblEstoque = new SimpleIntegerProperty();
     private StringProperty tblLote = new SimpleStringProperty();
     private ObjectProperty<LocalDate> tblValidade = new SimpleObjectProperty<>();
-    private StringProperty tblDocEntrada = new SimpleStringProperty();
 
     private List<ProdutoCodigoBarra> produtoCodigoBarraList = new ArrayList<>();
 
@@ -68,12 +66,16 @@ public class Produto implements Serializable {
     public Produto() {
     }
 
-    public Produto(ProdutoEstoque produtoEstoque) {
-        this.tblEstoque_id = new SimpleLongProperty(produtoEstoque.getId());
-        this.tblEstoque = new SimpleIntegerProperty(produtoEstoque.getQtd());
-        this.tblLote = new SimpleStringProperty(produtoEstoque.getLote());
-        this.tblValidade = new SimpleObjectProperty<>(produtoEstoque.getValidade());
-        this.tblDocEntrada = new SimpleStringProperty(produtoEstoque.getDocEntrada());
+    public Produto(ProdutoEstoque estoque) {
+        this.tblEstoque = estoque.qtdProperty();
+        this.tblLote = estoque.loteProperty();
+        this.tblValidade = estoque.validadeProperty();
+    }
+
+    public Produto(Integer qtdEstoq, String lote, LocalDate validade) {
+        this.tblEstoque = new SimpleIntegerProperty(qtdEstoq);
+        this.tblLote = new SimpleStringProperty(lote);
+        this.tblValidade = new SimpleObjectProperty<>(validade);
     }
 
     @Override
@@ -231,6 +233,7 @@ public class Produto implements Serializable {
         this.comissao.set(comissao);
     }
 
+    @JsonIgnore
     @ManyToOne
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro;
@@ -254,6 +257,7 @@ public class Produto implements Serializable {
         this.dtCadastro.set(dtCadastro);
     }
 
+    @JsonIgnore
     @ManyToOne
     public Usuario getUsuarioAtualizacao() {
         return usuarioAtualizacao;
@@ -411,19 +415,6 @@ public class Produto implements Serializable {
     }
 
     @Transient
-    public long getTblEstoque_id() {
-        return tblEstoque_id.get();
-    }
-
-    public LongProperty tblEstoque_idProperty() {
-        return tblEstoque_id;
-    }
-
-    public void setTblEstoque_id(long tblEstoque_id) {
-        this.tblEstoque_id.set(tblEstoque_id);
-    }
-
-    @Transient
     public int getTblEstoque() {
         return tblEstoque.get();
     }
@@ -462,19 +453,7 @@ public class Produto implements Serializable {
         this.tblValidade.set(tblValidade);
     }
 
-    @Transient
-    public String getTblDocEntrada() {
-        return tblDocEntrada.get();
-    }
-
-    public StringProperty tblDocEntradaProperty() {
-        return tblDocEntrada;
-    }
-
-    public void setTblDocEntrada(String tblDocEntrada) {
-        this.tblDocEntrada.set(tblDocEntrada);
-    }
-
+    @JsonIgnore
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<ProdutoEstoque> getProdutoEstoqueList() {
         return produtoEstoqueList;
@@ -484,6 +463,7 @@ public class Produto implements Serializable {
         this.produtoEstoqueList = produtoEstoqueList;
     }
 
+    @JsonIgnore
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<ProdutoCodigoBarra> getProdutoCodigoBarraList() {
         return produtoCodigoBarraList;
@@ -497,4 +477,43 @@ public class Produto implements Serializable {
     public String toString() {
         return descricaoProperty().get();
     }
+
+
+//    @Override
+//    public String toString() {
+//        return "Produto{" +
+//                "id=" + id +
+//                ", codigo=" + codigo +
+//                ", descricao=" + descricao +
+//                ", peso=" + peso +
+//                ", unidadeComercial=" + unidadeComercial +
+//                ", situacao=" + situacao +
+//                ", precoCompra=" + precoCompra +
+//                ", precoVenda=" + precoVenda +
+//                ", varejo=" + varejo +
+//                ", ultImpostoSefaz=" + ultImpostoSefaz +
+//                ", ultFrete=" + ultFrete +
+//                ", comissao=" + comissao +
+//                ", usuarioCadastro=" + usuarioCadastro +
+//                ", dtCadastro=" + dtCadastro +
+//                ", usuarioAtualizacao=" + usuarioAtualizacao +
+//                ", dtAtualizacao=" + dtAtualizacao +
+//                ", nfeGenero=" + nfeGenero +
+//                ", ncm=" + ncm +
+//                ", cest=" + cest +
+////                ", fiscalCstOrigem=" + fiscalCstOrigem +
+////                ", fiscalIcms=" + fiscalIcms +
+////                ", fiscalPis=" + fiscalPis +
+////                ", fiscalCofins=" + fiscalCofins +
+////                ", imgProduto=" + imgProduto +
+////                ", imgProdutoBack=" + imgProdutoBack +
+//                ", tblEstoque_id=" + tblEstoque_id +
+//                ", tblEstoque=" + tblEstoque +
+//                ", tblLote=" + tblLote +
+//                ", tblValidade=" + tblValidade +
+//                ", tblDocEntrada=" + tblDocEntrada +
+////                ", produtoCodigoBarraList=" + produtoCodigoBarraList +
+//                ", produtoEstoqueList=" + produtoEstoqueList +
+//                '}';
+//    }
 }

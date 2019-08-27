@@ -12,8 +12,8 @@ import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.StringUti
 
 import java.time.LocalTime;
 
-import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATAHORA;
-import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_HORA;
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATAHORA_HMS;
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_HORA_HMS;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 public class ServiceStatusBar {
@@ -47,12 +47,12 @@ public class ServiceStatusBar {
                 TCONFIG.getSis().getConnectDB().getDbPorta(),
                 TCONFIG.getSis().getConnectDB().getDbDatabase()
         );
-        tooHorarioLog = DTF_DATAHORA.format(UsuarioLogado.getDataDeLog());
+        tooHorarioLog = DTF_DATAHORA_HMS.format(UsuarioLogado.getDataDeLog());
         getStbRelogio().setTooltip(new Tooltip(
                 String.format("banco de dados: [%s]\thorário_log: %s",
                         toolDataBase, tooHorarioLog)
         ));
-        setTimeline(new Timeline(new KeyFrame(Duration.millis(1000), actionEvent -> getStbRelogio().setText(LocalTime.now().format(DTF_HORA)))));
+        setTimeline(new Timeline(new KeyFrame(Duration.millis(1000), actionEvent -> getStbRelogio().setText(LocalTime.now().format(DTF_HORA_HMS)))));
         getTimeline().setCycleCount(Animation.INDEFINITE);
         getTimeline().play();
 
