@@ -72,7 +72,7 @@ public class SaidaProdutoProduto implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     public SaidaProduto getSaidaProduto() {
         return saidaProduto;
     }
@@ -167,7 +167,7 @@ public class SaidaProdutoProduto implements Serializable {
         this.qtd.set(qtd);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getVlrVenda() {
         return vlrVenda.get();
     }
@@ -180,7 +180,7 @@ public class SaidaProdutoProduto implements Serializable {
         this.vlrVenda.set(vlrVenda);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getVlrBruto() {
         return vlrBruto.get();
     }
@@ -193,7 +193,7 @@ public class SaidaProdutoProduto implements Serializable {
         this.vlrBruto.set(vlrBruto);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getVlrDesconto() {
         return vlrDesconto.get();
     }

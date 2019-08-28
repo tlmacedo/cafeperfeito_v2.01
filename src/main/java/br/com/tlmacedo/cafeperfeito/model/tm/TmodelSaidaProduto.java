@@ -1,10 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.tm;
 
 import br.com.tlmacedo.cafeperfeito.controller.ControllerPrincipal;
-import br.com.tlmacedo.cafeperfeito.model.dao.ContasAReceberDAO;
-import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
-import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoEstoqueDAO;
-import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
+import br.com.tlmacedo.cafeperfeito.model.dao.*;
 import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
 import br.com.tlmacedo.cafeperfeito.model.enums.TipoSaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
@@ -41,6 +38,7 @@ public class TmodelSaidaProduto {
     private SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
     private ProdutoEstoqueDAO produtoEstoqueDAO = new ProdutoEstoqueDAO();
     private ContasAReceberDAO contasAReceberDAO = new ContasAReceberDAO();
+    private FichaKardexDAO fichaKardexDAO = new FichaKardexDAO();
 
     private TableColumn<SaidaProdutoProduto, String> colId;
     private TableColumn<SaidaProdutoProduto, String> colProdId;
@@ -443,6 +441,7 @@ public class TmodelSaidaProduto {
         setSaidaProdutoDAO(new SaidaProdutoDAO());
         setProdutoEstoqueDAO(new ProdutoEstoqueDAO());
         setContasAReceberDAO(new ContasAReceberDAO());
+        setFichaKardexDAO(new FichaKardexDAO());
         getSaidaProdutoProdutoObservableList().clear();
     }
     /**
@@ -450,7 +449,7 @@ public class TmodelSaidaProduto {
      */
 
     /**
-     * Begin booleans
+     * Begin Returns
      */
 
     public Integer validEstoque(Integer newQtd, Integer oldQtd) {
@@ -474,6 +473,56 @@ public class TmodelSaidaProduto {
         }
     }
 
+    private FichaKardex newFichaKardex(Integer qtdSaida, ProdutoEstoque estoque, List<ProdutoEstoque> produtoEstoqueList) {
+        FichaKardex fichaKardex = new FichaKardex();
+        try {
+            fichaKardex.setProduto(estoque.getProduto());
+            fichaKardex.documentoProperty().setValue(getSaidaProduto().idProperty().getValue().toString());
+            fichaKardex.detalheProperty().setValue(estoque.loteProperty().getValue());
+            fichaKardex.qtdProperty().setValue(qtdSaida);
+            fichaKardex.vlrUnitarioProperty().setValue(estoque.vlrBrutoProperty().getValue()
+                    .add(estoque.vlrFreteBrutoProperty().getValue())
+                    .add(estoque.vlrImpostoNaEntradaProperty().getValue())
+                    .add(estoque.vlrImpostoFreteNaEntradaProperty().getValue())
+                    .add(estoque.vlrImpostoDentroFreteProperty().getValue())
+                    .add(estoque.vlrFreteTaxaProperty().getValue())
+            );
+
+            fichaKardex.qtdEntradaProperty().setValue(0);
+            fichaKardex.vlrEntradaProperty().setValue(BigDecimal.ZERO);
+
+            fichaKardex.qtdSaidaProperty().setValue(qtdSaida);
+            fichaKardex.vlrSaidaProperty().setValue(fichaKardex.vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdSaida)));
+
+            fichaKardex.saldoProperty().setValue(produtoEstoqueList.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
+
+            fichaKardex.vlrSaldoProperty().setValue(produtoEstoqueList.stream().filter(stq -> stq.qtdProperty().getValue() > 0)
+                    .map(stq ->
+                            (stq.vlrBrutoProperty().getValue()
+                                    .add(stq.vlrFreteBrutoProperty().getValue())
+                                    .add(stq.vlrImpostoNaEntradaProperty().getValue())
+                                    .add(stq.vlrImpostoFreteNaEntradaProperty().getValue())
+                                    .add(stq.vlrImpostoDentroFreteProperty().getValue())
+                                    .add(stq.vlrFreteTaxaProperty().getValue()))
+                                    .multiply(BigDecimal.valueOf(stq.qtdProperty().getValue()))
+                    )
+                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return fichaKardex;
+    }
+
+    /**
+     * END Returns
+     */
+
+    /**
+     * Begin booleans
+     */
+
     public boolean guardarSaidaProduto() {
         try {
             getSaidaProduto().setCliente(empresaProperty().getValue());
@@ -483,7 +532,6 @@ public class TmodelSaidaProduto {
             getSaidaProdutoProdutoObservableList().stream().forEach(saidaProdutoProduto -> saidaProdutoProduto.setSaidaProduto(getSaidaProduto()));
 
             getSaidaProduto().setSaidaProdutoProdutoList(getSaidaProdutoProdutoObservableList());
-
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
@@ -494,10 +542,7 @@ public class TmodelSaidaProduto {
     public boolean salvarSaidaProduto() {
         try {
             getSaidaProdutoDAO().transactionBegin();
-//            setSaidaProduto(getSaidaProdutoDAO().merger(getSaidaProduto()));
-            //getSaidaProdutoDAO().merger(getSaidaProduto());
             setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
-//            getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto());
             getSaidaProdutoDAO().transactionCommit();
             if (baixarEstoque()) {
                 ContasAReceber aReceber = new ContasAReceber();
@@ -511,12 +556,14 @@ public class TmodelSaidaProduto {
                 aReceber.setSaidaProduto(getSaidaProduto());
                 getContasAReceberDAO().setTransactionPersist(aReceber);
             }
+            getFichaKardexDAO().transactionCommit();
             getProdutoEstoqueDAO().transactionCommit();
             getContasAReceberDAO().transactionCommit();
         } catch (Exception ex) {
             System.out.printf("não o erro foi bem aqui!\n");
             ex.printStackTrace();
             getSaidaProdutoDAO().transactionRollback();
+            getFichaKardexDAO().transactionRollback();
             getProdutoEstoqueDAO().transactionRollback();
             getContasAReceberDAO().transactionRollback();
             return false;
@@ -526,6 +573,7 @@ public class TmodelSaidaProduto {
 
     private boolean baixarEstoque() throws Exception {
         getProdutoEstoqueDAO().transactionBegin();
+        getFichaKardexDAO().transactionBegin();
         getSaidaProdutoProdutoObservableList().stream()
                 .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd)).sorted(Comparator.comparing(SaidaProdutoProduto::getDtValidade))
                 .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd, LinkedHashMap::new, Collectors.toList()))
@@ -541,9 +589,11 @@ public class TmodelSaidaProduto {
                                             if (saldoSaida[0] > 0) {
                                                 estoque.qtdProperty().setValue(estoque.qtdProperty().getValue() - saldoSaida[0]);
                                                 if (estoque.qtdProperty().getValue() < 0) {
+                                                    getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0] + estoque.qtdProperty().getValue(), estoque, produtoEstoqueList));
                                                     saldoSaida[0] = estoque.qtdProperty().getValue() * (-1);
                                                     estoque.qtdProperty().setValue(0);
                                                 } else {
+                                                    getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0], estoque, produtoEstoqueList));
                                                     saldoSaida[0] = 0;
                                                 }
                                                 getProdutoEstoqueDAO().setTransactionPersist(estoque);
@@ -868,6 +918,13 @@ public class TmodelSaidaProduto {
         this.contasAReceberDAO = contasAReceberDAO;
     }
 
+    public FichaKardexDAO getFichaKardexDAO() {
+        return fichaKardexDAO;
+    }
+
+    public void setFichaKardexDAO(FichaKardexDAO fichaKardexDAO) {
+        this.fichaKardexDAO = fichaKardexDAO;
+    }
     /**
      * END Gets and Setters
      */

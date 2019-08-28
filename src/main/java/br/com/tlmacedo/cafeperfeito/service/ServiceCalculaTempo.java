@@ -14,7 +14,7 @@ public class ServiceCalculaTempo {
         fim = System.currentTimeMillis();
         System.out.printf("\tfim: [%s]", fim);
 
-        System.out.printf("\t\t\ttempo: [%s]\n", fim - ini);
+        System.out.printf("\n\ttempo: [%s]\n", fim - ini);
 
     }
 

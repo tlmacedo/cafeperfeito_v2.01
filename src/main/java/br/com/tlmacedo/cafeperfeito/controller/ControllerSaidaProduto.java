@@ -264,11 +264,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                         limpaCampos(getPainelViewSaidaProduto());
                         break;
                     case F2:
+                        ServiceCalculaTempo calcTmp = new ServiceCalculaTempo();
                         getEnumsTasksList().clear();
                         getEnumsTasksList().add(EnumsTasks.SALVAR_SAIDA);
                         if (new ServiceSegundoPlano().abrindoCadastro(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
                             limpaCampos(getPainelViewSaidaProduto());
                         }
+                        calcTmp.fim();
                         break;
                     case F6:
                         getCboEmpresa().getEditor().setEditable(true);

@@ -17,15 +17,10 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
 
 //    @Override
 //    public T merger(T entity) {
-//        try {
-//            getConexao().getEntityManager().getTransaction().begin();
-//            T saved = getConexao().getEntityManager().merge(entity);
-//            getConexao().getEntityManager().getTransaction().commit();
-//            return saved;
-//        } catch (Exception ex) {
-//                transactionRollback(ex);
-//            return null;
-//        }
+//        transactionBegin();
+//        T saved = getConexao().getEntityManager().merge(entity);
+//        transactionCommit();
+//        return saved;
 //    }
 
     @Override
@@ -35,40 +30,53 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
 
     @Override
     public T setTransactionPersist(T entity) {
-//        try {
-        T saved = getConexao().getEntityManager().merge(entity);
-        return saved;
-//        } catch (Exception ex) {
-//            transactionRollback();
-//            return null;
-//        }
+        try {
+            T saved = getConexao().getEntityManager().merge(entity);
+            return saved;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override
     public void transactionCommit() {
-//        try {
-        getTransaction().commit();
-//        } catch (Exception ex) {
-//            transactionRollback(ex);
-//        }
+        try {
+            getTransaction().commit();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void transactionRollback() {
-        if (getTransaction() == null)
-            getTransaction().rollback();
+        try {
+            if (getTransaction() == null)
+                getTransaction().rollback();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void remove(T entity) {
-        getConexao().getEntityManager().getTransaction().begin();
-        getConexao().getEntityManager().remove(entity);
-        getConexao().getEntityManager().getTransaction().commit();
+        try {
+            getConexao().getEntityManager().getTransaction().begin();
+            getConexao().getEntityManager().remove(entity);
+            getConexao().getEntityManager().getTransaction().commit();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public T getById(Class<T> classe, I pk) {
-        return getConexao().getEntityManager().find(classe, pk);
+        try {
+            return getConexao().getEntityManager().find(classe, pk);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override

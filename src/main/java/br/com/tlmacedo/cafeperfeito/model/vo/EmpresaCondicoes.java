@@ -40,7 +40,7 @@ public class EmpresaCondicoes implements Serializable {
         this.id.set(id);
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Empresa getEmpresa() {
         return empresa;
     }
@@ -49,7 +49,7 @@ public class EmpresaCondicoes implements Serializable {
         this.empresa = empresa;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Produto getProduto() {
         return produto;
     }
@@ -58,7 +58,7 @@ public class EmpresaCondicoes implements Serializable {
         this.produto = produto;
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getValor() {
         return valor.get();
     }
@@ -123,7 +123,7 @@ public class EmpresaCondicoes implements Serializable {
         this.retirada.set(retirada);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getDesconto() {
         return desconto.get();
     }

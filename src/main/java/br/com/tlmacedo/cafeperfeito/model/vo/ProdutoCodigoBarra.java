@@ -52,7 +52,7 @@ public class ProdutoCodigoBarra implements Serializable {
         this.codigoBarra.set(codigoBarra);
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Produto getProduto() {
         return produto;
     }

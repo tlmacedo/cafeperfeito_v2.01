@@ -51,7 +51,7 @@ public class Telefone implements Serializable {
         this.descricao.set(descricao);
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public TelefoneOperadora getTelefoneOperadora() {
         return telefoneOperadora;
     }

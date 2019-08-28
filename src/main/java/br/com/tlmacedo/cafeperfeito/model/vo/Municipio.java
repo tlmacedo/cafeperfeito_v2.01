@@ -88,7 +88,7 @@ public class Municipio implements Serializable {
         this.ddd.set(ddd);
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Uf getUf() {
         return uf;
     }

@@ -155,7 +155,7 @@ public class Produto implements Serializable {
         this.situacao = situacao;
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getPrecoCompra() {
         return precoCompra.get();
     }
@@ -168,7 +168,7 @@ public class Produto implements Serializable {
         this.precoCompra.set(precoCompra);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getPrecoVenda() {
         return precoVenda.get();
     }
@@ -194,7 +194,7 @@ public class Produto implements Serializable {
         this.varejo.set(varejo);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getUltImpostoSefaz() {
         return ultImpostoSefaz.get();
     }
@@ -207,7 +207,7 @@ public class Produto implements Serializable {
         this.ultImpostoSefaz.set(ultImpostoSefaz);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getUltFrete() {
         return ultFrete.get();
     }
@@ -220,7 +220,7 @@ public class Produto implements Serializable {
         this.ultFrete.set(ultFrete);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getComissao() {
         return comissao.get();
     }
@@ -234,7 +234,7 @@ public class Produto implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro;
     }
@@ -258,7 +258,7 @@ public class Produto implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioAtualizacao() {
         return usuarioAtualizacao;
     }
@@ -319,7 +319,7 @@ public class Produto implements Serializable {
         this.cest.set(cest);
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public FiscalCstOrigem getFiscalCstOrigem() {
         return fiscalCstOrigem;
     }
@@ -328,7 +328,7 @@ public class Produto implements Serializable {
         this.fiscalCstOrigem = fiscalCstOrigem;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public FiscalIcms getFiscalIcms() {
         return fiscalIcms;
     }
@@ -337,7 +337,7 @@ public class Produto implements Serializable {
         this.fiscalIcms = fiscalIcms;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public FiscalPisCofins getFiscalPis() {
         return fiscalPis;
     }
@@ -346,7 +346,7 @@ public class Produto implements Serializable {
         this.fiscalPis = fiscalPis;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public FiscalPisCofins getFiscalCofins() {
         return fiscalCofins;
     }

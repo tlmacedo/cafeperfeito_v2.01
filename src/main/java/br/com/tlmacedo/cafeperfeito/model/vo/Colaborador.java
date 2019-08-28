@@ -97,7 +97,7 @@ public class Colaborador implements Serializable {
         this.dtAdmisao.set(dtAdmisao);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getSalario() {
         return salario.get();
     }

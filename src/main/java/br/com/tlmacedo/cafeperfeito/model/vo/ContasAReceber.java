@@ -43,7 +43,7 @@ public class ContasAReceber implements Serializable {
         this.id.set(id);
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public SaidaProduto getSaidaProduto() {
         return saidaProduto;
     }
@@ -74,7 +74,7 @@ public class ContasAReceber implements Serializable {
         this.pagamentoSituacao = pagamentoSituacao;
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getValor() {
         return valor.get();
     }
@@ -87,7 +87,7 @@ public class ContasAReceber implements Serializable {
         this.valor.set(valor);
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro;
     }

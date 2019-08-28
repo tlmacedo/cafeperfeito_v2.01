@@ -16,22 +16,22 @@ public class ProdutoEstoque implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
+    private Produto produto = new Produto();
     private IntegerProperty qtd = new SimpleIntegerProperty();
     private StringProperty lote = new SimpleStringProperty();
     private ObjectProperty<LocalDate> validade = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrFreteBruto = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrImpostoNaEntrada = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrImpostoFreteNaEntrada = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrImpostoDentroFrete = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrFreteBruto = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrFreteTaxa = new SimpleObjectProperty<>();
 
     private Usuario usuarioCadastro = new Usuario();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
 
     private StringProperty docEntrada = new SimpleStringProperty();
     private StringProperty docEntradaChaveNFe = new SimpleStringProperty();
-
-    private Produto produto = new Produto();
 
     public ProdutoEstoque() {
     }
@@ -50,7 +50,17 @@ public class ProdutoEstoque implements Serializable {
         this.id.set(id);
     }
 
-    @Column(length = 9, nullable = false)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
+    @Column(length = 5, nullable = false)
     public int getQtd() {
         return qtd.get();
     }
@@ -88,7 +98,7 @@ public class ProdutoEstoque implements Serializable {
         this.validade.set(validade);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getVlrBruto() {
         return vlrBruto.get();
     }
@@ -101,46 +111,7 @@ public class ProdutoEstoque implements Serializable {
         this.vlrBruto.set(vlrBruto);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
-    public BigDecimal getVlrImpostoNaEntrada() {
-        return vlrImpostoNaEntrada.get();
-    }
-
-    public ObjectProperty<BigDecimal> vlrImpostoNaEntradaProperty() {
-        return vlrImpostoNaEntrada;
-    }
-
-    public void setVlrImpostoNaEntrada(BigDecimal vlrImpostoNaEntrada) {
-        this.vlrImpostoNaEntrada.set(vlrImpostoNaEntrada);
-    }
-
-    @Column(length = 19, scale = 2, nullable = false)
-    public BigDecimal getVlrImpostoFreteNaEntrada() {
-        return vlrImpostoFreteNaEntrada.get();
-    }
-
-    public ObjectProperty<BigDecimal> vlrImpostoFreteNaEntradaProperty() {
-        return vlrImpostoFreteNaEntrada;
-    }
-
-    public void setVlrImpostoFreteNaEntrada(BigDecimal vlrImpostoFreteNaEntrada) {
-        this.vlrImpostoFreteNaEntrada.set(vlrImpostoFreteNaEntrada);
-    }
-
-    @Column(length = 19, scale = 2, nullable = false)
-    public BigDecimal getVlrImpostoDentroFrete() {
-        return vlrImpostoDentroFrete.get();
-    }
-
-    public ObjectProperty<BigDecimal> vlrImpostoDentroFreteProperty() {
-        return vlrImpostoDentroFrete;
-    }
-
-    public void setVlrImpostoDentroFrete(BigDecimal vlrImpostoDentroFrete) {
-        this.vlrImpostoDentroFrete.set(vlrImpostoDentroFrete);
-    }
-
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getVlrFreteBruto() {
         return vlrFreteBruto.get();
     }
@@ -153,7 +124,59 @@ public class ProdutoEstoque implements Serializable {
         this.vlrFreteBruto.set(vlrFreteBruto);
     }
 
-    @ManyToOne
+    @Column(length = 19, scale = 4, nullable = false)
+    public BigDecimal getVlrImpostoNaEntrada() {
+        return vlrImpostoNaEntrada.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrImpostoNaEntradaProperty() {
+        return vlrImpostoNaEntrada;
+    }
+
+    public void setVlrImpostoNaEntrada(BigDecimal vlrImpostoNaEntrada) {
+        this.vlrImpostoNaEntrada.set(vlrImpostoNaEntrada);
+    }
+
+    @Column(length = 19, scale = 4, nullable = false)
+    public BigDecimal getVlrImpostoFreteNaEntrada() {
+        return vlrImpostoFreteNaEntrada.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrImpostoFreteNaEntradaProperty() {
+        return vlrImpostoFreteNaEntrada;
+    }
+
+    public void setVlrImpostoFreteNaEntrada(BigDecimal vlrImpostoFreteNaEntrada) {
+        this.vlrImpostoFreteNaEntrada.set(vlrImpostoFreteNaEntrada);
+    }
+
+    @Column(length = 19, scale = 4, nullable = false)
+    public BigDecimal getVlrImpostoDentroFrete() {
+        return vlrImpostoDentroFrete.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrImpostoDentroFreteProperty() {
+        return vlrImpostoDentroFrete;
+    }
+
+    public void setVlrImpostoDentroFrete(BigDecimal vlrImpostoDentroFrete) {
+        this.vlrImpostoDentroFrete.set(vlrImpostoDentroFrete);
+    }
+
+    @Column(length = 19, scale = 4, nullable = false)
+    public BigDecimal getVlrFreteTaxa() {
+        return vlrFreteTaxa.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrFreteTaxaProperty() {
+        return vlrFreteTaxa;
+    }
+
+    public void setVlrFreteTaxa(BigDecimal vlrFreteTaxa) {
+        this.vlrFreteTaxa.set(vlrFreteTaxa);
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro;
     }
@@ -202,33 +225,24 @@ public class ProdutoEstoque implements Serializable {
         this.docEntradaChaveNFe.set(docEntradaChaveNFe);
     }
 
-    @JsonIgnore
-    @ManyToOne()
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
-    }
-
     @Override
     public String toString() {
         return "ProdutoEstoque{" +
                 "id=" + id +
+                ", produto=" + produto +
                 ", qtd=" + qtd +
                 ", lote=" + lote +
                 ", validade=" + validade +
                 ", vlrBruto=" + vlrBruto +
+                ", vlrFreteBruto=" + vlrFreteBruto +
                 ", vlrImpostoNaEntrada=" + vlrImpostoNaEntrada +
                 ", vlrImpostoFreteNaEntrada=" + vlrImpostoFreteNaEntrada +
                 ", vlrImpostoDentroFrete=" + vlrImpostoDentroFrete +
-                ", vlrFreteBruto=" + vlrFreteBruto +
+                ", vlrFreteTaxa=" + vlrFreteTaxa +
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
                 ", docEntrada=" + docEntrada +
                 ", docEntradaChaveNFe=" + docEntradaChaveNFe +
-                ", produto=" + produto +
                 '}';
     }
 }

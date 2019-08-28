@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
-import static javafx.stage.StageStyle.TRANSPARENT;
+import static javafx.stage.StageStyle.UNDECORATED;
 
 public class ViewLogin {
 
@@ -31,7 +31,7 @@ public class ViewLogin {
 
         getStage().setResizable(false);
         getStage().setScene(scene);
-        getStage().initStyle(TRANSPARENT);
+        getStage().initStyle(UNDECORATED);
         getStage().setTitle(TCONFIG.getFxml().getLogin().getTitulo());
         getStage().getIcons().setAll(new Image(getClass().getResource(TCONFIG.getFxml().getLogin().getIcone()).toString()));
         scene.setFill(Color.TRANSPARENT);

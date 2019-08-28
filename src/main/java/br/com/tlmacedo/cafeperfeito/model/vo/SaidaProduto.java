@@ -43,7 +43,7 @@ public class SaidaProduto implements Serializable {
         this.id.set(id);
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Empresa getCliente() {
         return cliente;
     }
@@ -52,7 +52,7 @@ public class SaidaProduto implements Serializable {
         this.cliente = cliente;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getVendedor() {
         return vendedor;
     }

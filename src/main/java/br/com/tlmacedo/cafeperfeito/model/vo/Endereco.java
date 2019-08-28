@@ -129,7 +129,7 @@ public class Endereco implements Serializable {
         this.pontoReferencia.set(pontoReferencia);
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Municipio getMunicipio() {
         return municipio;
     }

@@ -9,7 +9,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.5.2.v20131113-rNA", date="2019-08-27T11:41:22")
+@Generated(value="EclipseLink-2.5.2.v20131113-rNA", date="2019-08-28T12:06:21")
 @StaticMetamodel(ProdutoEstoque.class)
 public class ProdutoEstoque_ { 
 
@@ -17,6 +17,7 @@ public class ProdutoEstoque_ {
     public static volatile SingularAttribute<ProdutoEstoque, BigDecimal> vlrFreteBruto;
     public static volatile SingularAttribute<ProdutoEstoque, LocalDateTime> dtCadastro;
     public static volatile SingularAttribute<ProdutoEstoque, String> lote;
+    public static volatile SingularAttribute<ProdutoEstoque, BigDecimal> vlrFreteTaxa;
     public static volatile SingularAttribute<ProdutoEstoque, String> docEntradaChaveNFe;
     public static volatile SingularAttribute<ProdutoEstoque, BigDecimal> vlrImpostoFreteNaEntrada;
     public static volatile SingularAttribute<ProdutoEstoque, BigDecimal> vlrImpostoDentroFrete;

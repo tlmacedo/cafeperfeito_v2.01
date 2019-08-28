@@ -15,6 +15,7 @@
         <class>br.com.tlmacedo.cafeperfeito.model.vo.Empresa</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.EmpresaCondicoes</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.Endereco</class>
+        <class>br.com.tlmacedo.cafeperfeito.model.vo.FichaKardex</class>
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaCte</class>-->
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaFiscal</class>-->
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaNfe</class>-->

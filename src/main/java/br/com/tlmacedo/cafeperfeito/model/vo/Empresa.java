@@ -178,7 +178,7 @@ public class Empresa implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro;
     }
@@ -202,7 +202,7 @@ public class Empresa implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioAtualizacao() {
         return usuarioAtualizacao;
     }
@@ -237,7 +237,7 @@ public class Empresa implements Serializable {
         this.observacoes.set(observacoes);
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getLimite() {
         return limite.get();
     }
@@ -250,7 +250,7 @@ public class Empresa implements Serializable {
         this.limite.set(limite);
     }
 
-    @Column(length = 2, nullable = false)
+    @Column(length = 3, nullable = false)
     public int getPrazo() {
         return prazo.get();
     }
