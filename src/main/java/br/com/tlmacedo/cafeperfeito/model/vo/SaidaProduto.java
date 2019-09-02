@@ -87,7 +87,7 @@ public class SaidaProduto implements Serializable {
         this.dtSaida.set(dtSaida);
     }
 
-    @OneToMany(mappedBy = "saidaProduto", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "saidaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<SaidaProdutoProduto> getSaidaProdutoProdutoList() {
         return saidaProdutoProdutoList;
     }

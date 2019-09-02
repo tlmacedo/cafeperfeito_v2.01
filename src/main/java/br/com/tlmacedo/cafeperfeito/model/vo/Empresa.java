@@ -309,6 +309,15 @@ public class Empresa implements Serializable {
 //        return razaoProperty().get();
 //    }
 
+    @Transient
+    public String getRazaoFantasia() {
+        return String.format("%s (%s)",
+                razaoProperty().getValue(),
+                fantasiaProperty().getValue()
+        );
+    }
+
+
     @Override
     public String toString() {
         if (razaoProperty().get() == null)

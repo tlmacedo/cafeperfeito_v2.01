@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface DAO<T, I extends Serializable> {
 
-//    public T merger(T entity);
+    public T merger(T entity) throws Exception;
 
     public void remove(T entity);
 
     public void transactionBegin();
 
-    public T setTransactionPersist(T entity);
+    public T setTransactionPersist(T entity) throws Exception;
 
-    public void transactionCommit();
+    public void transactionCommit() throws Exception;
 
     public void transactionRollback();
 

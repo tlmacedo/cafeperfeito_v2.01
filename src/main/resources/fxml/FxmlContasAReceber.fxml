@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane fx:id="painelViewContasAReceber" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="780.0" prefWidth="1350.0" stylesheets="@../style/css/cafeperfeito.css"
+            xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.com.tlmacedo.cafeperfeito.controller.ControllerContasAReceber">
+    <children>
+        <TitledPane fx:id="tpnContasAReceber" animated="false" collapsible="false" layoutX="5.0" layoutY="5.0"
+                    minHeight="0.0" minWidth="0.0" prefHeight="780.0" prefWidth="1350.0" text="Contas a receber"
+                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0">
+                    <children>
+                        <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="5.0" prefWidth="95.0">
+                            <children>
+                                <Label prefWidth="434.0" styleClass="float" text="Dt. inicial">
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <DatePicker fx:id="dtpData1"
+                                            accessibleText="len::;type::dtp;value::now;seteditable::;binding::;">
+                                    <tooltip>
+                                        <Tooltip text="data inicial do filtro."/>
+                                    </tooltip>
+                                </DatePicker>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="105.0" layoutY="5.0" prefWidth="95.0">
+                            <children>
+                                <Label prefWidth="434.0" styleClass="float" text="Dt. final">
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <DatePicker fx:id="dtpData2"
+                                            accessibleText="len::;type::dtp;value::now;seteditable::;binding::;">
+                                    <tooltip>
+                                        <Tooltip text="data final do filtro."/>
+                                    </tooltip>
+                                </DatePicker>
+                            </children>
+                        </VBox>
+                        <CheckBox fx:id="chkDtVenda" layoutX="205.0" layoutY="23.0" mnemonicParsing="false"
+                                  selected="true" text="Dt. venda">
+                            <tooltip>
+                                <Tooltip text="filtrar por data de venda ou data de vencimento."/>
+                            </tooltip>
+                        </CheckBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="287.0" layoutY="5.0" prefWidth="350.0">
+                            <children>
+                                <Label prefWidth="434.0" styleClass="float" text="Cliente">
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <ComboBox fx:id="cboEmpresa"
+                                          accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                          prefWidth="434.0">
+                                    <tooltip>
+                                        <Tooltip text="filtrar por cliente."/>
+                                    </tooltip>
+                                </ComboBox>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="642.0" layoutY="5.0" prefWidth="235.0">
+                            <children>
+                                <Label prefWidth="434.0" styleClass="float" text="Pesquisar">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <TextField fx:id="txtPesquisa"
+                                           accessibleText="len::80;type::TEXTO;decimal::;value::;seteditable::;binding::;">
+                                    <tooltip>
+                                        <Tooltip text="filtrar por pesquisa."/>
+                                    </tooltip>
+                                </TextField>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="882.0" layoutY="5.0" prefWidth="150.0">
+                            <children>
+                                <Label prefWidth="434.0" styleClass="float" text="Situação pagamento">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <ComboBox fx:id="cboPagamentoSituacao"
+                                          accessibleText="len::;type::;value::0;seteditable::;binding::;"
+                                          prefWidth="434.0">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <tooltip>
+                                        <Tooltip text="filtrar por situação de pagamentos."/>
+                                    </tooltip>
+                                </ComboBox>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="1037.0" layoutY="5.0" prefWidth="100.0">
+                            <children>
+                                <Label prefWidth="400.0" styleClass="float" text="Reg. localizados">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Label fx:id="lblRegistrosLocalizados"
+                                       accessibleText="len::5;type::numero;value::0;seteditable::;binding::true;"
+                                       alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="100.0"
+                                       styleClass="lbl_informacao" textAlignment="RIGHT">
+                                    <tooltip>
+                                        <Tooltip text="quantidade de registros localizados."/>
+                                    </tooltip>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" cacheShape="false" centerShape="false" layoutX="5.0"
+                              layoutY="50.0" minHeight="0.0" minWidth="0.0" prefHeight="630.0" prefWidth="1335.0"
+                              scaleShape="false">
+                            <children>
+                                <Label prefWidth="1335.0" styleClass="float" text="Contas">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <TreeTableView fx:id="ttvContasAReceber" prefHeight="615.0" prefWidth="1328.0"/>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="212.0" layoutY="355.0" prefWidth="150.0"
+                              AnchorPane.bottomAnchor="0.0">
+                            <children>
+                                <Label prefWidth="400.0" styleClass="float" text="Qtd Clientes">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Label fx:id="lblQtdClientes" prefHeight="40.0" prefWidth="150.0"
+                                       styleClass="label-total-valor">
+                                    <tooltip>
+                                        <Tooltip text="quantidade de clientes filtrados."/>
+                                    </tooltip>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="375.0" layoutY="355.0" prefWidth="150.0"
+                              AnchorPane.bottomAnchor="0.0">
+                            <children>
+                                <Label prefWidth="400.0" styleClass="float" text="Qtd Contas">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Label fx:id="lblQtdContas" prefHeight="40.0" prefWidth="150.0"
+                                       styleClass="label-total-valor">
+                                    <tooltip>
+                                        <Tooltip text="quantidade de contas filtradas."/>
+                                    </tooltip>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="538.0" layoutY="355.0" prefWidth="150.0"
+                              AnchorPane.bottomAnchor="0.0">
+                            <children>
+                                <Label prefWidth="400.0" styleClass="float" text="Qtd Contas Pagas">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Label fx:id="lblQtdContasPagas" prefHeight="40.0" prefWidth="150.0"
+                                       styleClass="label-total-valor">
+                                    <tooltip>
+                                        <Tooltip text="quantidade de contas pagas no filtro."/>
+                                    </tooltip>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="701.0" layoutY="355.0" prefWidth="150.0"
+                              AnchorPane.bottomAnchor="0.0">
+                            <children>
+                                <Label prefWidth="400.0" styleClass="float" text="Qtd Contas Abertas">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Label fx:id="lblQtdContasAbertas" prefHeight="40.0" prefWidth="150.0"
+                                       styleClass="label-total-valor">
+                                    <tooltip>
+                                        <Tooltip text="quantidade de contas abertas no filtro."/>
+                                    </tooltip>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="866.0" layoutY="355.0" prefWidth="150.0"
+                              AnchorPane.bottomAnchor="0.0">
+                            <children>
+                                <Label prefWidth="400.0" styleClass="float" text="Total Contas R$">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Label fx:id="lblTotalContas" prefHeight="40.0" prefWidth="150.0"
+                                       styleClass="label-total-valor">
+                                    <tooltip>
+                                        <Tooltip text="total de contas no filtro."/>
+                                    </tooltip>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="1027.0" layoutY="355.0" prefWidth="150.0"
+                              AnchorPane.bottomAnchor="0.0">
+                            <children>
+                                <Label prefWidth="400.0" styleClass="float" text="Total Contas Pagas R$">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Label fx:id="lblTotalContasPagas" prefHeight="40.0" prefWidth="150.0"
+                                       styleClass="label-total-valor">
+                                    <tooltip>
+                                        <Tooltip text="total de contas pagas no filtro."/>
+                                    </tooltip>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="1190.0" layoutY="355.0" prefWidth="150.0"
+                              AnchorPane.bottomAnchor="0.0">
+                            <children>
+                                <Label prefWidth="400.0" styleClass="float" text="Total Contas Abertas R$">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Label fx:id="lblTotalContasAbertas" prefHeight="40.0" prefWidth="150.0"
+                                       styleClass="label-total-valor">
+                                    <tooltip>
+                                        <Tooltip text="total de contas abertas no filtro."/>
+                                    </tooltip>
+                                </Label>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+            </content>
+        </TitledPane>
+    </children>
+</AnchorPane>

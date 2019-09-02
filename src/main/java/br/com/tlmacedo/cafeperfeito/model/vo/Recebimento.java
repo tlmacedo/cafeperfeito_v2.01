@@ -1,12 +1,16 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoModalidade;
 import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity(name = "Recebimento")
 @Table(name = "recebimento")
@@ -17,12 +21,14 @@ public class Recebimento implements Serializable {
     private ContasAReceber aReceber = new ContasAReceber();
     private PagamentoSituacao pagamentoSituacao;
     private StringProperty documento = new SimpleStringProperty();
-    private ObjectProperty<LocalDate> dtVencimento = new SimpleObjectProperty<>();
+    private PagamentoModalidade pagamentoModalidade;
     private ObjectProperty<BigDecimal> valor = new SimpleObjectProperty<>();
 
-    private ObjectProperty<BigDecimal> vlrPago = new SimpleObjectProperty<>();
-    private Usuario usarioPagamento = new Usuario();
+    private Usuario usuarioPagamento = new Usuario();
     private ObjectProperty<LocalDate> dtPagamento = new SimpleObjectProperty<>();
+
+    private Usuario usuarioCadastro = new Usuario();
+    private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
 
     private Empresa emissorRecibo;
 
@@ -43,7 +49,8 @@ public class Recebimento implements Serializable {
         this.id.set(id);
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToOne
     public ContasAReceber getaReceber() {
         return aReceber;
     }
@@ -74,17 +81,13 @@ public class Recebimento implements Serializable {
         this.documento.set(documento);
     }
 
-    @Column(nullable = false)
-    public LocalDate getDtVencimento() {
-        return dtVencimento.get();
+    @Enumerated(EnumType.ORDINAL)
+    public PagamentoModalidade getPagamentoModalidade() {
+        return pagamentoModalidade;
     }
 
-    public ObjectProperty<LocalDate> dtVencimentoProperty() {
-        return dtVencimento;
-    }
-
-    public void setDtVencimento(LocalDate dtVencimento) {
-        this.dtVencimento.set(dtVencimento);
+    public void setPagamentoModalidade(PagamentoModalidade pagamentoModalidade) {
+        this.pagamentoModalidade = pagamentoModalidade;
     }
 
     @Column(length = 19, scale = 4, nullable = false)
@@ -100,26 +103,13 @@ public class Recebimento implements Serializable {
         this.valor.set(valor);
     }
 
-    @Column(length = 19, scale = 4, nullable = false)
-    public BigDecimal getVlrPago() {
-        return vlrPago.get();
-    }
-
-    public ObjectProperty<BigDecimal> vlrPagoProperty() {
-        return vlrPago;
-    }
-
-    public void setVlrPago(BigDecimal vlrPago) {
-        this.vlrPago.set(vlrPago);
-    }
-
     @ManyToOne(fetch = FetchType.LAZY)
-    public Usuario getUsarioPagamento() {
-        return usarioPagamento;
+    public Usuario getUsuarioPagamento() {
+        return usuarioPagamento;
     }
 
-    public void setUsarioPagamento(Usuario usarioPagamento) {
-        this.usarioPagamento = usarioPagamento;
+    public void setUsuarioPagamento(Usuario usuarioPagamento) {
+        this.usuarioPagamento = usuarioPagamento;
     }
 
     public LocalDate getDtPagamento() {
@@ -135,11 +125,51 @@ public class Recebimento implements Serializable {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
+    public Usuario getUsuarioCadastro() {
+        return usuarioCadastro;
+    }
+
+    public void setUsuarioCadastro(Usuario usuarioCadastro) {
+        this.usuarioCadastro = usuarioCadastro;
+    }
+
+    @CreationTimestamp
+    public LocalDateTime getDtCadastro() {
+        return dtCadastro.get();
+    }
+
+    public ObjectProperty<LocalDateTime> dtCadastroProperty() {
+        return dtCadastro;
+    }
+
+    public void setDtCadastro(LocalDateTime dtCadastro) {
+        this.dtCadastro.set(dtCadastro);
+    }
+
+    @Transient
+    //@ManyToOne(fetch = FetchType.LAZY)
     public Empresa getEmissorRecibo() {
         return emissorRecibo;
     }
 
     public void setEmissorRecibo(Empresa emissorRecibo) {
         this.emissorRecibo = emissorRecibo;
+    }
+
+    @Override
+    public String toString() {
+        return "Recebimento{" +
+                "id=" + id +
+                ", aReceber=" + aReceber +
+                ", pagamentoSituacao=" + pagamentoSituacao +
+                ", documento=" + documento +
+                ", pagamentoModalidade=" + pagamentoModalidade +
+                ", valor=" + valor +
+                ", usuarioPagamento=" + usuarioPagamento +
+                ", dtPagamento=" + dtPagamento +
+                ", usuarioCadastro=" + usuarioCadastro +
+                ", dtCadastro=" + dtCadastro +
+                ", emissorRecibo=" + emissorRecibo +
+                '}';
     }
 }

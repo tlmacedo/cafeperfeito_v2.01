@@ -75,6 +75,8 @@ public class ServiceAlertMensagem {
 
         startContagemRegressiva();
 
+        getBtnCancel().setOnAction(actionEvent -> getTask().cancel());
+
         getTask().setOnFailed(event -> {
             setRetornoProgressBar(false);
             dialogClose();

@@ -10,6 +10,7 @@ import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
+import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -32,6 +33,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -121,7 +123,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private String nomeTab = ViewSaidaProduto.getTitulo();
     private String nomeController = "saidaProduto";
     private ObjectProperty<StatusBarSaidaProduto> statusBar = new SimpleObjectProperty<>();
-    private Task<Void> taskSaidaProduto = newTaskSaidaProduto();
     private EventHandler eventHandlerSaidaProduto;
     private ServiceAlertMensagem alertMensagem;
 
@@ -133,17 +134,23 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private Endereco endereco = new Endereco();
 
-//    private SaidaProduto saidaProduto;
-//    private SaidaProdutoDAO saidaProdutoDAO;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         criarObjetos();
         preencherObjetos();
         fatorarObjetos();
+        if (!isTabCarregada()) {
+            Platform.runLater(() -> fechar());
+            return;
+        }
         escutarTecla();
-        ServiceCampoPersonalizado.fieldTextFormat(getPainelViewSaidaProduto());
+        fieldsFormat();
         Platform.runLater(() -> limpaCampos(getPainelViewSaidaProduto()));
+    }
+
+    @Override
+    public void fieldsFormat() {
+        ServiceCampoPersonalizado.fieldTextFormat(getPainelViewSaidaProduto());
     }
 
     @Override
@@ -153,8 +160,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                         .filter(tab -> tab.textProperty().get().equals(getNomeTab()))
                         .findFirst().orElse(null)
         );
-        ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal()
-                .removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
+        if (isTabCarregada())
+            ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal()
+                    .removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
     }
 
     @Override
@@ -170,8 +178,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         getEnumsTasksList().add(EnumsTasks.COMBOS_PREENCHER);
 
-        setTabCarregada(new ServiceSegundoPlano().abrindoCadastro(newTaskSaidaProduto(), String.format("Abrindo %s!", getNomeTab())));
-
+        setTabCarregada(new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Abrindo %s!", getNomeTab())));
     }
 
     @Override
@@ -258,7 +265,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                     return;
                 if (!ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().getSelectedItem().getText().equals(getNomeTab()))
                     return;
-                if (!teclaDisponivel(event.getCode())) return;
+                if (!ControllerPrincipal.getCtrlPrincipal().teclaDisponivel(event.getCode())) return;
                 switch (event.getCode()) {
                     case F1:
                         limpaCampos(getPainelViewSaidaProduto());
@@ -267,7 +274,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                         ServiceCalculaTempo calcTmp = new ServiceCalculaTempo();
                         getEnumsTasksList().clear();
                         getEnumsTasksList().add(EnumsTasks.SALVAR_SAIDA);
-                        if (new ServiceSegundoPlano().abrindoCadastro(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
+                        if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
+                            new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber());
                             limpaCampos(getPainelViewSaidaProduto());
                         }
                         calcTmp.fim();
@@ -474,10 +482,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             getCboEmpresa().getItems().add(0, new Empresa());
 
                             getCboNfeDadosNaturezaOperacao().setItems(
-                                    NfeDadosNaturezaOperacao.getList()
-                                            .stream()
-                                            .collect(Collectors.toCollection(FXCollections::observableArrayList))
-                            );
+                                    Arrays.stream(NfeDadosNaturezaOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
                             break;
 
                         case TABELA_PREENCHER:
@@ -507,35 +512,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         };
     }
 
-//    private Task newTaskF2() {
-//        int qtdTasks = getEnumsTasksList().size();
-//        final int[] cont = {1};
-//        return new Task<Void>() {
-//            @Override
-//            protected Void call() throws Exception {
-//                updateMessage("Finalizando...");
-//                for (EnumsTasks tasks : getEnumsTasksList()) {
-//                    updateProgress(cont[0]++, qtdTasks);
-//                    Thread.sleep(200);
-//                    updateMessage(String.format("%s%s", tasks.getDescricao(),
-//                            tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
-//                    switch (tasks) {
-//                        case SALVAR_SAIDA:
-//                            if (guardarSaidaProduto()) {
-//                                if (!salvarSaidaProduto())
-//                                    Thread.currentThread().interrupt();
-//                            } else {
-//                                Thread.currentThread().interrupt();
-//                            }
-//                            break;
-//                    }
-//                }
-//                updateMessage("saida finalizada com sucesso!!!");
-//                updateProgress(qtdTasks, qtdTasks);
-//                return null;
-//            }
-//        };
-//    }
 
     /**
      * END Tasks
@@ -561,9 +537,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         getLblComplemento().setText("");
     }
 
-    private boolean teclaDisponivel(KeyCode keyCode) {
-        return ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().getStbTeclas().getText().contains(String.format("%s-", keyCode.toString()));
-    }
+//    private boolean teclaDisponivel(KeyCode keyCode) {
+//        return ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().getStbTeclas().getText().contains(String.format("%s-", keyCode.toString()));
+//    }
 
     private void organizaPosicaoCampos(Integer diff) {
         getTpnNfe().setPrefHeight(getTpnNfe().getPrefHeight() + diff);
@@ -595,6 +571,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
      */
 
 
+    /**
+     * Begin Getters e Setters
+     */
     public AnchorPane getPainelViewSaidaProduto() {
         return painelViewSaidaProduto;
     }
@@ -1107,14 +1086,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.lblTotalDesconto = lblTotalDesconto;
     }
 
-    public Label getLblTotalLiquido() {
-        return lblTotalLiquido;
-    }
-
-    public void setLblTotalLiquido(Label lblTotalLiquido) {
-        this.lblTotalLiquido = lblTotalLiquido;
-    }
-
     public VBox getvBoxTotalLiquido() {
         return vBoxTotalLiquido;
     }
@@ -1123,9 +1094,14 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.vBoxTotalLiquido = vBoxTotalLiquido;
     }
 
-    /**
-     *
-     */
+    public Label getLblTotalLiquido() {
+        return lblTotalLiquido;
+    }
+
+    public void setLblTotalLiquido(Label lblTotalLiquido) {
+        this.lblTotalLiquido = lblTotalLiquido;
+    }
+
     public boolean isTabCarregada() {
         return tabCarregada;
     }
@@ -1158,12 +1134,16 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.nomeController = nomeController;
     }
 
-    public Task<Void> getTaskSaidaProduto() {
-        return taskSaidaProduto;
+    public StatusBarSaidaProduto getStatusBar() {
+        return statusBar.get();
     }
 
-    public void setTaskSaidaProduto(Task<Void> taskSaidaProduto) {
-        this.taskSaidaProduto = taskSaidaProduto;
+    public ObjectProperty<StatusBarSaidaProduto> statusBarProperty() {
+        return statusBar;
+    }
+
+    public void setStatusBar(StatusBarSaidaProduto statusBar) {
+        this.statusBar.set(statusBar);
     }
 
     public EventHandler getEventHandlerSaidaProduto() {
@@ -1180,14 +1160,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setAlertMensagem(ServiceAlertMensagem alertMensagem) {
         this.alertMensagem = alertMensagem;
-    }
-
-    public Endereco getEndereco() {
-        return endereco;
-    }
-
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
     }
 
     public TmodelProduto getTmodelProduto() {
@@ -1214,18 +1186,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.produtoFilteredList = produtoFilteredList;
     }
 
-    public StatusBarSaidaProduto getStatusBar() {
-        return statusBar.get();
-    }
-
-    public ObjectProperty<StatusBarSaidaProduto> statusBarProperty() {
-        return statusBar;
-    }
-
-    public void setStatusBar(StatusBarSaidaProduto statusBar) {
-        this.statusBar.set(statusBar);
-    }
-
     public TmodelSaidaProduto getTmodelSaidaProduto() {
         return tmodelSaidaProduto;
     }
@@ -1241,5 +1201,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     public void setSaidaProdutoProdutoObservableList(ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList) {
         this.saidaProdutoProdutoObservableList = saidaProdutoProdutoObservableList;
     }
+
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
+    }
+
+/**
+ * END Getters e Setters
+ */
 
 }

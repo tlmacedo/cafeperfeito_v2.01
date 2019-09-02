@@ -1,7 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.view;
 
 import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
-import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.service.ServiceOpenView;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,13 +18,10 @@ public class ViewRecebimento {
 
     private static Stage stage;
     private static ContasAReceber aReceber;
-    private static Recebimento recebimento;
 
-    public void openViewRecebimento(ContasAReceber aReceber, Recebimento recebimento) {
+    public void openViewRecebimento(ContasAReceber aReceber) {
         if (aReceber != null)
             setaReceber(aReceber);
-        if (recebimento != null)
-            setRecebimento(recebimento);
 
         setStage(new Stage());
         Parent parent;
@@ -65,11 +61,4 @@ public class ViewRecebimento {
         ViewRecebimento.aReceber = aReceber;
     }
 
-    public static Recebimento getRecebimento() {
-        return recebimento;
-    }
-
-    public static void setRecebimento(Recebimento recebimento) {
-        ViewRecebimento.recebimento = recebimento;
-    }
 }

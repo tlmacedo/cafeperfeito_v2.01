@@ -15,13 +15,19 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
             setConexao(new ConnectionFactory());
     }
 
-//    @Override
-//    public T merger(T entity) {
-//        transactionBegin();
-//        T saved = getConexao().getEntityManager().merge(entity);
-//        transactionCommit();
-//        return saved;
-//    }
+    @Override
+    public T merger(T entity) throws Exception {
+        try {
+            transactionBegin();
+            T saved = getConexao().getEntityManager().merge(entity);
+            transactionCommit();
+            return saved;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            transactionRollback();
+            return null;
+        }
+    }
 
     @Override
     public void transactionBegin() {
@@ -29,7 +35,7 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
     }
 
     @Override
-    public T setTransactionPersist(T entity) {
+    public T setTransactionPersist(T entity) throws Exception {
         try {
             T saved = getConexao().getEntityManager().merge(entity);
             return saved;
@@ -40,7 +46,7 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
     }
 
     @Override
-    public void transactionCommit() {
+    public void transactionCommit() throws Exception {
         try {
             getTransaction().commit();
         } catch (Exception ex) {

@@ -1,6 +1,5 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -12,6 +11,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "ContasAReceber")
 @Table(name = "contas_a_receber")
@@ -21,10 +22,11 @@ public class ContasAReceber implements Serializable {
     private LongProperty id = new SimpleLongProperty();
     private SaidaProduto saidaProduto = new SaidaProduto();
     private ObjectProperty<LocalDate> dtVencimento = new SimpleObjectProperty<>();
-    private PagamentoSituacao pagamentoSituacao;
     private ObjectProperty<BigDecimal> valor = new SimpleObjectProperty<>();
     private Usuario usuarioCadastro = new Usuario();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
+
+    private List<Recebimento> recebimentoList = new ArrayList<>();
 
     public ContasAReceber() {
     }
@@ -65,15 +67,6 @@ public class ContasAReceber implements Serializable {
         this.dtVencimento.set(dtVencimento);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public PagamentoSituacao getPagamentoSituacao() {
-        return pagamentoSituacao;
-    }
-
-    public void setPagamentoSituacao(PagamentoSituacao pagamentoSituacao) {
-        this.pagamentoSituacao = pagamentoSituacao;
-    }
-
     @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getValor() {
         return valor.get();
@@ -109,16 +102,25 @@ public class ContasAReceber implements Serializable {
         this.dtCadastro.set(dtCadastro);
     }
 
+    @OneToMany(mappedBy = "aReceber", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<Recebimento> getRecebimentoList() {
+        return recebimentoList;
+    }
+
+    public void setRecebimentoList(List<Recebimento> recebimentoList) {
+        this.recebimentoList = recebimentoList;
+    }
+
     @Override
     public String toString() {
         return "ContasAReceber{" +
                 "id=" + id +
                 ", saidaProduto=" + saidaProduto +
                 ", dtVencimento=" + dtVencimento +
-                ", pagamentoSituacao=" + pagamentoSituacao +
                 ", valor=" + valor +
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
+                ", recebimentoList=" + recebimentoList +
                 '}';
     }
 }

@@ -11,7 +11,8 @@ public enum EnumsTasks {
     TABELA_VINCULAR(1, "vinculando tModel"),
     TABELA_PREENCHER(2, "preenchendo tabela de "),
     COMBOS_PREENCHER(3, "carregando informações do cadastro"),
-    SALVAR_SAIDA(4, "salvando");
+    SALVAR_SAIDA(4, "salvando"),
+    ADD_RECEBIMENTO(5, "adicionando recebimento");
 
     private int cod;
     private String descricao;

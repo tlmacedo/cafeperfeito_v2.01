@@ -5,7 +5,7 @@ import javafx.concurrent.Task;
 public class ServiceSegundoPlano {
 
 
-    public boolean abrindoCadastro(Task<?> task, String titulo) {
+    public boolean executaListaTarefas(Task<?> task, String titulo) {
         ServiceAlertMensagem alertMensagem = new ServiceAlertMensagem();
         alertMensagem.setCabecalho(titulo);
         //alertMensagem.setStrIco("");

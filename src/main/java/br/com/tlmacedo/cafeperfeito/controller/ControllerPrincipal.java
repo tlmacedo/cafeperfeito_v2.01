@@ -5,6 +5,7 @@ import br.com.tlmacedo.cafeperfeito.model.dao.MenuPrincipalDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.MenuPrincipal;
 import br.com.tlmacedo.cafeperfeito.service.ServiceComandoTecladoMouse;
 import br.com.tlmacedo.cafeperfeito.service.ServiceStatusBar;
+import br.com.tlmacedo.cafeperfeito.view.ViewContasAReceber;
 import br.com.tlmacedo.cafeperfeito.view.ViewPrincipal;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import javafx.collections.ListChangeListener;
@@ -62,6 +63,12 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
         preencherObjetos();
         fatorarObjetos();
         escutarTecla();
+        fieldsFormat();
+    }
+
+    @Override
+    public void fieldsFormat() {
+
     }
 
     @Override
@@ -185,6 +192,9 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
                 case "saidaproduto":
                     tab = new ViewSaidaProduto().tabSaidaProduto(menu.menuLabelProperty().get());
                     break;
+                case "contasareceber":
+                    tab = new ViewContasAReceber().tabContasAReceber(menu.menuLabelProperty().get());
+                    break;
             }
             if (tab != null) {
                 tabId = getTabPaneViewPrincipal().getTabs().size();
@@ -201,6 +211,9 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
         }
     }
 
+    public boolean teclaDisponivel(KeyCode keyCode) {
+        return getServiceStatusBar().getStbTeclas().getText().contains(String.format("%s-", keyCode.toString()));
+    }
 
     public BorderPane getPainelViewPrincipal() {
         return painelViewPrincipal;

@@ -5,17 +5,21 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public enum PagamentoSituacao {
+public enum PagamentoModalidade {
 
-    //    NULL(-1, ""),
-    PENDENTE(0, "Pendente"),
-    QUITADO(1, "Quitado"),
-    CANCELADO(2, "Cancelado");
+    DINHEIRO(0, "Dinheiro"),
+    CARTAO(1, "Cartão"),
+    BOLETO(2, "Boleto"),
+    TRANSFERENCIA(3, "Transferência"),
+    ORDEM_BANCARIA(4, "Ordem bancária"),
+    RETIRADA(5, "Retirada"),
+    BONIFICACAO(6, "Bonificação"),
+    AMOSTRA(7, "Amostra");
 
     private Integer cod;
     private String descricao;
 
-    private PagamentoSituacao(Integer cod, String descricao) {
+    private PagamentoModalidade(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -28,11 +32,11 @@ public enum PagamentoSituacao {
 //        throw new IllegalArgumentException("Id inválido");
 //    }
 
-    public static List<PagamentoSituacao> getList() {
-        List list = Arrays.asList(PagamentoSituacao.values());
-        Collections.sort(list, new Comparator<PagamentoSituacao>() {
+    public static List<PagamentoModalidade> getList() {
+        List list = Arrays.asList(PagamentoModalidade.values());
+        Collections.sort(list, new Comparator<PagamentoModalidade>() {
             @Override
-            public int compare(PagamentoSituacao e1, PagamentoSituacao e2) {
+            public int compare(PagamentoModalidade e1, PagamentoModalidade e2) {
                 return e1.getDescricao().compareTo(e2.getDescricao());
             }
         });

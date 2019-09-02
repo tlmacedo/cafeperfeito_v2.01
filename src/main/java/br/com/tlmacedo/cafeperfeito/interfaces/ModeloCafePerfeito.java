@@ -2,6 +2,8 @@ package br.com.tlmacedo.cafeperfeito.interfaces;
 
 public interface ModeloCafePerfeito {
 
+    void fieldsFormat();
+
     void fechar();
 
     void criarObjetos();
@@ -11,4 +13,5 @@ public interface ModeloCafePerfeito {
     void fatorarObjetos();
 
     void escutarTecla();
+
 }

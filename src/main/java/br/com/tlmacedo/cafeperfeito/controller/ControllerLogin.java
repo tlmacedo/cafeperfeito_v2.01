@@ -41,9 +41,15 @@ public class ControllerLogin implements Initializable, ModeloCafePerfeito {
         preencherObjetos();
         fatorarObjetos();
         escutarTecla();
+        fieldsFormat();
         Platform.runLater(() -> {
             setLoginStage(ViewLogin.getStage());
         });
+    }
+
+    @Override
+    public void fieldsFormat() {
+
     }
 
     @Override

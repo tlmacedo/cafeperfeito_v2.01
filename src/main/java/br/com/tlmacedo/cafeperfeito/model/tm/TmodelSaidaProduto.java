@@ -2,7 +2,6 @@ package br.com.tlmacedo.cafeperfeito.model.tm;
 
 import br.com.tlmacedo.cafeperfeito.controller.ControllerPrincipal;
 import br.com.tlmacedo.cafeperfeito.model.dao.*;
-import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
 import br.com.tlmacedo.cafeperfeito.model.enums.TipoSaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
@@ -39,6 +38,8 @@ public class TmodelSaidaProduto {
     private ProdutoEstoqueDAO produtoEstoqueDAO = new ProdutoEstoqueDAO();
     private ContasAReceberDAO contasAReceberDAO = new ContasAReceberDAO();
     private FichaKardexDAO fichaKardexDAO = new FichaKardexDAO();
+    private ContasAReceber aReceber;
+    private RecebimentoDAO recebimentoDAO = new RecebimentoDAO();
 
     private TableColumn<SaidaProdutoProduto, String> colId;
     private TableColumn<SaidaProdutoProduto, String> colProdId;
@@ -545,22 +546,20 @@ public class TmodelSaidaProduto {
             setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
             getSaidaProdutoDAO().transactionCommit();
             if (baixarEstoque()) {
-                ContasAReceber aReceber = new ContasAReceber();
+                setaReceber(new ContasAReceber());
                 getContasAReceberDAO().transactionBegin();
-                aReceber.dtVencimentoProperty().setValue(getDtpDtVencimento().getValue());
-                aReceber.setPagamentoSituacao(PagamentoSituacao.PENDENTE);
-                aReceber.valorProperty().setValue(getSaidaProdutoProdutoObservableList().stream()
+                getaReceber().dtVencimentoProperty().setValue(getDtpDtVencimento().getValue());
+                getaReceber().valorProperty().setValue(getSaidaProdutoProdutoObservableList().stream()
                         .map(SaidaProdutoProduto::getVlrLiquido)
                         .reduce(BigDecimal.ZERO, BigDecimal::add));
-                aReceber.setUsuarioCadastro(UsuarioLogado.getUsuario());
-                aReceber.setSaidaProduto(getSaidaProduto());
-                getContasAReceberDAO().setTransactionPersist(aReceber);
+                getaReceber().setUsuarioCadastro(UsuarioLogado.getUsuario());
+                getaReceber().setSaidaProduto(getSaidaProduto());
+                setaReceber(getContasAReceberDAO().setTransactionPersist(getaReceber()));
             }
             getFichaKardexDAO().transactionCommit();
             getProdutoEstoqueDAO().transactionCommit();
             getContasAReceberDAO().transactionCommit();
         } catch (Exception ex) {
-            System.out.printf("não o erro foi bem aqui!\n");
             ex.printStackTrace();
             getSaidaProdutoDAO().transactionRollback();
             getFichaKardexDAO().transactionRollback();
@@ -587,16 +586,20 @@ public class TmodelSaidaProduto {
                                         && estoque.loteProperty().getValue().equals(s))
                                         .forEach(estoque -> {
                                             if (saldoSaida[0] > 0) {
-                                                estoque.qtdProperty().setValue(estoque.qtdProperty().getValue() - saldoSaida[0]);
-                                                if (estoque.qtdProperty().getValue() < 0) {
-                                                    getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0] + estoque.qtdProperty().getValue(), estoque, produtoEstoqueList));
-                                                    saldoSaida[0] = estoque.qtdProperty().getValue() * (-1);
-                                                    estoque.qtdProperty().setValue(0);
-                                                } else {
-                                                    getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0], estoque, produtoEstoqueList));
-                                                    saldoSaida[0] = 0;
+                                                try {
+                                                    estoque.qtdProperty().setValue(estoque.qtdProperty().getValue() - saldoSaida[0]);
+                                                    if (estoque.qtdProperty().getValue() < 0) {
+                                                        getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0] + estoque.qtdProperty().getValue(), estoque, produtoEstoqueList));
+                                                        saldoSaida[0] = estoque.qtdProperty().getValue() * (-1);
+                                                        estoque.qtdProperty().setValue(0);
+                                                    } else {
+                                                        getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0], estoque, produtoEstoqueList));
+                                                        saldoSaida[0] = 0;
+                                                    }
+                                                    getProdutoEstoqueDAO().setTransactionPersist(estoque);
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
                                                 }
-                                                getProdutoEstoqueDAO().setTransactionPersist(estoque);
                                             }
                                         });
                             });
@@ -925,6 +928,24 @@ public class TmodelSaidaProduto {
     public void setFichaKardexDAO(FichaKardexDAO fichaKardexDAO) {
         this.fichaKardexDAO = fichaKardexDAO;
     }
+
+    public ContasAReceber getaReceber() {
+        return aReceber;
+    }
+
+    public void setaReceber(ContasAReceber aReceber) {
+        this.aReceber = aReceber;
+    }
+
+    public RecebimentoDAO getRecebimentoDAO() {
+        return recebimentoDAO;
+    }
+
+    public void setRecebimentoDAO(RecebimentoDAO recebimentoDAO) {
+        this.recebimentoDAO = recebimentoDAO;
+    }
+
+
     /**
      * END Gets and Setters
      */
