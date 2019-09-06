@@ -107,6 +107,8 @@ public interface Regex_Convert {
     DateTimeFormatter DTF_DATAHORAFUSO = DateTimeFormatter.ofPattern("dd/MM/yyyy'T'HH:mm:ssXXX", LOCALE);
     DateTimeFormatter DTF_MYSQL_DATA = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DateTimeFormatter DTF_MYSQL_DATAHORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", LOCALE);
+    DateTimeFormatter DTF_MYSQL_DATAHORA_HM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", LOCALE);
+    DateTimeFormatter DTF_MYSQL_DATAHORA_HMS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", LOCALE);
     DateTimeFormatter DTF_MYSQL_DATAHORAFUSO = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX", LOCALE);
 
     KeyCombination CODE_KEY_CTRL_ALT_B = new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN);

@@ -52,13 +52,21 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     private ServiceAlertMensagem alertMensagem;
 
     private ContasAReceber aReceber;
+    private Recebimento recebimento;
     private RecebimentoDAO recebimentoDAO = new RecebimentoDAO();
 
     private BooleanProperty deshabilita = new SimpleBooleanProperty(true);
 
     public ControllerRecebimento() {
-        setaReceber(ViewRecebimento.getaReceber());
-        getEnumsTasksList().add(EnumsTasks.ADD_RECEBIMENTO);
+        setRecebimento(ViewRecebimento.getRecebimento());
+        if (getRecebimento() == null) {
+            setRecebimento(new Recebimento());
+            getEnumsTasksList().add(EnumsTasks.ADD_RECEBIMENTO);
+        } else {
+            setRecebimento(ViewRecebimento.getRecebimento());
+            getEnumsTasksList().add(EnumsTasks.UPDATE_RECEBIMENTO);
+            setDeshabilita(false);
+        }
     }
 
     @Override
@@ -92,16 +100,23 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     @Override
     public void preencherObjetos() {
         getCboPagamentoModalidade().setItems(Arrays.stream(PagamentoModalidade.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-        getCboPagamentoModalidade().getSelectionModel().select(PagamentoModalidade.DINHEIRO);
         getCboSituacao().setItems(
                 Arrays.stream(PagamentoSituacao.values())
                         .filter(pagamentoSituacao -> pagamentoSituacao.getCod() != 2)
                         .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-        getCboSituacao().getSelectionModel().select(PagamentoSituacao.PENDENTE);
 
-        getTxtValor().setText(ServiceMascara.getMoeda(getaReceber().valorProperty().getValue(), 2));
+        if (getRecebimento() == null) {
+            getRecebimento().setPagamentoModalidade(PagamentoModalidade.DINHEIRO);
+            getRecebimento().setPagamentoSituacao(PagamentoSituacao.PENDENTE);
+            getRecebimento().valorProperty().setValue(getaReceber().valorProperty().getValue());
+            getRecebimento().dtPagamentoProperty().setValue(getaReceber().dtVencimentoProperty().getValue());
+        }
+        getCboPagamentoModalidade().getSelectionModel().select(getRecebimento().getPagamentoModalidade());
+        getCboSituacao().getSelectionModel().select(getRecebimento().getPagamentoSituacao());
 
-        getDtpDtPagamento().setValue(getaReceber().dtVencimentoProperty().getValue());
+        //getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
+
+        getDtpDtPagamento().setValue(getRecebimento().dtPagamentoProperty().getValue());
 
     }
 
@@ -114,6 +129,8 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     public void escutarTecla() {
 
         deshabilitaProperty().bind(Bindings.createBooleanBinding(() -> {
+            if (getEnumsTasksList().get(0).equals(EnumsTasks.UPDATE_RECEBIMENTO))
+                return false;
                     if (
                             ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2).compareTo(BigDecimal.ZERO) > 0
                                     && getDtpDtPagamento().getValue().compareTo(LocalDate.now().minusDays(7)) >= 0
@@ -144,20 +161,20 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
     private boolean salvarRecebimento() {
         try {
-            Recebimento recebimento = new Recebimento();
-            recebimento.setaReceber(getaReceber());
-            recebimento.setPagamentoSituacao(getCboSituacao().getValue());
-            recebimento.documentoProperty().setValue(getTxtDocumento().getText());
-            recebimento.setPagamentoModalidade(getCboPagamentoModalidade().getValue());
-            recebimento.valorProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2));
-            recebimento.setUsuarioPagamento(null);
-            recebimento.setDtPagamento(null);
-            if (recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO)) {
-                recebimento.setUsuarioPagamento(UsuarioLogado.getUsuario());
-                recebimento.dtPagamentoProperty().setValue(getDtpDtPagamento().getValue());
+            if (getaReceber() != null)
+                getRecebimento().setaReceber(getaReceber());
+            getRecebimento().setPagamentoSituacao(getCboSituacao().getValue());
+            getRecebimento().documentoProperty().setValue(getTxtDocumento().getText());
+            getRecebimento().setPagamentoModalidade(getCboPagamentoModalidade().getValue());
+            getRecebimento().valorProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2));
+            getRecebimento().setUsuarioPagamento(null);
+            getRecebimento().setDtPagamento(null);
+            if (getRecebimento().getPagamentoSituacao().equals(PagamentoSituacao.QUITADO)) {
+                getRecebimento().setUsuarioPagamento(UsuarioLogado.getUsuario());
+                getRecebimento().dtPagamentoProperty().setValue(getDtpDtPagamento().getValue());
             }
-            recebimento.setUsuarioCadastro(UsuarioLogado.getUsuario());
-            getRecebimentoDAO().merger(recebimento);
+            getRecebimento().setUsuarioCadastro(UsuarioLogado.getUsuario());
+            getRecebimentoDAO().merger(getRecebimento());
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -180,6 +197,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                             tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
                     switch (tasks) {
                         case ADD_RECEBIMENTO:
+                        case UPDATE_RECEBIMENTO:
                             if (!salvarRecebimento()) {
                                 Thread.currentThread().interrupt();
                             }
@@ -297,6 +315,14 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
     public void setaReceber(ContasAReceber aReceber) {
         this.aReceber = aReceber;
+    }
+
+    public Recebimento getRecebimento() {
+        return recebimento;
+    }
+
+    public void setRecebimento(Recebimento recebimento) {
+        this.recebimento = recebimento;
     }
 
     public RecebimentoDAO getRecebimentoDAO() {

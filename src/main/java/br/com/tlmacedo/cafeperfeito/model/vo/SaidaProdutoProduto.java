@@ -234,6 +234,11 @@ public class SaidaProdutoProduto implements Serializable {
         return vlrLiquido.get();
     }
 
+    @Transient
+    public BigDecimal getValorLiquido() {
+        return vlrBrutoProperty().getValue().subtract(vlrDescontoProperty().getValue());
+    }
+
     public ObjectProperty<BigDecimal> vlrLiquidoProperty() {
         return vlrLiquido;
     }

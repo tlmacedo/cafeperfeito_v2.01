@@ -921,7 +921,7 @@
                                 <TableView fx:id="tvItensPedido" prefHeight="205.0" prefWidth="1328.0">
                                     <columns>
                                         <TableColumn prefWidth="75.0" text="C1"/>
-                                        <TableColumn prefWidth="75.0" text="C2"/>
+                                        <TableColumn prefWidth="75.0" text="C23"/>
                                     </columns>
                                 </TableView>
                             </children>

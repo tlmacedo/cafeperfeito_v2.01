@@ -8,13 +8,14 @@ import br.com.tlmacedo.cafeperfeito.model.enums.StatusBarContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
+import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
-import br.com.tlmacedo.cafeperfeito.service.ServiceCalculaTempo;
 import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
 import br.com.tlmacedo.cafeperfeito.service.ServiceSegundoPlano;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewContasAReceber;
+import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -29,6 +30,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +49,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     public TextField txtPesquisa;
     public ComboBox cboPagamentoSituacao;
     public Label lblRegistrosLocalizados;
-    public TreeTableView<ContasAReceber> ttvContasAReceber;
+    public TreeTableView<Object> ttvContasAReceber;
     public Label lblQtdClientes;
     public Label lblQtdContas;
     public Label lblQtdContasPagas;
@@ -72,7 +74,6 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        ServiceCalculaTempo calcTmp = new ServiceCalculaTempo();
         criarObjetos();
         preencherObjetos();
         fatorarObjetos();
@@ -82,7 +83,6 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         }
         escutarTecla();
         fieldsFormat();
-        calcTmp.fim();
     }
 
     @Override
@@ -121,11 +121,11 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
     @Override
     public void fatorarObjetos() {
-        getDtpData1().setDayCellFactory(param -> new FormatDataPicker(null));
-        getDtpData2().setDayCellFactory(param -> new FormatDataPicker(null));
+        //getDtpData1().setDayCellFactory(param -> new FormatDataPicker(null));
+        getDtpData2().setDayCellFactory(param -> new FormatDataPicker(getDtpData1().getValue()));
 
         getDtpData1().valueProperty().addListener((ov, o, n) -> {
-            if (n == null) return;
+            if (n == null || getDtpData1().getValue().compareTo(getDtpData2().getValue()) <= 0) return;
             getDtpData2().setValue(n);
             getDtpData2().setDayCellFactory(param -> new FormatDataPicker(n));
         });
@@ -164,6 +164,18 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 //                            limpaCampos(getPainelViewSaidaProduto());
 //                        }
 //                        calcTmp.fim();
+                        break;
+                    case F4:
+                        Object obj;
+                        if ((obj = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue()) == null)
+                            return;
+                        if (obj instanceof ContasAReceber) {
+                            if (getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().size() > 0) {
+                                obj = (Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue();
+                            }
+                        }
+                        new ViewRecebimento().openViewRecebimento((Recebimento) obj);
+                        getTtvContasAReceber().refresh();
                         break;
                     case F6:
 //                        getCboEmpresa().getEditor().setEditable(true);
@@ -207,6 +219,14 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
             }
             showStatusBar();
         });
+
+        getLblQtdClientes().textProperty().bind(getTmodelaReceber().qtdClientesProperty().asString());
+
+        getLblQtdContas().textProperty().bind(getTmodelaReceber().qtdContasProperty().asString());
+
+        getLblQtdContasPagas().textProperty().bind(getTmodelaReceber().qtdContasPagasProperty().asString());
+
+        getLblQtdContasAbertas().textProperty().bind(getTmodelaReceber().qtdContasAbertasProperty().asString());
 
     }
 
@@ -253,6 +273,9 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 //                            getTmodelSaidaProduto().setDtpDtVencimento(getDtpDtVencimento());
 //                            setSaidaProdutoProdutoObservableList(getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList());
 //                            getTmodelSaidaProduto().escutaLista();
+
+                            getDtpData1().setValue(LocalDate.of(LocalDate.now().getYear(), 1, 1));
+                            getDtpData2().setValue(LocalDate.now().plusMonths(2).withDayOfMonth(1).minusDays(1));
 
                             break;
 
@@ -395,11 +418,11 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         this.lblRegistrosLocalizados = lblRegistrosLocalizados;
     }
 
-    public TreeTableView<ContasAReceber> getTtvContasAReceber() {
+    public TreeTableView<Object> getTtvContasAReceber() {
         return ttvContasAReceber;
     }
 
-    public void setTtvContasAReceber(TreeTableView<ContasAReceber> ttvContasAReceber) {
+    public void setTtvContasAReceber(TreeTableView<Object> ttvContasAReceber) {
         this.ttvContasAReceber = ttvContasAReceber;
     }
 

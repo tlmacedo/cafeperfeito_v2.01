@@ -28,6 +28,9 @@ public class ContasAReceber implements Serializable {
 
     private List<Recebimento> recebimentoList = new ArrayList<>();
 
+    private ObjectProperty<BigDecimal> valorPago = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> valorSaldo = new SimpleObjectProperty<>();
+
     public ContasAReceber() {
     }
 
@@ -102,13 +105,40 @@ public class ContasAReceber implements Serializable {
         this.dtCadastro.set(dtCadastro);
     }
 
-    @OneToMany(mappedBy = "aReceber", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "aReceber", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     public List<Recebimento> getRecebimentoList() {
         return recebimentoList;
     }
 
     public void setRecebimentoList(List<Recebimento> recebimentoList) {
         this.recebimentoList = recebimentoList;
+    }
+
+    @Transient
+    public BigDecimal getValorPago() {
+        return valorPago.get();
+    }
+
+    public ObjectProperty<BigDecimal> valorPagoProperty() {
+        return valorPago;
+    }
+
+    public void setValorPago(BigDecimal valorPago) {
+        this.valorPago.set(valorPago);
+    }
+
+    @Transient
+    public BigDecimal getValorSaldo() {
+        return valorSaldo.get();
+    }
+
+    public ObjectProperty<BigDecimal> valorSaldoProperty() {
+        return valorSaldo;
+    }
+
+    public void setValorSaldo(BigDecimal valorSaldo) {
+        this.valorSaldo.set(valorSaldo);
     }
 
     @Override
@@ -120,7 +150,7 @@ public class ContasAReceber implements Serializable {
                 ", valor=" + valor +
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
-                ", recebimentoList=" + recebimentoList +
+                //", recebimentoList=" + recebimentoList +
                 '}';
     }
 }

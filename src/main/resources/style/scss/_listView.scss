@@ -1,16 +1,8 @@
 
 .list-view {
-  //  -fx-background-color: -fx-base;
-
-  //&:focused {
-  //  -fx-border-color: $corPricipal;
-  //}
-
   .list-cell {
     -fx-padding: 0 4;
     -fx-border-style: solid;
-    ////-fx-background-color: -fx-control-inner-background;
-    //-fx-background-color: linear-gradient(to right, -fx-base, derive(-fx-base, 35%));
     -fx-alignment: center-left;
     -fx-font-family: $fontFamily;
     -fx-font-size: $fontSizeh6;
@@ -38,41 +30,6 @@
     }
   }
 
-  //&.endereco {
-  //  .list-cell {
-  //    -fx-pref-height: 25;
-  //    -fx-background-color: -fx-control-inner-background;
-  //    -fx-text-fill: $sisColor_black;
-  //    -fx-padding: 0 0 0 3;
-  //
-  //    &:odd {
-  //      -fx-background-color: derive(-fx-control-inner-background, -20%);
-  //    }
-  //
-  //    &:filled:selected {
-  //      -fx-background-color: -fx-selection-bar;
-  //      -fx-text-fill: -fx-selection-bar-text;
-  //    }
-  //  }
-  //}
-  //
-  //&.produtoCodBarra {
-  //  .list-cell {
-  //    -fx-pref-height: 60;
-  //    -fx-background-colobr: -fx-control-inner-background;
-  //    -fx-text-fill: $sisColor_black;
-  //    -fx-padding: 0 0 0 3;
-  //
-  //    &:odd {
-  //      -fx-background-color: derive(-fx-control-inner-background, -20%);
-  //    }
-  //
-  //    &:filled:selected {
-  //      -fx-background-color: -fx-selection-bar;
-  //      -fx-text-fill: -fx-selection-bar-text;
-  //    }
-  //  }
-  //}
 
 }
 

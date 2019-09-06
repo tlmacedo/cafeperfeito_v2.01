@@ -50,7 +50,7 @@ public class Recebimento implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public ContasAReceber getaReceber() {
         return aReceber;
     }
