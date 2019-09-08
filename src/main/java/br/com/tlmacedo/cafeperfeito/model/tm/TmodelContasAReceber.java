@@ -6,6 +6,7 @@ import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
 import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
+import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -22,7 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.*;
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 
 public class TmodelContasAReceber {
 
@@ -30,7 +31,7 @@ public class TmodelContasAReceber {
     private DatePicker dtpData1;
     private DatePicker dtpData2;
     private CheckBox chkDtVenda;
-    private ObjectProperty<Empresa> empresa;// = new SimpleObjectProperty<>();
+    private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
     private TextField txtPesquisa;
     private ComboBox cboPagamentoSituacao;
     private Label lblRegistrosLocalizados;
@@ -42,9 +43,10 @@ public class TmodelContasAReceber {
     private TreeItem<Object> aReceberTreeItem;
     private TreeTableColumn<Object, Long> colId;
     private TreeTableColumn<Object, String> colCliente_Documento;
-    private TreeTableColumn<Object, String> colDtVenda_Modalidade;
+    private TreeTableColumn<Object, LocalDate> colDtVenda;
+    private TreeTableColumn<Object, String> colModalidade;
     private TreeTableColumn<Object, String> colSituacao;
-    private TreeTableColumn<Object, String> colDtVencimento_DtPagamento;
+    private TreeTableColumn<Object, LocalDate> colDtVencimento_DtPagamento;
     private TreeTableColumn<Object, String> colValor;
     private TreeTableColumn<Object, String> colValorPago;
     private TreeTableColumn<Object, String> colValorSaldo;
@@ -83,8 +85,8 @@ public class TmodelContasAReceber {
         getColId().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
                 return ((ContasAReceber) cellData.getValue().getValue()).idProperty().asObject();
-            } else if (cellData.getValue().getValue() instanceof Recebimento) {
-                return ((Recebimento) cellData.getValue().getValue()).idProperty().asObject();
+//            } else if (cellData.getValue().getValue() instanceof Recebimento) {
+//                return ((Recebimento) cellData.getValue().getValue()).idProperty().asObject();
             }
             return new SimpleObjectProperty<>(null);
         });
@@ -111,29 +113,38 @@ public class TmodelContasAReceber {
             return new SimpleStringProperty("");
         });
 
-        setColDtVenda_Modalidade(new TreeTableColumn("dt. venda / mod pag"));
-        getColDtVenda_Modalidade().setPrefWidth(120);
-        getColDtVenda_Modalidade().setCellFactory(cellFactory -> new TreeTableCell<>() {
+        setColDtVenda(new TreeTableColumn("dt. venda"));
+        getColDtVenda().setPrefWidth(120);
+        getColDtVenda().setStyle("-fx-alignment: center-right;");
+        getColDtVenda().setCellValueFactory(cellData -> {
+            if (cellData.getValue().getValue() instanceof ContasAReceber) {
+                return new SimpleObjectProperty<>(((ContasAReceber) cellData.getValue().getValue()).dtCadastroProperty().getValue().toLocalDate());
+            }
+            return new SimpleObjectProperty<>();
+        });
+        getColDtVenda().setCellFactory(cellFactory -> new TreeTableCell<>() {
             @Override
-            protected void updateItem(String item, boolean empty) {
+            protected void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty ? null : getItem());
-                if (getTreeTableRow().getItem() instanceof ContasAReceber)
-                    setAlignment(Pos.CENTER_RIGHT);
-                else
-                    setAlignment(Pos.CENTER_LEFT);
+                try {
+                    setText(empty ? null : getItem().format(DTF_DATA));
+                } catch (Exception ex) {
+                    if (ex instanceof NullPointerException)
+                        setText("");
+                }
             }
         });
-        getColDtVenda_Modalidade().setCellValueFactory(cellData -> {
-            if (cellData.getValue().getValue() instanceof ContasAReceber) {
-                return new SimpleStringProperty(((ContasAReceber) cellData.getValue().getValue()).dtCadastroProperty().getValue().format(DTF_MYSQL_DATAHORA_HM));
-            } else if (cellData.getValue().getValue() instanceof Recebimento) {
+
+        setColModalidade(new TreeTableColumn("/ mod pag"));
+        getColModalidade().setPrefWidth(120);
+        getColModalidade().setCellValueFactory(cellData -> {
+            if (cellData.getValue().getValue() instanceof Recebimento) {
                 return new SimpleStringProperty(((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao());
             }
             return new SimpleStringProperty("");
         });
 
-        setColSituacao(new TreeTableColumn(" / situação"));
+        setColSituacao(new TreeTableColumn("/ situação"));
         getColSituacao().setPrefWidth(90);
         getColSituacao().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof Recebimento) {
@@ -147,13 +158,24 @@ public class TmodelContasAReceber {
         getColDtVencimento_DtPagamento().setStyle("-fx-alignment: center-right;");
         getColDtVencimento_DtPagamento().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
-                return new SimpleStringProperty(((ContasAReceber) cellData.getValue().getValue()).dtVencimentoProperty().getValue().format(DTF_MYSQL_DATA));
+                return new SimpleObjectProperty<>(((ContasAReceber) cellData.getValue().getValue()).dtVencimentoProperty().getValue());
             } else if (cellData.getValue().getValue() instanceof Recebimento) {
-                if (((Recebimento) cellData.getValue().getValue()).dtPagamentoProperty().getValue() == null)
-                    return new SimpleStringProperty("");
-                return new SimpleStringProperty(((Recebimento) cellData.getValue().getValue()).dtPagamentoProperty().getValue().format(DTF_MYSQL_DATA));
+                if (((Recebimento) cellData.getValue().getValue()).dtPagamentoProperty().getValue() != null)
+                    return new SimpleObjectProperty<>(((Recebimento) cellData.getValue().getValue()).dtPagamentoProperty().getValue());
             }
-            return new SimpleStringProperty("");
+            return new SimpleObjectProperty<>();
+        });
+        getColDtVencimento_DtPagamento().setCellFactory(cellFactory -> new TreeTableCell<>() {
+            @Override
+            protected void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                try {
+                    setText(empty ? null : getItem().format(DTF_DATA));
+                } catch (Exception ex) {
+                    if (ex instanceof NullPointerException)
+                        setText("");
+                }
+            }
         });
 
         setColValor(new TreeTableColumn("valor R$"));
@@ -164,10 +186,11 @@ public class TmodelContasAReceber {
                 return new SimpleStringProperty(
                         ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).valorProperty().getValue(), 2));
             } else if (cellData.getValue().getValue() instanceof Recebimento) {
-                return new SimpleStringProperty(
-                        ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
+                if (!((Recebimento) cellData.getValue().getValue()).getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                    return new SimpleStringProperty(
+                            ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
             }
-            return new SimpleStringProperty("0,00");
+            return new SimpleStringProperty("");
         });
 
         setColValorPago(new TreeTableColumn("vlr pago R$"));
@@ -192,12 +215,12 @@ public class TmodelContasAReceber {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
                 return new SimpleStringProperty(
                         ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).valorSaldoProperty().getValue(), 2));
-            } else if (cellData.getValue().getValue() instanceof Recebimento) {
-                if (!((Recebimento) cellData.getValue().getValue()).getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                    return new SimpleStringProperty(
-                            ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
+//            } else if (cellData.getValue().getValue() instanceof Recebimento) {
+//                if (!((Recebimento) cellData.getValue().getValue()).getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+//                    return new SimpleStringProperty(
+//                            ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
             }
-            return new SimpleStringProperty("0,00");
+            return new SimpleStringProperty("");
         });
 
 
@@ -228,7 +251,7 @@ public class TmodelContasAReceber {
                     });
 
 
-            getTtvContasAReceber().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda_Modalidade(),
+            getTtvContasAReceber().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda(), getColModalidade(),
                     getColSituacao(), getColDtVencimento_DtPagamento(), getColValor(), getColValorPago(), getColValorSaldo());
 
             getTtvContasAReceber().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -236,6 +259,7 @@ public class TmodelContasAReceber {
             getTtvContasAReceber().setRoot(getaReceberTreeItem());
             getTtvContasAReceber().setShowRoot(false);
 
+            totalizaTabela();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -287,16 +311,17 @@ public class TmodelContasAReceber {
 
             getaReceberFilteredList().addListener((ListChangeListener<? super ContasAReceber>) change -> {
                 preencherTabela();
-                totalizaTabela();
+            });
+
+            empresaProperty().addListener((ov, o, n) -> {
+                if (n != null) {
+                    aplicaFiltro();
+                }
             });
 
             getDtpData1().valueProperty().addListener(observable -> aplicaFiltro());
             getDtpData2().valueProperty().addListener(observable -> aplicaFiltro());
             getChkDtVenda().selectedProperty().addListener(observable -> aplicaFiltro());
-//            empresaProperty().addListener((ov, o, n) -> {
-//                if (n != null)
-//                    aplicaFiltro();
-//            });
 
             totalizaTabela();
         } catch (Exception ex) {
@@ -310,32 +335,21 @@ public class TmodelContasAReceber {
                 if (getDtpData1().getValue() == null || getDtpData2().getValue() == null)
                     return true;
                 if (getChkDtVenda().isSelected()) {
-//                    System.out.printf("dtpData1:[%s]\tdtCadastro:[%s]\tdtpData2:[%s]\t\tresult:[%s]\n",
-//                            getDtpData1().getValue(),
-//                            aReceber.dtCadastroProperty().getValue().toLocalDate().format(DTF_DATA),
-//                            getDtpData2().getValue(),
-//                            (!(aReceber.dtCadastroProperty().getValue().toLocalDate().isBefore(getDtpData1().getValue())
-//                                    || aReceber.dtCadastroProperty().getValue().toLocalDate().isAfter(getDtpData2().getValue()))));
-//                    if (aReceber.dtCadastroProperty().getValue().toLocalDate().isBefore(getDtpData1().getValue())
-//                            || aReceber.dtCadastroProperty().getValue().toLocalDate().isAfter(getDtpData2().getValue()))
-//                        return false;
+                    if (aReceber.dtCadastroProperty().getValue().toLocalDate().isBefore(getDtpData1().getValue())
+                            || aReceber.dtCadastroProperty().getValue().toLocalDate().isAfter(getDtpData2().getValue()))
+                        return false;
                 } else {
                     if (aReceber.dtVencimentoProperty().getValue().isBefore(getDtpData1().getValue())
                             || aReceber.dtVencimentoProperty().getValue().isAfter(getDtpData2().getValue())) {
-                        System.out.printf("dtpData1:[%s]\tdtVencimento:[%s]\tdtpData2:[%s]\t\tresult:[%s]\n",
-                                getDtpData1().getValue(),
-                                aReceber.dtCadastroProperty().getValue().toLocalDate().format(DTF_DATA),
-                                getDtpData2().getValue(),
-                                (!(aReceber.dtVencimentoProperty().getValue().isBefore(getDtpData1().getValue())
-                                        || aReceber.dtVencimentoProperty().getValue().isAfter(getDtpData2().getValue()))));
                         return false;
                     }
                 }
-//                if (empresaProperty().getValue() != null) {
-//                    if (!aReceber.getSaidaProduto().getCliente().equals(empresaProperty().get()))
-//                        return false;
-//                }
-
+                if (empresaProperty().getValue() != null) {
+                    if (empresaProperty().getValue().idProperty().getValue() != 0)
+                        if (aReceber.getSaidaProduto().getCliente().idProperty().getValue() != empresaProperty().getValue().idProperty().getValue()) {
+                            return false;
+                        }
+                }
 
                 return true;
             });
@@ -345,14 +359,23 @@ public class TmodelContasAReceber {
     }
 
     private void totalizaTabela() {
-        getTtvContasAReceber().refresh();
-//        setQtdClientes((int) getaReceberFilteredList().stream().map(ContasAReceber::getSaidaProduto).map(SaidaProduto::getCliente).count());
-//
-//        setQtdContas(getaReceberFilteredList().size());
-//        setQtdContasPagas((int) getaReceberFilteredList().stream().filter(aReceber -> aReceber.valorProperty().getValue().compareTo(aReceber.getRecebimentoList().stream()
-//                .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-//                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) <= 0).count());
-//        setQtdContasAbertas(getQtdContas() - getQtdContasPagas());
+//        getTtvContasAReceber().refresh();
+        setQtdClientes(
+                getaReceberFilteredList().stream()
+                        .map(ContasAReceber::getSaidaProduto)
+                        .map(SaidaProduto::getCliente)
+                        .collect(Collectors.groupingBy(Empresa::getId))
+                        .size()
+//                        .map(Empresa::getId)
+//                        .reduce((aLong, aLong2) -> aLong2).stream().g
+        );
+
+        setQtdContas(getaReceberFilteredList().size());
+        setQtdContasPagas((int) getaReceberFilteredList().stream()
+                .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(aReceber.getRecebimentoList().stream()
+                        .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                        .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) <= 0).count());
+        setQtdContasAbertas(getQtdContas() - getQtdContasPagas());
     }
 
     /**
@@ -488,12 +511,20 @@ public class TmodelContasAReceber {
         this.colCliente_Documento = colCliente_Documento;
     }
 
-    public TreeTableColumn<Object, String> getColDtVenda_Modalidade() {
-        return colDtVenda_Modalidade;
+    public TreeTableColumn<Object, LocalDate> getColDtVenda() {
+        return colDtVenda;
     }
 
-    public void setColDtVenda_Modalidade(TreeTableColumn<Object, String> colDtVenda_Modalidade) {
-        this.colDtVenda_Modalidade = colDtVenda_Modalidade;
+    public void setColDtVenda(TreeTableColumn<Object, LocalDate> colDtVenda) {
+        this.colDtVenda = colDtVenda;
+    }
+
+    public TreeTableColumn<Object, String> getColModalidade() {
+        return colModalidade;
+    }
+
+    public void setColModalidade(TreeTableColumn<Object, String> colModalidade) {
+        this.colModalidade = colModalidade;
     }
 
     public TreeTableColumn<Object, String> getColSituacao() {
@@ -504,11 +535,11 @@ public class TmodelContasAReceber {
         this.colSituacao = colSituacao;
     }
 
-    public TreeTableColumn<Object, String> getColDtVencimento_DtPagamento() {
+    public TreeTableColumn<Object, LocalDate> getColDtVencimento_DtPagamento() {
         return colDtVencimento_DtPagamento;
     }
 
-    public void setColDtVencimento_DtPagamento(TreeTableColumn<Object, String> colDtVencimento_DtPagamento) {
+    public void setColDtVencimento_DtPagamento(TreeTableColumn<Object, LocalDate> colDtVencimento_DtPagamento) {
         this.colDtVencimento_DtPagamento = colDtVencimento_DtPagamento;
     }
 

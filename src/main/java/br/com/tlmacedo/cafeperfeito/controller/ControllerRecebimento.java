@@ -60,7 +60,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     public ControllerRecebimento() {
         setRecebimento(ViewRecebimento.getRecebimento());
         if (getRecebimento() == null) {
-            setRecebimento(new Recebimento());
+            setaReceber(ViewRecebimento.getaReceber());
             getEnumsTasksList().add(EnumsTasks.ADD_RECEBIMENTO);
         } else {
             setRecebimento(ViewRecebimento.getRecebimento());
@@ -106,6 +106,8 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                         .collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
         if (getRecebimento() == null) {
+            setRecebimento(new Recebimento());
+            getRecebimento().setaReceber(getaReceber());
             getRecebimento().setPagamentoModalidade(PagamentoModalidade.DINHEIRO);
             getRecebimento().setPagamentoSituacao(PagamentoSituacao.PENDENTE);
             getRecebimento().valorProperty().setValue(getaReceber().valorProperty().getValue());
@@ -114,7 +116,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
         getCboPagamentoModalidade().getSelectionModel().select(getRecebimento().getPagamentoModalidade());
         getCboSituacao().getSelectionModel().select(getRecebimento().getPagamentoSituacao());
 
-        //getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
+        getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
 
         getDtpDtPagamento().setValue(getRecebimento().dtPagamentoProperty().getValue());
 

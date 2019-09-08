@@ -69,6 +69,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     private ServiceAlertMensagem alertMensagem;
 
     private TmodelContasAReceber tmodelaReceber;
+    private ObjectProperty<ContasAReceber> aReceber = new SimpleObjectProperty<>();
     private ObservableList<ContasAReceber> aReceberObservableList;
     private FilteredList<ContasAReceber> aReceberFilteredList;
 
@@ -213,10 +214,22 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
         new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
 
-        getCboEmpresa().focusedProperty().addListener((ov, o, n) -> {
-            if (!n) {
+        getCboEmpresa().valueProperty().addListener((ov, o, n) -> {
+            if (n != null) {
                 getTmodelaReceber().setEmpresa(getCboEmpresa().getValue());
             }
+            showStatusBar();
+        });
+
+        getTtvContasAReceber().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
+            if (n.getValue() instanceof ContasAReceber) {
+                setaReceber((ContasAReceber) n.getValue());
+            } else {
+                setaReceber((ContasAReceber) n.getParent().getValue());
+            }
+        });
+
+        aReceberProperty().addListener((ov, o, n) -> {
             showStatusBar();
         });
 
@@ -241,64 +254,59 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
             @Override
             protected Void call() throws Exception {
                 updateMessage("Loading...");
-                for (EnumsTasks tasks : getEnumsTasksList()) {
-                    updateProgress(cont[0]++, qtdTasks);
-                    Thread.sleep(200);
-                    updateMessage(String.format("%s%s", tasks.getDescricao(),
-                            tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
-                    switch (tasks) {
-                        case TABELA_CRIAR:
-                            setTmodelaReceber(new TmodelContasAReceber());
-                            getTmodelaReceber().criarTabela();
+                try {
+                    for (EnumsTasks tasks : getEnumsTasksList()) {
+                        updateProgress(cont[0]++, qtdTasks);
+                        Thread.sleep(200);
+                        updateMessage(String.format("%s%s", tasks.getDescricao(),
+                                tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
+                        switch (tasks) {
+                            case TABELA_CRIAR:
+                                setTmodelaReceber(new TmodelContasAReceber());
+                                getTmodelaReceber().criarTabela();
 //
 //                            setTmodelSaidaProduto(new TmodelSaidaProduto());
 //                            getTmodelSaidaProduto().criaTabela();
-                            break;
+                                break;
 
-                        case TABELA_VINCULAR:
-                            getTmodelaReceber().setDtpData1(getDtpData1());
-                            getTmodelaReceber().setDtpData2(getDtpData2());
-                            getTmodelaReceber().setChkDtVenda(getChkDtVenda());
-                            getTmodelaReceber().setTxtPesquisa(getTxtPesquisa());
-                            getTmodelaReceber().setCboPagamentoSituacao(getCboPagamentoSituacao());
-                            getTmodelaReceber().setLblRegistrosLocalizados(getLblRegistrosLocalizados());
-                            getTmodelaReceber().setTtvContasAReceber(getTtvContasAReceber());
-                            setaReceberObservableList(getTmodelaReceber().getaReceberObservableList());
-                            setaReceberFilteredList(getTmodelaReceber().getaReceberFilteredList());
-                            getTmodelaReceber().escutaLista();
-//
-//                            getTmodelSaidaProduto().setTvSaidaProdutoProduto(getTvItensPedido());
-//                            getTmodelSaidaProduto().setTxtPesquisa(getTxtPesquisa());
-//                            getTmodelSaidaProduto().setDtpDtSaida(getDtpDtSaida());
-//                            getTmodelSaidaProduto().setDtpDtVencimento(getDtpDtVencimento());
-//                            setSaidaProdutoProdutoObservableList(getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList());
-//                            getTmodelSaidaProduto().escutaLista();
+                            case TABELA_VINCULAR:
+                                getTmodelaReceber().setDtpData1(getDtpData1());
+                                getTmodelaReceber().setDtpData2(getDtpData2());
+                                getTmodelaReceber().setChkDtVenda(getChkDtVenda());
+                                getTmodelaReceber().setTxtPesquisa(getTxtPesquisa());
+                                getTmodelaReceber().setCboPagamentoSituacao(getCboPagamentoSituacao());
+                                getTmodelaReceber().setLblRegistrosLocalizados(getLblRegistrosLocalizados());
+                                getTmodelaReceber().setTtvContasAReceber(getTtvContasAReceber());
+                                setaReceberObservableList(getTmodelaReceber().getaReceberObservableList());
+                                setaReceberFilteredList(getTmodelaReceber().getaReceberFilteredList());
+                                getTmodelaReceber().setEmpresa(null);
+                                getTmodelaReceber().escutaLista();
 
-                            getDtpData1().setValue(LocalDate.of(LocalDate.now().getYear(), 1, 1));
-                            getDtpData2().setValue(LocalDate.now().plusMonths(2).withDayOfMonth(1).minusDays(1));
+                                getDtpData1().setValue(LocalDate.of(LocalDate.now().getYear(), 1, 1));
+                                getDtpData2().setValue(LocalDate.now().plusMonths(2).withDayOfMonth(1).minusDays(1));
 
-                            break;
+                                break;
 
-                        case COMBOS_PREENCHER:
-                            getCboEmpresa().setItems(
-                                    new EmpresaDAO().getAll(Empresa.class, null, null, null, "razao")
-                                            .stream().filter(Empresa::isCliente)
-                                            .collect(Collectors.toCollection(FXCollections::observableArrayList))
-                            );
+                            case COMBOS_PREENCHER:
+                                getCboEmpresa().setItems(
+                                        new EmpresaDAO().getAll(Empresa.class, null, null, null, "razao")
+                                                .stream().filter(Empresa::isCliente)
+                                                .collect(Collectors.toCollection(FXCollections::observableArrayList))
+                                );
 
-                            getCboEmpresa().getItems().add(0, new Empresa());
+                                getCboEmpresa().getItems().add(0, new Empresa());
 
-                            getCboPagamentoSituacao().setItems(Arrays.stream(PagamentoSituacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                            getCboPagamentoSituacao().getItems().add(0, "");
-                            break;
+                                getCboPagamentoSituacao().setItems(Arrays.stream(PagamentoSituacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                getCboPagamentoSituacao().getItems().add(0, "");
+                                break;
 
-                        case TABELA_PREENCHER:
-                            getTmodelaReceber().preencherTabela();
+                            case TABELA_PREENCHER:
+                                getTmodelaReceber().preencherTabela();
 //
 //                            getTmodelSaidaProduto().preencheTabela();
-                            break;
+                                break;
 
-                        case SALVAR_SAIDA:
+                            case SALVAR_SAIDA:
 //                            if (getTmodelSaidaProduto().guardarSaidaProduto()) {
 //                                if (getTmodelSaidaProduto().salvarSaidaProduto()) {
 //                                    getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
@@ -309,8 +317,11 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 //                            } else {
 //                                Thread.currentThread().interrupt();
 //                            }
-                            break;
+                                break;
+                        }
                     }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
                 updateMessage("tarefa concluída!!!");
                 updateProgress(qtdTasks, qtdTasks);
@@ -328,14 +339,28 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
      */
 
     private void showStatusBar() {
-        try {
-//            if (getaReceberObservableList().size() <= 0 || getCboEmpresa().getValue().idProperty().getValue() == 0)
+//        try {
+//            if (getTtvContasAReceber().get.size() <= 0 || getCboEmpresa().getValue().idProperty().getValue() == 0)
 //                ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao().replace("  [F2-Finalizar venda]", ""));
 //            else
-            ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao());
+//                ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao());
+//        } catch (Exception ex) {
+//            ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao());
+//        }
+
+        String stb = "";
+        try {
+            if (aReceberProperty().getValue() == null) {
+                stb = statusBarProperty().getValue().getDescricao().replace("[Insert-Novo recebimento]  [F4-Editar recebimento]  ", "");
+            } else if (aReceberProperty().getValue().getRecebimentoList().size() <= 0) {
+                stb = statusBarProperty().getValue().getDescricao().replace("[F4-Editar recebimento]  ", "");
+            } else {
+                stb = statusBarProperty().getValue().getDescricao().replace("[Insert-Novo recebimento]  ", "");
+            }
         } catch (Exception ex) {
-            ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao());
+            stb = statusBarProperty().getValue().getDescricao();
         }
+        ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(stb);
     }
 
     /**
@@ -548,6 +573,18 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
     public void setTmodelaReceber(TmodelContasAReceber tmodelaReceber) {
         this.tmodelaReceber = tmodelaReceber;
+    }
+
+    public ContasAReceber getaReceber() {
+        return aReceber.get();
+    }
+
+    public ObjectProperty<ContasAReceber> aReceberProperty() {
+        return aReceber;
+    }
+
+    public void setaReceber(ContasAReceber aReceber) {
+        this.aReceber.set(aReceber);
     }
 
     public ObservableList<ContasAReceber> getaReceberObservableList() {
