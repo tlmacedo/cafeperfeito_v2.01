@@ -22,7 +22,7 @@ public interface DAO<T, I extends Serializable> {
 
     public T getById(Class<T> classe, I pk);
 
-    public List<T> getAll(Class<T> classe, String orderBy, String campo, String operador, String busca);
+    public List<T> getAll(Class<T> classe, String personalizaBusca, String orderBy);
 
     public EntityManager getEntityManager();
 

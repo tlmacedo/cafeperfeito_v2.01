@@ -163,7 +163,7 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
         String path = TCONFIG.getPaths().getPathIconeSistema();
         setMenuPrincipalList(
                 new MenuPrincipalDAO()
-                        .getAll(MenuPrincipal.class, null, null, null, null)
+                        .getAll(MenuPrincipal.class, null, null)
         );
         TreeItem[] treeItems = new TreeItem[getMenuPrincipalList().size() + 1];
         treeItems[0] = new TreeItem();

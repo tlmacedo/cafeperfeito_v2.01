@@ -51,3 +51,21 @@ $fontSizeh4: 16px;
 $fontSizeh3: 18px;
 $fontSizeh2: 22px;
 $fontSizeh1: 24px;
+
+$recebimento-recebimento-back: rgba(255, 111, 0, 0.7);
+$recebimento-recebimento-text: $sisColor_whiteblack;
+
+$recebimento-pendente-back: rgba(255, 219, 0, 0.8);
+$recebimento-pendente-text: $sisColor_black;
+
+$recebimento-vencido-back: rgba(255, 0, 0, 0.8);
+$recebimento-vencido-text: $sisColor_yellow;
+
+$recebimento-pago-back: rgba(91, 255, 0, 0.8);
+$recebimento-pago-text: $sisColor_black;
+
+$recebimento-cancelado-back: rgba(0, 0, 0, 0.8);
+$recebimento-cancelado-text: $sisColor_whiteblack;
+
+$recebimento-retirada-back: rgba(148, 0, 255, 0.8);
+$recebimento-retirada-text: $sisColor_whiteblack;

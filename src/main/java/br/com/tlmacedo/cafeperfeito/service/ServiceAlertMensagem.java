@@ -12,6 +12,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.SPLASH_IMAGENS;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
@@ -28,7 +32,7 @@ public class ServiceAlertMensagem {
     private HBox hBox = new HBox();
     private VBox vBox = new VBox();
     private ImageView imageView;
-    private Button[] btns = new Button[3];
+    private List<Button> btns = new ArrayList<>();
     private Button btnOk, btnCancel, btnYes, btnNo, btnApply, btnClose, btnFinish;
     private Label lblMsg = new Label(), lblContagem = new Label();
     private Integer timeOut = TCONFIG.getTimeOut();
@@ -42,12 +46,44 @@ public class ServiceAlertMensagem {
         loadDialogPane();
 
         setBtnOk(new Button());
-        getBtns()[0] = getBtnOk();
+        getBtns().add(getBtnOk());
 
         addButton();
 
-        getBtnOk().setDisable(false);
         getDialog().showAndWait();
+    }
+
+    public Optional<ButtonType> alertYesNoCancel() {
+        loadDialog();
+        loadDialogPane();
+
+        setBtnYes(new Button());
+        getBtns().add(getBtnYes());
+
+        setBtnNo(new Button());
+        getBtns().add(getBtnNo());
+
+        setBtnCancel(new Button());
+        getBtns().add(getBtnCancel());
+
+        addButton();
+
+//        getDialog().setResultConverter(o -> {
+//            if (o == ButtonType.YES)
+//                return true;
+//            return false;
+//        });
+
+
+//        Optional<ButtonType> result = getDialog().showAndWait();
+//        if (result.get() == ButtonType.YES)
+//            return true;
+//        else if (result.get() == ButtonType.NO)
+//            return false;
+//        else
+//            return null;
+
+        return getDialog().showAndWait();
     }
 
     public boolean alertProgressBar(Task<?> task, boolean isWait) {
@@ -64,10 +100,10 @@ public class ServiceAlertMensagem {
 
         if (isWait) {
             setBtnOk(new Button());
-            getBtns()[0] = getBtnOk();
-            setBtnCancel(new Button());
-            getBtns()[1] = getBtnCancel();
+            getBtns().add(getBtnOk());
         }
+        setBtnCancel(new Button());
+        getBtns().add(getBtnCancel());
 
         addButton();
 
@@ -194,6 +230,15 @@ public class ServiceAlertMensagem {
                 getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
                 setBtnCancel((Button) getDialogPane().lookupButton(ButtonType.CANCEL));
                 getBtnCancel().setCancelButton(true);
+            } else if (btn == getBtnYes()) {
+                getDialogPane().getButtonTypes().add(ButtonType.YES);
+                setBtnYes((Button) getDialogPane().lookupButton(ButtonType.YES));
+                getBtnYes().setDefaultButton(true);
+            } else if (btn == getBtnNo()) {
+                getDialogPane().getButtonTypes().add(ButtonType.NO);
+                setBtnNo((Button) getDialogPane().lookupButton(ButtonType.NO));
+                if (!getBtns().contains(getBtnCancel()))
+                    getBtnNo().setCancelButton(true);
             }
         }
     }
@@ -379,11 +424,11 @@ public class ServiceAlertMensagem {
         this.btnFinish = btnFinish;
     }
 
-    public Button[] getBtns() {
+    public List<Button> getBtns() {
         return btns;
     }
 
-    public void setBtns(Button[] btns) {
+    public void setBtns(List<Button> btns) {
         this.btns = btns;
     }
 

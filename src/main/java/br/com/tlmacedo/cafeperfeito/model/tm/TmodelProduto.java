@@ -27,7 +27,7 @@ public class TmodelProduto {
     private TextField txtPesquisa;
     private TreeTableView<Produto> ttvProduto;
     private ProdutoDAO produtoDAO = new ProdutoDAO();
-    private ObservableList<Produto> produtoObservableList = FXCollections.observableArrayList(getProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
+    private ObservableList<Produto> produtoObservableList = FXCollections.observableArrayList(getProdutoDAO().getAll(Produto.class, null, "descricao"));
     private FilteredList<Produto> produtoFilteredList = new FilteredList<>(getProdutoObservableList());
 
     private TreeItem<Produto> produtoTreeItem;
@@ -247,8 +247,8 @@ public class TmodelProduto {
     }
 
 //    public void atualizarProdutos() {
-//        //System.out.printf("getProdutoDAO(): [%s]\n" ,getProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
-//        getProdutoObservableList().setAll(getProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
+//        //System.out.printf("getProdutoDAO(): [%s]\n" ,getProdutoDAO().getAll(Produto.class, null,  "descricao"));
+//        getProdutoObservableList().setAll(getProdutoDAO().getAll(Produto.class, null,  "descricao"));
 //        getTtvProduto().refresh();
 //    }
 

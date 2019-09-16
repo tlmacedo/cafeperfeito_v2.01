@@ -11,12 +11,14 @@ import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
 import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
+import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import br.com.tlmacedo.cafeperfeito.service.ServiceSegundoPlano;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewContasAReceber;
 import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -50,13 +52,35 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     public ComboBox cboPagamentoSituacao;
     public Label lblRegistrosLocalizados;
     public TreeTableView<Object> ttvContasAReceber;
-    public Label lblQtdClientes;
-    public Label lblQtdContas;
-    public Label lblQtdContasPagas;
-    public Label lblQtdContasAbertas;
+    public Label lblTotQtdClientes;
+    public Label lblTotalQtdClientes;
+    public Label lblTotQtdContas;
     public Label lblTotalContas;
+    public Label lblTotQtdRetiradas;
+    public Label lblTotalRetiradas;
+    public Label lblTotQtdDescontos;
+    public Label lblTotalDescontos;
+    public Label lblTotQtdLucroBruto;
+    public Label lblTotalLucroBruto;
+    public Label lblTotQtdContasAReceber;
+    public Label lblTotalContasAReceber;
+    public Label lblTotQtdContasVencidas;
+    public Label lblTotalContasVencidas;
+    public Label lblTotQtdContasPendentes;
+    public Label lblTotalContasPendentes;
+    public Label lblTotQtdContasPagas;
     public Label lblTotalContasPagas;
-    public Label lblTotalContasAbertas;
+    public Label lblTotQtdContasSaldoClientes;
+    public Label lblTotalContasSaldoClientes;
+    public Label lblTotQtdLucroLiquido;
+    public Label lblTotalLucroLiquido;
+
+//    public Label lblQtdContas;
+//    public Label lblQtdContasPagas;
+//    public Label lblQtdContasAbertas;
+//    public Label lblTotalContas;
+//    public Label lblTotalContasPagas;
+//    public Label lblTotalContasAbertas;
 
 
     private boolean tabCarregada = false;
@@ -167,7 +191,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 //                        calcTmp.fim();
                         break;
                     case F4:
-                        Object obj;
+                        Object obj, objEnvi;
                         if ((obj = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue()) == null)
                             return;
                         if (obj instanceof ContasAReceber) {
@@ -175,8 +199,16 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                 obj = (Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue();
                             }
                         }
-                        new ViewRecebimento().openViewRecebimento((Recebimento) obj);
+                        Object finalObj = obj;
+                        objEnvi = getaReceberFilteredList().stream()
+                                .filter(aReceber1 -> aReceber1.getRecebimentoList().stream()
+                                        .filter(recebimento -> recebimento.idProperty().getValue() == ((Recebimento) finalObj).idProperty().getValue())
+                                        .count() > 0)
+                                .findFirst().orElse(null);
+                        if (objEnvi == null) return;
+                        new ViewRecebimento().openViewRecebimento((Recebimento) objEnvi);
                         getTtvContasAReceber().refresh();
+                        getTmodelaReceber().totalizaTabela();
                         break;
                     case F6:
 //                        getCboEmpresa().getEditor().setEditable(true);
@@ -216,30 +248,131 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
         getCboEmpresa().valueProperty().addListener((ov, o, n) -> {
             if (n != null) {
-                getTmodelaReceber().setEmpresa(getCboEmpresa().getValue());
+                getTmodelaReceber().setEmpresa(n);
             }
             showStatusBar();
         });
 
-        getTtvContasAReceber().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-            if (n.getValue() instanceof ContasAReceber) {
-                setaReceber((ContasAReceber) n.getValue());
-            } else {
-                setaReceber((ContasAReceber) n.getParent().getValue());
+        getCboPagamentoSituacao().valueProperty().addListener((ov, o, n) -> {
+            if (n != null && !n.toString().equals("")) {
+                getTmodelaReceber().setPagamentoSituacao(PagamentoSituacao.valueOf(n.toString().toUpperCase()));
             }
+        });
+
+        getTtvContasAReceber().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
+            if (n == null) {
+                setaReceber(null);
+            } else {
+                if (n.getValue() instanceof ContasAReceber) {
+                    setaReceber((ContasAReceber) n.getValue());
+                } else {
+                    setaReceber((ContasAReceber) n.getParent().getValue());
+                }
+            }
+        });
+
+        getDtpData1().focusedProperty().addListener((ov, o, n) -> {
+            if (!n) return;
+            getDtpData1().getEditor().deselect();
+            System.out.printf("ganhou focu, era pra selecionar tudo dtp1\n");
+        });
+        getDtpData2().focusedProperty().addListener((ov, o, n) -> {
+            if (!n) return;
+            getDtpData2().getEditor().deselect();
+            System.out.printf("ganhou focu, era pra selecionar tudo dtp2\n");
         });
 
         aReceberProperty().addListener((ov, o, n) -> {
             showStatusBar();
         });
 
-        getLblQtdClientes().textProperty().bind(getTmodelaReceber().qtdClientesProperty().asString());
+        getLblTotalQtdClientes().textProperty().bind(getTmodelaReceber().qtdClientesProperty().asString());
 
-        getLblQtdContas().textProperty().bind(getTmodelaReceber().qtdContasProperty().asString());
+        getLblTotQtdContas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas: [%d]", getTmodelaReceber().qtdContasProperty().getValue()),
+                getTmodelaReceber().qtdContasProperty()));
 
-        getLblQtdContasPagas().textProperty().bind(getTmodelaReceber().qtdContasPagasProperty().asString());
+        getLblTotalContas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalContasProperty().getValue(), 2)),
+                getTmodelaReceber().totalContasProperty()));
 
-        getLblQtdContasAbertas().textProperty().bind(getTmodelaReceber().qtdContasAbertasProperty().asString());
+        getLblTotQtdRetiradas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Bonif / Retiradas: [%d]", getTmodelaReceber().qtdContasRetiradasProperty().getValue()),
+                getTmodelaReceber().qtdContasRetiradasProperty()));
+
+        getLblTotalRetiradas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalContasRetiradasProperty().getValue(), 2)),
+                getTmodelaReceber().totalContasRetiradasProperty()));
+
+        getLblTotQtdDescontos().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Descontos Vendas: [%d]", getTmodelaReceber().qtdContasDescontosProperty().getValue()),
+                getTmodelaReceber().qtdContasDescontosProperty()));
+
+        getLblTotalDescontos().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalContasDescontosProperty().getValue(), 2)),
+                getTmodelaReceber().totalContasDescontosProperty()));
+
+        getLblTotQtdLucroBruto().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Lucro Bruto: [%s%%]", ServiceMascara.getMoeda(getTmodelaReceber().percLucroBrutoProperty().getValue(), 2)),
+                getTmodelaReceber().percLucroBrutoProperty()));
+
+        getLblTotalLucroBruto().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalLucroBrutoProperty().getValue(), 2)),
+                getTmodelaReceber().totalLucroBrutoProperty()));
+
+        getLblTotQtdContasAReceber().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas a Receber: [%d]", getTmodelaReceber().qtdContasAReceberProperty().getValue()),
+                getTmodelaReceber().qtdContasAReceberProperty()));
+
+        getLblTotalContasAReceber().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalContasAReceberProperty().getValue(), 2)),
+                getTmodelaReceber().totalContasAReceberProperty()));
+
+        getLblTotQtdContasVencidas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas Vencidas: [%d]", getTmodelaReceber().qtdContasVencidasProperty().getValue()),
+                getTmodelaReceber().qtdContasVencidasProperty()));
+
+        getLblTotalContasVencidas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalContasVencidasProperty().getValue(), 2)),
+                getTmodelaReceber().totalContasVencidasProperty()));
+
+        getLblTotQtdContasPendentes().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas Pendentes: [%d]", getTmodelaReceber().qtdContasPendentesProperty().getValue()),
+                getTmodelaReceber().qtdContasPendentesProperty()));
+
+        getLblTotalContasPendentes().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalContasPendentesProperty().getValue(), 2)),
+                getTmodelaReceber().totalContasPendentesProperty()));
+
+        getLblTotQtdContasPagas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas Pagas: [%d]", getTmodelaReceber().qtdContasPagasProperty().getValue()),
+                getTmodelaReceber().qtdContasPagasProperty()));
+
+        getLblTotalContasPagas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalContasPagasProperty().getValue(), 2)),
+                getTmodelaReceber().totalContasPagasProperty()));
+
+        getLblTotQtdContasSaldoClientes().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Saldo de clientes: [%d]", getTmodelaReceber().qtdContasSaldoClientesProperty().getValue()),
+                getTmodelaReceber().qtdContasSaldoClientesProperty()));
+
+        getLblTotalContasSaldoClientes().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalContasSaldoClientesProperty().getValue(), 2)),
+                getTmodelaReceber().totalContasSaldoClientesProperty()));
+
+        getLblTotQtdLucroLiquido().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Lucro Líquido: [%s%%]", ServiceMascara.getMoeda(getTmodelaReceber().percLucroLiquidoProperty().getValue(), 2)),
+                getTmodelaReceber().percLucroLiquidoProperty()));
+
+        getLblTotalLucroLiquido().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelaReceber().totalLucroLiquidoProperty().getValue(), 2)),
+                getTmodelaReceber().totalLucroLiquidoProperty()));
+
+//        getLblQtdContas().textProperty().bind(getTmodelaReceber().qtdContasProperty().asString());
+//
+//        getLblQtdContasPagas().textProperty().bind(getTmodelaReceber().qtdContasPagasProperty().asString());
+//
+//        getLblQtdContasAbertas().textProperty().bind(getTmodelaReceber().qtdContasAbertasProperty().asString());
 
     }
 
@@ -274,7 +407,6 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                 getTmodelaReceber().setDtpData2(getDtpData2());
                                 getTmodelaReceber().setChkDtVenda(getChkDtVenda());
                                 getTmodelaReceber().setTxtPesquisa(getTxtPesquisa());
-                                getTmodelaReceber().setCboPagamentoSituacao(getCboPagamentoSituacao());
                                 getTmodelaReceber().setLblRegistrosLocalizados(getLblRegistrosLocalizados());
                                 getTmodelaReceber().setTtvContasAReceber(getTtvContasAReceber());
                                 setaReceberObservableList(getTmodelaReceber().getaReceberObservableList());
@@ -289,7 +421,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
                             case COMBOS_PREENCHER:
                                 getCboEmpresa().setItems(
-                                        new EmpresaDAO().getAll(Empresa.class, null, null, null, "razao")
+                                        new EmpresaDAO().getAll(Empresa.class, null, "razao")
                                                 .stream().filter(Empresa::isCliente)
                                                 .collect(Collectors.toCollection(FXCollections::observableArrayList))
                                 );
@@ -301,6 +433,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                 break;
 
                             case TABELA_PREENCHER:
+                                //getTmodelaReceber().preencherTabela();
                                 getTmodelaReceber().preencherTabela();
 //
 //                            getTmodelSaidaProduto().preencheTabela();
@@ -309,7 +442,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                             case SALVAR_SAIDA:
 //                            if (getTmodelSaidaProduto().guardarSaidaProduto()) {
 //                                if (getTmodelSaidaProduto().salvarSaidaProduto()) {
-//                                    getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
+//                                    getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null,  "descricao"));
 //                                    getTtvProdutos().refresh();
 //                                } else {
 //                                    Thread.currentThread().interrupt();
@@ -370,7 +503,6 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     /**
      * Begin Getters e Setters
      */
-
     public AnchorPane getPainelViewContasAReceber() {
         return painelViewContasAReceber;
     }
@@ -451,36 +583,28 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         this.ttvContasAReceber = ttvContasAReceber;
     }
 
-    public Label getLblQtdClientes() {
-        return lblQtdClientes;
+    public Label getLblTotQtdClientes() {
+        return lblTotQtdClientes;
     }
 
-    public void setLblQtdClientes(Label lblQtdClientes) {
-        this.lblQtdClientes = lblQtdClientes;
+    public void setLblTotQtdClientes(Label lblTotQtdClientes) {
+        this.lblTotQtdClientes = lblTotQtdClientes;
     }
 
-    public Label getLblQtdContas() {
-        return lblQtdContas;
+    public Label getLblTotalQtdClientes() {
+        return lblTotalQtdClientes;
     }
 
-    public void setLblQtdContas(Label lblQtdContas) {
-        this.lblQtdContas = lblQtdContas;
+    public void setLblTotalQtdClientes(Label lblTotalQtdClientes) {
+        this.lblTotalQtdClientes = lblTotalQtdClientes;
     }
 
-    public Label getLblQtdContasPagas() {
-        return lblQtdContasPagas;
+    public Label getLblTotQtdContas() {
+        return lblTotQtdContas;
     }
 
-    public void setLblQtdContasPagas(Label lblQtdContasPagas) {
-        this.lblQtdContasPagas = lblQtdContasPagas;
-    }
-
-    public Label getLblQtdContasAbertas() {
-        return lblQtdContasAbertas;
-    }
-
-    public void setLblQtdContasAbertas(Label lblQtdContasAbertas) {
-        this.lblQtdContasAbertas = lblQtdContasAbertas;
+    public void setLblTotQtdContas(Label lblTotQtdContas) {
+        this.lblTotQtdContas = lblTotQtdContas;
     }
 
     public Label getLblTotalContas() {
@@ -491,6 +615,110 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         this.lblTotalContas = lblTotalContas;
     }
 
+    public Label getLblTotQtdRetiradas() {
+        return lblTotQtdRetiradas;
+    }
+
+    public void setLblTotQtdRetiradas(Label lblTotQtdRetiradas) {
+        this.lblTotQtdRetiradas = lblTotQtdRetiradas;
+    }
+
+    public Label getLblTotalRetiradas() {
+        return lblTotalRetiradas;
+    }
+
+    public void setLblTotalRetiradas(Label lblTotalRetiradas) {
+        this.lblTotalRetiradas = lblTotalRetiradas;
+    }
+
+    public Label getLblTotQtdDescontos() {
+        return lblTotQtdDescontos;
+    }
+
+    public void setLblTotQtdDescontos(Label lblTotQtdDescontos) {
+        this.lblTotQtdDescontos = lblTotQtdDescontos;
+    }
+
+    public Label getLblTotalDescontos() {
+        return lblTotalDescontos;
+    }
+
+    public void setLblTotalDescontos(Label lblTotalDescontos) {
+        this.lblTotalDescontos = lblTotalDescontos;
+    }
+
+    public Label getLblTotQtdLucroBruto() {
+        return lblTotQtdLucroBruto;
+    }
+
+    public void setLblTotQtdLucroBruto(Label lblTotQtdLucroBruto) {
+        this.lblTotQtdLucroBruto = lblTotQtdLucroBruto;
+    }
+
+    public Label getLblTotalLucroBruto() {
+        return lblTotalLucroBruto;
+    }
+
+    public void setLblTotalLucroBruto(Label lblTotalLucroBruto) {
+        this.lblTotalLucroBruto = lblTotalLucroBruto;
+    }
+
+    public Label getLblTotQtdContasAReceber() {
+        return lblTotQtdContasAReceber;
+    }
+
+    public void setLblTotQtdContasAReceber(Label lblTotQtdContasAReceber) {
+        this.lblTotQtdContasAReceber = lblTotQtdContasAReceber;
+    }
+
+    public Label getLblTotalContasAReceber() {
+        return lblTotalContasAReceber;
+    }
+
+    public void setLblTotalContasAReceber(Label lblTotalContasAReceber) {
+        this.lblTotalContasAReceber = lblTotalContasAReceber;
+    }
+
+    public Label getLblTotQtdContasVencidas() {
+        return lblTotQtdContasVencidas;
+    }
+
+    public void setLblTotQtdContasVencidas(Label lblTotQtdContasVencidas) {
+        this.lblTotQtdContasVencidas = lblTotQtdContasVencidas;
+    }
+
+    public Label getLblTotalContasVencidas() {
+        return lblTotalContasVencidas;
+    }
+
+    public void setLblTotalContasVencidas(Label lblTotalContasVencidas) {
+        this.lblTotalContasVencidas = lblTotalContasVencidas;
+    }
+
+    public Label getLblTotQtdContasPendentes() {
+        return lblTotQtdContasPendentes;
+    }
+
+    public void setLblTotQtdContasPendentes(Label lblTotQtdContasPendentes) {
+        this.lblTotQtdContasPendentes = lblTotQtdContasPendentes;
+    }
+
+    public Label getLblTotalContasPendentes() {
+        return lblTotalContasPendentes;
+    }
+
+    public void setLblTotalContasPendentes(Label lblTotalContasPendentes) {
+        this.lblTotalContasPendentes = lblTotalContasPendentes;
+    }
+
+    public Label getLblTotQtdContasPagas() {
+        return lblTotQtdContasPagas;
+    }
+
+    public void setLblTotQtdContasPagas(Label lblTotQtdContasPagas) {
+        this.lblTotQtdContasPagas = lblTotQtdContasPagas;
+    }
+
     public Label getLblTotalContasPagas() {
         return lblTotalContasPagas;
     }
@@ -499,12 +727,36 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         this.lblTotalContasPagas = lblTotalContasPagas;
     }
 
-    public Label getLblTotalContasAbertas() {
-        return lblTotalContasAbertas;
+    public Label getLblTotQtdContasSaldoClientes() {
+        return lblTotQtdContasSaldoClientes;
     }
 
-    public void setLblTotalContasAbertas(Label lblTotalContasAbertas) {
-        this.lblTotalContasAbertas = lblTotalContasAbertas;
+    public void setLblTotQtdContasSaldoClientes(Label lblTotQtdContasSaldoClientes) {
+        this.lblTotQtdContasSaldoClientes = lblTotQtdContasSaldoClientes;
+    }
+
+    public Label getLblTotalContasSaldoClientes() {
+        return lblTotalContasSaldoClientes;
+    }
+
+    public void setLblTotalContasSaldoClientes(Label lblTotalContasSaldoClientes) {
+        this.lblTotalContasSaldoClientes = lblTotalContasSaldoClientes;
+    }
+
+    public Label getLblTotQtdLucroLiquido() {
+        return lblTotQtdLucroLiquido;
+    }
+
+    public void setLblTotQtdLucroLiquido(Label lblTotQtdLucroLiquido) {
+        this.lblTotQtdLucroLiquido = lblTotQtdLucroLiquido;
+    }
+
+    public Label getLblTotalLucroLiquido() {
+        return lblTotalLucroLiquido;
+    }
+
+    public void setLblTotalLucroLiquido(Label lblTotalLucroLiquido) {
+        this.lblTotalLucroLiquido = lblTotalLucroLiquido;
     }
 
     public boolean isTabCarregada() {

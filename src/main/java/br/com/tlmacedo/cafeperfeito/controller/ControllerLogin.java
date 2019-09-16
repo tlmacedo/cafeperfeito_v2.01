@@ -66,7 +66,7 @@ public class ControllerLogin implements Initializable, ModeloCafePerfeito {
     public void preencherObjetos() {
         getLblTitulo().setText(TCONFIG.getFxml().getLogin().getTitulo());
         getCboUsuario().setItems(
-                new UsuarioDAO().getAll(Usuario.class, "ativo", ">=", "1", null)
+                new UsuarioDAO().getAll(Usuario.class, "ativo>=1", null)
                         .stream().collect(Collectors.toCollection(FXCollections::observableArrayList))
         );
     }

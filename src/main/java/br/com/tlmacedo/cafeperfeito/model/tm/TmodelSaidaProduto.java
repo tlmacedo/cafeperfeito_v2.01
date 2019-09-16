@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -65,6 +66,10 @@ public class TmodelSaidaProduto {
     private ObjectProperty<BigDecimal> totalBruto = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> totalDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> totalLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private ObjectProperty<BigDecimal> lucroVlrSaida = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private IntegerProperty lucroQtdSaida = new SimpleIntegerProperty(0);
+
 
     public TmodelSaidaProduto() {
     }
@@ -271,7 +276,7 @@ public class TmodelSaidaProduto {
 
 
         saidaProdutoProduto.vlrLiquidoProperty().setValue(saidaProdutoProduto.vlrBrutoProperty().getValue()
-                .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()).setScale(2));
+                .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()).setScale(2, RoundingMode.HALF_UP));
 
         getTvSaidaProdutoProduto().refresh();
 
@@ -495,6 +500,9 @@ public class TmodelSaidaProduto {
             fichaKardex.qtdSaidaProperty().setValue(qtdSaida);
             fichaKardex.vlrSaidaProperty().setValue(fichaKardex.vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdSaida)));
 
+            setLucroQtdSaida(getLucroQtdSaida() + fichaKardex.qtdSaidaProperty().getValue());
+            setLucroVlrSaida(getLucroVlrSaida().add(fichaKardex.vlrSaidaProperty().getValue()));
+
             fichaKardex.saldoProperty().setValue(produtoEstoqueList.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
 
             fichaKardex.vlrSaldoProperty().setValue(produtoEstoqueList.stream().filter(stq -> stq.qtdProperty().getValue() > 0)
@@ -530,7 +538,11 @@ public class TmodelSaidaProduto {
             getSaidaProduto().setVendedor(UsuarioLogado.getUsuario());
             getSaidaProduto().setDtSaida(getDtpDtSaida().getValue());
 
-            getSaidaProdutoProdutoObservableList().stream().forEach(saidaProdutoProduto -> saidaProdutoProduto.setSaidaProduto(getSaidaProduto()));
+            getSaidaProdutoProdutoObservableList().stream().forEach(saidaProdutoProduto -> {
+                saidaProdutoProduto.setSaidaProduto(getSaidaProduto());
+                saidaProdutoProduto.setVlrEntrada(BigDecimal.ZERO);
+                saidaProdutoProduto.setVlrEntradaBruto(BigDecimal.ZERO);
+            });
 
             getSaidaProduto().setSaidaProdutoProdutoList(getSaidaProdutoProdutoObservableList());
         } catch (Exception ex) {
@@ -544,8 +556,14 @@ public class TmodelSaidaProduto {
         try {
             getSaidaProdutoDAO().transactionBegin();
             setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
+            //setSaidaProdutoProdutoObservableList(getSaidaProduto().getSaidaProdutoProdutoList().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
             getSaidaProdutoDAO().transactionCommit();
             if (baixarEstoque()) {
+//                setSaidaProduto(getSaidaProdutoDAO().merger(getSaidaProduto()));
+                getSaidaProdutoDAO().transactionBegin();
+                setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
+                getSaidaProdutoDAO().transactionCommit();
+
                 setaReceber(new ContasAReceber());
                 getContasAReceberDAO().transactionBegin();
                 getaReceber().dtVencimentoProperty().setValue(getDtpDtVencimento().getValue());
@@ -573,15 +591,17 @@ public class TmodelSaidaProduto {
     private boolean baixarEstoque() throws Exception {
         getProdutoEstoqueDAO().transactionBegin();
         getFichaKardexDAO().transactionBegin();
-        getSaidaProdutoProdutoObservableList().stream()
+        getSaidaProduto().getSaidaProdutoProdutoList().stream()
                 .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd)).sorted(Comparator.comparing(SaidaProdutoProduto::getDtValidade))
                 .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd, LinkedHashMap::new, Collectors.toList()))
                 .forEach((aLong, saidaProdutoProdutos) -> {
+                    setLucroQtdSaida(0);
+                    setLucroVlrSaida(BigDecimal.ZERO);
                     saidaProdutoProdutos.stream()
                             .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote, LinkedHashMap::new, Collectors.toList()))
                             .forEach((s, saidaProdutoProdutos1) -> {
-                                final Integer[] saldoSaida = {saidaProdutoProdutos1.stream().collect(Collectors.summingInt(SaidaProdutoProduto::getQtd))};
-                                List<ProdutoEstoque> produtoEstoqueList = getProdutoEstoqueDAO().getAll(ProdutoEstoque.class, "produto_id", "=", aLong.toString(), "validade");
+                                final Integer[] saldoSaida = {saidaProdutoProdutos1.stream().collect(Collectors.summingInt(SaidaProdutoProduto::getQtd)), 0};
+                                List<ProdutoEstoque> produtoEstoqueList = getProdutoEstoqueDAO().getAll(ProdutoEstoque.class, String.format("produto_id=%s", aLong.toString()), "validade");
                                 produtoEstoqueList.stream().filter(estoque -> estoque.qtdProperty().getValue() > 0
                                         && estoque.loteProperty().getValue().equals(s))
                                         .forEach(estoque -> {
@@ -589,11 +609,15 @@ public class TmodelSaidaProduto {
                                                 try {
                                                     estoque.qtdProperty().setValue(estoque.qtdProperty().getValue() - saldoSaida[0]);
                                                     if (estoque.qtdProperty().getValue() < 0) {
+                                                        //fichaKardex[0] = newFichaKardex(saldoSaida[0] + estoque.qtdProperty().getValue(), estoque, produtoEstoqueList);
                                                         getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0] + estoque.qtdProperty().getValue(), estoque, produtoEstoqueList));
+                                                        //getFichaKardexDAO().setTransactionPersist(fichaKardex[0]);
                                                         saldoSaida[0] = estoque.qtdProperty().getValue() * (-1);
                                                         estoque.qtdProperty().setValue(0);
                                                     } else {
+                                                        //fichaKardex[0] = newFichaKardex(saldoSaida[0], estoque, produtoEstoqueList);
                                                         getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0], estoque, produtoEstoqueList));
+                                                        //getFichaKardexDAO().setTransactionPersist(fichaKardex[0]);
                                                         saldoSaida[0] = 0;
                                                     }
                                                     getProdutoEstoqueDAO().setTransactionPersist(estoque);
@@ -603,7 +627,22 @@ public class TmodelSaidaProduto {
                                             }
                                         });
                             });
+                    saidaProdutoProdutos.stream()
+                            .forEach(saidaProdutoProduto -> {
+                                saidaProdutoProduto.setVlrEntradaBruto(getLucroVlrSaida());
+                                saidaProdutoProduto.setVlrEntrada(getLucroVlrSaida().divide(BigDecimal.valueOf(getLucroQtdSaida()), 4, RoundingMode.HALF_UP));
+                            });
                 });
+//        getSaidaProdutoProdutoObservableList().stream()
+//                .forEach(saidaProdutoProduto ->
+//                saidaProdutoProduto.setVlrEntrada(
+//                    new FichaKardexDAO().getAll(FichaKardex.class,
+//                            String.format("produto_id = %d AND documento = %d AND qtdSaida > 0", "id",
+//                                    saidaProdutoProduto.idProdProperty().getValue().toString(),
+//                                    saidaProdutoProduto.getSaidaProduto().idProperty().getValue().toString()),
+//                            null).stream().collect(Collectors.toCollection(FXCollections::observableArrayList))
+//                .stream().map(FichaKardex::getVlrSaida).reduce(BigDecimal.ZERO,BigDecimal::add).divide
+//                });
         //}
         return true;
     }
@@ -945,6 +984,29 @@ public class TmodelSaidaProduto {
         this.recebimentoDAO = recebimentoDAO;
     }
 
+    public BigDecimal getLucroVlrSaida() {
+        return lucroVlrSaida.get();
+    }
+
+    public ObjectProperty<BigDecimal> lucroVlrSaidaProperty() {
+        return lucroVlrSaida;
+    }
+
+    public void setLucroVlrSaida(BigDecimal lucroVlrSaida) {
+        this.lucroVlrSaida.set(lucroVlrSaida);
+    }
+
+    public int getLucroQtdSaida() {
+        return lucroQtdSaida.get();
+    }
+
+    public IntegerProperty lucroQtdSaidaProperty() {
+        return lucroQtdSaida;
+    }
+
+    public void setLucroQtdSaida(int lucroQtdSaida) {
+        this.lucroQtdSaida.set(lucroQtdSaida);
+    }
 
     /**
      * END Gets and Setters

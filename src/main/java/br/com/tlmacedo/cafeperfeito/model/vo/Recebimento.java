@@ -160,7 +160,6 @@ public class Recebimento implements Serializable {
     public String toString() {
         return "Recebimento{" +
                 "id=" + id +
-                ", aReceber=" + aReceber +
                 ", pagamentoSituacao=" + pagamentoSituacao +
                 ", documento=" + documento +
                 ", pagamentoModalidade=" + pagamentoModalidade +

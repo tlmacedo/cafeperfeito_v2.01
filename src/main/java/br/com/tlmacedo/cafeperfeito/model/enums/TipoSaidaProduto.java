@@ -8,7 +8,7 @@ import java.util.List;
 public enum TipoSaidaProduto {
 
     VENDA(0, "venda"),
-    BONIFICACAO(1, "bonificação"),
+    BONIFICACAO(1, "bonif"),
     RETIRADA(2, "retirada"),
     CORTESIA(3, "cortesia"),
     AMOSTRA(4, "amostra"),

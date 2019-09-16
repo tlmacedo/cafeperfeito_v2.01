@@ -76,10 +76,16 @@ public class ServiceMascara {
     }
 
     public static String getMoeda(BigDecimal value, int decimal) {
-        if (value.toString().contains(".") || value.toString().contains(","))
-            return formataNumeroDecimal(value.setScale(decimal).toString(), decimal);
-        else
-            return formataNumeroDecimal(value.toString(), decimal);
+        try {
+            if (value.toString().contains(".") || value.toString().contains(","))
+                return formataNumeroDecimal(value.setScale(decimal).toString(), decimal);
+            else
+                return formataNumeroDecimal(value.toString(), decimal);
+        } catch (Exception ex) {
+            if (ex instanceof NullPointerException)
+                return formataNumeroDecimal(BigDecimal.ZERO.setScale(decimal).toString(), decimal);
+            return null;
+        }
     }
 
     public static BigDecimal getBigDecimalFromTextField(String value, int decimal) {
@@ -88,6 +94,7 @@ public class ServiceMascara {
                 .replace(",", ".")).setScale(decimal, RoundingMode.HALF_UP);
         return result.toString() != "0.00" ? result : BigDecimal.ZERO;
     }
+
     public static String getTelefone(String value) {
         String strValue = value.replaceAll("\\D", "").trim();
         if (strValue.length() > 11) strValue = strValue.substring(0, 11);

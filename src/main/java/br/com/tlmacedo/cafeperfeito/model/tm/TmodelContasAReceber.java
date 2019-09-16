@@ -3,11 +3,9 @@ package br.com.tlmacedo.cafeperfeito.model.tm;
 import br.com.tlmacedo.cafeperfeito.model.dao.ContasAReceberDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoModalidade;
 import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
-import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
-import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
-import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
-import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
+import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -18,9 +16,7 @@ import javafx.scene.control.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
@@ -33,11 +29,12 @@ public class TmodelContasAReceber {
     private CheckBox chkDtVenda;
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
     private TextField txtPesquisa;
-    private ComboBox cboPagamentoSituacao;
+    private ObjectProperty<PagamentoSituacao> pagamentoSituacao = new SimpleObjectProperty<>();
+    //    private ComboBox cboPagamentoSituacao;
     private Label lblRegistrosLocalizados;
     private TreeTableView<Object> ttvContasAReceber;
     private ContasAReceberDAO aReceberDAO = new ContasAReceberDAO();
-    private ObservableList<ContasAReceber> aReceberObservableList = FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, null, null, "dtCadastro DESC"));
+    private ObservableList<ContasAReceber> aReceberObservableList = FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC"));
     private FilteredList<ContasAReceber> aReceberFilteredList = new FilteredList<ContasAReceber>(getaReceberObservableList());
 
     private TreeItem<Object> aReceberTreeItem;
@@ -47,40 +44,52 @@ public class TmodelContasAReceber {
     private TreeTableColumn<Object, String> colModalidade;
     private TreeTableColumn<Object, String> colSituacao;
     private TreeTableColumn<Object, LocalDate> colDtVencimento_DtPagamento;
+    private TreeTableColumn<Object, String> colVlrPedido;
+    private TreeTableColumn<Object, String> colVlrDesc;
     private TreeTableColumn<Object, String> colValor;
     private TreeTableColumn<Object, String> colValorPago;
     private TreeTableColumn<Object, String> colValorSaldo;
     private TreeTableColumn<Object, String> colUsuario;
 
     private IntegerProperty qtdClientes = new SimpleIntegerProperty(0);
-    private IntegerProperty qtdContas = new SimpleIntegerProperty(0);
-    private IntegerProperty qtdContasPagas = new SimpleIntegerProperty(0);
-    private IntegerProperty qtdContasAbertas = new SimpleIntegerProperty(0);
-    private ObjectProperty<BigDecimal> totalContas = new SimpleObjectProperty<>(BigDecimal.ZERO);
-    private ObjectProperty<BigDecimal> totalContasPagas = new SimpleObjectProperty<>(BigDecimal.ZERO);
-    private ObjectProperty<BigDecimal> totalContasAbertas = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
-    private List<String> styleList = new ArrayList<>();
+    private IntegerProperty qtdContas = new SimpleIntegerProperty(0);
+    private ObjectProperty<BigDecimal> totalContas = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private IntegerProperty qtdContasRetiradas = new SimpleIntegerProperty(0);
+    private ObjectProperty<BigDecimal> totalContasRetiradas = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private IntegerProperty qtdContasDescontos = new SimpleIntegerProperty(0);
+    private ObjectProperty<BigDecimal> totalContasDescontos = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private IntegerProperty qtdContasAReceber = new SimpleIntegerProperty(0);
+    private ObjectProperty<BigDecimal> totalContasAReceber = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private IntegerProperty qtdContasVencidas = new SimpleIntegerProperty(0);
+    private ObjectProperty<BigDecimal> totalContasVencidas = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private IntegerProperty qtdContasPendentes = new SimpleIntegerProperty(0);
+    private ObjectProperty<BigDecimal> totalContasPendentes = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private IntegerProperty qtdContasPagas = new SimpleIntegerProperty(0);
+    private ObjectProperty<BigDecimal> totalContasPagas = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private IntegerProperty qtdContasSaldoClientes = new SimpleIntegerProperty(0);
+    private ObjectProperty<BigDecimal> totalContasSaldoClientes = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private ObjectProperty<BigDecimal> percLucroBruto = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> totalLucroBruto = new SimpleObjectProperty<>(BigDecimal.ZERO);
+
+    private ObjectProperty<BigDecimal> percLucroLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> totalLucroLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
     /**
      * Begin voids
      */
 
-    private void carregaListaStyle() {
-
-        getStyleList().add("pendente");
-        getStyleList().add("vencido");
-        getStyleList().add("pago");
-        getStyleList().add("cancelado");
-        getStyleList().add("retirada");
-    }
-
     public void criarTabela() {
-        carregaListaStyle();
-
-
         setColId(new TreeTableColumn("id"));
-        getColId().setPrefWidth(58);
+        getColId().setPrefWidth(50);
         getColId().setStyle("-fx-alignment: center-right;");
         getColId().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
@@ -92,7 +101,7 @@ public class TmodelContasAReceber {
         });
 
         setColCliente_Documento(new TreeTableColumn("cliente / documento pag"));
-        getColCliente_Documento().setPrefWidth(250);
+        getColCliente_Documento().setPrefWidth(280);
         getColCliente_Documento().setCellFactory(cellFactory -> new TreeTableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -114,7 +123,7 @@ public class TmodelContasAReceber {
         });
 
         setColDtVenda(new TreeTableColumn("dt. venda"));
-        getColDtVenda().setPrefWidth(120);
+        getColDtVenda().setPrefWidth(90);
         getColDtVenda().setStyle("-fx-alignment: center-right;");
         getColDtVenda().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
@@ -136,7 +145,7 @@ public class TmodelContasAReceber {
         });
 
         setColModalidade(new TreeTableColumn("/ mod pag"));
-        getColModalidade().setPrefWidth(120);
+        getColModalidade().setPrefWidth(100);
         getColModalidade().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof Recebimento) {
                 return new SimpleStringProperty(((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao());
@@ -145,7 +154,7 @@ public class TmodelContasAReceber {
         });
 
         setColSituacao(new TreeTableColumn("/ situação"));
-        getColSituacao().setPrefWidth(90);
+        getColSituacao().setPrefWidth(80);
         getColSituacao().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof Recebimento) {
                 return new SimpleStringProperty(((Recebimento) cellData.getValue().getValue()).getPagamentoSituacao().getDescricao());
@@ -154,7 +163,7 @@ public class TmodelContasAReceber {
         });
 
         setColDtVencimento_DtPagamento(new TreeTableColumn("dt. venc / dt. pag"));
-        getColDtVencimento_DtPagamento().setPrefWidth(100);
+        getColDtVencimento_DtPagamento().setPrefWidth(90);
         getColDtVencimento_DtPagamento().setStyle("-fx-alignment: center-right;");
         getColDtVencimento_DtPagamento().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
@@ -176,6 +185,27 @@ public class TmodelContasAReceber {
                         setText("");
                 }
             }
+        });
+
+        setColVlrPedido(new TreeTableColumn<>("vlr. Ped."));
+        getColVlrPedido().setPrefWidth(90);
+        getColVlrPedido().setStyle("-fx-alignment: center-right;");
+        getColVlrPedido().setCellValueFactory(cellData -> {
+            if (cellData.getValue().getValue() instanceof ContasAReceber) {
+                return new SimpleStringProperty(
+                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrPedidoProperty().getValue(), 2));
+            }
+            return new SimpleStringProperty("");
+        });
+
+        setColVlrDesc(new TreeTableColumn<>("vlr. Desc."));
+        getColVlrDesc().setPrefWidth(90);
+        getColVlrDesc().setStyle("-fx-alignment: center-right;");
+        getColVlrDesc().setCellValueFactory(cellData -> {
+            if (cellData.getValue().getValue() instanceof ContasAReceber)
+                return new SimpleStringProperty(
+                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrDescProperty().getValue(), 2));
+            return new SimpleStringProperty("");
         });
 
         setColValor(new TreeTableColumn("valor R$"));
@@ -231,13 +261,13 @@ public class TmodelContasAReceber {
         try {
             setaReceberTreeItem(new TreeItem(null));
             getaReceberFilteredList().stream()
-                    //.filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == 87)
-                    .forEach(aReceber1 -> {
+//                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == 64)
+                    .forEach(aReceber -> {
                         final BigDecimal[] vlrPago = {BigDecimal.ZERO};
-                        final BigDecimal[] vlrSaldo = {aReceber1.valorProperty().getValue()};
-                        TreeItem<Object> paiItem = new TreeItem(aReceber1);
+                        final BigDecimal[] vlrSaldo = {aReceber.valorProperty().getValue()};
+                        TreeItem<Object> paiItem = new TreeItem(aReceber);
                         getaReceberTreeItem().getChildren().add(paiItem);
-                        aReceber1.getRecebimentoList().stream()
+                        aReceber.getRecebimentoList().stream()
                                 .forEach(recebimento -> {
                                     if (recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO)) {
                                         vlrPago[0] = vlrPago[0].add(recebimento.valorProperty().getValue());
@@ -248,11 +278,16 @@ public class TmodelContasAReceber {
                                 });
                         ((ContasAReceber) paiItem.getValue()).valorPagoProperty().setValue(vlrPago[0]);
                         ((ContasAReceber) paiItem.getValue()).valorSaldoProperty().setValue(vlrSaldo[0]);
+                        ((ContasAReceber) paiItem.getValue()).vlrPedidoProperty().setValue(aReceber.getSaidaProduto().getSaidaProdutoProdutoList().stream()
+                                .map(SaidaProdutoProduto::getVlrBruto).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        ((ContasAReceber) paiItem.getValue()).vlrDescProperty().setValue(aReceber.getSaidaProduto().getSaidaProdutoProdutoList().stream()
+                                .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add));
                     });
 
 
-            getTtvContasAReceber().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda(), getColModalidade(),
-                    getColSituacao(), getColDtVencimento_DtPagamento(), getColValor(), getColValorPago(), getColValorSaldo());
+            getTtvContasAReceber().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda(),
+                    getColModalidade(), getColSituacao(), getColDtVencimento_DtPagamento(), getColVlrPedido(),
+                    getColVlrDesc(), getColValor(), getColValorPago(), getColValorSaldo());
 
             getTtvContasAReceber().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
@@ -266,67 +301,65 @@ public class TmodelContasAReceber {
     }
 
     public void escutaLista() {
-        try {
-            getTtvContasAReceber().setRowFactory(objectTreeTableView -> new TreeTableRow<>() {
-                @Override
-                protected void updateItem(Object item, boolean empty) {
-                    super.updateItem(item, empty);
-                    getStyleClass().removeAll(getStyleClass().stream().filter(s -> s.contains("recebimento-")).collect(Collectors.toList()));
-                    if (!empty) {
-                        String stilo = "";
-                        if (item instanceof ContasAReceber) {
-                            PagamentoModalidade modalidade = null;
-                            BigDecimal vlrPg = BigDecimal.ZERO;
-                            try {
-                                if (LocalDate.now().compareTo(((ContasAReceber) item).dtVencimentoProperty().getValue()) <= 0) {
-                                    stilo = "recebimento-pendente";
-                                } else {
-                                    stilo = "recebimento-vencido";
-                                }
-                                modalidade = ((ContasAReceber) item).getRecebimentoList().stream().sorted(Comparator.comparing(Recebimento::getValor).reversed())
-                                        .findFirst().orElse(null).getPagamentoModalidade();
-                                vlrPg = ((ContasAReceber) item).getRecebimentoList().stream()
-                                        .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                                        .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
-                                if (vlrPg.compareTo(((ContasAReceber) item).valorProperty().getValue()) >= 0) {
-                                    stilo = "recebimento-pago";
-                                }
-                            } catch (Exception ex) {
-
-                            }
-                            if (modalidade != null && (modalidade.equals(PagamentoModalidade.RETIRADA)
-                                    || modalidade.equals(PagamentoModalidade.BONIFICACAO)
-                                    || modalidade.equals(PagamentoModalidade.AMOSTRA))) {
-                                stilo = "recebimento-retirada";
+        getTtvContasAReceber().setRowFactory(objectTreeTableView -> new TreeTableRow<>() {
+            @Override
+            protected void updateItem(Object item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll(getStyleClass().stream().filter(s -> s.contains("recebimento-")).collect(Collectors.toList()));
+                if (!empty) {
+                    String stilo = "";
+                    if (item instanceof ContasAReceber) {
+                        PagamentoModalidade modalidade = null;
+                        BigDecimal vlrPg = BigDecimal.ZERO;
+                        try {
+                            if (LocalDate.now().compareTo(((ContasAReceber) item).dtVencimentoProperty().getValue()) <= 0) {
+                                stilo = "recebimento-pendente";
                             } else {
+                                stilo = "recebimento-vencido";
                             }
-                        } else if (item instanceof Recebimento) {
-                            stilo = "recebimento-recebimento";
+                            modalidade = ((ContasAReceber) item).getRecebimentoList().stream().sorted(Comparator.comparing(Recebimento::getValor).reversed())
+                                    .findFirst().orElse(null).getPagamentoModalidade();
+                            vlrPg = ((ContasAReceber) item).getRecebimentoList().stream()
+                                    .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                    .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
+                            if (vlrPg.compareTo(((ContasAReceber) item).valorProperty().getValue()) >= 0) {
+                                stilo = "recebimento-pago";
+                            }
+                        } catch (Exception ex) {
+
                         }
-                        if (!stilo.equals(""))
-                            getStyleClass().add(stilo);
+                        if (modalidade != null && (modalidade.equals(PagamentoModalidade.RETIRADA)
+                                || modalidade.equals(PagamentoModalidade.BONIFICACAO)
+                                || modalidade.equals(PagamentoModalidade.AMOSTRA))) {
+                            stilo = "recebimento-retirada";
+                        } else {
+                        }
+                    } else if (item instanceof Recebimento) {
+                        stilo = "recebimento-recebimento";
                     }
+                    if (!stilo.equals(""))
+                        getStyleClass().add(stilo);
                 }
-            });
+            }
+        });
 
-            getaReceberFilteredList().addListener((ListChangeListener<? super ContasAReceber>) change -> {
-                preencherTabela();
-            });
+        getaReceberFilteredList().addListener((ListChangeListener<? super ContasAReceber>) change -> {
+            preencherTabela();
+        });
 
-            empresaProperty().addListener((ov, o, n) -> {
-                if (n != null) {
-                    aplicaFiltro();
-                }
-            });
+        getLblRegistrosLocalizados().textProperty().bind(Bindings.createIntegerBinding(() ->
+                getaReceberFilteredList().size(), getaReceberFilteredList().predicateProperty()).asString());
 
-            getDtpData1().valueProperty().addListener(observable -> aplicaFiltro());
-            getDtpData2().valueProperty().addListener(observable -> aplicaFiltro());
-            getChkDtVenda().selectedProperty().addListener(observable -> aplicaFiltro());
+        empresaProperty().addListener((ov, o, n) -> {
+            if (n != null) {
+                aplicaFiltro();
+            }
+        });
 
-            totalizaTabela();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        getDtpData1().valueProperty().addListener(observable -> aplicaFiltro());
+        getDtpData2().valueProperty().addListener(observable -> aplicaFiltro());
+        getChkDtVenda().selectedProperty().addListener(observable -> aplicaFiltro());
+
     }
 
     private void aplicaFiltro() {
@@ -351,6 +384,11 @@ public class TmodelContasAReceber {
                         }
                 }
 
+                if (pagamentoSituacaoProperty().getValue() != null) {
+
+                }
+
+
                 return true;
             });
         } catch (Exception ex) {
@@ -358,24 +396,145 @@ public class TmodelContasAReceber {
         }
     }
 
-    private void totalizaTabela() {
-//        getTtvContasAReceber().refresh();
+    public void totalizaTabela() {
         setQtdClientes(
                 getaReceberFilteredList().stream()
                         .map(ContasAReceber::getSaidaProduto)
                         .map(SaidaProduto::getCliente)
                         .collect(Collectors.groupingBy(Empresa::getId))
                         .size()
-//                        .map(Empresa::getId)
-//                        .reduce((aLong, aLong2) -> aLong2).stream().g
         );
 
-        setQtdContas(getaReceberFilteredList().size());
-        setQtdContasPagas((int) getaReceberFilteredList().stream()
-                .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(aReceber.getRecebimentoList().stream()
-                        .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                        .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) <= 0).count());
-        setQtdContasAbertas(getQtdContas() - getQtdContasPagas());
+        setQtdContas((int) getaReceberFilteredList().size());
+
+        setTotalContas(
+                getaReceberFilteredList().stream()
+                        .map(ContasAReceber::getVlrPedido)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        setQtdContasRetiradas(
+                (int) getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) == 0)
+                        .count()
+        );
+
+        setTotalContasRetiradas(
+                getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) == 0)
+                        .map(ContasAReceber::getVlrPedido)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        setQtdContasDescontos(
+                (int) getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.vlrDescProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+                        .count()
+        );
+
+        setTotalContasDescontos(
+                getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.vlrDescProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+                        .map(ContasAReceber::getVlrDesc)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        setPercLucroBruto(
+                BigDecimal.TEN.setScale(4)
+        );
+
+        setTotalLucroBruto(
+                BigDecimal.TEN.setScale(4)
+        );
+
+        setQtdContasAReceber(
+                (int) getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+                        .count()
+        );
+
+        setTotalContasAReceber(
+                getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+                        .map(ContasAReceber::getValor)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        setQtdContasVencidas(
+                (int) getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
+                        .count()
+        );
+
+        setTotalContasVencidas(
+                getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
+                        .map(ContasAReceber::getValorSaldo)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        setQtdContasPendentes(
+                (int) getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) >= 0)
+                        .count()
+        );
+
+        setTotalContasPendentes(
+                getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) >= 0)
+                        .map(ContasAReceber::getValorSaldo)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        setQtdContasPagas(
+                (int) getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) <= 0)
+                        .count()
+        );
+
+        setTotalContasPagas(
+                getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) <= 0)
+                        .map(ContasAReceber::getValorPago)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        setQtdContasSaldoClientes(
+                (int) getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
+                        .count()
+        );
+
+        setTotalContasSaldoClientes(
+                getaReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
+                        .map(ContasAReceber::getValorSaldo)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        setPercLucroLiquido(
+                BigDecimal.ONE.setScale(4)
+        );
+
+        setTotalLucroLiquido(
+                BigDecimal.ONE.setScale(4)
+        );
+
+//        setPercLucroLiquido(
+//                getQtdContasVencidas() + getQtdContasPendentes() + getQtdContasPagas()
+//        );
+
+//        setTotalContasConfirmacao(
+//                getTotalContasVencidas().add(getTotalContasPendentes()).add(getTotalContasPagas()).add(getTotalContasSaldoClientes())
+//        );
     }
 
     /**
@@ -386,7 +545,6 @@ public class TmodelContasAReceber {
     /**
      * Begin Getters e Setters
      */
-
     public TablePosition getTp() {
         return tp;
     }
@@ -439,12 +597,16 @@ public class TmodelContasAReceber {
         this.txtPesquisa = txtPesquisa;
     }
 
-    public ComboBox getCboPagamentoSituacao() {
-        return cboPagamentoSituacao;
+    public PagamentoSituacao getPagamentoSituacao() {
+        return pagamentoSituacao.get();
     }
 
-    public void setCboPagamentoSituacao(ComboBox cboPagamentoSituacao) {
-        this.cboPagamentoSituacao = cboPagamentoSituacao;
+    public ObjectProperty<PagamentoSituacao> pagamentoSituacaoProperty() {
+        return pagamentoSituacao;
+    }
+
+    public void setPagamentoSituacao(PagamentoSituacao pagamentoSituacao) {
+        this.pagamentoSituacao.set(pagamentoSituacao);
     }
 
     public Label getLblRegistrosLocalizados() {
@@ -543,6 +705,22 @@ public class TmodelContasAReceber {
         this.colDtVencimento_DtPagamento = colDtVencimento_DtPagamento;
     }
 
+    public TreeTableColumn<Object, String> getColVlrPedido() {
+        return colVlrPedido;
+    }
+
+    public void setColVlrPedido(TreeTableColumn<Object, String> colVlrPedido) {
+        this.colVlrPedido = colVlrPedido;
+    }
+
+    public TreeTableColumn<Object, String> getColVlrDesc() {
+        return colVlrDesc;
+    }
+
+    public void setColVlrDesc(TreeTableColumn<Object, String> colVlrDesc) {
+        this.colVlrDesc = colVlrDesc;
+    }
+
     public TreeTableColumn<Object, String> getColValor() {
         return colValor;
     }
@@ -599,30 +777,6 @@ public class TmodelContasAReceber {
         this.qtdContas.set(qtdContas);
     }
 
-    public int getQtdContasPagas() {
-        return qtdContasPagas.get();
-    }
-
-    public IntegerProperty qtdContasPagasProperty() {
-        return qtdContasPagas;
-    }
-
-    public void setQtdContasPagas(int qtdContasPagas) {
-        this.qtdContasPagas.set(qtdContasPagas);
-    }
-
-    public int getQtdContasAbertas() {
-        return qtdContasAbertas.get();
-    }
-
-    public IntegerProperty qtdContasAbertasProperty() {
-        return qtdContasAbertas;
-    }
-
-    public void setQtdContasAbertas(int qtdContasAbertas) {
-        this.qtdContasAbertas.set(qtdContasAbertas);
-    }
-
     public BigDecimal getTotalContas() {
         return totalContas.get();
     }
@@ -633,6 +787,138 @@ public class TmodelContasAReceber {
 
     public void setTotalContas(BigDecimal totalContas) {
         this.totalContas.set(totalContas);
+    }
+
+    public int getQtdContasRetiradas() {
+        return qtdContasRetiradas.get();
+    }
+
+    public IntegerProperty qtdContasRetiradasProperty() {
+        return qtdContasRetiradas;
+    }
+
+    public void setQtdContasRetiradas(int qtdContasRetiradas) {
+        this.qtdContasRetiradas.set(qtdContasRetiradas);
+    }
+
+    public BigDecimal getTotalContasRetiradas() {
+        return totalContasRetiradas.get();
+    }
+
+    public ObjectProperty<BigDecimal> totalContasRetiradasProperty() {
+        return totalContasRetiradas;
+    }
+
+    public void setTotalContasRetiradas(BigDecimal totalContasRetiradas) {
+        this.totalContasRetiradas.set(totalContasRetiradas);
+    }
+
+    public int getQtdContasDescontos() {
+        return qtdContasDescontos.get();
+    }
+
+    public IntegerProperty qtdContasDescontosProperty() {
+        return qtdContasDescontos;
+    }
+
+    public void setQtdContasDescontos(int qtdContasDescontos) {
+        this.qtdContasDescontos.set(qtdContasDescontos);
+    }
+
+    public BigDecimal getTotalContasDescontos() {
+        return totalContasDescontos.get();
+    }
+
+    public ObjectProperty<BigDecimal> totalContasDescontosProperty() {
+        return totalContasDescontos;
+    }
+
+    public void setTotalContasDescontos(BigDecimal totalContasDescontos) {
+        this.totalContasDescontos.set(totalContasDescontos);
+    }
+
+    public int getQtdContasAReceber() {
+        return qtdContasAReceber.get();
+    }
+
+    public IntegerProperty qtdContasAReceberProperty() {
+        return qtdContasAReceber;
+    }
+
+    public void setQtdContasAReceber(int qtdContasAReceber) {
+        this.qtdContasAReceber.set(qtdContasAReceber);
+    }
+
+    public BigDecimal getTotalContasAReceber() {
+        return totalContasAReceber.get();
+    }
+
+    public ObjectProperty<BigDecimal> totalContasAReceberProperty() {
+        return totalContasAReceber;
+    }
+
+    public void setTotalContasAReceber(BigDecimal totalContasAReceber) {
+        this.totalContasAReceber.set(totalContasAReceber);
+    }
+
+    public int getQtdContasVencidas() {
+        return qtdContasVencidas.get();
+    }
+
+    public IntegerProperty qtdContasVencidasProperty() {
+        return qtdContasVencidas;
+    }
+
+    public void setQtdContasVencidas(int qtdContasVencidas) {
+        this.qtdContasVencidas.set(qtdContasVencidas);
+    }
+
+    public BigDecimal getTotalContasVencidas() {
+        return totalContasVencidas.get();
+    }
+
+    public ObjectProperty<BigDecimal> totalContasVencidasProperty() {
+        return totalContasVencidas;
+    }
+
+    public void setTotalContasVencidas(BigDecimal totalContasVencidas) {
+        this.totalContasVencidas.set(totalContasVencidas);
+    }
+
+    public int getQtdContasPendentes() {
+        return qtdContasPendentes.get();
+    }
+
+    public IntegerProperty qtdContasPendentesProperty() {
+        return qtdContasPendentes;
+    }
+
+    public void setQtdContasPendentes(int qtdContasPendentes) {
+        this.qtdContasPendentes.set(qtdContasPendentes);
+    }
+
+    public BigDecimal getTotalContasPendentes() {
+        return totalContasPendentes.get();
+    }
+
+    public ObjectProperty<BigDecimal> totalContasPendentesProperty() {
+        return totalContasPendentes;
+    }
+
+    public void setTotalContasPendentes(BigDecimal totalContasPendentes) {
+        this.totalContasPendentes.set(totalContasPendentes);
+    }
+
+    public int getQtdContasPagas() {
+        return qtdContasPagas.get();
+    }
+
+    public IntegerProperty qtdContasPagasProperty() {
+        return qtdContasPagas;
+    }
+
+    public void setQtdContasPagas(int qtdContasPagas) {
+        this.qtdContasPagas.set(qtdContasPagas);
     }
 
     public BigDecimal getTotalContasPagas() {
@@ -647,27 +933,79 @@ public class TmodelContasAReceber {
         this.totalContasPagas.set(totalContasPagas);
     }
 
-    public BigDecimal getTotalContasAbertas() {
-        return totalContasAbertas.get();
+    public int getQtdContasSaldoClientes() {
+        return qtdContasSaldoClientes.get();
     }
 
-    public ObjectProperty<BigDecimal> totalContasAbertasProperty() {
-        return totalContasAbertas;
+    public IntegerProperty qtdContasSaldoClientesProperty() {
+        return qtdContasSaldoClientes;
     }
 
-    public void setTotalContasAbertas(BigDecimal totalContasAbertas) {
-        this.totalContasAbertas.set(totalContasAbertas);
+    public void setQtdContasSaldoClientes(int qtdContasSaldoClientes) {
+        this.qtdContasSaldoClientes.set(qtdContasSaldoClientes);
     }
 
-    public List<String> getStyleList() {
-        return styleList;
+    public BigDecimal getTotalContasSaldoClientes() {
+        return totalContasSaldoClientes.get();
     }
 
-    public void setStyleList(List<String> styleList) {
-        this.styleList = styleList;
+    public ObjectProperty<BigDecimal> totalContasSaldoClientesProperty() {
+        return totalContasSaldoClientes;
     }
 
-    /**
-     * END Getters e Setters
-     */
+    public void setTotalContasSaldoClientes(BigDecimal totalContasSaldoClientes) {
+        this.totalContasSaldoClientes.set(totalContasSaldoClientes);
+    }
+
+    public BigDecimal getPercLucroBruto() {
+        return percLucroBruto.get();
+    }
+
+    public ObjectProperty<BigDecimal> percLucroBrutoProperty() {
+        return percLucroBruto;
+    }
+
+    public void setPercLucroBruto(BigDecimal percLucroBruto) {
+        this.percLucroBruto.set(percLucroBruto);
+    }
+
+    public BigDecimal getTotalLucroBruto() {
+        return totalLucroBruto.get();
+    }
+
+    public ObjectProperty<BigDecimal> totalLucroBrutoProperty() {
+        return totalLucroBruto;
+    }
+
+    public void setTotalLucroBruto(BigDecimal totalLucroBruto) {
+        this.totalLucroBruto.set(totalLucroBruto);
+    }
+
+    public BigDecimal getPercLucroLiquido() {
+        return percLucroLiquido.get();
+    }
+
+    public ObjectProperty<BigDecimal> percLucroLiquidoProperty() {
+        return percLucroLiquido;
+    }
+
+    public void setPercLucroLiquido(BigDecimal percLucroLiquido) {
+        this.percLucroLiquido.set(percLucroLiquido);
+    }
+
+    public BigDecimal getTotalLucroLiquido() {
+        return totalLucroLiquido.get();
+    }
+
+    public ObjectProperty<BigDecimal> totalLucroLiquidoProperty() {
+        return totalLucroLiquido;
+    }
+
+    public void setTotalLucroLiquido(BigDecimal totalLucroLiquido) {
+        this.totalLucroLiquido.set(totalLucroLiquido);
+    }
+
+/**
+ * END Getters e Setters
+ */
 }

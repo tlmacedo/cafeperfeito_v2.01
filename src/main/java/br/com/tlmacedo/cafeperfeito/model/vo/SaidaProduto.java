@@ -104,4 +104,16 @@ public class SaidaProduto implements Serializable {
 //        this.saidaProdutoProdutoList = saidaProdutoProdutoList;
 //    }
 
+
+    @Override
+    public String toString() {
+        return "SaidaProduto{" +
+                "id=" + id +
+                ", cliente=" + cliente +
+                ", vendedor=" + vendedor +
+                ", dtCadastro=" + dtCadastro +
+                ", dtSaida=" + dtSaida +
+                ", saidaProdutoProdutoList=" + saidaProdutoProdutoList +
+                '}';
+    }
 }

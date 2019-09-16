@@ -118,7 +118,9 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
         getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
 
-        getDtpDtPagamento().setValue(getRecebimento().dtPagamentoProperty().getValue());
+        getDtpDtPagamento().setValue(getRecebimento().dtPagamentoProperty().getValue() != null
+                ? getRecebimento().dtPagamentoProperty().getValue()
+                : LocalDate.now());
 
     }
 
@@ -131,16 +133,20 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     public void escutarTecla() {
 
         deshabilitaProperty().bind(Bindings.createBooleanBinding(() -> {
-            if (getEnumsTasksList().get(0).equals(EnumsTasks.UPDATE_RECEBIMENTO))
-                return false;
-                    if (
-                            ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2).compareTo(BigDecimal.ZERO) > 0
-                                    && getDtpDtPagamento().getValue().compareTo(LocalDate.now().minusDays(7)) >= 0
-                    )
+                    if (getRecebimento() != null)
+                        getCboSituacao().getSelectionModel().select(getRecebimento().getPagamentoSituacao());
+                    if (getCboPagamentoModalidade().getValue().equals(PagamentoModalidade.AMOSTRA)
+                            || getCboPagamentoModalidade().getValue().equals(PagamentoModalidade.BONIFICACAO)
+                            || getCboPagamentoModalidade().getValue().equals(PagamentoModalidade.RETIRADA)) {
+                        getCboSituacao().getSelectionModel().select(PagamentoSituacao.QUITADO);
                         return false;
-                    else
-                        return true;
-                }, getDtpDtPagamento().valueProperty(), getTxtValor().textProperty()
+                    }
+
+                    return (
+                            ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2).compareTo(BigDecimal.ZERO) <= 0
+                                    && getDtpDtPagamento().getValue().compareTo(LocalDate.now().minusDays(7)) < 0
+                    );
+                }, getCboPagamentoModalidade().valueProperty(), getDtpDtPagamento().valueProperty(), getTxtValor().textProperty()
         ));
 
         getBtnCancel().setOnAction(actionEvent -> fechar());
@@ -163,6 +169,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
     private boolean salvarRecebimento() {
         try {
+            getRecebimentoDAO().transactionBegin();
             if (getaReceber() != null)
                 getRecebimento().setaReceber(getaReceber());
             getRecebimento().setPagamentoSituacao(getCboSituacao().getValue());
@@ -176,9 +183,10 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                 getRecebimento().dtPagamentoProperty().setValue(getDtpDtPagamento().getValue());
             }
             getRecebimento().setUsuarioCadastro(UsuarioLogado.getUsuario());
-            getRecebimentoDAO().merger(getRecebimento());
-
+            setRecebimento(getRecebimentoDAO().setTransactionPersist(getRecebimento()));
+            getRecebimentoDAO().transactionCommit();
         } catch (Exception ex) {
+            getRecebimentoDAO().transactionRollback();
             ex.printStackTrace();
             return false;
         }

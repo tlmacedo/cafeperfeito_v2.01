@@ -25,6 +25,8 @@ public class SaidaProdutoProduto implements Serializable {
     private ObjectProperty<LocalDate> dtValidade = new SimpleObjectProperty<>();
 
     private IntegerProperty qtd = new SimpleIntegerProperty();
+    private ObjectProperty<BigDecimal> vlrEntrada = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrEntradaBruto = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrVenda = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrDesconto = new SimpleObjectProperty<>();
@@ -168,6 +170,32 @@ public class SaidaProdutoProduto implements Serializable {
     }
 
     @Column(length = 19, scale = 4, nullable = false)
+    public BigDecimal getVlrEntrada() {
+        return vlrEntrada.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrEntradaProperty() {
+        return vlrEntrada;
+    }
+
+    public void setVlrEntrada(BigDecimal vlrEntrada) {
+        this.vlrEntrada.set(vlrEntrada);
+    }
+
+    @Column(length = 19, scale = 4, nullable = false)
+    public BigDecimal getVlrEntradaBruto() {
+        return vlrEntradaBruto.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrEntradaBrutoProperty() {
+        return vlrEntradaBruto;
+    }
+
+    public void setVlrEntradaBruto(BigDecimal vlrEntradaBruto) {
+        this.vlrEntradaBruto.set(vlrEntradaBruto);
+    }
+
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getVlrVenda() {
         return vlrVenda.get();
     }
@@ -258,7 +286,6 @@ public class SaidaProdutoProduto implements Serializable {
     public String toString() {
         return "SaidaProdutoProduto{" +
                 "id=" + id +
-                ", saidaProduto=" + saidaProduto +
                 ", idProd=" + idProd +
                 ", codigo=" + codigo +
                 ", descricao=" + descricao +

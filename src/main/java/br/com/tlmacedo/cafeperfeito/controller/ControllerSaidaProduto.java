@@ -1,8 +1,10 @@
 package br.com.tlmacedo.cafeperfeito.controller;
 
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
+import br.com.tlmacedo.cafeperfeito.model.dao.ContasAReceberDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
+import br.com.tlmacedo.cafeperfeito.model.dao.RecebimentoDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
@@ -32,11 +34,12 @@ import javafx.scene.layout.VBox;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
+import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito {
 
@@ -130,9 +133,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private ObservableList<Produto> produtoObservableList;
     private FilteredList<Produto> produtoFilteredList;
     private TmodelSaidaProduto tmodelSaidaProduto;
+    private ObservableList<Empresa> empresaObservableList = FXCollections.observableArrayList(
+            new EmpresaDAO().getAll(Empresa.class, "cliente=1", "razao, fantasia"));
+    private ContasAReceberDAO aReceberDAO = new ContasAReceberDAO();
+    private ObservableList<ContasAReceber> aReceberObservableList =
+            FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC"));
     private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList;
 
-    private Endereco endereco = new Endereco();
+    private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
+    private ObjectProperty<List<Endereco>> enderecoList = new SimpleObjectProperty<>();
+    private ObjectProperty<Endereco> endereco = new SimpleObjectProperty<>();
+    private ObjectProperty<List<Telefone>> telefoneList = new SimpleObjectProperty<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -271,14 +282,57 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                         limpaCampos(getPainelViewSaidaProduto());
                         break;
                     case F2:
-                        ServiceCalculaTempo calcTmp = new ServiceCalculaTempo();
                         getEnumsTasksList().clear();
                         getEnumsTasksList().add(EnumsTasks.SALVAR_SAIDA);
-                        if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
-                            new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber());
-                            limpaCampos(getPainelViewSaidaProduto());
+
+                        if (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
+                                .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0) {
+                            boolean utilizaCredito = false;
+                            BigDecimal credito;
+                            if ((credito = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2)).compareTo(BigDecimal.ZERO) < 0) {
+                                setAlertMensagem(new ServiceAlertMensagem());
+                                getAlertMensagem().setCabecalho("Crédito disponível");
+                                getAlertMensagem().setContentText(String.format("o Cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
+                                        ServiceMascara.getMoeda(credito, 2)));
+                                getAlertMensagem().setStrIco("");
+                                ButtonType btnResult;
+                                if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
+                                    return;
+                                utilizaCredito = (btnResult == ButtonType.YES);
+                            }
+                            if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
+                                if (utilizaCredito) {
+                                    try {
+                                        getaReceberDAO().transactionBegin();
+                                        baixaCredito(credito);
+                                        getTmodelSaidaProduto().getaReceber().getRecebimentoList().add(addRecebimento(getTmodelSaidaProduto().getaReceber(),
+                                                PagamentoModalidade.CREDITO, credito));
+                                        getTmodelSaidaProduto().getaReceber().valorProperty().setValue(
+                                                getTmodelSaidaProduto().getaReceber().valorProperty().getValue().add(credito));
+                                        getTmodelSaidaProduto().setaReceber(getaReceberDAO().setTransactionPersist(getTmodelSaidaProduto().getaReceber()));
+                                        getaReceberDAO().transactionCommit();
+                                    } catch (Exception ex) {
+                                        getaReceberDAO().transactionRollback();
+                                    }
+                                }
+                                getEmpresaObservableList().stream()
+                                        .filter(empresa1 -> empresa1.idProperty().getValue() == empresaProperty().getValue().idProperty().getValue())
+                                        .findFirst().ifPresent(empresa1 -> empresa1.limiteUtilizadoProperty().setValue(
+                                        empresa1.limiteUtilizadoProperty().getValue().add(
+                                                ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)
+                                        )));
+
+                                //informacoesAdicionais();
+                                new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber());
+                                limpaCampos(getPainelViewSaidaProduto());
+                            }
+                        } else {
+                            setAlertMensagem(new ServiceAlertMensagem());
+                            getAlertMensagem().setCabecalho("Limite excedido");
+                            getAlertMensagem().setContentText("Cliente não possui limite para finalizar o pedido!");
+                            getAlertMensagem().setStrIco("");
+                            getAlertMensagem().alertOk();
                         }
-                        calcTmp.fim();
                         break;
                     case F6:
                         getCboEmpresa().getEditor().setEditable(true);
@@ -316,26 +370,123 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
 
-        getCboEmpresa().focusedProperty().addListener((ov, o, n) -> {
-            if (!n) {
-                if (getCboEmpresa().getValue() == null || getCboEmpresa().getValue().idProperty().getValue() == 0) {
-                    getCboEndereco().getItems().clear();
-                    getCboTelefone().getItems().clear();
-                } else {
-                    getCboEndereco().setItems(getCboEmpresa().getValue().getEnderecoList().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                    getCboTelefone().setItems(getCboEmpresa().getValue().getTelefoneList().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
+//        getCboEmpresa().focusedProperty().addListener((ov, o, n) -> {
+//            if (!n) {
+//                if (getCboEmpresa().getValue() == null || getCboEmpresa().getValue().idProperty().getValue() == 0) {
+//                    getCboEndereco().getItems().clear();
+//                    getCboTelefone().getItems().clear();
+//                } else {
+//                    getCboEndereco().setItems(getCboEmpresa().getValue().getEnderecoList().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
+//                    getCboTelefone().setItems(getCboEmpresa().getValue().getTelefoneList().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
+//                }
+//                getTmodelSaidaProduto().setEmpresa(getCboEmpresa().getValue());
+//                getCboEndereco().getSelectionModel().select(0);
+//                getCboTelefone().getSelectionModel().select(0);
+//
+//                getLblLimite().setText(getCboEmpresa().getValue() == null || getCboEmpresa().getValue().idProperty().getValue() == 0
+//                        ? "0,00"
+//                        : ServiceMascara.getMoeda(getCboEmpresa().getValue().limiteProperty().getValue(), 2));
+//                getTmodelSaidaProduto().prazoProperty().setValue(getCboEmpresa().getValue() == null ? 0 : getCboEmpresa().getValue().getPrazo());
+//            }
+//            showStatusBar();
+//        });
 
-                }
-                getTmodelSaidaProduto().setEmpresa(getCboEmpresa().getValue());
-                getCboEndereco().getSelectionModel().select(0);
-                getCboTelefone().getSelectionModel().select(0);
-                getLblLimite().setText(getCboEmpresa().getValue() == null || getCboEmpresa().getValue().idProperty().getValue() == 0
-                        ? "0,00"
-                        : ServiceMascara.getMoeda(getCboEmpresa().getValue().limiteProperty().getValue(), 2));
-                getTmodelSaidaProduto().prazoProperty().setValue(getCboEmpresa().getValue() == null ? 0 : getCboEmpresa().getValue().getPrazo());
-            }
+        empresaProperty().bind(Bindings.createObjectBinding(() -> {
+                    if (getCboEmpresa().getValue() == null)
+                        return new Empresa();
+                    return getCboEmpresa().getValue();
+                }, getCboEmpresa().valueProperty())
+        );
+
+        empresaProperty().addListener((ov, o, n) -> {
+            getDtpDtSaida().setValue(LocalDate.now());
+            getTmodelSaidaProduto().empresaProperty().setValue(n);
+//            if (n == null) {
+//                empresaProperty().setValue(getEmpresaObservableList().get(0));
+//                return;
+//            }
+
+            getLblLimite().setText(ServiceMascara.getMoeda(n.limiteProperty().getValue(), 2));
+            getLblLimiteUtilizado().setText(ServiceMascara.getMoeda(n.limiteUtilizadoProperty().getValue(), 2));
+
+            getTmodelSaidaProduto().prazoProperty().setValue(n.prazoProperty().getValue());
+
+            getLblUltimoPedidoDt().setText(n.dtUltimoPedidoProperty().getValue() != null ? n.dtUltimoPedidoProperty().getValue().format(DTF_DATA) : "");
+            getLblUltimoPedidoDias().setText(n != null
+                    ? ""
+                    : (n.dtUltimoPedidoProperty().getValue() != null
+                    ? String.valueOf(DAYS.between(n.dtUltimoPedidoProperty().getValue(), LocalDate.now()))
+                    : String.valueOf(DAYS.between(n.dtCadastroProperty().getValue().toLocalDate(), LocalDate.now()))));
+            getLblUltimoPedidoVlr().setText(ServiceMascara.getMoeda(n.vlrUltimoPedidoProperty().getValue(), 2));
+            getLblQtdPedidos().setText(n.qtdPedidosProperty().getValue().toString());
+            getLblTicketMedioVlr().setText(ServiceMascara.getMoeda(n.vlrTickeMedioProperty().getValue(), 2));
+
+            enderecoListProperty().setValue(n.getEnderecoList());
+            telefoneListProperty().setValue(n.getTelefoneList());
+
+//            if (n != null) {
+//                getTmodelSaidaProduto().prazoProperty().setValue(n.prazoProperty().getValue());
+//                getLblLimite().setText(ServiceMascara.getMoeda(n.limiteProperty().getValue(), 2));
+//                getLblLimiteUtilizado().setText(ServiceMascara.getMoeda(n.limiteUtilizadoProperty().getValue(), 2));
+//
+//            }
+//
+//            if (n.dtUltimoPedidoProperty().getValue() != null) {
+//                getLblUltimoPedidoDt().setText(n.dtUltimoPedidoProperty().getValue().format(DTF_DATA));
+//                getLblUltimoPedidoDias().setText(String.valueOf(DAYS.between(n.dtUltimoPedidoProperty().getValue(), LocalDate.now())));
+//                getLblUltimoPedidoVlr().setText(ServiceMascara.getMoeda(n.vlrUltimoPedidoProperty().getValue(), 2));
+//                getLblQtdPedidos().setText(n.qtdPedidosProperty().getValue().toString());
+//                getLblTicketMedioVlr().setText(ServiceMascara.getMoeda(n.vlrTickeMedioProperty().getValue(), 2));
+//            }
+
+
+            getCboEndereco().getSelectionModel().select(0);
+            getCboTelefone().getSelectionModel().select(0);
+            n.getEnderecoList().stream()
+                    .filter(endereco1 -> endereco1.getTipo().equals(TipoEndereco.ENTREGA))
+                    .findFirst().ifPresent(endereco1 -> getCboEndereco().getSelectionModel().select(endereco1));
+
             showStatusBar();
         });
+
+        getLblLimiteDisponivel().textProperty().bind(Bindings.createStringBinding(() -> {
+                    try {
+                        return ServiceMascara.getMoeda(
+                                empresaProperty().getValue().limiteProperty().getValue()
+                                        .subtract(empresaProperty().getValue().limiteUtilizadoProperty().getValue()), 2);
+                    } catch (Exception ex) {
+                        return "0,00";
+                    }
+                }, getLblLimite().textProperty(), getLblLimiteUtilizado().textProperty())
+        );
+
+        enderecoListProperty().addListener((ov, o, n) -> {
+            if (n != null)
+                getCboEndereco().setItems(FXCollections.observableArrayList(n));
+            else
+                getCboEndereco().getItems().clear();
+        });
+
+        enderecoProperty().bind(Bindings.createObjectBinding(() -> getCboEndereco().getValue(), getCboEndereco().valueProperty()));
+
+        enderecoProperty().addListener((ov, o, n) -> {
+            if (n == null) {
+                limpaEndereco();
+                return;
+            }
+            getLblLogradoruro().setText(n.getLogradouro());
+            getLblNumero().setText(n.getNumero());
+            getLblBairro().setText(n.getBairro());
+            getLblComplemento().setText(n.getComplemento());
+        });
+
+
+//        getTmodelSaidaProduto().prazoProperty().bind(Bindings.createIntegerBinding(() -> {
+//                    if (empresaProperty().getValue() == null)
+//                        return 0;
+//                    return empresaProperty().getValue().prazoProperty().getValue();
+//                }, empresaProperty()
+//        ));
 
         getCboEmpresa().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
             if (getCboEmpresa().getSelectionModel().getSelectedItem() != null)
@@ -347,11 +498,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 getTxtPesquisa().requestFocus();
         });
 
-        getLblLimiteDisponivel().textProperty().bind(Bindings.createStringBinding(() -> {
-            BigDecimal vLimite = ServiceMascara.getBigDecimalFromTextField(getLblLimite().getText(), 2);
-            BigDecimal vUtilizado = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2);
-            return ServiceMascara.getMoeda(vLimite.subtract(vUtilizado).setScale(2, RoundingMode.HALF_UP), 2);
-        }, getLblLimite().textProperty(), getLblLimiteUtilizado().textProperty()));
+//        getLblLimiteDisponivel().textProperty().bind(Bindings.createStringBinding(() -> {
+//            BigDecimal vLimite = ServiceMascara.getBigDecimalFromTextField(getLblLimite().getText(), 2);
+//            BigDecimal vUtilizado = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2);
+//            return ServiceMascara.getMoeda(vLimite.subtract(vUtilizado).setScale(2, RoundingMode.HALF_UP), 2);
+//        }, getLblLimite().textProperty(), getLblLimiteUtilizado().textProperty()));
 
         getTmodelSaidaProduto().prazoProperty().addListener((ov, o, n) -> {
             if (n == null) return;
@@ -364,16 +515,16 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             getDtpDtVencimento().setValue(getDtpDtSaida().getValue().plusDays(Integer.parseInt(getLblPrazo().getText())));
         });
 
-        getCboEndereco().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-            if (n == null) {
-                limpaEndereco();
-                return;
-            }
-            getLblLogradoruro().setText(n.getLogradouro());
-            getLblNumero().setText(n.getNumero());
-            getLblBairro().setText(n.getBairro());
-            getLblComplemento().setText(n.getComplemento());
-        });
+//        getCboEndereco().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
+//            if (n == null) {
+//                limpaEndereco();
+//                return;
+//            }
+//            getLblLogradoruro().setText(n.getLogradouro());
+//            getLblNumero().setText(n.getNumero());
+//            getLblBairro().setText(n.getBairro());
+//            getLblComplemento().setText(n.getComplemento());
+//        });
 
         getTabNfeInformacoes().selectedProperty().addListener((ov, o, n) -> {
             int diff = 21;
@@ -467,17 +618,18 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             getTmodelSaidaProduto().setTxtPesquisa(getTxtPesquisa());
                             getTmodelSaidaProduto().setDtpDtSaida(getDtpDtSaida());
                             getTmodelSaidaProduto().setDtpDtVencimento(getDtpDtVencimento());
+                            getTmodelSaidaProduto().empresaProperty().setValue(empresaProperty().getValue());
                             setSaidaProdutoProdutoObservableList(getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList());
                             getTmodelSaidaProduto().escutaLista();
 
                             break;
 
                         case COMBOS_PREENCHER:
-                            getCboEmpresa().setItems(
-                                    new EmpresaDAO().getAll(Empresa.class, null, null, null, "razao")
-                                            .stream().filter(Empresa::isCliente)
-                                            .collect(Collectors.toCollection(FXCollections::observableArrayList))
-                            );
+
+                            informacoesAdicionais();
+
+                            getCboEmpresa().setItems(getEmpresaObservableList());
+
 
                             getCboEmpresa().getItems().add(0, new Empresa());
 
@@ -494,7 +646,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                         case SALVAR_SAIDA:
                             if (getTmodelSaidaProduto().guardarSaidaProduto()) {
                                 if (getTmodelSaidaProduto().salvarSaidaProduto()) {
-                                    getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, null, null, "descricao"));
+                                    getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, "descricao"));
                                     getTtvProdutos().refresh();
                                 } else {
                                     Thread.currentThread().interrupt();
@@ -521,6 +673,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
      * Begin voids
      */
 
+    private void limpaCampos(TitledPane titledPane) {
+        limpaCampos((AnchorPane) titledPane.getContent());
+    }
+
     private void limpaCampos(AnchorPane anchorPane) {
         ServiceCampoPersonalizado.fieldClear(anchorPane);
         if (anchorPane == getPainelViewSaidaProduto()) {
@@ -535,6 +691,18 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         getLblNumero().setText("");
         getLblBairro().setText("");
         getLblComplemento().setText("");
+    }
+
+    private void limpaInfoCliente() {
+        getLblLimite().setText("0,00");
+        getLblLimiteUtilizado().setText("0,00");
+        getLblLimiteDisponivel().setText("0,00");
+        getLblPrazo().setText("0");
+        getLblUltimoPedidoDt().setText("");
+        getLblUltimoPedidoDias().setText("");
+        getLblUltimoPedidoVlr().setText("0,00");
+        getLblQtdPedidos().setText("0");
+        getLblTicketMedioVlr().setText("0,00");
     }
 
 //    private boolean teclaDisponivel(KeyCode keyCode) {
@@ -566,10 +734,123 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         }
     }
 
+    private void informacoesAdicionais() {
+
+
+        getaReceberObservableList().stream()
+                //.collect(Collectors.groupingBy(SaidaProdutoProduto::getLote, LinkedHashMap::new, Collectors.toList()))
+                .map(ContasAReceber::getSaidaProduto)
+                .collect(Collectors.groupingBy(SaidaProduto::getCliente, LinkedHashMap::new, Collectors.toList()))
+                .forEach((empresa, saidaProdutos) -> {
+                    BigDecimal vlrLimiteUtilizado =
+                            getaReceberObservableList().stream()
+                                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresa.idProperty().getValue())
+                                    .map(ContasAReceber::getValor)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                    .subtract(
+                                            getaReceberObservableList().stream()
+                                                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() ==
+                                                            empresa.idProperty().getValue())
+                                                    .map(ContasAReceber::getRecebimentoList)
+                                                    .map(recebimentos -> recebimentos.stream()
+                                                            .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                                            .map(Recebimento::getValor)
+                                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                    );
+                    LocalDate dtUltimoPedido = saidaProdutos.get(0).dtSaidaProperty().getValue();
+                    BigDecimal vlrUltimoPedido = saidaProdutos.get(0).getSaidaProdutoProdutoList().stream()
+                            .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
+                                    .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    BigDecimal vlrTicketMedio =
+                            saidaProdutos.stream()
+                                    .map(SaidaProduto::getSaidaProdutoProdutoList)
+                                    .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+                                            .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
+                                                    .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                    .divide(BigDecimal.valueOf(saidaProdutos.size()), 4, RoundingMode.HALF_UP);
+
+                    getEmpresaObservableList().stream()
+                            .filter(empresa1 -> empresa1.idProperty().getValue() == empresa.idProperty().getValue())
+                            .findFirst().ifPresent(empresa1 -> {
+                        empresa1.limiteUtilizadoProperty().setValue(vlrLimiteUtilizado);
+                        empresa1.dtUltimoPedidoProperty().setValue(dtUltimoPedido);
+                        empresa1.vlrUltimoPedidoProperty().setValue(vlrUltimoPedido);
+                        empresa1.qtdPedidosProperty().setValue(saidaProdutos.size());
+                        empresa1.vlrTickeMedioProperty().setValue(vlrTicketMedio);
+                    });
+                });
+    }
+
+    private void baixaCredito(BigDecimal vlrCredito) throws Exception {
+        final BigDecimal[] vlrCreditoABaixar = {vlrCredito};
+        System.out.printf("baixar credito de R$ %s\n", vlrCreditoABaixar[0]);
+        getaReceberObservableList().stream()
+                .sorted(Comparator.comparing(ContasAReceber::getDtCadastro))
+                .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresaProperty().getValue().idProperty().getValue()
+                        && aReceber.getRecebimentoList().stream()
+                        .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                        .map(Recebimento::getValor)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add).compareTo(aReceber.valorProperty().getValue()) > 0)
+                .forEach(aReceber -> {
+                    System.out.printf("aReceber: [%s]\n", aReceber);
+                    if (vlrCreditoABaixar[0].compareTo(BigDecimal.ZERO) < 0) {
+                        BigDecimal saldoConta = aReceber.valorProperty().getValue().subtract(aReceber.getRecebimentoList().stream()
+                                .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                .map(Recebimento::getValor)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add));
+                        System.out.printf("saldo: [%s]\n\n", saldoConta);
+                        aReceber.getRecebimentoList().add(addRecebimento(aReceber, PagamentoModalidade.CREDITO_BAIXA, saldoConta));
+                        try {
+                            aReceber = getaReceberDAO().setTransactionPersist(aReceber);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        vlrCreditoABaixar[0] = vlrCreditoABaixar[0].add(saldoConta);
+                    }
+                });
+    }
+
     /**
      * END voids
      */
 
+
+    /**
+     * Begin returns
+     */
+
+    private Recebimento addRecebimento(ContasAReceber aReceber, PagamentoModalidade modalidade, BigDecimal vlr) {
+        Recebimento recebimento = new Recebimento();
+        recebimento.setaReceber(aReceber);
+        recebimento.setPagamentoSituacao(PagamentoSituacao.QUITADO);
+        String codDocRecebimento =
+                ServiceValidarDado.gerarCodigoCafePerfeito(
+                        String.format("%s%s%s%s",
+                                LocalDate.now().getYear(),
+                                LocalDate.now().getMonthValue(),
+                                LocalDate.now().getDayOfMonth(),
+                                new RecebimentoDAO().getAll(Recebimento.class, String.format("dtCadastro='%s'", LocalDate.now()), "dtCadastro DESC")
+                                        .stream().count() + 1
+                        )
+                );
+        recebimento.documentoProperty().setValue(String.format("UC%s", codDocRecebimento));
+        recebimento.setPagamentoModalidade(modalidade);
+        recebimento.valorProperty().setValue(vlr);
+        if (modalidade.equals(PagamentoModalidade.CREDITO))
+            recebimento.valorProperty().setValue(vlr.multiply(new BigDecimal("-1.0")));
+        recebimento.setUsuarioPagamento(UsuarioLogado.getUsuario());
+        recebimento.dtPagamentoProperty().setValue(LocalDate.now());
+        recebimento.setUsuarioCadastro(UsuarioLogado.getUsuario());
+        return recebimento;
+    }
+
+    /**
+     * END returns
+     */
 
     /**
      * Begin Getters e Setters
@@ -1202,16 +1483,80 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.saidaProdutoProdutoObservableList = saidaProdutoProdutoObservableList;
     }
 
+    public ObservableList<Empresa> getEmpresaObservableList() {
+        return empresaObservableList;
+    }
+
+    public void setEmpresaObservableList(ObservableList<Empresa> empresaObservableList) {
+        this.empresaObservableList = empresaObservableList;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa.get();
+    }
+
+    public ObjectProperty<Empresa> empresaProperty() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa.set(empresa);
+    }
+
+    public List<Endereco> getEnderecoList() {
+        return enderecoList.get();
+    }
+
+    public ObjectProperty<List<Endereco>> enderecoListProperty() {
+        return enderecoList;
+    }
+
+    public void setEnderecoList(List<Endereco> enderecoList) {
+        this.enderecoList.set(enderecoList);
+    }
+
+    public List<Telefone> getTelefoneList() {
+        return telefoneList.get();
+    }
+
+    public ObjectProperty<List<Telefone>> telefoneListProperty() {
+        return telefoneList;
+    }
+
+    public void setTelefoneList(List<Telefone> telefoneList) {
+        this.telefoneList.set(telefoneList);
+    }
+
     public Endereco getEndereco() {
+        return endereco.get();
+    }
+
+    public ObjectProperty<Endereco> enderecoProperty() {
         return endereco;
     }
 
     public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
+        this.endereco.set(endereco);
     }
 
-/**
- * END Getters e Setters
- */
+    public ContasAReceberDAO getaReceberDAO() {
+        return aReceberDAO;
+    }
+
+    public void setaReceberDAO(ContasAReceberDAO aReceberDAO) {
+        this.aReceberDAO = aReceberDAO;
+    }
+
+    public ObservableList<ContasAReceber> getaReceberObservableList() {
+        return aReceberObservableList;
+    }
+
+    public void setaReceberObservableList(ObservableList<ContasAReceber> aReceberObservableList) {
+        this.aReceberObservableList = aReceberObservableList;
+    }
+
+    /**
+     * END Getters e Setters
+     */
 
 }

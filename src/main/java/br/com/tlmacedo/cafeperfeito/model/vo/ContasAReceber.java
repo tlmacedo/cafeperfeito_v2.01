@@ -28,6 +28,8 @@ public class ContasAReceber implements Serializable {
 
     private List<Recebimento> recebimentoList = new ArrayList<>();
 
+    private ObjectProperty<BigDecimal> vlrPedido = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrDesc = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> valorPago = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> valorSaldo = new SimpleObjectProperty<>();
 
@@ -116,6 +118,32 @@ public class ContasAReceber implements Serializable {
     }
 
     @Transient
+    public BigDecimal getVlrPedido() {
+        return vlrPedido.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrPedidoProperty() {
+        return vlrPedido;
+    }
+
+    public void setVlrPedido(BigDecimal vlrPedido) {
+        this.vlrPedido.set(vlrPedido);
+    }
+
+    @Transient
+    public BigDecimal getVlrDesc() {
+        return vlrDesc.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrDescProperty() {
+        return vlrDesc;
+    }
+
+    public void setVlrDesc(BigDecimal vlrDesc) {
+        this.vlrDesc.set(vlrDesc);
+    }
+
+    @Transient
     public BigDecimal getValorPago() {
         return valorPago.get();
     }
@@ -143,14 +171,23 @@ public class ContasAReceber implements Serializable {
 
     @Override
     public String toString() {
-        return "ContasAReceber{" +
-                "id=" + id +
-                ", saidaProduto=" + saidaProduto +
-                ", dtVencimento=" + dtVencimento +
-                ", valor=" + valor +
-                ", usuarioCadastro=" + usuarioCadastro +
-                ", dtCadastro=" + dtCadastro +
-                //", recebimentoList=" + recebimentoList +
-                '}';
+        try {
+            return "ContasAReceber{" +
+                    "id=" + id +
+                    ", saidaProduto=" + saidaProduto +
+                    ", dtVencimento=" + dtVencimento +
+                    ", valor=" + valor +
+                    ", usuarioCadastro=" + usuarioCadastro +
+                    ", dtCadastro=" + dtCadastro +
+                    ", recebimentoList=" + recebimentoList +
+                    ", valorPago=" + valorPago +
+                    ", valorSaldo=" + valorSaldo +
+                    '}';
+
+        } catch (Exception ex) {
+            System.out.printf("Deu zebra bem aqui!!!!!!");
+            ex.printStackTrace();
+            return null;
+        }
     }
 }

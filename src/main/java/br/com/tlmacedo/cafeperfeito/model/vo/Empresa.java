@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,18 +31,24 @@ public class Empresa implements Serializable {
     private BooleanProperty transportadora = new SimpleBooleanProperty();
 
     private Usuario usuarioCadastro = new Usuario();
-    private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
+    private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>(null);
     private Usuario usuarioAtualizacao = new Usuario();
     private ObjectProperty<LocalDateTime> dtAtualizacao = new SimpleObjectProperty<>();
     private StringProperty observacoes = new SimpleStringProperty();
-    private ObjectProperty<BigDecimal> limite = new SimpleObjectProperty<>();
-    private IntegerProperty prazo = new SimpleIntegerProperty();
-    private BooleanProperty prazoDiaUtil = new SimpleBooleanProperty();
+    private ObjectProperty<BigDecimal> limite = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private IntegerProperty prazo = new SimpleIntegerProperty(0);
+    private BooleanProperty prazoDiaUtil = new SimpleBooleanProperty(false);
 
     private List<EmpresaCondicoes> empresaCondicoes = new ArrayList<>();
 
     private List<Endereco> enderecoList = new ArrayList<>();
     private List<Telefone> telefoneList = new ArrayList<>();
+
+    private ObjectProperty<BigDecimal> limiteUtilizado = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<LocalDate> dtUltimoPedido = new SimpleObjectProperty<>(null);
+    private ObjectProperty<BigDecimal> vlrUltimoPedido = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private IntegerProperty qtdPedidos = new SimpleIntegerProperty(0);
+    private ObjectProperty<BigDecimal> vlrTickeMedio = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
     public Empresa() {
     }
@@ -317,6 +324,70 @@ public class Empresa implements Serializable {
         );
     }
 
+    @Transient
+    public BigDecimal getLimiteUtilizado() {
+        return limiteUtilizado.get();
+    }
+
+    public ObjectProperty<BigDecimal> limiteUtilizadoProperty() {
+        return limiteUtilizado;
+    }
+
+    public void setLimiteUtilizado(BigDecimal limiteUtilizado) {
+        this.limiteUtilizado.set(limiteUtilizado);
+    }
+
+    @Transient
+    public LocalDate getDtUltimoPedido() {
+        return dtUltimoPedido.get();
+    }
+
+    public ObjectProperty<LocalDate> dtUltimoPedidoProperty() {
+        return dtUltimoPedido;
+    }
+
+    public void setDtUltimoPedido(LocalDate dtUltimoPedido) {
+        this.dtUltimoPedido.set(dtUltimoPedido);
+    }
+
+    @Transient
+    public BigDecimal getVlrUltimoPedido() {
+        return vlrUltimoPedido.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrUltimoPedidoProperty() {
+        return vlrUltimoPedido;
+    }
+
+    public void setVlrUltimoPedido(BigDecimal vlrUltimoPedido) {
+        this.vlrUltimoPedido.set(vlrUltimoPedido);
+    }
+
+    @Transient
+    public int getQtdPedidos() {
+        return qtdPedidos.get();
+    }
+
+    public IntegerProperty qtdPedidosProperty() {
+        return qtdPedidos;
+    }
+
+    public void setQtdPedidos(int qtdPedidos) {
+        this.qtdPedidos.set(qtdPedidos);
+    }
+
+    @Transient
+    public BigDecimal getVlrTickeMedio() {
+        return vlrTickeMedio.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrTickeMedioProperty() {
+        return vlrTickeMedio;
+    }
+
+    public void setVlrTickeMedio(BigDecimal vlrTickeMedio) {
+        this.vlrTickeMedio.set(vlrTickeMedio);
+    }
 
     @Override
     public String toString() {
