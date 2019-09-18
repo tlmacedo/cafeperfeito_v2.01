@@ -37,7 +37,7 @@ public class TmodelSaidaProduto {
     private ObjectProperty<DatePicker> dtpDtSaida = new SimpleObjectProperty<>(), dtpDtVencimento = new SimpleObjectProperty<>();
     private SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
     private ProdutoEstoqueDAO produtoEstoqueDAO = new ProdutoEstoqueDAO();
-    private ContasAReceberDAO contasAReceberDAO = new ContasAReceberDAO();
+    private ContasAReceberDAO contasAReceberDAO;
     private FichaKardexDAO fichaKardexDAO = new FichaKardexDAO();
     private ContasAReceber aReceber;
     private RecebimentoDAO recebimentoDAO = new RecebimentoDAO();

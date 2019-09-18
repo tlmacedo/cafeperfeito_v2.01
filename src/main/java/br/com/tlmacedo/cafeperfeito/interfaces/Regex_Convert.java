@@ -18,6 +18,8 @@ public interface Regex_Convert {
     KeyCombination CHAR_KEY_SHIFT_CTRL_POSITIVO = new KeyCharacterCombination("+", KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN);
     KeyCombination CODE_KEY_SHIFT_CTRL_NEGATIVO = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN);
     KeyCombination CHAR_KEY_SHIFT_CTRL_NEGATIVO = new KeyCharacterCombination("-", KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN);
+    KeyCombination CODE_KEY_SHIFT_CTRL_N = new KeyCodeCombination(KeyCode.N, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN);
+    KeyCombination CHAR_KEY_SHIFT_CTRL_N = new KeyCharacterCombination("[nN]", KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN);
 
 
     RadialGradient FUNDO_RADIAL_GRADIENT =

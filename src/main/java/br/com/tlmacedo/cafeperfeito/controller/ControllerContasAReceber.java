@@ -199,16 +199,16 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                 obj = (Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue();
                             }
                         }
-                        Object finalObj = obj;
-                        objEnvi = getaReceberFilteredList().stream()
-                                .filter(aReceber1 -> aReceber1.getRecebimentoList().stream()
-                                        .filter(recebimento -> recebimento.idProperty().getValue() == ((Recebimento) finalObj).idProperty().getValue())
-                                        .count() > 0)
-                                .findFirst().orElse(null);
-                        if (objEnvi == null) return;
-                        new ViewRecebimento().openViewRecebimento((Recebimento) objEnvi);
-                        getTtvContasAReceber().refresh();
-                        getTmodelaReceber().totalizaTabela();
+//                        Object finalObj = obj;
+//                        objEnvi = getaReceberFilteredList().stream()
+//                                .filter(aReceber1 -> aReceber1.getRecebimentoList().stream()
+//                                        .filter(recebimento -> recebimento.idProperty().getValue() == ((Recebimento) finalObj).idProperty().getValue())
+//                                        .count() > 0)
+//                                .findFirst().orElse(null);
+//                        if (objEnvi == null) return;
+//                        new ViewRecebimento().openViewRecebimento((Recebimento) objEnvi);
+                        new ViewRecebimento().openViewRecebimento((Recebimento) obj);
+                        getTmodelaReceber().preencherTabela();
                         break;
                     case F6:
 //                        getCboEmpresa().getEditor().setEditable(true);

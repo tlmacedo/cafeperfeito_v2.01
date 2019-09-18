@@ -68,7 +68,7 @@ public class Recebimento implements Serializable {
         this.pagamentoSituacao = pagamentoSituacao;
     }
 
-    @Column(length = 15, nullable = false)
+    @Column(length = 18, nullable = false)
     public String getDocumento() {
         return documento.get();
     }
@@ -103,6 +103,7 @@ public class Recebimento implements Serializable {
         this.valor.set(valor);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioPagamento() {
         return usuarioPagamento;
@@ -124,6 +125,7 @@ public class Recebimento implements Serializable {
         this.dtPagamento.set(dtPagamento);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro;

@@ -94,8 +94,8 @@ public class TmodelContasAReceber {
         getColId().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
                 return ((ContasAReceber) cellData.getValue().getValue()).idProperty().asObject();
-//            } else if (cellData.getValue().getValue() instanceof Recebimento) {
-//                return ((Recebimento) cellData.getValue().getValue()).idProperty().asObject();
+            } else if (cellData.getValue().getValue() instanceof Recebimento) {
+                return ((Recebimento) cellData.getValue().getValue()).idProperty().asObject();
             }
             return new SimpleObjectProperty<>(null);
         });
@@ -259,7 +259,7 @@ public class TmodelContasAReceber {
 
     public void preencherTabela() {
         try {
-            setaReceberTreeItem(new TreeItem(null));
+            setaReceberTreeItem(new TreeItem());
             getaReceberFilteredList().stream()
 //                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == 64)
                     .forEach(aReceber -> {
@@ -273,7 +273,7 @@ public class TmodelContasAReceber {
                                         vlrPago[0] = vlrPago[0].add(recebimento.valorProperty().getValue());
                                         vlrSaldo[0] = vlrSaldo[0].subtract(recebimento.valorProperty().getValue());
                                     }
-                                    TreeItem<Object> filhoItem = new TreeItem<>(recebimento);
+                                    TreeItem<Object> filhoItem = new TreeItem(recebimento);
                                     paiItem.getChildren().add(filhoItem);
                                 });
                         ((ContasAReceber) paiItem.getValue()).valorPagoProperty().setValue(vlrPago[0]);

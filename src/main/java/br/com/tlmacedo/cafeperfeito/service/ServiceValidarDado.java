@@ -1,9 +1,12 @@
 package br.com.tlmacedo.cafeperfeito.service;
 
 
+import br.com.tlmacedo.cafeperfeito.model.dao.RecebimentoDAO;
+import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import org.apache.maven.surefire.shade.common.org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,7 +20,7 @@ public class ServiceValidarDado {
     static final int[] pesoCnpj = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
     static final int[] pesoChaveNfeCte = {4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9,
             8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-    static final int[] pesoCafe = {11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+    static final int[] pesoCafe = {5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
     static Pattern p, pt, pd;
     static Matcher m, mt, md;
 
@@ -54,28 +57,42 @@ public class ServiceValidarDado {
         return digitoDV[0].toString() + digitoDV[1].toString();
     }
 
-    static Integer geraDvCafePerfeito(String value) {
-        final String newDv = String.format("%013d", Long.valueOf(value));
-        int[] numeros = newDv.substring(0, 13).chars().map(Character::getNumericValue).toArray();
-        int resultado = 0;
-        for (int i = 0; i < numeros.length - 1; i++)
-            if (i % 2 == 0)
-                resultado += (numeros[i] * 3);
-            else
-                resultado += numeros[i];
-        int digitoVerificador = 10 - (resultado % 10);
-        if (digitoVerificador > 9)
-            digitoVerificador = 0;
-        return digitoVerificador;
+
+    public static String gerarCodigoCafePerfeito(Class classe) {
+        String value = "";
+        if (classe.equals(Recebimento.class)) {
+            value = String.format("%04d%02d%02d%03d",
+                    LocalDate.now().getYear(),
+                    LocalDate.now().getMonthValue(),
+                    LocalDate.now().getDayOfMonth(),
+                    new RecebimentoDAO().getAll(classe, String.format("dtCadastro BETWEEN '%s' AND '%s'",
+                            LocalDate.now().atTime(0, 0, 0),
+                            LocalDate.now().atTime(23, 59, 59)), "dtCadastro DESC").stream().count() + 1
+            );
+            return gerarCodigoCafePerfeito(value);
+        }
+        return "não gerado";
     }
 
     public static String gerarCodigoCafePerfeito(String value) {
-        return value + geraDvCafePerfeito(value).toString();
+        System.out.printf("value: [%s]\n", value);
+        value = value.replaceAll("\\D", "");
+        System.out.printf("value: [%s]\n", value);
+        value = String.format("%011d", Long.valueOf(value.replaceAll("\\D", "")));
+        System.out.printf("value: [%s]\n", value);
+        //value = value.replaceAll("\\W", "");
+        return String.format("%s-%s", value, calculaDv(value, pesoCafe));
     }
 
     public static boolean isCodigoCafePerfeito(String value) {
+        value = value.replaceAll("\\D", "");
 
-        return (value.substring(value.length() - 1).equals(geraDvCafePerfeito(value.substring(0, value.length() - 1)).toString()));
+        if (value == null || value.length() != 13
+                || value.matches(value.charAt(0) + "{13}"))
+            return false;
+        String base = value.substring(0, value.length() - 2);
+        String dv = value.substring(value.length() - 2);
+        return dv.equals(calculaDv(base, pesoCafe));
     }
 
 //    public static WebTipo isEmailHomePageValido(final String value, boolean getMsgFaill) {

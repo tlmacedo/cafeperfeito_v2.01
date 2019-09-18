@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -50,6 +51,7 @@ public class ContasAReceber implements Serializable {
         this.id.set(id);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public SaidaProduto getSaidaProduto() {
         return saidaProduto;
@@ -85,6 +87,7 @@ public class ContasAReceber implements Serializable {
         this.valor.set(valor);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro;

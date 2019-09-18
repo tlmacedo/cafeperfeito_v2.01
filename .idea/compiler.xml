@@ -20,7 +20,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="cafeperfeito_v2.01" target="12" />
+      <module name="cafeperfeito_v2.01" target="13" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

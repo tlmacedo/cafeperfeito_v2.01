@@ -3,6 +3,8 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="painelViewRecebimento" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
             minWidth="-Infinity" prefHeight="150.0" prefWidth="370.0" stylesheets="@../style/css/cafeperfeito.css"
@@ -39,14 +41,24 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <TextField fx:id="txtDocumento"
-                                           accessibleText="len::120;type::TEXTO;decimal::;value::;seteditable::false;binding::true;"
-                                           alignment="CENTER_LEFT" prefWidth="400.0" styleClass="lbl_informacao"
-                                           text="">
-                                    <tooltip>
-                                        <Tooltip text="número do comprovante ou documento de pagamento"/>
-                                    </tooltip>
-                                </TextField>
+                                <HBox>
+                                    <children>
+                                        <ImageView fx:id="imgNewDocumento" fitHeight="20.0" fitWidth="20.0"
+                                                   pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../image/ico/ic_novo_registro_dp16.png"/>
+                                            </image>
+                                        </ImageView>
+                                        <TextField fx:id="txtDocumento"
+                                                   accessibleText="len::120;type::TEXTO;decimal::;value::;seteditable::true;binding::;"
+                                                   alignment="CENTER_RIGHT" prefWidth="150.0"
+                                                   styleClass="lbl_informacao" text="">
+                                            <tooltip>
+                                                <Tooltip text="número do comprovante ou documento de pagamento"/>
+                                            </tooltip>
+                                        </TextField>
+                                    </children>
+                                </HBox>
                             </children>
                         </VBox>
                         <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" prefWidth="100.0">

@@ -1,3 +1,4 @@
+import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 
 import java.util.Scanner;
@@ -19,17 +20,27 @@ public class Testes {
                     continua = false;
                     continue;
                 }
-                String numeroGerado = ServiceValidarDado.gerarCodigoCafePerfeito(entrada);
+
+//                new RecebimentoDAO().getAll(Recebimento.class, String.format("dtCadastro BETWEEN '%s' AND '%s'",
+//                        LocalDate.now().atTime(0,0,0),
+//                        LocalDate.now().atTime(23,59,59)), "dtCadastro DESC").stream()
+//                        .forEach(System.out::println);
+                String numeroGerado = "";
+                if (entrada.equals(""))
+                    numeroGerado = ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class);
+                else
+                    numeroGerado = ServiceValidarDado.gerarCodigoCafePerfeito(entrada);
+
                 System.out.printf("\nnúmero gerado foi: %s", numeroGerado);
-                String validacao = null;
-                boolean result = true;
-                while (result) {
-                    System.out.printf("\nnúmero a ser validado é: ");
-                    validacao = new Scanner(System.in).nextLine();
-                    result = !ServiceValidarDado.isCodigoCafePerfeito(validacao);
-                    System.out.printf("\no número é: [%s]", !result);
-                }
-                System.out.printf("\n\no número: [%s] foi validado com sucesso\n\n\n", validacao);
+//                String validacao = null;
+//                boolean result = true;
+//                while (result) {
+//                    System.out.printf("\nnúmero a ser validado é: ");
+//                    validacao = new Scanner(System.in).nextLine();
+//                    result = !ServiceValidarDado.isCodigoCafePerfeito(validacao);
+//                    System.out.printf("\no número é: [%s]", !result);
+//                }
+//                System.out.printf("\n\no número: [%s] foi validado com sucesso\n\n\n", validacao);
 
             }
 

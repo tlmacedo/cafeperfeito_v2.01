@@ -8,10 +8,7 @@ import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
 import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
-import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
-import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
-import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
-import br.com.tlmacedo.cafeperfeito.service.ServiceSegundoPlano;
+import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -21,6 +18,9 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -33,12 +33,16 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.CHAR_KEY_SHIFT_CTRL_N;
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.CODE_KEY_SHIFT_CTRL_N;
+
 public class ControllerRecebimento implements Initializable, ModeloCafePerfeito {
 
 
     public AnchorPane painelViewRecebimento;
     public TitledPane tpnRecebimento;
     public ComboBox<PagamentoModalidade> cboPagamentoModalidade;
+    public ImageView imgNewDocumento;
     public TextField txtDocumento;
     public DatePicker dtpDtPagamento;
     public ComboBox<PagamentoSituacao> cboSituacao;
@@ -54,6 +58,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     private ContasAReceber aReceber;
     private Recebimento recebimento;
     private RecebimentoDAO recebimentoDAO = new RecebimentoDAO();
+    private BigDecimal saldo = BigDecimal.ZERO;
 
     private BooleanProperty deshabilita = new SimpleBooleanProperty(true);
 
@@ -61,6 +66,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
         setRecebimento(ViewRecebimento.getRecebimento());
         if (getRecebimento() == null) {
             setaReceber(ViewRecebimento.getaReceber());
+            setSaldo(ViewRecebimento.getSaldo());
             getEnumsTasksList().add(EnumsTasks.ADD_RECEBIMENTO);
         } else {
             setRecebimento(ViewRecebimento.getRecebimento());
@@ -116,7 +122,10 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
         getCboPagamentoModalidade().getSelectionModel().select(getRecebimento().getPagamentoModalidade());
         getCboSituacao().getSelectionModel().select(getRecebimento().getPagamentoSituacao());
 
-        getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
+        if (getSaldo().compareTo(BigDecimal.ZERO) != 0)
+            getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue().add(getSaldo()), 2));
+        else
+            getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
 
         getDtpDtPagamento().setValue(getRecebimento().dtPagamentoProperty().getValue() != null
                 ? getRecebimento().dtPagamentoProperty().getValue()
@@ -131,6 +140,12 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
     @Override
     public void escutarTecla() {
+
+        getPainelViewRecebimento().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (CODE_KEY_SHIFT_CTRL_N.match(keyEvent) || CHAR_KEY_SHIFT_CTRL_N.match(keyEvent)) {
+                getNewDocumento();
+            }
+        });
 
         deshabilitaProperty().bind(Bindings.createBooleanBinding(() -> {
                     if (getRecebimento() != null)
@@ -159,6 +174,8 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             else
                 getCboPagamentoModalidade().requestFocus();
         });
+
+        getImgNewDocumento().addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> getNewDocumento());
 
 
     }
@@ -226,6 +243,19 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
      * END Booleans
      */
 
+
+    /**
+     * Begin Voids
+     */
+
+    private void getNewDocumento() {
+        System.out.printf("oioioi");
+        getTxtDocumento().setText(ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class));
+    }
+
+    /**
+     * END Voids
+     */
     /**
      * Begin Getters e Setters
      */
@@ -370,6 +400,23 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     public void setNomeController(String nomeController) {
         this.nomeController = nomeController;
     }
+
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo;
+    }
+
+    public ImageView getImgNewDocumento() {
+        return imgNewDocumento;
+    }
+
+    public void setImgNewDocumento(ImageView imgNewDocumento) {
+        this.imgNewDocumento = imgNewDocumento;
+    }
+
 /**
  * END Getters e Setters
  */

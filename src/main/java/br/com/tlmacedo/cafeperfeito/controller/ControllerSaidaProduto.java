@@ -4,7 +4,6 @@ import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.ContasAReceberDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
-import br.com.tlmacedo.cafeperfeito.model.dao.RecebimentoDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
@@ -303,16 +302,14 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
                                 if (utilizaCredito) {
                                     try {
-                                        getaReceberDAO().transactionBegin();
+                                        getTmodelSaidaProduto().getContasAReceberDAO().transactionBegin();
                                         baixaCredito(credito);
                                         getTmodelSaidaProduto().getaReceber().getRecebimentoList().add(addRecebimento(getTmodelSaidaProduto().getaReceber(),
                                                 PagamentoModalidade.CREDITO, credito));
-                                        getTmodelSaidaProduto().getaReceber().valorProperty().setValue(
-                                                getTmodelSaidaProduto().getaReceber().valorProperty().getValue().add(credito));
                                         getTmodelSaidaProduto().setaReceber(getaReceberDAO().setTransactionPersist(getTmodelSaidaProduto().getaReceber()));
-                                        getaReceberDAO().transactionCommit();
+                                        getTmodelSaidaProduto().getContasAReceberDAO().transactionCommit();
                                     } catch (Exception ex) {
-                                        getaReceberDAO().transactionRollback();
+                                        getTmodelSaidaProduto().getContasAReceberDAO().transactionRollback();
                                     }
                                 }
                                 getEmpresaObservableList().stream()
@@ -322,8 +319,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                                 ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)
                                         )));
 
-                                //informacoesAdicionais();
-                                new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber());
+                                new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber(), credito);
                                 limpaCampos(getPainelViewSaidaProduto());
                             }
                         } else {
@@ -619,6 +615,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             getTmodelSaidaProduto().setDtpDtSaida(getDtpDtSaida());
                             getTmodelSaidaProduto().setDtpDtVencimento(getDtpDtVencimento());
                             getTmodelSaidaProduto().empresaProperty().setValue(empresaProperty().getValue());
+                            getTmodelSaidaProduto().setContasAReceberDAO(getaReceberDAO());
                             setSaidaProdutoProdutoObservableList(getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList());
                             getTmodelSaidaProduto().escutaLista();
 
@@ -787,7 +784,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private void baixaCredito(BigDecimal vlrCredito) throws Exception {
         final BigDecimal[] vlrCreditoABaixar = {vlrCredito};
-        System.out.printf("baixar credito de R$ %s\n", vlrCreditoABaixar[0]);
         getaReceberObservableList().stream()
                 .sorted(Comparator.comparing(ContasAReceber::getDtCadastro))
                 .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresaProperty().getValue().idProperty().getValue()
@@ -796,16 +792,14 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                         .map(Recebimento::getValor)
                         .reduce(BigDecimal.ZERO, BigDecimal::add).compareTo(aReceber.valorProperty().getValue()) > 0)
                 .forEach(aReceber -> {
-                    System.out.printf("aReceber: [%s]\n", aReceber);
                     if (vlrCreditoABaixar[0].compareTo(BigDecimal.ZERO) < 0) {
                         BigDecimal saldoConta = aReceber.valorProperty().getValue().subtract(aReceber.getRecebimentoList().stream()
                                 .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
                                 .map(Recebimento::getValor)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add));
-                        System.out.printf("saldo: [%s]\n\n", saldoConta);
                         aReceber.getRecebimentoList().add(addRecebimento(aReceber, PagamentoModalidade.CREDITO_BAIXA, saldoConta));
                         try {
-                            aReceber = getaReceberDAO().setTransactionPersist(aReceber);
+                            aReceber = getTmodelSaidaProduto().getContasAReceberDAO().setTransactionPersist(aReceber);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -828,14 +822,14 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         recebimento.setaReceber(aReceber);
         recebimento.setPagamentoSituacao(PagamentoSituacao.QUITADO);
         String codDocRecebimento =
-                ServiceValidarDado.gerarCodigoCafePerfeito(
-                        String.format("%s%s%s%s",
-                                LocalDate.now().getYear(),
-                                LocalDate.now().getMonthValue(),
-                                LocalDate.now().getDayOfMonth(),
-                                new RecebimentoDAO().getAll(Recebimento.class, String.format("dtCadastro='%s'", LocalDate.now()), "dtCadastro DESC")
-                                        .stream().count() + 1
-                        )
+                ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class
+//                        String.format("%s%s%s%s",
+//                                LocalDate.now().getYear(),
+//                                LocalDate.now().getMonthValue(),
+//                                LocalDate.now().getDayOfMonth(),
+//                                new RecebimentoDAO().getAll(Recebimento.class, String.format("dtCadastro='%s'", LocalDate.now()), "dtCadastro DESC")
+//                                        .stream().count() + 1
+//                        )
                 );
         recebimento.documentoProperty().setValue(String.format("UC%s", codDocRecebimento));
         recebimento.setPagamentoModalidade(modalidade);
@@ -845,6 +839,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         recebimento.setUsuarioPagamento(UsuarioLogado.getUsuario());
         recebimento.dtPagamentoProperty().setValue(LocalDate.now());
         recebimento.setUsuarioCadastro(UsuarioLogado.getUsuario());
+        System.out.printf("addRecebimento: [%s]\n\n", recebimento);
         return recebimento;
     }
 
