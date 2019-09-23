@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import br.com.tlmacedo.cafeperfeito.model.enums.TipoEndereco;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -387,6 +388,46 @@ public class Empresa implements Serializable {
 
     public void setVlrTickeMedio(BigDecimal vlrTickeMedio) {
         this.vlrTickeMedio.set(vlrTickeMedio);
+    }
+
+
+    @Transient
+    @JsonIgnore
+    public Endereco getEnderecoPrincipal() {
+        return getEnderecoList().stream()
+                .filter(endereco -> endereco.getTipo() == TipoEndereco.PRINCIPAL)
+                .findFirst().orElse(null);
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getMunicipio() {
+        Endereco end = getEnderecoPrincipal();
+        if (end == null) return "MANAUS";
+        return end.getMunicipio().getDescricao();
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getUf() {
+        Endereco end = getEnderecoPrincipal();
+        if (end == null) return "AM";
+        return end.getMunicipio().getUf().getSigla();
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getFonePrincipal() {
+        Telefone tel = getTelefoneList().stream()
+                .filter(telefone -> telefone.isPrincipal())
+                .findFirst().orElse(getTelefoneList().stream().findFirst().orElse(null));
+        return tel == null ? "" : tel.getDescricao();
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getEmailPrincipal() {
+        return "";
     }
 
     @Override

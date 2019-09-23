@@ -25,6 +25,8 @@ public class Colaborador implements Serializable {
     private ObjectProperty<BigDecimal> salario = new SimpleObjectProperty<>();
     private IntegerProperty ativo = new SimpleIntegerProperty();
 
+    private Empresa lojaAtivo;
+
     private Blob imagem, imagemBack;
 
 
@@ -121,6 +123,16 @@ public class Colaborador implements Serializable {
 
     public void setAtivo(ColaboradorSituacao ativo) {
         this.ativo.set(ativo.getCod());
+    }
+
+    @JsonIgnore
+    @ManyToOne
+    public Empresa getLojaAtivo() {
+        return lojaAtivo;
+    }
+
+    public void setLojaAtivo(Empresa lojaAtivo) {
+        this.lojaAtivo = lojaAtivo;
     }
 
     @JsonIgnore

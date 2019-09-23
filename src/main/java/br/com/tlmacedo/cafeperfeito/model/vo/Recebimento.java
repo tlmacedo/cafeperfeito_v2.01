@@ -49,7 +49,7 @@ public class Recebimento implements Serializable {
         this.id.set(id);
     }
 
-    @JsonIgnore
+    //@JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public ContasAReceber getaReceber() {
         return aReceber;

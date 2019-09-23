@@ -5,26 +5,24 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public enum PagamentoSituacao {
+public enum RelatorioTipo {
 
-    //    NULL(-1, ""),
-    PENDENTE(0, "Pendente"),
-    QUITADO(1, "Quitado"),
-    CANCELADO(2, "Cancelado");
+    RECIBO(0, "/relatorio/recibo.jasper"),
+    NFE(1, "/relatorio/SIDTMDanfe.jasper");
 
     private Integer cod;
     private String descricao;
 
-    private PagamentoSituacao(Integer cod, String descricao) {
+    private RelatorioTipo(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
 
-    public static List<PagamentoSituacao> getList() {
-        List list = Arrays.asList(PagamentoSituacao.values());
-        Collections.sort(list, new Comparator<PagamentoSituacao>() {
+    public static List<RelatorioTipo> getList() {
+        List list = Arrays.asList(RelatorioTipo.values());
+        Collections.sort(list, new Comparator<RelatorioTipo>() {
             @Override
-            public int compare(PagamentoSituacao e1, PagamentoSituacao e2) {
+            public int compare(RelatorioTipo e1, RelatorioTipo e2) {
                 return e1.getDescricao().compareTo(e2.getDescricao());
             }
         });

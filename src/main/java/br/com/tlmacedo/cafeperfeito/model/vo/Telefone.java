@@ -1,10 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,6 +15,7 @@ public class Telefone implements Serializable {
 
     private LongProperty id = new SimpleLongProperty();
     private StringProperty descricao = new SimpleStringProperty();
+    private BooleanProperty principal = new SimpleBooleanProperty();
 
     private TelefoneOperadora telefoneOperadora = new TelefoneOperadora();
 
@@ -49,6 +47,19 @@ public class Telefone implements Serializable {
 
     public void setDescricao(String descricao) {
         this.descricao.set(descricao);
+    }
+
+    @Column(length = 1, nullable = false)
+    public boolean isPrincipal() {
+        return principal.get();
+    }
+
+    public BooleanProperty principalProperty() {
+        return principal;
+    }
+
+    public void setPrincipal(boolean principal) {
+        this.principal.set(principal);
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

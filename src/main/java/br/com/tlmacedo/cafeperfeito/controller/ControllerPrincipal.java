@@ -212,7 +212,10 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
     }
 
     public boolean teclaDisponivel(KeyCode keyCode) {
-        return getServiceStatusBar().getStbTeclas().getText().contains(String.format("%s-", keyCode.toString()));
+        String tecla = keyCode.toString().toLowerCase();
+        if (keyCode.equals(KeyCode.HELP))
+            tecla = "insert";
+        return getServiceStatusBar().getStbTeclas().getText().toLowerCase().contains(String.format("%s-", tecla));
     }
 
     public BorderPane getPainelViewPrincipal() {

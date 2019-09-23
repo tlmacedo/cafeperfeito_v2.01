@@ -9,10 +9,7 @@ import br.com.tlmacedo.cafeperfeito.model.tm.TmodelContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
-import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
-import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
-import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
-import br.com.tlmacedo.cafeperfeito.service.ServiceSegundoPlano;
+import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewContasAReceber;
@@ -31,6 +28,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -94,6 +92,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
     private TmodelContasAReceber tmodelaReceber;
     private ObjectProperty<ContasAReceber> aReceber = new SimpleObjectProperty<>();
+    private ObjectProperty<Recebimento> recebimento = new SimpleObjectProperty<>();
     private ObservableList<ContasAReceber> aReceberObservableList;
     private FilteredList<ContasAReceber> aReceberFilteredList;
 
@@ -191,28 +190,13 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 //                        calcTmp.fim();
                         break;
                     case F4:
-                        Object obj, objEnvi;
-                        if ((obj = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue()) == null)
-                            return;
-                        if (obj instanceof ContasAReceber) {
-                            if (getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().size() > 0) {
-                                obj = (Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue();
-                            }
-                        }
-//                        Object finalObj = obj;
-//                        objEnvi = getaReceberFilteredList().stream()
-//                                .filter(aReceber1 -> aReceber1.getRecebimentoList().stream()
-//                                        .filter(recebimento -> recebimento.idProperty().getValue() == ((Recebimento) finalObj).idProperty().getValue())
-//                                        .count() > 0)
-//                                .findFirst().orElse(null);
-//                        if (objEnvi == null) return;
-//                        new ViewRecebimento().openViewRecebimento((Recebimento) objEnvi);
-                        new ViewRecebimento().openViewRecebimento((Recebimento) obj);
+                        if (recebimentoProperty().getValue() == null
+                                || !getTtvContasAReceber().isFocused()) return;
+                        new ViewRecebimento().openViewRecebimento((Recebimento) recebimentoProperty().getValue());
                         getTmodelaReceber().preencherTabela();
                         break;
                     case F6:
-//                        getCboEmpresa().getEditor().setEditable(true);
-//                        getCboEmpresa().requestFocus();
+                        getCboEmpresa().requestFocus();
                         break;
                     case F7:
                         getTxtPesquisa().requestFocus();
@@ -232,6 +216,47 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                     case F12:
                         fechar();
                         break;
+                    case HELP:
+                        new ViewRecebimento().openViewRecebimento(aReceberProperty().getValue(), null);
+                        break;
+                    case P:
+                        if (event.isControlDown()) {
+                            if (recebimentoProperty().getValue() == null
+                                    || !getTtvContasAReceber().isFocused()) return;
+                            try {
+                                System.out.printf("recebimento: [%s]\n", recebimentoProperty().getValue());
+                                new ServiceRecibo().imprimeRecibo(recebimentoProperty().getValue());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                }
+            }
+        });
+
+        getTtvContasAReceber().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
+            if (n.getValue() instanceof ContasAReceber) {
+                aReceberProperty().setValue((ContasAReceber) n.getValue());
+                if (((ContasAReceber) n.getValue()).getRecebimentoList().size() > 0)
+                    recebimentoProperty().setValue((Recebimento) n.getChildren().get(0).getValue());
+                else
+                    recebimentoProperty().setValue(null);
+            } else if (n.getValue() instanceof Recebimento) {
+                aReceberProperty().setValue((ContasAReceber) n.getParent().getValue());
+                recebimentoProperty().setValue((Recebimento) n.getValue());
+            } else {
+                aReceberProperty().setValue(null);
+                recebimentoProperty().setValue(null);
+            }
+
+
+            Object obj, objEnvi;
+            if ((obj = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue()) == null)
+                return;
+            if (obj instanceof ContasAReceber) {
+                if (getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().size() > 0) {
+                    obj = (Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue();
                 }
             }
         });
@@ -259,27 +284,13 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
             }
         });
 
-        getTtvContasAReceber().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-            if (n == null) {
-                setaReceber(null);
-            } else {
-                if (n.getValue() instanceof ContasAReceber) {
-                    setaReceber((ContasAReceber) n.getValue());
-                } else {
-                    setaReceber((ContasAReceber) n.getParent().getValue());
-                }
-            }
-        });
-
         getDtpData1().focusedProperty().addListener((ov, o, n) -> {
             if (!n) return;
             getDtpData1().getEditor().deselect();
-            System.out.printf("ganhou focu, era pra selecionar tudo dtp1\n");
         });
         getDtpData2().focusedProperty().addListener((ov, o, n) -> {
             if (!n) return;
             getDtpData2().getEditor().deselect();
-            System.out.printf("ganhou focu, era pra selecionar tudo dtp2\n");
         });
 
         aReceberProperty().addListener((ov, o, n) -> {
@@ -483,15 +494,21 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
         String stb = "";
         try {
+            stb = statusBarProperty().getValue().getDescricao();
             if (aReceberProperty().getValue() == null) {
-                stb = statusBarProperty().getValue().getDescricao().replace("[Insert-Novo recebimento]  [F4-Editar recebimento]  ", "");
-            } else if (aReceberProperty().getValue().getRecebimentoList().size() <= 0) {
-                stb = statusBarProperty().getValue().getDescricao().replace("[F4-Editar recebimento]  ", "");
+                stb = stb.replace("[Insert-Novo recebimento]  [Ctrl+P-Imprimir recibo]  [F4-Editar recebimento]  ", "");
             } else {
-                stb = statusBarProperty().getValue().getDescricao().replace("[Insert-Novo recebimento]  ", "");
+                if (aReceberProperty().getValue().getRecebimentoList().size() <= 0) {
+                    stb = stb.replace("[Ctrl+P-Imprimir recibo]  [F4-Editar recebimento]  ", "");
+                } else {
+                    if (aReceberProperty().getValue().valorProperty().getValue()
+                            .compareTo(aReceberProperty().getValue().getRecebimentoList().stream()
+                                    .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) <= 0)
+                        stb = stb.replace("[Insert-Novo recebimento]  ", "");
+                }
             }
         } catch (Exception ex) {
-            stb = statusBarProperty().getValue().getDescricao();
+            //stb = statusBarProperty().getValue().getDescricao();
         }
         ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(stb);
     }
@@ -855,6 +872,17 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         this.aReceberFilteredList = aReceberFilteredList;
     }
 
+    public Recebimento getRecebimento() {
+        return recebimento.get();
+    }
+
+    public ObjectProperty<Recebimento> recebimentoProperty() {
+        return recebimento;
+    }
+
+    public void setRecebimento(Recebimento recebimento) {
+        this.recebimento.set(recebimento);
+    }
 /**
  * END Getters e Setters
  */

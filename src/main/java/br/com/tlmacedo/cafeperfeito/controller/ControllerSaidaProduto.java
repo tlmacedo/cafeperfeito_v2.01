@@ -822,15 +822,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         recebimento.setaReceber(aReceber);
         recebimento.setPagamentoSituacao(PagamentoSituacao.QUITADO);
         String codDocRecebimento =
-                ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class
-//                        String.format("%s%s%s%s",
-//                                LocalDate.now().getYear(),
-//                                LocalDate.now().getMonthValue(),
-//                                LocalDate.now().getDayOfMonth(),
-//                                new RecebimentoDAO().getAll(Recebimento.class, String.format("dtCadastro='%s'", LocalDate.now()), "dtCadastro DESC")
-//                                        .stream().count() + 1
-//                        )
-                );
+                ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class, getDtpDtSaida().getValue());
         recebimento.documentoProperty().setValue(String.format("UC%s", codDocRecebimento));
         recebimento.setPagamentoModalidade(modalidade);
         recebimento.valorProperty().setValue(vlr);

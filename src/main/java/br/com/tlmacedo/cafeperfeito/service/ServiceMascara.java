@@ -1,22 +1,29 @@
 package br.com.tlmacedo.cafeperfeito.service;
 
+import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
+import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import com.google.common.base.Splitter;
 import javafx.scene.control.TextField;
 
+import javax.swing.text.MaskFormatter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.REGEX_PONTUACAO;
-import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.REGEX_TELEFONE_BD;
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.*;
+import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.MY_LOCALE;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 public class ServiceMascara {
 
     private static Pattern pattern;
     private static Matcher matcher;
+    private static MaskFormatter formatter;
     private String mascara;
     private StringBuilder resultado;
 
@@ -25,6 +32,21 @@ public class ServiceMascara {
         if (caractere == null || caractere.equals(""))
             caractere = TCONFIG.getSis().getMaskCaracter().getUpper();
         return String.format("%0" + len + "d", 0).replace("0", caractere);
+    }
+
+    private static String getValueFormatado(String value, String mask) {
+        try {
+            setFormatter(new MaskFormatter(mask));
+            getFormatter().setValueContainsLiteralCharacters(false);
+            String ret = getFormatter().valueToString(value);
+            if (!ret.equals(""))
+                while (!Character.isDigit(ret.charAt(ret.length() - 1)))
+                    ret = ret.substring(0, ret.length() - 1);
+            return ret;
+        } catch (ParseException | StringIndexOutOfBoundsException ex) {
+            //ex.printStackTrace();
+        }
+        return "";
     }
 
     public static String getNumeroMask(int len, int decimal) {
@@ -39,6 +61,18 @@ public class ServiceMascara {
     public static String getRgMask(int len) {
         if (len == 0) len = 11;
         return getNumeroMask(len, 0);
+    }
+
+    public static String getCnpj(String value) {
+        return getValueFormatado(value, MASK_CNPJ);
+    }
+
+    public static String getCpf(String value) {
+        return getValueFormatado(value, MASK_CPF);
+    }
+
+    public static String getIe(String value, String uf) {
+        return getValueFormatado(value, getMascaraIE(uf));
     }
 
     public static String getNumeroMilMask(int len) {
@@ -88,6 +122,30 @@ public class ServiceMascara {
         }
     }
 
+    public static String getMoeda2(BigDecimal value, int decimal) {
+        if (value.toString().contains(".") || value.toString().contains(","))
+            return formataNumeroDecimal(value.setScale(decimal).toString(), decimal);
+        else
+            return formataNumeroDecimal(value.toString(), decimal);
+    }
+
+    public static String getDataExtenso(String municipio, LocalDate localDate) {
+        if (municipio == null) {
+            Endereco endereco;
+            if ((endereco = UsuarioLogado.getUsuario().getLojaAtivo().getEnderecoPrincipal()) != null)
+                municipio = endereco.getMunicipio().getDescricao();
+            else
+                municipio = TCONFIG.getInfLoja().getMunicipio();
+        }
+        return String.format("%s,   %02d   de   %s    de    %04d",
+                municipio,
+                localDate.getDayOfMonth(),
+                localDate.getMonth().getDisplayName(TextStyle.FULL_STANDALONE, MY_LOCALE),
+                localDate.getYear()
+        );
+    }
+
+
     public static BigDecimal getBigDecimalFromTextField(String value, int decimal) {
         if (value.equals("") || value == null) return BigDecimal.ZERO.setScale(decimal);
         BigDecimal result = new BigDecimal(formataNumeroDecimal(value, decimal).replace(".", "")
@@ -98,19 +156,19 @@ public class ServiceMascara {
     public static String getTelefone(String value) {
         String strValue = value.replaceAll("\\D", "").trim();
         if (strValue.length() > 11) strValue = strValue.substring(0, 11);
-        pattern = Pattern.compile(REGEX_TELEFONE_BD);
-        matcher = pattern.matcher(strValue);
-        if (matcher.find()) {
+        setPattern(Pattern.compile(REGEX_TELEFONE_BD));
+        setMatcher(getPattern().matcher(strValue));
+        if (getMatcher().find()) {
             return String.format("%s%s%s",
-                    matcher.group(1) == null
+                    getMatcher().group(1) == null
                             ? ""
-                            : String.format("(%s) ", matcher.group(1)),
-                    matcher.group(2) == null
+                            : String.format("(%s) ", getMatcher().group(1)),
+                    getMatcher().group(2) == null
                             ? ""
-                            : String.format("%s-", matcher.group(2)),
-                    matcher.group(3) == null
+                            : String.format("%s-", getMatcher().group(2)),
+                    getMatcher().group(3) == null
                             ? ""
-                            : String.format("%s", matcher.group(3))
+                            : String.format("%s", getMatcher().group(3))
             );
         }
         return strValue;
@@ -207,6 +265,69 @@ public class ServiceMascara {
     }
 
 
+    public static String getMascaraIE(String uf) {
+//        String caracter = ServiceVariaveisSistema.TCONFIG.getSis().getMaskCaracter().getDigit();
+        switch (uf) {
+            case "AC":
+                return "##.###.###/###-##";
+            case "AL":
+                return "#########";
+            case "AM":
+                return "##.###.###-#";
+            case "AP":
+                return "#########";
+            case "BA":
+                return "###.###.##-#";
+            case "CE":
+                return "########-#";
+            case "DF":
+                return "###########-##";
+            case "ES":
+                return "###.###.##-#";
+            case "GO":
+                return "##.###.###-#";
+            case "MA":
+                return "#########";
+            case "MG":
+                return "###.###.###/####";
+            case "MS":
+                return "#########";
+            case "MT":
+                return "#########";
+            case "PA":
+                return "##-######-#";
+            case "PB":
+                return "########-#";
+            case "PE":
+                return "##.#.###.#######-#";
+            case "PI":
+                return "#########";
+            case "PR":
+                return "########-##";
+            case "RJ":
+                return "##.###.##-#";
+            case "RN":
+                return "##.###.###-#";
+            case "RO":
+                return "###.#####-#";
+            case "RR":
+                return "########-#";
+            case "RS":
+                return "###-#######";
+            case "SC":
+                return "###.###.###";
+            case "SE":
+                return "#########-#";
+            case "SP":
+                return "###.###.###.###";
+            case "TO":
+                return "###########";
+            default:
+                return "##############";
+        }
+    }
+
+
     public String getMascara() {
         return mascara;
     }
@@ -237,5 +358,13 @@ public class ServiceMascara {
 
     public static void setMatcher(Matcher matcher) {
         ServiceMascara.matcher = matcher;
+    }
+
+    public static MaskFormatter getFormatter() {
+        return formatter;
+    }
+
+    public static void setFormatter(MaskFormatter formatter) {
+        ServiceMascara.formatter = formatter;
     }
 }

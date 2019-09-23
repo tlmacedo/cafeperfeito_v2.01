@@ -58,16 +58,18 @@ public class ServiceValidarDado {
     }
 
 
-    public static String gerarCodigoCafePerfeito(Class classe) {
+    public static String gerarCodigoCafePerfeito(Class classe, LocalDate dtDocumento) {
         String value = "";
         if (classe.equals(Recebimento.class)) {
+            if (dtDocumento == null)
+                dtDocumento = LocalDate.now();
             value = String.format("%04d%02d%02d%03d",
-                    LocalDate.now().getYear(),
-                    LocalDate.now().getMonthValue(),
-                    LocalDate.now().getDayOfMonth(),
+                    dtDocumento.getYear(),
+                    dtDocumento.getMonthValue(),
+                    dtDocumento.getDayOfMonth(),
                     new RecebimentoDAO().getAll(classe, String.format("dtCadastro BETWEEN '%s' AND '%s'",
-                            LocalDate.now().atTime(0, 0, 0),
-                            LocalDate.now().atTime(23, 59, 59)), "dtCadastro DESC").stream().count() + 1
+                            dtDocumento.atTime(0, 0, 0),
+                            dtDocumento.atTime(23, 59, 59)), "dtCadastro DESC").stream().count() + 1
             );
             return gerarCodigoCafePerfeito(value);
         }
@@ -75,12 +77,8 @@ public class ServiceValidarDado {
     }
 
     public static String gerarCodigoCafePerfeito(String value) {
-        System.out.printf("value: [%s]\n", value);
         value = value.replaceAll("\\D", "");
-        System.out.printf("value: [%s]\n", value);
         value = String.format("%011d", Long.valueOf(value.replaceAll("\\D", "")));
-        System.out.printf("value: [%s]\n", value);
-        //value = value.replaceAll("\\W", "");
         return String.format("%s-%s", value, calculaDv(value, pesoCafe));
     }
 

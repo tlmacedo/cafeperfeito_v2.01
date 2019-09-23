@@ -27,7 +27,7 @@ public class Testes {
 //                        .forEach(System.out::println);
                 String numeroGerado = "";
                 if (entrada.equals(""))
-                    numeroGerado = ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class);
+                    numeroGerado = ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class, null);
                 else
                     numeroGerado = ServiceValidarDado.gerarCodigoCafePerfeito(entrada);
 

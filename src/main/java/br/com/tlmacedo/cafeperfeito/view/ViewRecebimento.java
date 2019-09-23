@@ -33,6 +33,8 @@ public class ViewRecebimento {
         if (aReceber != null)
             setaReceber(aReceber);
         setSaldo(saldo);
+        if (getSaldo() == null)
+            setSaldo(BigDecimal.ZERO);
         openViewRecebimento();
     }
 

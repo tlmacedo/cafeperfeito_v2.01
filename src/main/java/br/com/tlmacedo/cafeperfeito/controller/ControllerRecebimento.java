@@ -116,7 +116,9 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             getRecebimento().setaReceber(getaReceber());
             getRecebimento().setPagamentoModalidade(PagamentoModalidade.DINHEIRO);
             getRecebimento().setPagamentoSituacao(PagamentoSituacao.PENDENTE);
-            getRecebimento().valorProperty().setValue(getaReceber().valorProperty().getValue());
+            getRecebimento().valorProperty().setValue(getaReceber().valorProperty().getValue()
+                    .subtract(getaReceber().getRecebimentoList().stream()
+                            .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)));
             getRecebimento().dtPagamentoProperty().setValue(getaReceber().dtVencimentoProperty().getValue());
         }
         getCboPagamentoModalidade().getSelectionModel().select(getRecebimento().getPagamentoModalidade());
@@ -249,8 +251,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
      */
 
     private void getNewDocumento() {
-        System.out.printf("oioioi");
-        getTxtDocumento().setText(ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class));
+        getTxtDocumento().setText(ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class, getaReceber().dtCadastroProperty().getValue().toLocalDate()));
     }
 
     /**
