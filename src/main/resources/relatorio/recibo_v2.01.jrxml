@@ -108,7 +108,7 @@
                     "\n" + $F{emitEnd} +
                     "\nFone: " +
                     br.com.tlmacedo.cafeperfeito.service.ServiceMascara.getTelefone($F{emitFone}) +
-                    "\ne-mail:" + $F{emitEmail}]]></textFieldExpression>
+                    "\ne-mail: " + $F{emitEmail}]]></textFieldExpression>
             </textField>
             <staticText>
                 <reportElement x="374" y="4" width="157" height="42" uuid="e6ec6dd9-f081-48b9-8c8c-dae41c64eb72"/>
