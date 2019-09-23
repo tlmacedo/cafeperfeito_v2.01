@@ -9,11 +9,11 @@ public enum SituacaoCadastroEmpresa {
 
     INATIVO(0, "Inativo"),
     ATIVO(1, "Ativo"),
-    POTENCIAL(2, "Potencial"),
-    ANALISE(3, "Análise"),
-    SUSPENSO(4, "Suspenso"),
-    FECHADO(5, "Fechado"),
-    CANCELADO(6, "Cancelado");
+    NEGOCIACAO(2, "Negociação"),
+    TERCEIROS(3, "Terceiros"),
+    SUSPENSA(4, "Suspensa"),
+    INAPTA(5, "Inapta"),
+    BAIXADA(6, "Baixada");
 
     private int cod;
     private String descricao;
@@ -21,14 +21,6 @@ public enum SituacaoCadastroEmpresa {
     private SituacaoCadastroEmpresa(int cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
-    }
-
-    public static SituacaoCadastroEmpresa toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (SituacaoCadastroEmpresa tipo : SituacaoCadastroEmpresa.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
     }
 
     public static List<SituacaoCadastroEmpresa> getList() {

@@ -22,14 +22,6 @@ public enum NfeTransporteModFrete {
         this.descricao = descricao;
     }
 
-    public static NfeTransporteModFrete toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeTransporteModFrete tipo : NfeTransporteModFrete.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeTransporteModFrete> getList() {
         List list = Arrays.asList(NfeTransporteModFrete.values());
         Collections.sort(list, new Comparator<NfeTransporteModFrete>() {

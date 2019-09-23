@@ -12,7 +12,7 @@ public enum PagamentoSituacao {
     QUITADO(1, "Quitado"),
     CANCELADO(2, "Cancelado");
 
-    private Integer cod;
+    private int cod;
     private String descricao;
 
     private PagamentoSituacao(Integer cod, String descricao) {
@@ -31,7 +31,7 @@ public enum PagamentoSituacao {
         return list;
     }
 
-    public Integer getCod() {
+    public int getCod() {
         return cod;
     }
 

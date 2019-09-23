@@ -5,12 +5,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
+
 public enum RelatorioTipo {
 
-    RECIBO(0, "/relatorio/recibo.jasper"),
-    NFE(1, "/relatorio/SIDTMDanfe.jasper");
+    RECIBO(0, String.format("/relatorio/recibo_v%s.jasper", TCONFIG.getVersao())),
+    NFE(1, String.format("/relatorio/danfe_v%s.jasper", TCONFIG.getVersao()));
 
-    private Integer cod;
+    private int cod;
     private String descricao;
 
     private RelatorioTipo(Integer cod, String descricao) {
@@ -29,7 +31,7 @@ public enum RelatorioTipo {
         return list;
     }
 
-    public Integer getCod() {
+    public int getCod() {
         return cod;
     }
 

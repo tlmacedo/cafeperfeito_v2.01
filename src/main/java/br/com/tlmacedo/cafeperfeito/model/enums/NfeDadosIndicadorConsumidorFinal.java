@@ -18,14 +18,6 @@ public enum NfeDadosIndicadorConsumidorFinal {
         this.descricao = descricao;
     }
 
-    public static NfeDadosIndicadorConsumidorFinal toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeDadosIndicadorConsumidorFinal tipo : NfeDadosIndicadorConsumidorFinal.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeDadosIndicadorConsumidorFinal> getList() {
         List list = Arrays.asList(NfeDadosIndicadorConsumidorFinal.values());
         Collections.sort(list, new Comparator<NfeDadosIndicadorConsumidorFinal>() {

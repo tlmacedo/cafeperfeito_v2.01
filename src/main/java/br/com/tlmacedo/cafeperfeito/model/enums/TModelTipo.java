@@ -19,14 +19,6 @@ public enum TModelTipo {
         this.descricao = descricao;
     }
 
-    public static TModelTipo toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (TModelTipo tipo : TModelTipo.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<TModelTipo> getList() {
         List list = Arrays.asList(TModelTipo.values());
         Collections.sort(list, new Comparator<TModelTipo>() {

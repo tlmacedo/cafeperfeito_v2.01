@@ -29,14 +29,6 @@ public enum NfeCobrancaDuplicataPagamentoMeio {
         this.descricao = descricao;
     }
 
-    public static NfeCobrancaDuplicataPagamentoMeio toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeCobrancaDuplicataPagamentoMeio tipo : NfeCobrancaDuplicataPagamentoMeio.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeCobrancaDuplicataPagamentoMeio> getList() {
         List list = Arrays.asList(NfeCobrancaDuplicataPagamentoMeio.values());
         Collections.sort(list, new Comparator<NfeCobrancaDuplicataPagamentoMeio>() {

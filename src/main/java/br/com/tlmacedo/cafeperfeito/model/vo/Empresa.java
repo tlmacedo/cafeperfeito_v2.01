@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoCadastroEmpresa;
 import br.com.tlmacedo.cafeperfeito.model.enums.TipoEndereco;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
@@ -12,7 +13,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+
+import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 @Entity(name = "Empresa")
 @Table(name = "empresa")
@@ -22,7 +26,7 @@ public class Empresa implements Serializable {
 
     private LongProperty id = new SimpleLongProperty();
     private BooleanProperty pessoaJuridica = new SimpleBooleanProperty();
-    private IntegerProperty situacao = new SimpleIntegerProperty();
+    private SituacaoCadastroEmpresa situacao;
     private StringProperty cnpj = new SimpleStringProperty();
     private StringProperty ie = new SimpleStringProperty();
     private StringProperty razao = new SimpleStringProperty();
@@ -44,6 +48,7 @@ public class Empresa implements Serializable {
 
     private List<Endereco> enderecoList = new ArrayList<>();
     private List<Telefone> telefoneList = new ArrayList<>();
+    private List<EmailHomePage> emailHomePageList = new ArrayList<>();
 
     private ObjectProperty<BigDecimal> limiteUtilizado = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<LocalDate> dtUltimoPedido = new SimpleObjectProperty<>(null);
@@ -81,17 +86,13 @@ public class Empresa implements Serializable {
         this.pessoaJuridica.set(pessoaJuridica);
     }
 
-    @Column(length = 2, nullable = false)
-    public int getSituacao() {
-        return situacao.get();
-    }
-
-    public IntegerProperty situacaoProperty() {
+    @Enumerated(EnumType.ORDINAL)
+    public SituacaoCadastroEmpresa getSituacao() {
         return situacao;
     }
 
-    public void setSituacao(int situacao) {
-        this.situacao.set(situacao);
+    public void setSituacao(SituacaoCadastroEmpresa situacao) {
+        this.situacao = situacao;
     }
 
     @Column(length = 14, nullable = false)
@@ -312,10 +313,14 @@ public class Empresa implements Serializable {
         this.telefoneList = telefoneList;
     }
 
-    //    @Override
-//    public String toString() {
-//        return razaoProperty().get();
-//    }
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<EmailHomePage> getEmailHomePageList() {
+        return emailHomePageList;
+    }
+
+    public void setEmailHomePageList(List<EmailHomePage> emailHomePageList) {
+        this.emailHomePageList = emailHomePageList;
+    }
 
     @Transient
     public String getRazaoFantasia() {
@@ -393,7 +398,7 @@ public class Empresa implements Serializable {
 
     @Transient
     @JsonIgnore
-    public Endereco getEnderecoPrincipal() {
+    public Endereco getEndereco() {
         return getEnderecoList().stream()
                 .filter(endereco -> endereco.getTipo() == TipoEndereco.PRINCIPAL)
                 .findFirst().orElse(null);
@@ -401,17 +406,28 @@ public class Empresa implements Serializable {
 
     @Transient
     @JsonIgnore
+    public String getEnderecoPrincipal() {
+        if (getEndereco() == null)
+            return "";
+        return String.format("%s, %s - %s",
+                getEndereco().logradouroProperty().getValue(),
+                getEndereco().numeroProperty().getValue(),
+                getEndereco().bairroProperty().getValue());
+    }
+
+    @Transient
+    @JsonIgnore
     public String getMunicipio() {
-        Endereco end = getEnderecoPrincipal();
-        if (end == null) return "MANAUS";
+        Endereco end = getEndereco();
+        if (end == null) return TCONFIG.getInfLoja().getMunicipio();
         return end.getMunicipio().getDescricao();
     }
 
     @Transient
     @JsonIgnore
     public String getUf() {
-        Endereco end = getEnderecoPrincipal();
-        if (end == null) return "AM";
+        Endereco end = getEndereco();
+        if (end == null) return TCONFIG.getInfLoja().getUf();
         return end.getMunicipio().getUf().getSigla();
     }
 
@@ -427,7 +443,14 @@ public class Empresa implements Serializable {
     @Transient
     @JsonIgnore
     public String getEmailPrincipal() {
-        return "";
+        EmailHomePage mail = getEmailHomePageList().stream()
+                .sorted(Comparator.comparing(EmailHomePage::getTipoEmailHomePage).reversed())
+                .sorted(Comparator.comparing(EmailHomePage::isPrincipal).reversed())
+                .sorted(Comparator.comparing(EmailHomePage::getId))
+                .findFirst().orElse(null);
+        if (mail == null)
+            return "";
+        return mail.descricaoProperty().getValue();
     }
 
     @Override

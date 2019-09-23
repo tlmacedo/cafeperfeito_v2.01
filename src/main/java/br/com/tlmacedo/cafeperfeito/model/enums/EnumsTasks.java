@@ -23,14 +23,6 @@ public enum EnumsTasks {
         this.descricao = descricao;
     }
 
-    public static EnumsTasks toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (EnumsTasks tipo : EnumsTasks.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<EnumsTasks> getList() {
         List list = Arrays.asList(EnumsTasks.values());
         Collections.sort(list, new Comparator<EnumsTasks>() {

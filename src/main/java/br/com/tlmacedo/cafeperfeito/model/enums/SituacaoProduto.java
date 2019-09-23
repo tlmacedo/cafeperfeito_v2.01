@@ -23,14 +23,6 @@ public enum SituacaoProduto {
         this.descricao = descricao;
     }
 
-    public static SituacaoProduto toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (SituacaoProduto tipo : SituacaoProduto.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<SituacaoProduto> getList() {
         List list = Arrays.asList(SituacaoProduto.values());
         Collections.sort(list, new Comparator<SituacaoProduto>() {

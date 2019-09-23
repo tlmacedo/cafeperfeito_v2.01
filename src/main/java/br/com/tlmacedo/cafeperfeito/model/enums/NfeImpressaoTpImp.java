@@ -22,14 +22,6 @@ public enum NfeImpressaoTpImp {
         this.descricao = descricao;
     }
 
-    public static NfeImpressaoTpImp toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeImpressaoTpImp tipo : NfeImpressaoTpImp.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeImpressaoTpImp> getList() {
         List list = Arrays.asList(NfeImpressaoTpImp.values());
         Collections.sort(list, new Comparator<NfeImpressaoTpImp>() {

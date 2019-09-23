@@ -224,7 +224,6 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                             if (recebimentoProperty().getValue() == null
                                     || !getTtvContasAReceber().isFocused()) return;
                             try {
-                                System.out.printf("recebimento: [%s]\n", recebimentoProperty().getValue());
                                 new ServiceRecibo().imprimeRecibo(recebimentoProperty().getValue());
                             } catch (Exception e) {
                                 e.printStackTrace();

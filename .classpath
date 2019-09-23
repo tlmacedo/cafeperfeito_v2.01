@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry kind="src" path="target/generated-sources/annotations"/>
+	<classpathentry kind="lib" path="lib/cafeperfeito_v2.01.jar"/>
+	<classpathentry kind="lib" path="lib/cafeperfeito.jar"/>
+	<classpathentry kind="lib" path="lib/sunpkcs11.jar"/>
+	<classpathentry kind="lib" path="lib/wsdlNfe_v400.back.jar"/>
+	<classpathentry kind="lib" path="lib/wsdlNfe_v400.jar"/>
+	<classpathentry kind="lib" path="lib/xsdConfigSistema.jar"/>
+	<classpathentry kind="lib" path="lib/xsdCte_pl300nt2018_002.jar"/>
+	<classpathentry kind="lib" path="lib/xsdNfe_pl009v120.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

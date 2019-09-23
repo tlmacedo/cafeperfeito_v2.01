@@ -19,14 +19,6 @@ public enum NfeDadosDestinoOperacao {
         this.descricao = descricao;
     }
 
-    public static NfeDadosDestinoOperacao toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeDadosDestinoOperacao tipo : NfeDadosDestinoOperacao.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeDadosDestinoOperacao> getList() {
         List list = Arrays.asList(NfeDadosDestinoOperacao.values());
         Collections.sort(list, new Comparator<NfeDadosDestinoOperacao>() {

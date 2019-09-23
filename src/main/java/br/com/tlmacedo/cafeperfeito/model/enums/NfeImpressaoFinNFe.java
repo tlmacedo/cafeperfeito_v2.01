@@ -20,14 +20,6 @@ public enum NfeImpressaoFinNFe {
         this.descricao = descricao;
     }
 
-    public static NfeImpressaoFinNFe toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeImpressaoFinNFe tipo : NfeImpressaoFinNFe.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeImpressaoFinNFe> getList() {
         List list = Arrays.asList(NfeImpressaoFinNFe.values());
         Collections.sort(list, new Comparator<NfeImpressaoFinNFe>() {

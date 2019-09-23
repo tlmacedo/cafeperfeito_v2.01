@@ -14,21 +14,13 @@ public enum TipoSaidaProduto {
     AMOSTRA(4, "amostra"),
     TESTE(5, "teste");
 
-    private Integer cod;
+    private int cod;
     private String descricao;
 
     private TipoSaidaProduto(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
-
-//    public static TipoSaidaProduto toEnum(Integer cod) {
-//        if (cod == null) return null;
-//        for (TipoSaidaProduto tipo : TipoSaidaProduto.values())
-//            if (cod == tipo.getCod())
-//                return tipo;
-//        throw new IllegalArgumentException("Id inválido");
-//    }
 
     public static List<TipoSaidaProduto> getList() {
         List list = Arrays.asList(TipoSaidaProduto.values());
@@ -41,7 +33,7 @@ public enum TipoSaidaProduto {
         return list;
     }
 
-    public Integer getCod() {
+    public int getCod() {
         return cod;
     }
 

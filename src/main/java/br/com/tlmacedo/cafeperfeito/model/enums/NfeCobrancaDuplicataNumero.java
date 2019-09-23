@@ -21,14 +21,6 @@ public enum NfeCobrancaDuplicataNumero {
         this.descricao = descricao;
     }
 
-    public static NfeCobrancaDuplicataNumero toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeCobrancaDuplicataNumero tipo : NfeCobrancaDuplicataNumero.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeCobrancaDuplicataNumero> getList() {
         List list = Arrays.asList(NfeCobrancaDuplicataNumero.values());
         Collections.sort(list, new Comparator<NfeCobrancaDuplicataNumero>() {

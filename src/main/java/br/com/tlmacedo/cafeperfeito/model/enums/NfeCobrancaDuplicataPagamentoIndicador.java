@@ -18,14 +18,6 @@ public enum NfeCobrancaDuplicataPagamentoIndicador {
         this.descricao = descricao;
     }
 
-    public static NfeCobrancaDuplicataPagamentoIndicador toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeCobrancaDuplicataPagamentoIndicador tipo : NfeCobrancaDuplicataPagamentoIndicador.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeCobrancaDuplicataPagamentoIndicador> getList() {
         List list = Arrays.asList(NfeCobrancaDuplicataPagamentoIndicador.values());
         Collections.sort(list, new Comparator<NfeCobrancaDuplicataPagamentoIndicador>() {

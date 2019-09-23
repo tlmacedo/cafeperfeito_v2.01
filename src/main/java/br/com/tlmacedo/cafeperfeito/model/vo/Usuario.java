@@ -2,15 +2,10 @@ package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.AccessGuest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Optional;
 
@@ -21,7 +16,7 @@ public class Usuario extends Colaborador implements Serializable {
 
     private StringProperty email = new SimpleStringProperty();
     private StringProperty senha = new SimpleStringProperty();
-    private IntegerProperty accessGuest = new SimpleIntegerProperty();
+    private AccessGuest accessGuest;
 
     public Usuario() {
     }
@@ -77,17 +72,13 @@ public class Usuario extends Colaborador implements Serializable {
         this.senha.set(senha);
     }
 
-    @Column(length = 2, nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     public AccessGuest getAccessGuest() {
-        return AccessGuest.toEnum(accessGuest.get());
-    }
-
-    public IntegerProperty accessGuestProperty() {
         return accessGuest;
     }
 
     public void setAccessGuest(AccessGuest accessGuest) {
-        this.accessGuest.set(accessGuest.getCod());
+        this.accessGuest = accessGuest;
     }
 
     @Override

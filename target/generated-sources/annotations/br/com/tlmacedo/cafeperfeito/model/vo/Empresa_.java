@@ -1,5 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoCadastroEmpresa;
+import br.com.tlmacedo.cafeperfeito.model.vo.EmailHomePage;
 import br.com.tlmacedo.cafeperfeito.model.vo.EmpresaCondicoes;
 import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
 import br.com.tlmacedo.cafeperfeito.model.vo.Telefone;
@@ -11,12 +13,12 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.5.2.v20131113-rNA", date="2019-09-23T12:00:25")
+@Generated(value="EclipseLink-2.5.2.v20131113-rNA", date="2019-09-23T17:20:37")
 @StaticMetamodel(Empresa.class)
 public class Empresa_ { 
 
     public static volatile ListAttribute<Empresa, Telefone> telefoneList;
-    public static volatile SingularAttribute<Empresa, Integer> situacao;
+    public static volatile SingularAttribute<Empresa, SituacaoCadastroEmpresa> situacao;
     public static volatile SingularAttribute<Empresa, LocalDateTime> dtCadastro;
     public static volatile SingularAttribute<Empresa, Integer> prazo;
     public static volatile SingularAttribute<Empresa, String> cnpj;
@@ -36,5 +38,6 @@ public class Empresa_ {
     public static volatile SingularAttribute<Empresa, String> ie;
     public static volatile SingularAttribute<Empresa, Boolean> prazoDiaUtil;
     public static volatile SingularAttribute<Empresa, Usuario> usuarioCadastro;
+    public static volatile ListAttribute<Empresa, EmailHomePage> emailHomePageList;
 
 }

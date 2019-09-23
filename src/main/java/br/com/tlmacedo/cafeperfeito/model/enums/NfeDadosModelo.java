@@ -20,14 +20,6 @@ public enum NfeDadosModelo {
         this.descricao = descricao;
     }
 
-    public static NfeDadosModelo toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeDadosModelo tipo : NfeDadosModelo.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeDadosModelo> getList() {
         List list = Arrays.asList(NfeDadosModelo.values());
         Collections.sort(list, new Comparator<NfeDadosModelo>() {

@@ -18,21 +18,13 @@ public enum PagamentoModalidade {
     CREDITO_BAIXA(8, "Crédito baixado"),
     CREDITO(9, "Crédito");
 
-    private Integer cod;
+    private int cod;
     private String descricao;
 
-    private PagamentoModalidade(Integer cod, String descricao) {
+    private PagamentoModalidade(int cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
-
-//    public static TipoSaidaProduto toEnum(Integer cod) {
-//        if (cod == null) return null;
-//        for (TipoSaidaProduto tipo : TipoSaidaProduto.values())
-//            if (cod == tipo.getCod())
-//                return tipo;
-//        throw new IllegalArgumentException("Id inválido");
-//    }
 
     public static List<PagamentoModalidade> getList() {
         List list = Arrays.asList(PagamentoModalidade.values());
@@ -45,7 +37,7 @@ public enum PagamentoModalidade {
         return list;
     }
 
-    public Integer getCod() {
+    public int getCod() {
         return cod;
     }
 

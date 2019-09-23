@@ -1,7 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 
-import br.com.tlmacedo.cafeperfeito.model.enums.ColaboradorSituacao;
+import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoColaborador;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 
@@ -23,7 +23,7 @@ public class Colaborador implements Serializable {
     private StringProperty ctps = new SimpleStringProperty();
     private ObjectProperty<LocalDateTime> dtAdmisao = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> salario = new SimpleObjectProperty<>();
-    private IntegerProperty ativo = new SimpleIntegerProperty();
+    private SituacaoColaborador situacao;
 
     private Empresa lojaAtivo;
 
@@ -112,17 +112,13 @@ public class Colaborador implements Serializable {
         this.salario.set(salario);
     }
 
-    @Column(length = 2, nullable = false)
-    public ColaboradorSituacao getAtivo() {
-        return ColaboradorSituacao.toEnum(ativo.get());
+    @Enumerated(EnumType.ORDINAL)
+    public SituacaoColaborador getSituacao() {
+        return situacao;
     }
 
-    public IntegerProperty ativoProperty() {
-        return ativo;
-    }
-
-    public void setAtivo(ColaboradorSituacao ativo) {
-        this.ativo.set(ativo.getCod());
+    public void setSituacao(SituacaoColaborador situacao) {
+        this.situacao = situacao;
     }
 
     @JsonIgnore
@@ -155,6 +151,7 @@ public class Colaborador implements Serializable {
         this.imagemBack = imagemBack;
     }
 
+
     @Override
     public String toString() {
         return "Colaborador{" +
@@ -162,9 +159,12 @@ public class Colaborador implements Serializable {
                 ", nome=" + nome +
                 ", apelido=" + apelido +
                 ", ctps=" + ctps +
-                ", dataAdmisao=" + dtAdmisao +
+                ", dtAdmisao=" + dtAdmisao +
                 ", salario=" + salario +
-                ", ativo=" + ativo +
+                ", situacao=" + situacao +
+                ", lojaAtivo=" + lojaAtivo +
+                ", imagem=" + imagem +
+                ", imagemBack=" + imagemBack +
                 '}';
     }
 }

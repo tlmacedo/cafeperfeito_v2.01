@@ -5,30 +5,24 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public enum UndComercialProduto {
+public enum TipoEmailHomePage {
 
-    UNIDADE(0, "UND"),
-    PACOTE(1, "PCT"),
-    PESO(2, "KG"),
-    FARDO(3, "FD"),
-    CAIXA(4, "CX"),
-    VIDRO(5, "VD"),
-    DUZIA(6, "DZ"),
-    LATA(7, "LT");
+    HOME_PAGE(0, "Home page"),
+    EMAIL(1, "email");
 
     private int cod;
     private String descricao;
 
-    private UndComercialProduto(Integer cod, String descricao) {
+    private TipoEmailHomePage(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
 
-    public static List<UndComercialProduto> getList() {
-        List list = Arrays.asList(UndComercialProduto.values());
-        Collections.sort(list, new Comparator<UndComercialProduto>() {
+    public static List<TipoEmailHomePage> getList() {
+        List list = Arrays.asList(TipoEmailHomePage.values());
+        Collections.sort(list, new Comparator<TipoEmailHomePage>() {
             @Override
-            public int compare(UndComercialProduto e1, UndComercialProduto e2) {
+            public int compare(TipoEmailHomePage e1, TipoEmailHomePage e2) {
                 return e1.getDescricao().compareTo(e2.getDescricao());
             }
         });

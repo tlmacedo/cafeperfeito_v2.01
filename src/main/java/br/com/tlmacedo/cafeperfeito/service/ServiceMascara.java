@@ -132,7 +132,7 @@ public class ServiceMascara {
     public static String getDataExtenso(String municipio, LocalDate localDate) {
         if (municipio == null) {
             Endereco endereco;
-            if ((endereco = UsuarioLogado.getUsuario().getLojaAtivo().getEnderecoPrincipal()) != null)
+            if ((endereco = UsuarioLogado.getUsuario().getLojaAtivo().getEndereco()) != null)
                 municipio = endereco.getMunicipio().getDescricao();
             else
                 municipio = TCONFIG.getInfLoja().getMunicipio();

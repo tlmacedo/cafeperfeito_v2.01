@@ -25,14 +25,6 @@ public enum AccessGuest {
         this.descricao = descricao;
     }
 
-    public static AccessGuest toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (AccessGuest tipo : AccessGuest.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<AccessGuest> getList() {
         List list = Arrays.asList(AccessGuest.values());
         Collections.sort(list, new Comparator<AccessGuest>() {

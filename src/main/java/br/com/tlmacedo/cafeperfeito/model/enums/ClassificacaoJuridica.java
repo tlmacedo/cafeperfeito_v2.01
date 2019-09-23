@@ -18,14 +18,6 @@ public enum ClassificacaoJuridica {
         this.descricao = descricao;
     }
 
-    public static ClassificacaoJuridica toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (ClassificacaoJuridica tipo : ClassificacaoJuridica.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<ClassificacaoJuridica> getList() {
         List list = Arrays.asList(ClassificacaoJuridica.values());
         Collections.sort(list, new Comparator<ClassificacaoJuridica>() {

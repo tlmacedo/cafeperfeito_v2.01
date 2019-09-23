@@ -23,14 +23,6 @@ public enum NfeDadosIndicadorPresenca {
         this.descricao = descricao;
     }
 
-    public static NfeDadosIndicadorPresenca toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeDadosIndicadorPresenca tipo : NfeDadosIndicadorPresenca.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
-
     public static List<NfeDadosIndicadorPresenca> getList() {
         List list = Arrays.asList(NfeDadosIndicadorPresenca.values());
         Collections.sort(list, new Comparator<NfeDadosIndicadorPresenca>() {
