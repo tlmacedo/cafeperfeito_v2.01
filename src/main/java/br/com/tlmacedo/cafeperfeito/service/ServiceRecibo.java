@@ -6,7 +6,6 @@ import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
-import net.sf.jasperreports.engine.JRException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,14 +40,9 @@ public class ServiceRecibo {
                 .mapToInt(SaidaProdutoProduto::getQtd).sum();
 
         Map paramentros = new HashMap();
-        paramentros.put("valorExtenso", new ServiceNumeroExtenso(getRecebimento().valorProperty().get()).toString());
-        paramentros.put("referenteA", String.format("%02d KG de %s\n", qtd, descricaoProduto[0]));
-        try {
-            new ServiceRelatorio().gerar(RelatorioTipo.RECIBO, paramentros, list);
-        } catch (JRException e) {
-            e.printStackTrace();
-        }
-
+        paramentros.put("valorExtenso", new ServiceNumeroExtenso(getRecebimento().valorProperty().get()).toString().toUpperCase());
+        paramentros.put("referenteA", String.format("%02d KG de %s", qtd, descricaoProduto[0]).toUpperCase());
+        new ServiceRelatorio().gerar(RelatorioTipo.RECIBO, paramentros, list);
     }
 
 

@@ -4,6 +4,7 @@ import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import com.google.common.base.Splitter;
 import javafx.scene.control.TextField;
+import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.StringUtils;
 
 import javax.swing.text.MaskFormatter;
 import java.math.BigDecimal;
@@ -172,6 +173,12 @@ public class ServiceMascara {
             );
         }
         return strValue;
+    }
+
+    public static String getReciboQuebraLinha(String value, int qtd) {
+//        System.out.printf(String.format("%s%0" + qtd + "s", value, "0"));
+        System.out.printf("%s\n", StringUtils.rightPad(value + " ", qtd, "*"));
+        return StringUtils.rightPad(value + " ", qtd, "*");
     }
 
     public void fieldMask(TextField textField, String tipMascara) {

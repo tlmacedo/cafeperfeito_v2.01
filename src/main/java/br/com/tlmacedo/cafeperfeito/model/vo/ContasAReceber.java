@@ -174,23 +174,17 @@ public class ContasAReceber implements Serializable {
 
     @Override
     public String toString() {
-        try {
-            return "ContasAReceber{" +
-                    "id=" + id +
-                    ", saidaProduto=" + saidaProduto +
-                    ", dtVencimento=" + dtVencimento +
-                    ", valor=" + valor +
-                    ", usuarioCadastro=" + usuarioCadastro +
-                    ", dtCadastro=" + dtCadastro +
-                    ", recebimentoList=" + recebimentoList +
-                    ", valorPago=" + valorPago +
-                    ", valorSaldo=" + valorSaldo +
-                    '}';
-
-        } catch (Exception ex) {
-            System.out.printf("Deu zebra bem aqui!!!!!!");
-            ex.printStackTrace();
-            return null;
-        }
+        return "ContasAReceber{" +
+                "id=" + id +
+                ", saidaProduto=" + saidaProduto +
+                ", dtVencimento=" + dtVencimento +
+                ", valor=" + valor +
+                ", usuarioCadastro=" + usuarioCadastro +
+                ", dtCadastro=" + dtCadastro +
+                ", vlrPedido=" + vlrPedido +
+                ", vlrDesc=" + vlrDesc +
+                ", valorPago=" + valorPago +
+                ", valorSaldo=" + valorSaldo +
+                '}';
     }
 }

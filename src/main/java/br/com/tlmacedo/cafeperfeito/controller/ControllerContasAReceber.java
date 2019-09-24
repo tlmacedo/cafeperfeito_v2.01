@@ -464,7 +464,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                         }
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    //ex.printStackTrace();
                 }
                 updateMessage("tarefa concluída!!!");
                 updateProgress(qtdTasks, qtdTasks);
