@@ -69,7 +69,7 @@
                         </VBox>
                         <VBox alignment="CENTER_LEFT" layoutX="642.0" layoutY="5.0" prefWidth="235.0">
                             <children>
-                                <Label prefWidth="434.0" styleClass="float" text="Pesquisar">
+                                <Label prefWidth="434.0" styleClass="float" text="Pesquisar documento">
                                     <VBox.margin>
                                         <Insets/>
                                     </VBox.margin>
@@ -267,7 +267,7 @@
                                     </padding>
                                 </Label>
                                 <Label fx:id="lblTotalContasVencidas" prefHeight="40.0" prefWidth="400.0"
-                                       styleClass="label-total-valor">
+                                       styleClass="label-total-valor-recebimento-vencido">
                                     <tooltip>
                                         <Tooltip text="valor total de contas vencidas."/>
                                     </tooltip>

@@ -59,6 +59,12 @@ public class Empresa implements Serializable {
     public Empresa() {
     }
 
+    public Empresa(Empresa empresa) {
+        this.idProperty().setValue(0);
+        this.razaoProperty().setValue("");
+        this.fantasiaProperty().setValue("");
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public long getId() {
@@ -455,7 +461,7 @@ public class Empresa implements Serializable {
 
     @Override
     public String toString() {
-        if (razaoProperty().get() == null)
+        if (razaoProperty().get() == null || razaoProperty().getValue().equals(""))
             return "";
         else
             return String.format(

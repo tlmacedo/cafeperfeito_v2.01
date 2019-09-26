@@ -298,6 +298,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
                                     return;
                                 utilizaCredito = (btnResult == ButtonType.YES);
+                            } else {
+                                credito = BigDecimal.ZERO;
                             }
                             if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
                                 if (utilizaCredito) {
@@ -311,6 +313,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     } catch (Exception ex) {
                                         getTmodelSaidaProduto().getContasAReceberDAO().transactionRollback();
                                     }
+                                } else {
+                                    credito = BigDecimal.ZERO;
                                 }
                                 getEmpresaObservableList().stream()
                                         .filter(empresa1 -> empresa1.idProperty().getValue() == empresaProperty().getValue().idProperty().getValue())

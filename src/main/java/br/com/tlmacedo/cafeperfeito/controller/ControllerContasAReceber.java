@@ -47,7 +47,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     public CheckBox chkDtVenda;
     public ComboBox<Empresa> cboEmpresa;
     public TextField txtPesquisa;
-    public ComboBox cboPagamentoSituacao;
+    public ComboBox<PagamentoSituacao> cboPagamentoSituacao;
     public Label lblRegistrosLocalizados;
     public TreeTableView<Object> ttvContasAReceber;
     public Label lblTotQtdClientes;
@@ -235,29 +235,30 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         });
 
         getTtvContasAReceber().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-            if (n.getValue() instanceof ContasAReceber) {
-                aReceberProperty().setValue((ContasAReceber) n.getValue());
-                if (((ContasAReceber) n.getValue()).getRecebimentoList().size() > 0)
-                    recebimentoProperty().setValue((Recebimento) n.getChildren().get(0).getValue());
-                else
-                    recebimentoProperty().setValue(null);
-            } else if (n.getValue() instanceof Recebimento) {
-                aReceberProperty().setValue((ContasAReceber) n.getParent().getValue());
-                recebimentoProperty().setValue((Recebimento) n.getValue());
-            } else {
+            try {
+                if (n.getValue() instanceof ContasAReceber) {
+                    aReceberProperty().setValue((ContasAReceber) n.getValue());
+                    if (((ContasAReceber) n.getValue()).getRecebimentoList().size() > 0)
+                        recebimentoProperty().setValue((Recebimento) n.getChildren().get(0).getValue());
+                    else
+                        recebimentoProperty().setValue(null);
+                } else if (n.getValue() instanceof Recebimento) {
+                    aReceberProperty().setValue((ContasAReceber) n.getParent().getValue());
+                    recebimentoProperty().setValue((Recebimento) n.getValue());
+                }
+            } catch (Exception ex) {
                 aReceberProperty().setValue(null);
                 recebimentoProperty().setValue(null);
             }
 
-
-            Object obj, objEnvi;
-            if ((obj = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue()) == null)
-                return;
-            if (obj instanceof ContasAReceber) {
-                if (getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().size() > 0) {
-                    obj = (Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue();
-                }
-            }
+//            Object obj, objEnvi;
+//            if ((obj = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue()) == null)
+//                return;
+//            if (obj instanceof ContasAReceber) {
+//                if (getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().size() > 0) {
+//                    obj = (Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue();
+//                }
+//            }
         });
 
         ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
@@ -271,17 +272,17 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
 
         getCboEmpresa().valueProperty().addListener((ov, o, n) -> {
-            if (n != null) {
-                getTmodelaReceber().setEmpresa(n);
-            }
+//            if (n != null) {
+//                getTmodelaReceber().setEmpresa(n);
+//            }
             showStatusBar();
         });
 
-        getCboPagamentoSituacao().valueProperty().addListener((ov, o, n) -> {
-            if (n != null && !n.toString().equals("")) {
-                getTmodelaReceber().setPagamentoSituacao(PagamentoSituacao.valueOf(n.toString().toUpperCase()));
-            }
-        });
+//        getCboPagamentoSituacao().valueProperty().addListener((ov, o, n) -> {
+//            if (n != null && !n.toString().equals("")) {
+//                getTmodelaReceber().setPagamentoSituacao(PagamentoSituacao.valueOf(n.toString().toUpperCase()));
+//            }
+//        });
 
         getDtpData1().focusedProperty().addListener((ov, o, n) -> {
             if (!n) return;
@@ -421,7 +422,8 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                 getTmodelaReceber().setTtvContasAReceber(getTtvContasAReceber());
                                 setaReceberObservableList(getTmodelaReceber().getaReceberObservableList());
                                 setaReceberFilteredList(getTmodelaReceber().getaReceberFilteredList());
-                                getTmodelaReceber().setEmpresa(null);
+                                getTmodelaReceber().empresaProperty().bind(getCboEmpresa().valueProperty());
+                                getTmodelaReceber().pagamentoSituacaoProperty().bind(getCboPagamentoSituacao().valueProperty());
                                 getTmodelaReceber().escutaLista();
 
                                 getDtpData1().setValue(LocalDate.of(LocalDate.now().getYear(), 1, 1));
@@ -435,11 +437,10 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                                 .stream().filter(Empresa::isCliente)
                                                 .collect(Collectors.toCollection(FXCollections::observableArrayList))
                                 );
-
-                                getCboEmpresa().getItems().add(0, new Empresa());
+                                getCboEmpresa().getItems().add(0, new Empresa(null));
 
                                 getCboPagamentoSituacao().setItems(Arrays.stream(PagamentoSituacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                getCboPagamentoSituacao().getItems().add(0, "");
+                                getCboPagamentoSituacao().getItems().add(0, null);
                                 break;
 
                             case TABELA_PREENCHER:
@@ -464,7 +465,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                         }
                     }
                 } catch (Exception ex) {
-                    //ex.printStackTrace();
+                    ex.printStackTrace();
                 }
                 updateMessage("tarefa concluída!!!");
                 updateProgress(qtdTasks, qtdTasks);
@@ -575,11 +576,11 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         this.txtPesquisa = txtPesquisa;
     }
 
-    public ComboBox getCboPagamentoSituacao() {
+    public ComboBox<PagamentoSituacao> getCboPagamentoSituacao() {
         return cboPagamentoSituacao;
     }
 
-    public void setCboPagamentoSituacao(ComboBox cboPagamentoSituacao) {
+    public void setCboPagamentoSituacao(ComboBox<PagamentoSituacao> cboPagamentoSituacao) {
         this.cboPagamentoSituacao = cboPagamentoSituacao;
     }
 

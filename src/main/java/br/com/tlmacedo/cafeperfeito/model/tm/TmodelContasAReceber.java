@@ -350,12 +350,9 @@ public class TmodelContasAReceber {
         getLblRegistrosLocalizados().textProperty().bind(Bindings.createIntegerBinding(() ->
                 getaReceberFilteredList().size(), getaReceberFilteredList().predicateProperty()).asString());
 
-        empresaProperty().addListener((ov, o, n) -> {
-            if (n != null) {
-                aplicaFiltro();
-            }
-        });
-
+        empresaProperty().addListener(observable -> aplicaFiltro());
+        getTxtPesquisa().textProperty().addListener(observable -> aplicaFiltro());
+        pagamentoSituacaoProperty().addListener(observable -> aplicaFiltro());
         getDtpData1().valueProperty().addListener(observable -> aplicaFiltro());
         getDtpData2().valueProperty().addListener(observable -> aplicaFiltro());
         getChkDtVenda().selectedProperty().addListener(observable -> aplicaFiltro());
@@ -385,9 +382,34 @@ public class TmodelContasAReceber {
                 }
 
                 if (pagamentoSituacaoProperty().getValue() != null) {
-
+                    switch (pagamentoSituacaoProperty().getValue()) {
+                        case PENDENTE:
+                            if (aReceber.valorProperty().getValue()
+                                    .compareTo(aReceber.getRecebimentoList().stream()
+                                            .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                            .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) <= 0)
+                                return false;
+                            break;
+                        case CANCELADO:
+                            if (aReceber.getRecebimentoList().stream()
+                                    .filter(recebimento -> recebimento.getPagamentoSituacao()
+                                            .equals(PagamentoSituacao.CANCELADO)).count() == 0)
+                                return false;
+                            break;
+                        case QUITADO:
+                            if (aReceber.valorProperty().getValue()
+                                    .compareTo(aReceber.getRecebimentoList().stream()
+                                            .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                            .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) > 0)
+                                return false;
+                            break;
+                    }
                 }
 
+                if (aReceber.getRecebimentoList().stream()
+                        .filter(recebimento -> recebimento.documentoProperty().getValue().toLowerCase()
+                                .contains(getTxtPesquisa().getText().toLowerCase())).count() == 0)
+                    return false;
 
                 return true;
             });
@@ -445,8 +467,48 @@ public class TmodelContasAReceber {
                 BigDecimal.TEN.setScale(4)
         );
 
+        BigDecimal valBruto = getaReceberFilteredList().stream()
+                .map(ContasAReceber::getSaidaProduto)
+                .map(SaidaProduto::getSaidaProdutoProdutoList)
+                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+                        .map(SaidaProdutoProduto::getVlrBruto)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        System.out.printf("valBruto:\t\t\t\t\t[%s]\n", valBruto);
+        BigDecimal valEntradaBruto = getaReceberFilteredList().stream()
+                .map(ContasAReceber::getSaidaProduto)
+                .map(SaidaProduto::getSaidaProdutoProdutoList)
+                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+                        .map(SaidaProdutoProduto::getVlrEntradaBruto)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        System.out.printf("valEntradaBruto:\t\t\t[%s]\n", valEntradaBruto);
+        BigDecimal valDesconto = getaReceberFilteredList().stream()
+                .map(ContasAReceber::getSaidaProduto)
+                .map(SaidaProduto::getSaidaProdutoProdutoList)
+                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+                        .map(SaidaProdutoProduto::getVlrDesconto)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        System.out.printf("valDesconto:\t\t\t\t[%s]\n", valDesconto);
+        BigDecimal valLiq = valBruto.subtract(valEntradaBruto.add(valDesconto));
+        System.out.printf("valLiq:\t\t\t\t\t\t[%s]\n\n", valLiq);
+
+        BigDecimal val = getaReceberFilteredList().stream()
+                .map(ContasAReceber::getSaidaProduto)
+                .map(SaidaProduto::getSaidaProdutoProdutoList)
+                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+                        .map(saidaProdutoProduto ->
+                                saidaProdutoProduto.vlrBrutoProperty().getValue()
+                                        .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()
+                                                .add(saidaProdutoProduto.vlrDescontoProperty().getValue())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        System.out.printf("val:\t\t\t\t\t\t[%s]\n\n\n\n", val);
+
         setTotalLucroBruto(
-                BigDecimal.TEN.setScale(4)
+                val.setScale(4)
+//                BigDecimal.TEN.setScale(4)
         );
 
         setQtdContasAReceber(

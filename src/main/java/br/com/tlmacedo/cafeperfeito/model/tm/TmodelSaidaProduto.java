@@ -95,7 +95,7 @@ public class TmodelSaidaProduto {
         getColProdCod().setCellValueFactory(param -> param.getValue().codigoProperty());
 
         setColProdDescricao(new TableColumn<>("descrição"));
-        getColProdDescricao().setPrefWidth(350);
+        getColProdDescricao().setPrefWidth(450);
         getColProdDescricao().setCellValueFactory(param -> param.getValue().descricaoProperty());
 
         setColTipoSaidaProduto(new TableColumn<>("tipo saida"));
@@ -187,11 +187,11 @@ public class TmodelSaidaProduto {
 
     public void preencheTabela() {
         getTvSaidaProdutoProduto().getColumns().setAll(
-                getColId(), getColProdId(),
+                //getColId(), getColProdId(),
                 getColProdCod(), getColProdDescricao(), getColTipoSaidaProduto(), getColProdLote(),
                 getColProdValidade(), getColQtd(), getColVlrVenda(), getColVlrBruto(), getColVlrDesconto(),
                 getColVlrLiquido()
-                , getColEstoque()
+                //, getColEstoque()
         );
 
 
@@ -595,8 +595,6 @@ public class TmodelSaidaProduto {
                 .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd)).sorted(Comparator.comparing(SaidaProdutoProduto::getDtValidade))
                 .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd, LinkedHashMap::new, Collectors.toList()))
                 .forEach((aLong, saidaProdutoProdutos) -> {
-                    setLucroQtdSaida(0);
-                    setLucroVlrSaida(BigDecimal.ZERO);
                     saidaProdutoProdutos.stream()
                             .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote, LinkedHashMap::new, Collectors.toList()))
                             .forEach((s, saidaProdutoProdutos1) -> {
@@ -605,6 +603,8 @@ public class TmodelSaidaProduto {
                                 produtoEstoqueList.stream().filter(estoque -> estoque.qtdProperty().getValue() > 0
                                         && estoque.loteProperty().getValue().equals(s))
                                         .forEach(estoque -> {
+                                            setLucroQtdSaida(0);
+                                            setLucroVlrSaida(BigDecimal.ZERO);
                                             if (saldoSaida[0] > 0) {
                                                 try {
                                                     estoque.qtdProperty().setValue(estoque.qtdProperty().getValue() - saldoSaida[0]);
@@ -625,12 +625,12 @@ public class TmodelSaidaProduto {
                                                     e.printStackTrace();
                                                 }
                                             }
+                                            saidaProdutoProdutos.stream()
+                                                    .forEach(saidaProdutoProduto -> {
+                                                        saidaProdutoProduto.setVlrEntradaBruto(getLucroVlrSaida());
+                                                        saidaProdutoProduto.setVlrEntrada(getLucroVlrSaida().divide(BigDecimal.valueOf(getLucroQtdSaida()), 4, RoundingMode.HALF_UP));
+                                                    });
                                         });
-                            });
-                    saidaProdutoProdutos.stream()
-                            .forEach(saidaProdutoProduto -> {
-                                saidaProdutoProduto.setVlrEntradaBruto(getLucroVlrSaida());
-                                saidaProdutoProduto.setVlrEntrada(getLucroVlrSaida().divide(BigDecimal.valueOf(getLucroQtdSaida()), 4, RoundingMode.HALF_UP));
                             });
                 });
 //        getSaidaProdutoProdutoObservableList().stream()

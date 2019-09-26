@@ -70,6 +70,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             getEnumsTasksList().add(EnumsTasks.ADD_RECEBIMENTO);
         } else {
             setRecebimento(ViewRecebimento.getRecebimento());
+            setaReceber(ViewRecebimento.getaReceber());
             getEnumsTasksList().add(EnumsTasks.UPDATE_RECEBIMENTO);
             setDeshabilita(false);
         }
@@ -121,10 +122,11 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                             .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)));
             getRecebimento().dtPagamentoProperty().setValue(getaReceber().dtVencimentoProperty().getValue());
         }
+        getTxtDocumento().setText(getRecebimento().documentoProperty().getValue());
         getCboPagamentoModalidade().getSelectionModel().select(getRecebimento().getPagamentoModalidade());
         getCboSituacao().getSelectionModel().select(getRecebimento().getPagamentoSituacao());
 
-        if (getSaldo().compareTo(BigDecimal.ZERO) != 0)
+        if (getSaldo().compareTo(BigDecimal.ZERO) < 0)
             getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue().add(getSaldo()), 2));
         else
             getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
@@ -193,6 +195,8 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                 getRecebimento().setaReceber(getaReceber());
             getRecebimento().setPagamentoSituacao(getCboSituacao().getValue());
             getRecebimento().documentoProperty().setValue(getTxtDocumento().getText());
+            if (getRecebimento().documentoProperty().getValue() == null)
+                getRecebimento().documentoProperty().setValue("");
             getRecebimento().setPagamentoModalidade(getCboPagamentoModalidade().getValue());
             getRecebimento().valorProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2));
             getRecebimento().setUsuarioPagamento(null);

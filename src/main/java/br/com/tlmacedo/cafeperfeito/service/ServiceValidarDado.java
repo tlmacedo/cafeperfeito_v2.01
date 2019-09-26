@@ -20,7 +20,7 @@ public class ServiceValidarDado {
     static final int[] pesoCnpj = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
     static final int[] pesoChaveNfeCte = {4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9,
             8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-    static final int[] pesoCafe = {5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+    static final int[] pesoCafe = {3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
     static Pattern p, pt, pd;
     static Matcher m, mt, md;
 
@@ -63,30 +63,34 @@ public class ServiceValidarDado {
         if (classe.equals(Recebimento.class)) {
             if (dtDocumento == null)
                 dtDocumento = LocalDate.now();
-            value = String.format("%04d%02d%02d%03d",
+            value = String.format("%02d%02d%02d%03d",
                     dtDocumento.getYear(),
                     dtDocumento.getMonthValue(),
                     dtDocumento.getDayOfMonth(),
                     new RecebimentoDAO().getAll(classe, String.format("dtCadastro BETWEEN '%s' AND '%s'",
                             dtDocumento.atTime(0, 0, 0),
-                            dtDocumento.atTime(23, 59, 59)), "dtCadastro DESC").stream().count() + 1
+                            dtDocumento.atTime(23, 59, 59)), "dtCadastro DESC").stream()
+                            .filter(o -> !((Recebimento) o).documentoProperty().getValue().equals(""))
+                            .count() + 1
             );
-            return gerarCodigoCafePerfeito(value);
+            System.out.printf("value: [%s]\n", value.substring(2));
+            return gerarCodigoCafePerfeito(value.substring(2));
         }
         return "não gerado";
     }
 
     public static String gerarCodigoCafePerfeito(String value) {
-        value = value.replaceAll("\\D", "");
-        value = String.format("%011d", Long.valueOf(value.replaceAll("\\D", "")));
+        System.out.printf("meuValue: [%s]\n", value);
+        //value = value.replaceAll("\\D", "");
+        value = String.format("%09d", Long.valueOf(value.replaceAll("\\D", "")));
         return String.format("%s-%s", value, calculaDv(value, pesoCafe));
     }
 
     public static boolean isCodigoCafePerfeito(String value) {
         value = value.replaceAll("\\D", "");
 
-        if (value == null || value.length() != 13
-                || value.matches(value.charAt(0) + "{13}"))
+        if (value == null || value.length() != 11
+                || value.matches(value.charAt(0) + "{11}"))
             return false;
         String base = value.substring(0, value.length() - 2);
         String dv = value.substring(value.length() - 2);

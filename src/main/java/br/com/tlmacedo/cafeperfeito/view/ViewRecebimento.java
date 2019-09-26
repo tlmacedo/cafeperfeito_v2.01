@@ -24,8 +24,10 @@ public class ViewRecebimento {
     private static BigDecimal saldo;
 
     public void openViewRecebimento(Recebimento recebimento) {
-        if (recebimento != null)
+        if (recebimento != null) {
             setRecebimento(recebimento);
+            setaReceber(recebimento.getaReceber());
+        }
         openViewRecebimento();
     }
 

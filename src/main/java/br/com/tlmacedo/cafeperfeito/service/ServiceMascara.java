@@ -176,8 +176,6 @@ public class ServiceMascara {
     }
 
     public static String getReciboQuebraLinha(String value, int qtd) {
-//        System.out.printf(String.format("%s%0" + qtd + "s", value, "0"));
-        System.out.printf("%s\n", StringUtils.rightPad(value + " ", qtd, "*"));
         return StringUtils.rightPad(value + " ", qtd, "*");
     }
 
