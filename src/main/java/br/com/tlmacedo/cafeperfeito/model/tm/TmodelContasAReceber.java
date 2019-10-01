@@ -15,6 +15,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -365,14 +366,17 @@ public class TmodelContasAReceber {
                 if (getDtpData1().getValue() == null || getDtpData2().getValue() == null)
                     return true;
                 if (getChkDtVenda().isSelected()) {
+//                    if (aReceber.dtCadastroProperty().getValue().compareTo(getDtpData1().getValue().atTime(0,0,0))<0
+//                    || aReceber.dtCadastroProperty().getValue().compareTo(getDtpData2().getValue().atTime(23,59,59))>0)
                     if (aReceber.dtCadastroProperty().getValue().toLocalDate().isBefore(getDtpData1().getValue())
                             || aReceber.dtCadastroProperty().getValue().toLocalDate().isAfter(getDtpData2().getValue()))
                         return false;
                 } else {
+//                    if (aReceber.dtVencimentoProperty().getValue().compareTo(getDtpData1().getValue())<0
+//                    || aReceber.dtVencimentoProperty().getValue().compareTo(getDtpData2().getValue())>0)
                     if (aReceber.dtVencimentoProperty().getValue().isBefore(getDtpData1().getValue())
-                            || aReceber.dtVencimentoProperty().getValue().isAfter(getDtpData2().getValue())) {
+                            || aReceber.dtVencimentoProperty().getValue().isAfter(getDtpData2().getValue()))
                         return false;
-                    }
                 }
                 if (empresaProperty().getValue() != null) {
                     if (empresaProperty().getValue().idProperty().getValue() != 0)
@@ -463,53 +467,54 @@ public class TmodelContasAReceber {
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
 
-        setPercLucroBruto(
-                BigDecimal.TEN.setScale(4)
-        );
+        setTotalLucroBruto(getaReceberFilteredList().stream()
+                .map(ContasAReceber::getSaidaProduto)
+                .map(SaidaProduto::getSaidaProdutoProdutoList)
+                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+                        .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
+                                .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
 
-        BigDecimal valBruto = getaReceberFilteredList().stream()
-                .map(ContasAReceber::getSaidaProduto)
-                .map(SaidaProduto::getSaidaProdutoProdutoList)
-                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
-                        .map(SaidaProdutoProduto::getVlrBruto)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        System.out.printf("valBruto:\t\t\t\t\t[%s]\n", valBruto);
-        BigDecimal valEntradaBruto = getaReceberFilteredList().stream()
-                .map(ContasAReceber::getSaidaProduto)
-                .map(SaidaProduto::getSaidaProdutoProdutoList)
-                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
-                        .map(SaidaProdutoProduto::getVlrEntradaBruto)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        System.out.printf("valEntradaBruto:\t\t\t[%s]\n", valEntradaBruto);
-        BigDecimal valDesconto = getaReceberFilteredList().stream()
-                .map(ContasAReceber::getSaidaProduto)
-                .map(SaidaProduto::getSaidaProdutoProdutoList)
-                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
-                        .map(SaidaProdutoProduto::getVlrDesconto)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        System.out.printf("valDesconto:\t\t\t\t[%s]\n", valDesconto);
-        BigDecimal valLiq = valBruto.subtract(valEntradaBruto.add(valDesconto));
-        System.out.printf("valLiq:\t\t\t\t\t\t[%s]\n\n", valLiq);
+        if (getTotalLucroBruto().compareTo(BigDecimal.ZERO) > 0)
+            setPercLucroBruto(getTotalLucroBruto().multiply(new BigDecimal("100.")).divide(getTotalContas(), 4, RoundingMode.HALF_UP));
+        else
+            setPercLucroBruto(BigDecimal.ZERO);
 
-        BigDecimal val = getaReceberFilteredList().stream()
-                .map(ContasAReceber::getSaidaProduto)
-                .map(SaidaProduto::getSaidaProdutoProdutoList)
-                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
-                        .map(saidaProdutoProduto ->
-                                saidaProdutoProduto.vlrBrutoProperty().getValue()
-                                        .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()
-                                                .add(saidaProdutoProduto.vlrDescontoProperty().getValue())))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        System.out.printf("val:\t\t\t\t\t\t[%s]\n\n\n\n", val);
+        setTotalLucroLiquido(getTotalLucroBruto().subtract(getTotalContasDescontos().add(getTotalContasRetiradas())));
 
-        setTotalLucroBruto(
-                val.setScale(4)
-//                BigDecimal.TEN.setScale(4)
-        );
+        if (getTotalLucroLiquido().compareTo(BigDecimal.ZERO) > 0)
+            setPercLucroLiquido(getTotalLucroLiquido().multiply(new BigDecimal("100.")).divide(getTotalContas(), 4, RoundingMode.HALF_UP));
+        else
+            setPercLucroLiquido(BigDecimal.ZERO);
+
+//        BigDecimal valDesconto = getaReceberFilteredList().stream()
+//                .map(ContasAReceber::getSaidaProduto)
+//                .map(SaidaProduto::getSaidaProdutoProdutoList)
+//                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+//                        .map(SaidaProdutoProduto::getVlrDesconto)
+//                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//        System.out.printf("valDesconto:\t\t\t\t[%s]\n", valDesconto);
+//        BigDecimal valLiq = valBruto.subtract(valEntradaBruto.add(valDesconto));
+//        System.out.printf("valLiq:\t\t\t\t\t\t[%s]\n\n", valLiq);
+//
+//        BigDecimal val = getaReceberFilteredList().stream()
+//                .map(ContasAReceber::getSaidaProduto)
+//                .map(SaidaProduto::getSaidaProdutoProdutoList)
+//                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+//                        .map(saidaProdutoProduto ->
+//                                saidaProdutoProduto.vlrBrutoProperty().getValue()
+//                                        .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()
+//                                                .add(saidaProdutoProduto.vlrDescontoProperty().getValue())))
+//                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//        System.out.printf("val:\t\t\t\t\t\t[%s]\n\n\n\n", val);
+
+//        setTotalLucroBruto(
+//                val.setScale(4)
+////                BigDecimal.TEN.setScale(4)
+//        );
 
         setQtdContasAReceber(
                 (int) getaReceberFilteredList().stream()
@@ -582,13 +587,13 @@ public class TmodelContasAReceber {
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
 
-        setPercLucroLiquido(
-                BigDecimal.ONE.setScale(4)
-        );
+//        setPercLucroLiquido(
+//                BigDecimal.ONE.setScale(4)
+//        );
 
-        setTotalLucroLiquido(
-                BigDecimal.ONE.setScale(4)
-        );
+//        setTotalLucroLiquido(
+//                BigDecimal.ONE.setScale(4)
+//        );
 
 //        setPercLucroLiquido(
 //                getQtdContasVencidas() + getQtdContasPendentes() + getQtdContasPagas()

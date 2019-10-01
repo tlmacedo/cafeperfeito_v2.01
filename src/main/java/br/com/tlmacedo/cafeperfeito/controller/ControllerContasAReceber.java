@@ -149,8 +149,9 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         getDtpData2().setDayCellFactory(param -> new FormatDataPicker(getDtpData1().getValue()));
 
         getDtpData1().valueProperty().addListener((ov, o, n) -> {
-            if (n == null || getDtpData1().getValue().compareTo(getDtpData2().getValue()) <= 0) return;
-            getDtpData2().setValue(n);
+            if (n == null) return;// || getDtpData1().getValue().compareTo(getDtpData2().getValue()) <= 0) return;
+            if (getDtpData1().getValue().compareTo(getDtpData2().getValue()) > 0)
+                getDtpData2().setValue(n);
             getDtpData2().setDayCellFactory(param -> new FormatDataPicker(n));
         });
 
@@ -324,7 +325,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                 getTmodelaReceber().totalContasDescontosProperty()));
 
         getLblTotQtdLucroBruto().textProperty().bind(Bindings.createStringBinding(() ->
-                        String.format("Lucro Bruto: [%s%%]", ServiceMascara.getMoeda(getTmodelaReceber().percLucroBrutoProperty().getValue(), 2)),
+                        String.format("Lucro Bruto: [%s%%]", ServiceMascara.getMoeda(getTmodelaReceber().percLucroBrutoProperty().getValue(), 4)),
                 getTmodelaReceber().percLucroBrutoProperty()));
 
         getLblTotalLucroBruto().textProperty().bind(Bindings.createStringBinding(() ->
@@ -372,7 +373,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                 getTmodelaReceber().totalContasSaldoClientesProperty()));
 
         getLblTotQtdLucroLiquido().textProperty().bind(Bindings.createStringBinding(() ->
-                        String.format("Lucro Líquido: [%s%%]", ServiceMascara.getMoeda(getTmodelaReceber().percLucroLiquidoProperty().getValue(), 2)),
+                        String.format("Lucro Líquido: [%s%%]", ServiceMascara.getMoeda(getTmodelaReceber().percLucroLiquidoProperty().getValue(), 4)),
                 getTmodelaReceber().percLucroLiquidoProperty()));
 
         getLblTotalLucroLiquido().textProperty().bind(Bindings.createStringBinding(() ->

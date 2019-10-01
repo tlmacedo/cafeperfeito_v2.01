@@ -113,7 +113,7 @@ public class ServiceMascara {
     public static String getMoeda(BigDecimal value, int decimal) {
         try {
             if (value.toString().contains(".") || value.toString().contains(","))
-                return formataNumeroDecimal(value.setScale(decimal).toString(), decimal);
+                return formataNumeroDecimal(value.setScale(decimal, RoundingMode.HALF_UP).toString(), decimal);
             else
                 return formataNumeroDecimal(value.toString(), decimal);
         } catch (Exception ex) {
