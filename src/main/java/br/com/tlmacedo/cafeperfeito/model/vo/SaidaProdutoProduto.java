@@ -282,10 +282,12 @@ public class SaidaProdutoProduto implements Serializable {
 //                '}';
 //    }
 
+
     @Override
     public String toString() {
         return "SaidaProdutoProduto{" +
                 "id=" + id +
+                //", saidaProduto=" + saidaProduto +
                 ", idProd=" + idProd +
                 ", codigo=" + codigo +
                 ", descricao=" + descricao +
@@ -293,6 +295,8 @@ public class SaidaProdutoProduto implements Serializable {
                 ", lote=" + lote +
                 ", dtValidade=" + dtValidade +
                 ", qtd=" + qtd +
+                ", vlrEntrada=" + vlrEntrada +
+                ", vlrEntradaBruto=" + vlrEntradaBruto +
                 ", vlrVenda=" + vlrVenda +
                 ", vlrBruto=" + vlrBruto +
                 ", vlrDesconto=" + vlrDesconto +
