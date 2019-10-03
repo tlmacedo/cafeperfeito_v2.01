@@ -9,13 +9,14 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.data.JRXmlDataSource;
 import net.sf.jasperreports.view.JasperViewer;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServiceRelatorio {
+public class ServiceRelatorio extends JFrame {
     public void gerar(RelatorioTipo tipo, File pathXml) throws JRException {
 
         JRDataSource ds = new JRXmlDataSource(pathXml);
@@ -41,12 +42,14 @@ public class ServiceRelatorio {
 
         JasperPrint impressao = null;
 
-//        try {
         impressao = JasperFillManager.fillReport(relJasper, parametros, ds);
         JasperViewer viewer = new JasperViewer(impressao, false);
         viewer.setVisible(true);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
+//        JRViewer viewer = new JRViewer(impressao);
+//        this.add(viewer);
+//        this.setSize(700, 500);
+//        this.setVisible(true);
+//        System.out.printf("Done!");
+//        ServiceAlertMensagem alertMensagem;
     }
 }

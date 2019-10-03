@@ -24,6 +24,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -139,7 +140,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
         getEnumsTasksList().add(EnumsTasks.COMBOS_PREENCHER);
 
-        setTabCarregada(new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Abrindo %s!", getNomeTab())));
+        setTabCarregada(new ServiceSegundoPlano().executaListaTarefas(newTaskContasAReceber(), String.format("Abrindo %s!", getNomeTab())));
 
     }
 
@@ -225,7 +226,9 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                             if (recebimentoProperty().getValue() == null
                                     || !getTtvContasAReceber().isFocused()) return;
                             try {
+                                ControllerPrincipal.getCtrlPrincipal().getPrincipalStage().getScene().setCursor(Cursor.CROSSHAIR);
                                 new ServiceRecibo().imprimeRecibo(recebimentoProperty().getValue());
+                                ControllerPrincipal.getCtrlPrincipal().getPrincipalStage().getScene().setCursor(Cursor.DEFAULT);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -392,7 +395,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
      * Begin Tasks
      */
 
-    private Task newTaskSaidaProduto() {
+    private Task newTaskContasAReceber() {
         int qtdTasks = getEnumsTasksList().size();
         final int[] cont = {1};
         return new Task<Void>() {
@@ -463,6 +466,15 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 //                                Thread.currentThread().interrupt();
 //                            }
                                 break;
+//                            case RELATORIO_IMPRIME_RECIBO:
+//                                Platform.runLater(() -> {
+//                                    try {
+//                                        new ServiceRecibo().imprimeRecibo(recebimentoProperty().getValue());
+//                                    } catch (Exception e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                });
+//                                break;
                         }
                     }
                 } catch (Exception ex) {
@@ -470,6 +482,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                 }
                 updateMessage("tarefa concluída!!!");
                 updateProgress(qtdTasks, qtdTasks);
+                getEnumsTasksList().clear();
                 return null;
             }
         };

@@ -20,12 +20,14 @@ public class SaidaProduto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private Empresa cliente = new Empresa();
-    private Usuario vendedor = new Usuario();
+    private ObjectProperty<Empresa> cliente = new SimpleObjectProperty<>();
+    private ObjectProperty<Usuario> vendedor = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDate> dtSaida = new SimpleObjectProperty<>();
 
     private List<SaidaProdutoProduto> saidaProdutoProdutoList = new ArrayList<>();
+
+    private ObjectProperty<SaidaProdutoNfe> saidaProdutoNfe = new SimpleObjectProperty<>();
 
     public SaidaProduto() {
     }
@@ -47,21 +49,29 @@ public class SaidaProduto implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Empresa getCliente() {
+        return cliente.get();
+    }
+
+    public ObjectProperty<Empresa> clienteProperty() {
         return cliente;
     }
 
     public void setCliente(Empresa cliente) {
-        this.cliente = cliente;
+        this.cliente.set(cliente);
     }
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getVendedor() {
+        return vendedor.get();
+    }
+
+    public ObjectProperty<Usuario> vendedorProperty() {
         return vendedor;
     }
 
     public void setVendedor(Usuario vendedor) {
-        this.vendedor = vendedor;
+        this.vendedor.set(vendedor);
     }
 
     @CreationTimestamp
@@ -99,7 +109,20 @@ public class SaidaProduto implements Serializable {
         this.saidaProdutoProdutoList = saidaProdutoProdutoList;
     }
 
-//    public List<SaidaProdutoProduto> getSaidaProdutoProdutoList() {
+    @OneToOne(mappedBy = "saidaProduto", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    public SaidaProdutoNfe getSaidaProdutoNfe() {
+        return saidaProdutoNfe.get();
+    }
+
+    public ObjectProperty<SaidaProdutoNfe> saidaProdutoNfeProperty() {
+        return saidaProdutoNfe;
+    }
+
+    public void setSaidaProdutoNfe(SaidaProdutoNfe saidaProdutoNfe) {
+        this.saidaProdutoNfe.set(saidaProdutoNfe);
+    }
+
+    //    public List<SaidaProdutoProduto> getSaidaProdutoProdutoList() {
 //        return saidaProdutoProdutoList;
 //    }
 //

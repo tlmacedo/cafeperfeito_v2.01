@@ -1,59 +1,78 @@
-import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoEstoqueDAO;
-import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoProdutoDAO;
-import br.com.tlmacedo.cafeperfeito.model.vo.ProdutoEstoque;
-import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoProduto;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import java.math.BigDecimal;
-import java.util.List;
+import static java.time.temporal.ChronoUnit.DAYS;
 
 public class Testes {
 
 
     public static void main(String[] args) {
 
-        SaidaProdutoProdutoDAO saidaProdutoProdutoDAO = new SaidaProdutoProdutoDAO();
         try {
-            List<SaidaProdutoProduto> saidaProdutoProdutoList = new SaidaProdutoProdutoDAO().getAll(SaidaProdutoProduto.class,
-                    null, null);
-            saidaProdutoProdutoDAO.transactionBegin();
-            saidaProdutoProdutoList.stream()
-                    .forEach(saidaProdutoProduto -> {
-                        BigDecimal vlr = BigDecimal.ZERO;
-                        if (saidaProdutoProduto.vlrEntradaProperty().getValue().compareTo(BigDecimal.ZERO) == 0) {
-                            System.out.printf("produto01: [%s]\n", saidaProdutoProduto);
-                            ProdutoEstoque prodEstoque = new ProdutoEstoqueDAO().getAll(ProdutoEstoque.class,
-                                    String.format("produto_id='%d' AND lote='%s' AND validade='%s'",
-                                            saidaProdutoProduto.idProdProperty().getValue(),
-                                            saidaProdutoProduto.loteProperty().getValue(),
-                                            saidaProdutoProduto.dtValidadeProperty().getValue()),
-                                    null).stream().findFirst().orElse(null);
-                            if (prodEstoque != null) {
-                                vlr = prodEstoque.vlrBrutoProperty().getValue()
-                                        .add(prodEstoque.vlrFreteBrutoProperty().getValue())
-                                        .add(prodEstoque.vlrImpostoNaEntradaProperty().getValue())
-                                        .add(prodEstoque.vlrImpostoFreteNaEntradaProperty().getValue())
-                                        .add(prodEstoque.vlrImpostoDentroFreteProperty().getValue())
-                                        .add(prodEstoque.vlrFreteTaxaProperty().getValue());
-                            }
-                            saidaProdutoProduto.vlrEntradaProperty().setValue(vlr);
-                        } else {
-                            vlr = saidaProdutoProduto.vlrEntradaProperty().getValue();
-                        }
-                        saidaProdutoProduto.vlrEntradaBrutoProperty().setValue(
-                                vlr.multiply(BigDecimal.valueOf(saidaProdutoProduto.qtdProperty().getValue()))
-                        );
-                        try {
-                            saidaProdutoProdutoDAO.setTransactionPersist(saidaProdutoProduto);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        System.out.printf("produto02: [%s]\n", saidaProdutoProduto);
-                    });
-            saidaProdutoProdutoDAO.transactionCommit();
+            System.out.printf("%s\n\n", LocalDateTime.now());
+            LocalDate dtUltPedito = LocalDate.parse("2019-09-30");
+            LocalDateTime dtCadastro = LocalDateTime.parse("2006-07-28T00:00:00");
+
+            System.out.println(String.valueOf(DAYS.between(dtUltPedito, LocalDate.now())));
+            System.out.println(DAYS.between(dtCadastro.toLocalDate(), LocalDate.now()));
         } catch (Exception ex) {
-            saidaProdutoProdutoDAO.transactionRollback();
             ex.printStackTrace();
         }
+
+
+        /**
+         * *-**-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*---*--*-*-*-*-*-
+         * *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+         */
+
+//        SaidaProdutoProdutoDAO saidaProdutoProdutoDAO = new SaidaProdutoProdutoDAO();
+//        try {
+//            List<SaidaProdutoProduto> saidaProdutoProdutoList = new SaidaProdutoProdutoDAO().getAll(SaidaProdutoProduto.class,
+//                    null, null);
+//            saidaProdutoProdutoDAO.transactionBegin();
+//            saidaProdutoProdutoList.stream()
+//                    .forEach(saidaProdutoProduto -> {
+//                        BigDecimal vlr = BigDecimal.ZERO;
+//                        if (saidaProdutoProduto.vlrEntradaProperty().getValue().compareTo(BigDecimal.ZERO) == 0) {
+//                            System.out.printf("produto01: [%s]\n", saidaProdutoProduto);
+//                            ProdutoEstoque prodEstoque = new ProdutoEstoqueDAO().getAll(ProdutoEstoque.class,
+//                                    String.format("produto_id='%d' AND lote='%s' AND validade='%s'",
+//                                            saidaProdutoProduto.idProdProperty().getValue(),
+//                                            saidaProdutoProduto.loteProperty().getValue(),
+//                                            saidaProdutoProduto.dtValidadeProperty().getValue()),
+//                                    null).stream().findFirst().orElse(null);
+//                            if (prodEstoque != null) {
+//                                vlr = prodEstoque.vlrBrutoProperty().getValue()
+//                                        .add(prodEstoque.vlrFreteBrutoProperty().getValue())
+//                                        .add(prodEstoque.vlrImpostoNaEntradaProperty().getValue())
+//                                        .add(prodEstoque.vlrImpostoFreteNaEntradaProperty().getValue())
+//                                        .add(prodEstoque.vlrImpostoDentroFreteProperty().getValue())
+//                                        .add(prodEstoque.vlrFreteTaxaProperty().getValue());
+//                            }
+//                            saidaProdutoProduto.vlrEntradaProperty().setValue(vlr);
+//                        } else {
+//                            vlr = saidaProdutoProduto.vlrEntradaProperty().getValue();
+//                        }
+//                        saidaProdutoProduto.vlrEntradaBrutoProperty().setValue(
+//                                vlr.multiply(BigDecimal.valueOf(saidaProdutoProduto.qtdProperty().getValue()))
+//                        );
+//                        try {
+//                            saidaProdutoProdutoDAO.setTransactionPersist(saidaProdutoProduto);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                        System.out.printf("produto02: [%s]\n", saidaProdutoProduto);
+//                    });
+//            saidaProdutoProdutoDAO.transactionCommit();
+//        } catch (Exception ex) {
+//            saidaProdutoProdutoDAO.transactionRollback();
+//            ex.printStackTrace();
+//        }
+
+        /**
+         * *-**-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*---*--*-*-*-*-*-
+         * *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+         */
 
 //        try {
 //            boolean continua = true;
