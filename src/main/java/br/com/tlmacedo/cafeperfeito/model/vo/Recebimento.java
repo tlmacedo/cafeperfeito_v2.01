@@ -18,19 +18,19 @@ public class Recebimento implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private ContasAReceber aReceber = new ContasAReceber();
+    private ObjectProperty<ContasAReceber> aReceber = new SimpleObjectProperty<>();
     private PagamentoSituacao pagamentoSituacao;
     private StringProperty documento = new SimpleStringProperty();
     private PagamentoModalidade pagamentoModalidade;
     private ObjectProperty<BigDecimal> valor = new SimpleObjectProperty<>();
 
-    private Usuario usuarioPagamento = new Usuario();
+    private ObjectProperty<Usuario> usuarioPagamento = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDate> dtPagamento = new SimpleObjectProperty<>();
 
-    private Usuario usuarioCadastro = new Usuario();
+    private ObjectProperty<Usuario> usuarioCadastro = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
 
-    private Empresa emissorRecibo;
+    private ObjectProperty<Empresa> emissorRecibo = new SimpleObjectProperty<>();
 
     public Recebimento() {
     }
@@ -49,14 +49,17 @@ public class Recebimento implements Serializable {
         this.id.set(id);
     }
 
-    //@JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public ContasAReceber getaReceber() {
+        return aReceber.get();
+    }
+
+    public ObjectProperty<ContasAReceber> aReceberProperty() {
         return aReceber;
     }
 
     public void setaReceber(ContasAReceber aReceber) {
-        this.aReceber = aReceber;
+        this.aReceber.set(aReceber);
     }
 
     @Enumerated(EnumType.ORDINAL)
@@ -106,11 +109,15 @@ public class Recebimento implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioPagamento() {
+        return usuarioPagamento.get();
+    }
+
+    public ObjectProperty<Usuario> usuarioPagamentoProperty() {
         return usuarioPagamento;
     }
 
     public void setUsuarioPagamento(Usuario usuarioPagamento) {
-        this.usuarioPagamento = usuarioPagamento;
+        this.usuarioPagamento.set(usuarioPagamento);
     }
 
     public LocalDate getDtPagamento() {
@@ -128,11 +135,15 @@ public class Recebimento implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
+        return usuarioCadastro.get();
+    }
+
+    public ObjectProperty<Usuario> usuarioCadastroProperty() {
         return usuarioCadastro;
     }
 
     public void setUsuarioCadastro(Usuario usuarioCadastro) {
-        this.usuarioCadastro = usuarioCadastro;
+        this.usuarioCadastro.set(usuarioCadastro);
     }
 
     @CreationTimestamp
@@ -149,13 +160,16 @@ public class Recebimento implements Serializable {
     }
 
     @Transient
-    //@ManyToOne(fetch = FetchType.LAZY)
     public Empresa getEmissorRecibo() {
+        return emissorRecibo.get();
+    }
+
+    public ObjectProperty<Empresa> emissorReciboProperty() {
         return emissorRecibo;
     }
 
     public void setEmissorRecibo(Empresa emissorRecibo) {
-        this.emissorRecibo = emissorRecibo;
+        this.emissorRecibo.set(emissorRecibo);
     }
 
     @Override

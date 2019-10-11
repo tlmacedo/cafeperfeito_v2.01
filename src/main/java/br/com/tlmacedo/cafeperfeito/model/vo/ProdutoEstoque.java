@@ -16,7 +16,7 @@ public class ProdutoEstoque implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private Produto produto = new Produto();
+    private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
     private IntegerProperty qtd = new SimpleIntegerProperty();
     private StringProperty lote = new SimpleStringProperty();
     private ObjectProperty<LocalDate> validade = new SimpleObjectProperty<>();
@@ -27,7 +27,7 @@ public class ProdutoEstoque implements Serializable {
     private ObjectProperty<BigDecimal> vlrImpostoDentroFrete = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrFreteTaxa = new SimpleObjectProperty<>();
 
-    private Usuario usuarioCadastro = new Usuario();
+    private ObjectProperty<Usuario> usuarioCadastro = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
 
     private StringProperty docEntrada = new SimpleStringProperty();
@@ -53,11 +53,15 @@ public class ProdutoEstoque implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Produto getProduto() {
+        return produto.get();
+    }
+
+    public ObjectProperty<Produto> produtoProperty() {
         return produto;
     }
 
     public void setProduto(Produto produto) {
-        this.produto = produto;
+        this.produto.set(produto);
     }
 
     @Column(length = 5, nullable = false)
@@ -178,11 +182,15 @@ public class ProdutoEstoque implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
+        return usuarioCadastro.get();
+    }
+
+    public ObjectProperty<Usuario> usuarioCadastroProperty() {
         return usuarioCadastro;
     }
 
     public void setUsuarioCadastro(Usuario usuarioCadastro) {
-        this.usuarioCadastro = usuarioCadastro;
+        this.usuarioCadastro.set(usuarioCadastro);
     }
 
     @CreationTimestamp

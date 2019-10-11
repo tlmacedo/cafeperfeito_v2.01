@@ -35,9 +35,9 @@ public class Empresa implements Serializable {
     private BooleanProperty fornecedor = new SimpleBooleanProperty();
     private BooleanProperty transportadora = new SimpleBooleanProperty();
 
-    private Usuario usuarioCadastro = new Usuario();
+    private ObjectProperty<Usuario> usuarioCadastro = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>(null);
-    private Usuario usuarioAtualizacao = new Usuario();
+    private ObjectProperty<Usuario> usuarioAtualizacao = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtAtualizacao = new SimpleObjectProperty<>();
     private StringProperty observacoes = new SimpleStringProperty();
     private ObjectProperty<BigDecimal> limite = new SimpleObjectProperty<>(BigDecimal.ZERO);
@@ -195,11 +195,15 @@ public class Empresa implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
+        return usuarioCadastro.get();
+    }
+
+    public ObjectProperty<Usuario> usuarioCadastroProperty() {
         return usuarioCadastro;
     }
 
     public void setUsuarioCadastro(Usuario usuarioCadastro) {
-        this.usuarioCadastro = usuarioCadastro;
+        this.usuarioCadastro.set(usuarioCadastro);
     }
 
     @CreationTimestamp
@@ -219,11 +223,15 @@ public class Empresa implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioAtualizacao() {
+        return usuarioAtualizacao.get();
+    }
+
+    public ObjectProperty<Usuario> usuarioAtualizacaoProperty() {
         return usuarioAtualizacao;
     }
 
     public void setUsuarioAtualizacao(Usuario usuarioAtualizacao) {
-        this.usuarioAtualizacao = usuarioAtualizacao;
+        this.usuarioAtualizacao.set(usuarioAtualizacao);
     }
 
     @UpdateTimestamp
@@ -301,6 +309,7 @@ public class Empresa implements Serializable {
         this.empresaCondicoes = empresaCondicoes;
     }
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Endereco> getEnderecoList() {
         return enderecoList;
@@ -310,6 +319,7 @@ public class Empresa implements Serializable {
         this.enderecoList = enderecoList;
     }
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Telefone> getTelefoneList() {
         return telefoneList;
@@ -319,6 +329,7 @@ public class Empresa implements Serializable {
         this.telefoneList = telefoneList;
     }
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     public List<EmailHomePage> getEmailHomePageList() {
         return emailHomePageList;

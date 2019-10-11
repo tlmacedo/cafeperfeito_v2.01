@@ -2,16 +2,16 @@ package br.com.tlmacedo.cafeperfeito.interfaces;
 
 public interface ModeloCafePerfeito {
 
-    void fieldsFormat();
+    void fieldsFormat() throws Exception;
 
     void fechar();
 
-    void criarObjetos();
+    void criarObjetos() throws Exception;
 
-    void preencherObjetos();
+    void preencherObjetos() throws Exception;
 
-    void fatorarObjetos();
+    void fatorarObjetos() throws Exception;
 
-    void escutarTecla();
+    void escutarTecla() throws Exception;
 
 }

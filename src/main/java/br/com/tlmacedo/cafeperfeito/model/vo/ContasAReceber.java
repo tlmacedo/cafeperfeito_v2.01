@@ -21,10 +21,10 @@ public class ContasAReceber implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private SaidaProduto saidaProduto = new SaidaProduto();
+    private ObjectProperty<SaidaProduto> saidaProduto = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDate> dtVencimento = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> valor = new SimpleObjectProperty<>();
-    private Usuario usuarioCadastro = new Usuario();
+    private ObjectProperty<Usuario> usuarioCadastro = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
 
     private List<Recebimento> recebimentoList = new ArrayList<>();
@@ -54,11 +54,15 @@ public class ContasAReceber implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public SaidaProduto getSaidaProduto() {
+        return saidaProduto.get();
+    }
+
+    public ObjectProperty<SaidaProduto> saidaProdutoProperty() {
         return saidaProduto;
     }
 
     public void setSaidaProduto(SaidaProduto saidaProduto) {
-        this.saidaProduto = saidaProduto;
+        this.saidaProduto.set(saidaProduto);
     }
 
     @Column(nullable = false)
@@ -90,11 +94,15 @@ public class ContasAReceber implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
+        return usuarioCadastro.get();
+    }
+
+    public ObjectProperty<Usuario> usuarioCadastroProperty() {
         return usuarioCadastro;
     }
 
     public void setUsuarioCadastro(Usuario usuarioCadastro) {
-        this.usuarioCadastro = usuarioCadastro;
+        this.usuarioCadastro.set(usuarioCadastro);
     }
 
     @CreationTimestamp

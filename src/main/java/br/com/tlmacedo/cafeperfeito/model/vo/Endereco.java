@@ -1,10 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.TipoEndereco;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,7 +20,7 @@ public class Endereco implements Serializable {
     private StringProperty bairro = new SimpleStringProperty();
     private StringProperty pontoReferencia = new SimpleStringProperty();
 
-    private Municipio municipio = new Municipio();
+    private ObjectProperty<Municipio> municipio = new SimpleObjectProperty<>();
 
     public Endereco() {
     }
@@ -131,11 +128,15 @@ public class Endereco implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     public Municipio getMunicipio() {
+        return municipio.get();
+    }
+
+    public ObjectProperty<Municipio> municipioProperty() {
         return municipio;
     }
 
     public void setMunicipio(Municipio municipio) {
-        this.municipio = municipio;
+        this.municipio.set(municipio);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
@@ -192,17 +193,19 @@ public class SaidaProdutoNfe implements Serializable {
         this.modFrete = modFrete;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Empresa getTransportador() {
-        return transportador.get();
+        return transportadorProperty().get();
     }
 
     public ObjectProperty<Empresa> transportadorProperty() {
+        if (transportador == null)
+            transportador = new SimpleObjectProperty<>(new EmpresaDAO().getById(Empresa.class, 0L));
         return transportador;
     }
 
     public void setTransportador(Empresa transportador) {
-        this.transportador.set(transportador);
+        transportadorProperty().set(transportador);
     }
 
     @Column(length = 60, nullable = false)

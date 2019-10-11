@@ -2,10 +2,7 @@ package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.service.ServiceImageUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.scene.image.Image;
 
 import javax.persistence.*;
@@ -21,7 +18,7 @@ public class ProdutoCodigoBarra implements Serializable {
     private LongProperty id = new SimpleLongProperty();
     private StringProperty codigoBarra = new SimpleStringProperty();
 
-    private Produto produto;
+    private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
 
     private Blob imgCodigoBarra;
 
@@ -54,11 +51,15 @@ public class ProdutoCodigoBarra implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     public Produto getProduto() {
+        return produto.get();
+    }
+
+    public ObjectProperty<Produto> produtoProperty() {
         return produto;
     }
 
     public void setProduto(Produto produto) {
-        this.produto = produto;
+        this.produto.set(produto);
     }
 
     @JsonIgnore

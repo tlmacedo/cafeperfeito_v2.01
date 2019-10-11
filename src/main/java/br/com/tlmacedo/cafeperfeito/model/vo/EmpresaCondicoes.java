@@ -13,8 +13,8 @@ public class EmpresaCondicoes implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private Empresa empresa = new Empresa();
-    private Produto produto = new Produto();
+    private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
+    private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> valor = new SimpleObjectProperty<>();
     private IntegerProperty qtdMinima = new SimpleIntegerProperty();
     private IntegerProperty prazo = new SimpleIntegerProperty();
@@ -42,20 +42,28 @@ public class EmpresaCondicoes implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     public Empresa getEmpresa() {
+        return empresa.get();
+    }
+
+    public ObjectProperty<Empresa> empresaProperty() {
         return empresa;
     }
 
     public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
+        this.empresa.set(empresa);
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
     public Produto getProduto() {
+        return produto.get();
+    }
+
+    public ObjectProperty<Produto> produtoProperty() {
         return produto;
     }
 
     public void setProduto(Produto produto) {
-        this.produto = produto;
+        this.produto.set(produto);
     }
 
     @Column(length = 19, scale = 4, nullable = false)

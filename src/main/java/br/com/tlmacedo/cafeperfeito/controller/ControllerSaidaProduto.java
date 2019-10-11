@@ -146,20 +146,24 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        criarObjetos();
-        preencherObjetos();
-        fatorarObjetos();
-        if (!isTabCarregada()) {
-            Platform.runLater(() -> fechar());
-            return;
+        try {
+            criarObjetos();
+            preencherObjetos();
+            fatorarObjetos();
+            if (!isTabCarregada()) {
+                Platform.runLater(() -> fechar());
+                return;
+            }
+            escutarTecla();
+            fieldsFormat();
+            Platform.runLater(() -> limpaCampos(getPainelViewSaidaProduto()));
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        escutarTecla();
-        fieldsFormat();
-        Platform.runLater(() -> limpaCampos(getPainelViewSaidaProduto()));
     }
 
     @Override
-    public void fieldsFormat() {
+    public void fieldsFormat() throws Exception {
         ServiceCampoPersonalizado.fieldTextFormat(getPainelViewSaidaProduto());
     }
 
@@ -176,12 +180,12 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     @Override
-    public void criarObjetos() {
+    public void criarObjetos() throws Exception {
         getEnumsTasksList().add(EnumsTasks.TABELA_CRIAR);
     }
 
     @Override
-    public void preencherObjetos() {
+    public void preencherObjetos() throws Exception {
         getEnumsTasksList().add(EnumsTasks.TABELA_VINCULAR);
 
         getEnumsTasksList().add(EnumsTasks.TABELA_PREENCHER);
@@ -192,7 +196,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     @Override
-    public void fatorarObjetos() {
+    public void fatorarObjetos() throws Exception {
 
         getDtpDtSaida().setDayCellFactory(param -> new FormatDataPicker(null));
         getDtpDtVencimento().setDayCellFactory(param -> new FormatDataPicker(null));
@@ -215,7 +219,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     @Override
-    public void escutarTecla() {
+    public void escutarTecla() throws Exception {
 
         statusBarProperty().addListener((ov, o, n) -> {
             if (n == null) return;
@@ -271,51 +275,52 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         setEventHandlerSaidaProduto(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if (ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().getSelectedIndex() < 0)
-                    return;
-                if (!ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().getSelectedItem().getText().equals(getNomeTab()))
-                    return;
-                if (!ControllerPrincipal.getCtrlPrincipal().teclaDisponivel(event.getCode())) return;
-                switch (event.getCode()) {
-                    case F1:
-                        limpaCampos(getPainelViewSaidaProduto());
-                        break;
-                    case F2:
-                        getEnumsTasksList().clear();
-                        getEnumsTasksList().add(EnumsTasks.SALVAR_SAIDA);
+                try {
+                    if (ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().getSelectedIndex() < 0)
+                        return;
+                    if (!ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().getSelectedItem().getText().equals(getNomeTab()))
+                        return;
+                    if (!ControllerPrincipal.getCtrlPrincipal().teclaDisponivel(event.getCode())) return;
+                    switch (event.getCode()) {
+                        case F1:
+                            limpaCampos(getPainelViewSaidaProduto());
+                            break;
+                        case F2:
+                            getEnumsTasksList().clear();
+                            getEnumsTasksList().add(EnumsTasks.SALVAR_SAIDA);
 
-                        if (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
-                                .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0) {
-                            boolean utilizaCredito = false;
-                            BigDecimal credito;
-                            if ((credito = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2)).compareTo(BigDecimal.ZERO) < 0) {
-                                setAlertMensagem(new ServiceAlertMensagem());
-                                getAlertMensagem().setCabecalho("Crédito disponível");
-                                getAlertMensagem().setContentText(String.format("o Cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
-                                        ServiceMascara.getMoeda(credito, 2)));
-                                getAlertMensagem().setStrIco("");
-                                ButtonType btnResult;
-                                if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
-                                    return;
-                                utilizaCredito = (btnResult == ButtonType.YES);
-                            } else {
-                                credito = BigDecimal.ZERO;
-                            }
-                            if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
-                                if (utilizaCredito) {
-                                    try {
-                                        getTmodelSaidaProduto().getContasAReceberDAO().transactionBegin();
-                                        baixaCredito(credito);
-                                        getTmodelSaidaProduto().getaReceber().getRecebimentoList().add(addRecebimento(getTmodelSaidaProduto().getaReceber(),
-                                                PagamentoModalidade.CREDITO, credito));
-                                        getTmodelSaidaProduto().setaReceber(getaReceberDAO().setTransactionPersist(getTmodelSaidaProduto().getaReceber()));
-                                        getTmodelSaidaProduto().getContasAReceberDAO().transactionCommit();
-                                    } catch (Exception ex) {
-                                        getTmodelSaidaProduto().getContasAReceberDAO().transactionRollback();
-                                    }
+                            if (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
+                                    .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0) {
+                                boolean utilizaCredito = false;
+                                BigDecimal credito;
+                                if ((credito = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2)).compareTo(BigDecimal.ZERO) < 0) {
+                                    setAlertMensagem(new ServiceAlertMensagem());
+                                    getAlertMensagem().setCabecalho("Crédito disponível");
+                                    getAlertMensagem().setContentText(String.format("o Cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
+                                            ServiceMascara.getMoeda(credito, 2)));
+                                    getAlertMensagem().setStrIco("");
+                                    ButtonType btnResult;
+                                    if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
+                                        return;
+                                    utilizaCredito = (btnResult == ButtonType.YES);
                                 } else {
                                     credito = BigDecimal.ZERO;
                                 }
+                                if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
+                                    if (utilizaCredito) {
+                                        try {
+                                            getTmodelSaidaProduto().getContasAReceberDAO().transactionBegin();
+                                            baixaCredito(credito);
+                                            getTmodelSaidaProduto().getaReceber().getRecebimentoList().add(addRecebimento(getTmodelSaidaProduto().getaReceber(),
+                                                    PagamentoModalidade.CREDITO, credito));
+                                            getTmodelSaidaProduto().setaReceber(getaReceberDAO().setTransactionPersist(getTmodelSaidaProduto().getaReceber()));
+                                            getTmodelSaidaProduto().getContasAReceberDAO().transactionCommit();
+                                        } catch (Exception ex) {
+                                            getTmodelSaidaProduto().getContasAReceberDAO().transactionRollback();
+                                        }
+                                    } else {
+                                        credito = BigDecimal.ZERO;
+                                    }
 //                                getEmpresaObservableList().stream()
 //                                        .filter(empresa1 -> empresa1.idProperty().getValue() == empresaProperty().getValue().idProperty().getValue())
 //                                        .findFirst().ifPresent(empresa1 -> empresa1.limiteUtilizadoProperty().setValue(
@@ -323,50 +328,53 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 //                                                ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)
 //                                        )));
 
-                                new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber(), credito);
-                                atualizaTotaisCliente(getTmodelSaidaProduto().getaReceber());
+                                    new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber(), credito);
+                                    atualizaTotaisCliente(getTmodelSaidaProduto().getaReceber());
 
 //                                getaReceberObservableList().add(getTmodelSaidaProduto().getaReceber());
 //                                getaReceberObservableList().sorted();
 //                                setaReceberObservableList(
 //                                        FXCollections.observableArrayList(getaReceberObservableList().add(getTmodelSaidaProduto().getaReceber()))
 //                                );
-                                //setaReceberObservableList(FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC")));
-                                //getaReceberObservableList().add(getTmodelSaidaProduto().getaReceber());
+                                    //setaReceberObservableList(FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC")));
+                                    //getaReceberObservableList().add(getTmodelSaidaProduto().getaReceber());
 
-                                //informacoesAdicionais();
-                                limpaCampos(getPainelViewSaidaProduto());
+                                    //informacoesAdicionais();
+                                    limpaCampos(getPainelViewSaidaProduto());
+                                }
+                            } else {
+                                setAlertMensagem(new ServiceAlertMensagem());
+                                getAlertMensagem().setCabecalho("Limite excedido");
+                                getAlertMensagem().setContentText("Cliente não possui limite para finalizar o pedido!");
+                                getAlertMensagem().setStrIco("");
+                                getAlertMensagem().alertOk();
                             }
-                        } else {
-                            setAlertMensagem(new ServiceAlertMensagem());
-                            getAlertMensagem().setCabecalho("Limite excedido");
-                            getAlertMensagem().setContentText("Cliente não possui limite para finalizar o pedido!");
-                            getAlertMensagem().setStrIco("");
-                            getAlertMensagem().alertOk();
-                        }
-                        break;
-                    case F6:
-                        getCboEmpresa().getEditor().setEditable(true);
-                        getCboEmpresa().requestFocus();
-                        break;
-                    case F7:
-                        getTxtPesquisa().requestFocus();
-                        break;
-                    case F8:
-                        getTvItensPedido().requestFocus();
-                        getTvItensPedido().getSelectionModel().select(getSaidaProdutoProdutoObservableList().size() - 1,
-                                getTmodelSaidaProduto().getColQtd());
-                        break;
-                    case F9:
-                        getTpnNfe().setExpanded(!getTpnNfe().isExpanded());
-                        if (getTpnNfe().isExpanded())
-                            getCboNfeDadosNaturezaOperacao().requestFocus();
-                        else
+                            break;
+                        case F6:
+                            getCboEmpresa().getEditor().setEditable(true);
+                            getCboEmpresa().requestFocus();
+                            break;
+                        case F7:
                             getTxtPesquisa().requestFocus();
-                        break;
-                    case F12:
-                        fechar();
-                        break;
+                            break;
+                        case F8:
+                            getTvItensPedido().requestFocus();
+                            getTvItensPedido().getSelectionModel().select(getSaidaProdutoProdutoObservableList().size() - 1,
+                                    getTmodelSaidaProduto().getColQtd());
+                            break;
+                        case F9:
+                            getTpnNfe().setExpanded(!getTpnNfe().isExpanded());
+                            if (getTpnNfe().isExpanded())
+                                getCboNfeDadosNaturezaOperacao().requestFocus();
+                            else
+                                getTxtPesquisa().requestFocus();
+                            break;
+                        case F12:
+                            fechar();
+                            break;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         });
@@ -584,83 +592,86 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
      */
 
     private Task newTaskSaidaProduto() {
-        int qtdTasks = getEnumsTasksList().size();
-        final int[] cont = {1};
-        return new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                updateMessage("Loading...");
-                for (EnumsTasks tasks : getEnumsTasksList()) {
-                    updateProgress(cont[0]++, qtdTasks);
-                    Thread.sleep(200);
-                    updateMessage(String.format("%s%s", tasks.getDescricao(),
-                            tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
-                    switch (tasks) {
-                        case TABELA_CRIAR:
-                            setTmodelProduto(new TmodelProduto(TModelTipo.PROD_VENDA));
-                            getTmodelProduto().criaTabela();
+        try {
+            int qtdTasks = getEnumsTasksList().size();
+            final int[] cont = {1};
+            return new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    updateMessage("Loading...");
+                    for (EnumsTasks tasks : getEnumsTasksList()) {
+                        updateProgress(cont[0]++, qtdTasks);
+                        Thread.sleep(200);
+                        updateMessage(String.format("%s%s", tasks.getDescricao(),
+                                tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
+                        switch (tasks) {
+                            case TABELA_CRIAR:
+                                setTmodelProduto(new TmodelProduto(TModelTipo.PROD_VENDA));
+                                getTmodelProduto().criaTabela();
 
-                            setTmodelSaidaProduto(new TmodelSaidaProduto());
-                            getTmodelSaidaProduto().criaTabela();
-                            break;
+                                setTmodelSaidaProduto(new TmodelSaidaProduto());
+                                getTmodelSaidaProduto().criaTabela();
+                                break;
 
-                        case TABELA_VINCULAR:
-                            getTmodelProduto().setLblRegistrosLocalizados(getLblRegistrosLocalizados());
-                            getTmodelProduto().setTtvProduto(getTtvProdutos());
-                            getTmodelProduto().setTxtPesquisa(getTxtPesquisa());
-                            setProdutoObservableList(getTmodelProduto().getProdutoObservableList());
-                            setProdutoFilteredList(getTmodelProduto().getProdutoFilteredList());
-                            getTmodelProduto().escutaLista();
+                            case TABELA_VINCULAR:
+                                getTmodelProduto().setLblRegistrosLocalizados(getLblRegistrosLocalizados());
+                                getTmodelProduto().setTtvProduto(getTtvProdutos());
+                                getTmodelProduto().setTxtPesquisa(getTxtPesquisa());
+                                setProdutoObservableList(getTmodelProduto().getProdutoObservableList());
+                                setProdutoFilteredList(getTmodelProduto().getProdutoFilteredList());
+                                getTmodelProduto().escutaLista();
 
-                            getTmodelSaidaProduto().setTvSaidaProdutoProduto(getTvItensPedido());
-                            getTmodelSaidaProduto().setTxtPesquisa(getTxtPesquisa());
-                            getTmodelSaidaProduto().setDtpDtSaida(getDtpDtSaida());
-                            getTmodelSaidaProduto().setDtpDtVencimento(getDtpDtVencimento());
-                            getTmodelSaidaProduto().empresaProperty().setValue(empresaProperty().getValue());
-                            getTmodelSaidaProduto().setContasAReceberDAO(getaReceberDAO());
-                            setSaidaProdutoProdutoObservableList(getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList());
-                            getTmodelSaidaProduto().escutaLista();
+                                getTmodelSaidaProduto().setTvSaidaProdutoProduto(getTvItensPedido());
+                                getTmodelSaidaProduto().setTxtPesquisa(getTxtPesquisa());
+                                getTmodelSaidaProduto().setDtpDtSaida(getDtpDtSaida());
+                                getTmodelSaidaProduto().setDtpDtVencimento(getDtpDtVencimento());
+                                getTmodelSaidaProduto().empresaProperty().setValue(empresaProperty().getValue());
+                                getTmodelSaidaProduto().setContasAReceberDAO(getaReceberDAO());
+                                setSaidaProdutoProdutoObservableList(getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList());
+                                getTmodelSaidaProduto().escutaLista();
+                                break;
+                            case COMBOS_PREENCHER:
 
-                            break;
+                                informacoesAdicionais();
 
-                        case COMBOS_PREENCHER:
-
-                            informacoesAdicionais();
-
-                            getCboEmpresa().setItems(getEmpresaObservableList());
+                                getCboEmpresa().setItems(getEmpresaObservableList());
 
 
-                            getCboEmpresa().getItems().add(0, new Empresa());
+                                getCboEmpresa().getItems().add(0, new Empresa());
 
-                            getCboNfeDadosNaturezaOperacao().setItems(
-                                    Arrays.stream(NfeDadosNaturezaOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                            break;
+                                getCboNfeDadosNaturezaOperacao().setItems(
+                                        Arrays.stream(NfeDadosNaturezaOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                break;
 
-                        case TABELA_PREENCHER:
-                            getTmodelProduto().preencheTabela();
+                            case TABELA_PREENCHER:
+                                getTmodelProduto().preencheTabela();
 
-                            getTmodelSaidaProduto().preencheTabela();
-                            break;
+                                getTmodelSaidaProduto().preencheTabela();
+                                break;
 
-                        case SALVAR_SAIDA:
-                            if (getTmodelSaidaProduto().guardarSaidaProduto()) {
-                                if (getTmodelSaidaProduto().salvarSaidaProduto()) {
-                                    getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, "descricao"));
-                                    getTtvProdutos().refresh();
+                            case SALVAR_SAIDA:
+                                if (getTmodelSaidaProduto().guardarSaidaProduto()) {
+                                    if (getTmodelSaidaProduto().salvarSaidaProduto()) {
+                                        getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, "descricao"));
+                                        getTtvProdutos().refresh();
+                                    } else {
+                                        Thread.currentThread().interrupt();
+                                    }
                                 } else {
                                     Thread.currentThread().interrupt();
                                 }
-                            } else {
-                                Thread.currentThread().interrupt();
-                            }
-                            break;
+                                break;
+                        }
                     }
+                    updateMessage("tarefa concluída!!!");
+                    updateProgress(qtdTasks, qtdTasks);
+                    return null;
                 }
-                updateMessage("tarefa concluída!!!");
-                updateProgress(qtdTasks, qtdTasks);
-                return null;
-            }
-        };
+            };
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -734,52 +745,54 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private void informacoesAdicionais() {
-
-        getaReceberObservableList().stream()
-                .map(ContasAReceber::getSaidaProduto)
-                .collect(Collectors.groupingBy(SaidaProduto::getCliente, LinkedHashMap::new, Collectors.toList()))
-                .forEach((empresa, saidaProdutos) -> {
-                    BigDecimal vlrLimiteUtilizado =
-                            getaReceberObservableList().stream()
-                                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresa.idProperty().getValue())
-                                    .map(ContasAReceber::getValor)
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-                                    .subtract(
-                                            getaReceberObservableList().stream()
-                                                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() ==
-                                                            empresa.idProperty().getValue())
-                                                    .map(ContasAReceber::getRecebimentoList)
-                                                    .map(recebimentos -> recebimentos.stream()
-                                                            .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                                                            .map(Recebimento::getValor)
-                                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
-                                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-                                    );
-                    LocalDate dtUltimoPedido = saidaProdutos.get(0).dtSaidaProperty().getValue();
-                    BigDecimal vlrUltimoPedido = saidaProdutos.get(0).getSaidaProdutoProdutoList().stream()
-                            .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
-                                    .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-                    BigDecimal vlrTicketMedio =
-                            saidaProdutos.stream()
-                                    .map(SaidaProduto::getSaidaProdutoProdutoList)
-                                    .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
-                                            .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
-                                                    .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
-                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-                                    .divide(BigDecimal.valueOf(saidaProdutos.size()), 4, RoundingMode.HALF_UP);
-
-                    getEmpresaObservableList().stream()
-                            .filter(empresa1 -> empresa1.idProperty().getValue() == empresa.idProperty().getValue())
-                            .findFirst().ifPresent(empresa1 -> {
-                        empresa1.limiteUtilizadoProperty().setValue(vlrLimiteUtilizado);
-                        empresa1.dtUltimoPedidoProperty().setValue(dtUltimoPedido);
-                        empresa1.vlrUltimoPedidoProperty().setValue(vlrUltimoPedido);
-                        empresa1.qtdPedidosProperty().setValue(saidaProdutos.size());
-                        empresa1.vlrTickeMedioProperty().setValue(vlrTicketMedio);
+        try {
+            getaReceberObservableList().stream()
+                    .map(ContasAReceber::getSaidaProduto)
+                    .collect(Collectors.groupingBy(SaidaProduto::getCliente, LinkedHashMap::new, Collectors.toList()))
+                    .forEach((empresa, saidaProdutos) -> {
+                        BigDecimal vlrLimiteUtilizado =
+                                getaReceberObservableList().stream()
+                                        .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresa.idProperty().getValue())
+                                        .map(ContasAReceber::getValor)
+                                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                        .subtract(
+                                                getaReceberObservableList().stream()
+                                                        .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() ==
+                                                                empresa.idProperty().getValue())
+                                                        .map(ContasAReceber::getRecebimentoList)
+                                                        .map(recebimentos -> recebimentos.stream()
+                                                                .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                                                .map(Recebimento::getValor)
+                                                                .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                        );
+                        LocalDate dtUltimoPedido = saidaProdutos.get(0).dtSaidaProperty().getValue();
+                        BigDecimal vlrUltimoPedido = saidaProdutos.get(0).getSaidaProdutoProdutoList().stream()
+                                .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
+                                        .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        BigDecimal vlrTicketMedio =
+                                saidaProdutos.stream()
+                                        .map(SaidaProduto::getSaidaProdutoProdutoList)
+                                        .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+                                                .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
+                                                        .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
+                                                .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                        .divide(BigDecimal.valueOf(saidaProdutos.size()), 4, RoundingMode.HALF_UP);
+                        getEmpresaObservableList().stream()
+                                .filter(empresa1 -> empresa1.idProperty().getValue() == empresa.idProperty().getValue())
+                                .findFirst().ifPresent(empresa1 -> {
+                            empresa1.limiteUtilizadoProperty().setValue(vlrLimiteUtilizado);
+                            empresa1.dtUltimoPedidoProperty().setValue(dtUltimoPedido);
+                            empresa1.vlrUltimoPedidoProperty().setValue(vlrUltimoPedido);
+                            empresa1.qtdPedidosProperty().setValue(saidaProdutos.size());
+                            empresa1.vlrTickeMedioProperty().setValue(vlrTicketMedio);
+                        });
                     });
-                });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void atualizaTotaisCliente(ContasAReceber contasAReceber) {

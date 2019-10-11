@@ -17,7 +17,7 @@ public class Telefone implements Serializable {
     private StringProperty descricao = new SimpleStringProperty();
     private BooleanProperty principal = new SimpleBooleanProperty();
 
-    private TelefoneOperadora telefoneOperadora = new TelefoneOperadora();
+    private ObjectProperty<TelefoneOperadora> telefoneOperadora = new SimpleObjectProperty<>();
 
     public Telefone() {
     }
@@ -64,11 +64,15 @@ public class Telefone implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     public TelefoneOperadora getTelefoneOperadora() {
+        return telefoneOperadora.get();
+    }
+
+    public ObjectProperty<TelefoneOperadora> telefoneOperadoraProperty() {
         return telefoneOperadora;
     }
 
     public void setTelefoneOperadora(TelefoneOperadora telefoneOperadora) {
-        this.telefoneOperadora = telefoneOperadora;
+        this.telefoneOperadora.set(telefoneOperadora);
     }
 
     @Override

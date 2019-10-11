@@ -37,18 +37,22 @@ public class ControllerLogin implements Initializable, ModeloCafePerfeito {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        criarObjetos();
-        preencherObjetos();
-        fatorarObjetos();
-        escutarTecla();
-        fieldsFormat();
-        Platform.runLater(() -> {
-            setLoginStage(ViewLogin.getStage());
-        });
+        try {
+            criarObjetos();
+            preencherObjetos();
+            fatorarObjetos();
+            escutarTecla();
+            fieldsFormat();
+            Platform.runLater(() -> {
+                setLoginStage(ViewLogin.getStage());
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
-    public void fieldsFormat() {
+    public void fieldsFormat() throws Exception {
 
     }
 
@@ -58,12 +62,12 @@ public class ControllerLogin implements Initializable, ModeloCafePerfeito {
     }
 
     @Override
-    public void criarObjetos() {
+    public void criarObjetos() throws Exception {
 
     }
 
     @Override
-    public void preencherObjetos() {
+    public void preencherObjetos() throws Exception {
         getLblTitulo().setText(TCONFIG.getFxml().getLogin().getTitulo());
         getCboUsuario().setItems(
                 new UsuarioDAO().getAll(Usuario.class, "ativo>=1", null)
@@ -72,7 +76,7 @@ public class ControllerLogin implements Initializable, ModeloCafePerfeito {
     }
 
     @Override
-    public void fatorarObjetos() {
+    public void fatorarObjetos() throws Exception {
         getCboUsuario().setCellFactory(param -> new ListCell<Usuario>() {
             @Override
             protected void updateItem(Usuario item, boolean empty) {
@@ -86,7 +90,7 @@ public class ControllerLogin implements Initializable, ModeloCafePerfeito {
     }
 
     @Override
-    public void escutarTecla() {
+    public void escutarTecla() throws Exception {
 
         getBtnCancel().setOnAction(event -> fechar());
 

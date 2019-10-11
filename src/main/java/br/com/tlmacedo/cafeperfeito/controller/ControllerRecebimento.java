@@ -78,19 +78,23 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        criarObjetos();
-        preencherObjetos();
-        fatorarObjetos();
-        escutarTecla();
-        fieldsFormat();
-        Platform.runLater(() -> {
-            setRecebimentoStage(ViewRecebimento.getStage());
-            getCboPagamentoModalidade().requestFocus();
-        });
+        try {
+            criarObjetos();
+            preencherObjetos();
+            fatorarObjetos();
+            escutarTecla();
+            fieldsFormat();
+            Platform.runLater(() -> {
+                setRecebimentoStage(ViewRecebimento.getStage());
+                getCboPagamentoModalidade().requestFocus();
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
-    public void fieldsFormat() {
+    public void fieldsFormat() throws Exception {
         ServiceCampoPersonalizado.fieldTextFormat(getPainelViewRecebimento());
     }
 
@@ -100,12 +104,12 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     }
 
     @Override
-    public void criarObjetos() {
+    public void criarObjetos() throws Exception {
 
     }
 
     @Override
-    public void preencherObjetos() {
+    public void preencherObjetos() throws Exception {
         getCboPagamentoModalidade().setItems(Arrays.stream(PagamentoModalidade.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
         getCboSituacao().setItems(
                 Arrays.stream(PagamentoSituacao.values())
@@ -138,12 +142,12 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     }
 
     @Override
-    public void fatorarObjetos() {
+    public void fatorarObjetos() throws Exception {
 
     }
 
     @Override
-    public void escutarTecla() {
+    public void escutarTecla() throws Exception {
 
         getPainelViewRecebimento().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
             if (CODE_KEY_SHIFT_CTRL_N.match(keyEvent) || CHAR_KEY_SHIFT_CTRL_N.match(keyEvent)) {
@@ -173,10 +177,14 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
         getBtnOK().disableProperty().bind(deshabilitaProperty());
 
         getBtnOK().setOnAction(actionEvent -> {
-            if (new ServiceSegundoPlano().executaListaTarefas(newTaskRecebimento(), "recebimento"))
-                fechar();
-            else
-                getCboPagamentoModalidade().requestFocus();
+            try {
+                if (new ServiceSegundoPlano().executaListaTarefas(newTaskRecebimento(), "recebimento"))
+                    fechar();
+                else
+                    getCboPagamentoModalidade().requestFocus();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
 
         getImgNewDocumento().addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> getNewDocumento());

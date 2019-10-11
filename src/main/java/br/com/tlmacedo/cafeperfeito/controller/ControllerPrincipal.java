@@ -57,17 +57,21 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ctrlPrincipal = this;
-        getLblImageLogoViewPrincipal().setVisible(true);
-        criarObjetos();
-        preencherObjetos();
-        fatorarObjetos();
-        escutarTecla();
-        fieldsFormat();
+        try {
+            ctrlPrincipal = this;
+            getLblImageLogoViewPrincipal().setVisible(true);
+            criarObjetos();
+            preencherObjetos();
+            fatorarObjetos();
+            escutarTecla();
+            fieldsFormat();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
-    public void fieldsFormat() {
+    public void fieldsFormat() throws Exception {
 
     }
 
@@ -77,23 +81,23 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
     }
 
     @Override
-    public void criarObjetos() {
+    public void criarObjetos() throws Exception {
         getLblImageLogoViewPrincipal().setVisible(true);
     }
 
     @Override
-    public void preencherObjetos() {
+    public void preencherObjetos() throws Exception {
         carregaMenuPrincipal();
         setServiceStatusBar(new ServiceStatusBar(getStatusBar_ViewPrincipal(), getStbLogadoInf(), getStbTeclas(), getStbRelogio()));
     }
 
     @Override
-    public void fatorarObjetos() {
+    public void fatorarObjetos() throws Exception {
 
     }
 
     @Override
-    public void escutarTecla() {
+    public void escutarTecla() throws Exception {
         getImgMenuPrincipalExpande().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(true));
         getImgMenuPrincipalRetrair().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(false));
 

@@ -16,7 +16,7 @@ public class SaidaProdutoProduto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private SaidaProduto saidaProduto = new SaidaProduto();
+    private ObjectProperty<SaidaProduto> saidaProduto = new SimpleObjectProperty<>();
     private LongProperty idProd = new SimpleLongProperty();
     private StringProperty codigo = new SimpleStringProperty();
     private StringProperty descricao = new SimpleStringProperty();
@@ -34,13 +34,13 @@ public class SaidaProdutoProduto implements Serializable {
     private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>();
     private IntegerProperty estoque = new SimpleIntegerProperty();
 
-    private Produto produto = new Produto();
+    private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
 
     public SaidaProdutoProduto() {
     }
 
     public SaidaProdutoProduto(Integer idProd, Produto produto, TipoSaidaProduto tipSaida, Integer qtd) {
-        this.produto = new ProdutoDAO().getById(Produto.class, idProd.longValue());
+        this.produto.setValue(new ProdutoDAO().getById(Produto.class, idProd.longValue()));
         this.idProd = getProduto().idProperty();
         this.codigo = getProduto().codigoProperty();
         this.descricao = getProduto().descricaoProperty();
@@ -76,11 +76,15 @@ public class SaidaProdutoProduto implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public SaidaProduto getSaidaProduto() {
+        return saidaProduto.get();
+    }
+
+    public ObjectProperty<SaidaProduto> saidaProdutoProperty() {
         return saidaProduto;
     }
 
     public void setSaidaProduto(SaidaProduto saidaProduto) {
-        this.saidaProduto = saidaProduto;
+        this.saidaProduto.set(saidaProduto);
     }
 
     @Column(length = 20, nullable = false)
@@ -250,11 +254,15 @@ public class SaidaProdutoProduto implements Serializable {
     @JsonIgnore
     @Transient
     public Produto getProduto() {
+        return produto.get();
+    }
+
+    public ObjectProperty<Produto> produtoProperty() {
         return produto;
     }
 
     public void setProduto(Produto produto) {
-        this.produto = produto;
+        this.produto.set(produto);
     }
 
     @Transient

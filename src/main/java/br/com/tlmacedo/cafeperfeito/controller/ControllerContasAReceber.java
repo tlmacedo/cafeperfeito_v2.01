@@ -99,19 +99,23 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        criarObjetos();
-        preencherObjetos();
-        fatorarObjetos();
-        if (!isTabCarregada()) {
-            Platform.runLater(() -> fechar());
-            return;
+        try {
+            criarObjetos();
+            preencherObjetos();
+            fatorarObjetos();
+            if (!isTabCarregada()) {
+                Platform.runLater(() -> fechar());
+                return;
+            }
+            escutarTecla();
+            fieldsFormat();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        escutarTecla();
-        fieldsFormat();
     }
 
     @Override
-    public void fieldsFormat() {
+    public void fieldsFormat() throws Exception {
         ServiceCampoPersonalizado.fieldTextFormat(getPainelViewContasAReceber());
     }
 
@@ -128,12 +132,12 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     }
 
     @Override
-    public void criarObjetos() {
+    public void criarObjetos() throws Exception {
         getEnumsTasksList().add(EnumsTasks.TABELA_CRIAR);
     }
 
     @Override
-    public void preencherObjetos() {
+    public void preencherObjetos() throws Exception {
         getEnumsTasksList().add(EnumsTasks.TABELA_VINCULAR);
 
         getEnumsTasksList().add(EnumsTasks.TABELA_PREENCHER);
@@ -145,7 +149,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     }
 
     @Override
-    public void fatorarObjetos() {
+    public void fatorarObjetos() throws Exception {
         //getDtpData1().setDayCellFactory(param -> new FormatDataPicker(null));
         getDtpData2().setDayCellFactory(param -> new FormatDataPicker(getDtpData1().getValue()));
 
@@ -160,7 +164,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     }
 
     @Override
-    public void escutarTecla() {
+    public void escutarTecla() throws Exception {
         statusBarProperty().addListener((ov, o, n) -> {
             if (n == null) return;
             showStatusBar();

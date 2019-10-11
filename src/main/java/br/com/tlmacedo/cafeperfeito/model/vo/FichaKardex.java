@@ -14,7 +14,7 @@ public class FichaKardex implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private Produto produto = new Produto();
+    private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtMovimento = new SimpleObjectProperty<>();
     private StringProperty documento = new SimpleStringProperty();
     private StringProperty detalhe = new SimpleStringProperty();
@@ -46,11 +46,15 @@ public class FichaKardex implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     public Produto getProduto() {
+        return produto.get();
+    }
+
+    public ObjectProperty<Produto> produtoProperty() {
         return produto;
     }
 
     public void setProduto(Produto produto) {
-        this.produto = produto;
+        this.produto.set(produto);
     }
 
     @CreationTimestamp

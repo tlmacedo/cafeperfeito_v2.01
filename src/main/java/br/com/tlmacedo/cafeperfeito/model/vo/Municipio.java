@@ -16,7 +16,7 @@ public class Municipio implements Serializable {
     private StringProperty ibge_codigo = new SimpleStringProperty();
     private IntegerProperty ddd = new SimpleIntegerProperty();
 
-    private Uf uf = new Uf();
+    private ObjectProperty<Uf> uf = new SimpleObjectProperty<>();
 
     public Municipio() {
     }
@@ -90,11 +90,15 @@ public class Municipio implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     public Uf getUf() {
+        return uf.get();
+    }
+
+    public ObjectProperty<Uf> ufProperty() {
         return uf;
     }
 
     public void setUf(Uf uf) {
-        this.uf = uf;
+        this.uf.set(uf);
     }
 
     @Override

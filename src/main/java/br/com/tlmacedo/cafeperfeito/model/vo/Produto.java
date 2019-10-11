@@ -39,19 +39,19 @@ public class Produto implements Serializable {
     private ObjectProperty<BigDecimal> ultFrete = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> comissao = new SimpleObjectProperty<>();
 
-    private Usuario usuarioCadastro = new Usuario();
+    private ObjectProperty<Usuario> usuarioCadastro = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
-    private Usuario usuarioAtualizacao = new Usuario();
+    private ObjectProperty<Usuario> usuarioAtualizacao = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtAtualizacao = new SimpleObjectProperty<>();
 
 
     private StringProperty nfeGenero = new SimpleStringProperty();
     private StringProperty ncm = new SimpleStringProperty();
     private StringProperty cest = new SimpleStringProperty();
-    private FiscalCstOrigem fiscalCstOrigem = new FiscalCstOrigem();
-    private FiscalIcms fiscalIcms = new FiscalIcms();
-    private FiscalPisCofins fiscalPis = new FiscalPisCofins();
-    private FiscalPisCofins fiscalCofins = new FiscalPisCofins();
+    private ObjectProperty<FiscalCstOrigem> fiscalCstOrigem = new SimpleObjectProperty<>();
+    private ObjectProperty<FiscalIcms> fiscalIcms = new SimpleObjectProperty<>();
+    private ObjectProperty<FiscalPisCofins> fiscalPis = new SimpleObjectProperty<>();
+    private ObjectProperty<FiscalPisCofins> fiscalCofins = new SimpleObjectProperty<>();
 
     private Blob imgProduto, imgProdutoBack;
 
@@ -236,11 +236,15 @@ public class Produto implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
+        return usuarioCadastro.get();
+    }
+
+    public ObjectProperty<Usuario> usuarioCadastroProperty() {
         return usuarioCadastro;
     }
 
     public void setUsuarioCadastro(Usuario usuarioCadastro) {
-        this.usuarioCadastro = usuarioCadastro;
+        this.usuarioCadastro.set(usuarioCadastro);
     }
 
     @CreationTimestamp
@@ -260,11 +264,15 @@ public class Produto implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioAtualizacao() {
+        return usuarioAtualizacao.get();
+    }
+
+    public ObjectProperty<Usuario> usuarioAtualizacaoProperty() {
         return usuarioAtualizacao;
     }
 
     public void setUsuarioAtualizacao(Usuario usuarioAtualizacao) {
-        this.usuarioAtualizacao = usuarioAtualizacao;
+        this.usuarioAtualizacao.set(usuarioAtualizacao);
     }
 
     @UpdateTimestamp
@@ -321,38 +329,54 @@ public class Produto implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     public FiscalCstOrigem getFiscalCstOrigem() {
+        return fiscalCstOrigem.get();
+    }
+
+    public ObjectProperty<FiscalCstOrigem> fiscalCstOrigemProperty() {
         return fiscalCstOrigem;
     }
 
     public void setFiscalCstOrigem(FiscalCstOrigem fiscalCstOrigem) {
-        this.fiscalCstOrigem = fiscalCstOrigem;
+        this.fiscalCstOrigem.set(fiscalCstOrigem);
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
     public FiscalIcms getFiscalIcms() {
+        return fiscalIcms.get();
+    }
+
+    public ObjectProperty<FiscalIcms> fiscalIcmsProperty() {
         return fiscalIcms;
     }
 
     public void setFiscalIcms(FiscalIcms fiscalIcms) {
-        this.fiscalIcms = fiscalIcms;
+        this.fiscalIcms.set(fiscalIcms);
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
     public FiscalPisCofins getFiscalPis() {
+        return fiscalPis.get();
+    }
+
+    public ObjectProperty<FiscalPisCofins> fiscalPisProperty() {
         return fiscalPis;
     }
 
     public void setFiscalPis(FiscalPisCofins fiscalPis) {
-        this.fiscalPis = fiscalPis;
+        this.fiscalPis.set(fiscalPis);
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
     public FiscalPisCofins getFiscalCofins() {
+        return fiscalCofins.get();
+    }
+
+    public ObjectProperty<FiscalPisCofins> fiscalCofinsProperty() {
         return fiscalCofins;
     }
 
     public void setFiscalCofins(FiscalPisCofins fiscalCofins) {
-        this.fiscalCofins = fiscalCofins;
+        this.fiscalCofins.set(fiscalCofins);
     }
 
     @JsonIgnore

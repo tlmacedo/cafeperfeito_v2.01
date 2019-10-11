@@ -1,6 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 
+import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoColaborador;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
@@ -25,7 +26,7 @@ public class Colaborador implements Serializable {
     private ObjectProperty<BigDecimal> salario = new SimpleObjectProperty<>();
     private SituacaoColaborador situacao;
 
-    private Empresa lojaAtivo;
+    private ObjectProperty<Empresa> lojaAtivo = new SimpleObjectProperty<>();
 
     private Blob imagem, imagemBack;
 
@@ -124,11 +125,16 @@ public class Colaborador implements Serializable {
     @JsonIgnore
     @ManyToOne
     public Empresa getLojaAtivo() {
+        return lojaAtivoProperty().get();
+    }
+
+    public ObjectProperty<Empresa> lojaAtivoProperty() {
+        if (lojaAtivo == null) lojaAtivo = new SimpleObjectProperty<>(new EmpresaDAO().getById(Empresa.class, 0L));
         return lojaAtivo;
     }
 
     public void setLojaAtivo(Empresa lojaAtivo) {
-        this.lojaAtivo = lojaAtivo;
+        lojaAtivoProperty().set(lojaAtivo);
     }
 
     @JsonIgnore
@@ -150,7 +156,6 @@ public class Colaborador implements Serializable {
     public void setImagemBack(Blob imagemBack) {
         this.imagemBack = imagemBack;
     }
-
 
     @Override
     public String toString() {

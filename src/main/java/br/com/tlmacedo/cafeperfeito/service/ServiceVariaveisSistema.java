@@ -32,7 +32,7 @@ public class ServiceVariaveisSistema {
 //            UsuarioLogado.getUsuario().setApelido(StringUtils.capitalize(UsuarioLogado.getUserLog().getApelido()));
 //            UsuarioLogado.setLojaUser(new EmpresaDAO().getById(Empresa.class, Long.valueOf(1)));
         }
-
+//        System.out.printf("Usuario: [%s]\n", UsuarioLogado.getUsuario());
     }
 
     public void getVariaveisSistema() {

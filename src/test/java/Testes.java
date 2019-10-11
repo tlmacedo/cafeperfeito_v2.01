@@ -1,7 +1,6 @@
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import static java.time.temporal.ChronoUnit.DAYS;
+import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
+import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
+import br.com.tlmacedo.cafeperfeito.service.ServiceUtilJSon;
 
 public class Testes {
 
@@ -9,15 +8,28 @@ public class Testes {
     public static void main(String[] args) {
 
         try {
-            System.out.printf("%s\n\n", LocalDateTime.now());
-            LocalDate dtUltPedito = LocalDate.parse("2019-09-30");
-            LocalDateTime dtCadastro = LocalDateTime.parse("2006-07-28T00:00:00");
-
-            System.out.println(String.valueOf(DAYS.between(dtUltPedito, LocalDate.now())));
-            System.out.println(DAYS.between(dtCadastro.toLocalDate(), LocalDate.now()));
+            ServiceUtilJSon.printJsonFromObject(new EmpresaDAO().getById(Empresa.class, 1L), "Empresa");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+
+        /**
+         * *-**-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*---*--*-*-*-*-*-
+         * *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+         */
+
+
+//        try {
+//            System.out.printf("%s\n\n", LocalDateTime.now());
+//            LocalDate dtUltPedito = LocalDate.parse("2019-09-30");
+//            LocalDateTime dtCadastro = LocalDateTime.parse("2006-07-28T00:00:00");
+//
+//            System.out.println(String.valueOf(DAYS.between(dtUltPedito, LocalDate.now())));
+//            System.out.println(DAYS.between(dtCadastro.toLocalDate(), LocalDate.now()));
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
 
 
         /**
