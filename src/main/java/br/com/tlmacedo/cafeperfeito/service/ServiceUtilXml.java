@@ -1,17 +1,18 @@
 package br.com.tlmacedo.cafeperfeito.service;
 
 import br.inf.portalfiscal.xsd.nfe.consStatServ.TConsStatServ;
+import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 
 import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 
-public class ServiceXmlUtil {
+public class ServiceUtilXml {
 
     private static final String STATUS = "TConsStatServ";
 //    private static final String RECIBO = "TRecibo";
 //    private static final String SITUACAO_NFE = "TConsSitNFe";
-//    private static final String TENVINFE = "TEnviNFe";
+private static final String TENVINFE = "TEnviNFe";
 //    private static final String DIST_DFE = "DistDFeInt";
 //    private static final String INUTILIZACAO = "TInutNFe";
 //    private static final String TNFE = "TNFe";
@@ -62,6 +63,10 @@ public class ServiceXmlUtil {
             case STATUS:
                 context = JAXBContext.newInstance(TConsStatServ.class);
                 element = new br.inf.portalfiscal.xsd.nfe.consStatServ.ObjectFactory().createConsStatServ((TConsStatServ) obj);
+                break;
+            case TENVINFE:
+                context = JAXBContext.newInstance(TEnviNFe.class);
+                element = new br.inf.portalfiscal.xsd.nfe.enviNFe.ObjectFactory().createEnviNFe((TEnviNFe) obj);
                 break;
         }
 

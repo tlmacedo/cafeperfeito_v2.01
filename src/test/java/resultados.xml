@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<enviNFe versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe">
+    <idLote>000000000000085</idLote>
+    <indSinc>0</indSinc>
+    <NFe>
+        <infNFe versao="4.00" Id="13190908009246000136550010000008771201909305">
+            <ide>
+                <cUF>13</cUF>
+                <cNF>20190930</cNF>
+                <natOp>DENTRO DO ESTADO</natOp>
+                <mod>55</mod>
+                <serie>1</serie>
+                <nNF>877</nNF>
+                <dhEmi>2019-09-30T17:03:12.541066</dhEmi>
+                <dhSaiEnt>2019-09-30T08:00</dhSaiEnt>
+                <tpNF>1</tpNF>
+                <idDest>1</idDest>
+                <cMunFG>1302603</cMunFG>
+                <tpImp>1</tpImp>
+                <tpEmis>1</tpEmis>
+                <cDV>5</cDV>
+                <tpAmb>2</tpAmb>
+                <finNFe>1</finNFe>
+                <indFinal>1</indFinal>
+                <indPres>3</indPres>
+                <procEmi>0</procEmi>
+                <verProc>v2.01</verProc>
+            </ide>
+        </infNFe>
+    </NFe>
+</enviNFe>

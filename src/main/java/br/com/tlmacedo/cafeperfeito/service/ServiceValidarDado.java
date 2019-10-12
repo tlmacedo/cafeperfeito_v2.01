@@ -4,6 +4,7 @@ package br.com.tlmacedo.cafeperfeito.service;
 import br.com.tlmacedo.cafeperfeito.model.dao.RecebimentoDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
+import br.com.tlmacedo.nfe.model.vo.IdeVO;
 import org.apache.maven.surefire.shade.common.org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.REGEX_EMAIL;
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.REGEX_TELEFONE;
+import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 public class ServiceValidarDado {
     static final int[] pesoCpf = {11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
@@ -95,6 +97,28 @@ public class ServiceValidarDado {
         String base = value.substring(0, value.length() - 2);
         String dv = value.substring(value.length() - 2);
         return dv.equals(calculaDv(base, pesoCafe));
+    }
+
+    public static String gerarChaveNfe(IdeVO ideVO) {
+        ideVO.setcNF(String.format("%04d%02d%02d", ideVO.getDhEmi().getYear(),
+                ideVO.getDhEmi().getMonthValue(),
+                ideVO.getDhEmi().getDayOfMonth()));
+
+        String chave = String.format("%s%s%s%s%s%s%s%s",
+                ideVO.getcUF(),
+                String.format("%02d%02d", ideVO.getDhEmi().getYear() % 100,
+                        ideVO.getDhEmi().getMonthValue()),
+                TCONFIG.getInfLoja().getCnpj(),
+                String.format("%02d", Integer.parseInt(ideVO.getMod())),
+                String.format("%03d", Integer.parseInt(ideVO.getSerie())),
+                String.format("%09d", Integer.parseInt(ideVO.getnNF())),
+                String.format(ideVO.getTpEmis()),
+                ideVO.getcNF());
+
+        ideVO.setcDV(String.valueOf(nfeDv(chave)));
+        return String.format("%s%s",
+                chave,
+                ideVO.getcDV());
     }
 
 //    public static WebTipo isEmailHomePageValido(final String value, boolean getMsgFaill) {

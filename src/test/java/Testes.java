@@ -1,6 +1,10 @@
-import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
-import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
-import br.com.tlmacedo.cafeperfeito.service.ServiceUtilJSon;
+import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
+import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
+import br.com.tlmacedo.cafeperfeito.nfe.v400.NotaFiscal;
+import br.com.tlmacedo.cafeperfeito.service.ServiceUtilXml;
+import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
+import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
+import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 
 public class Testes {
 
@@ -8,7 +12,36 @@ public class Testes {
     public static void main(String[] args) {
 
         try {
-            ServiceUtilJSon.printJsonFromObject(new EmpresaDAO().getById(Empresa.class, 1L), "Empresa");
+
+//            AAA aaa = new AAA();
+//
+//            aaa.setDescricao("Thiago Macedo");
+//            aaa.setId("001");
+//            System.out.printf("%s\n", aaa);
+
+
+//            Testando testando = new Testando();
+//
+//            testando.setDescricao("Thiago Macedo");
+//            testando.setId("001");
+//
+//            System.out.printf("%s\n", testando);
+
+
+            new ServiceVariaveisSistema().getVariaveisSistema();
+
+//            new NotaFiscal(
+//                    new SaidaProdutoDAO().getById(SaidaProduto.class, 87L));
+
+            NotaFiscal notaFiscal = new NotaFiscal(
+                    new SaidaProdutoDAO().getById(SaidaProduto.class, 85L)
+            );
+
+            TEnviNFe tEnviNFe = new EnviNfe_v400(notaFiscal.getEnviNfeVO()).gettEnviNFe();
+
+            String retorno = ServiceUtilXml.objectToXml(tEnviNFe);
+            System.out.printf("strEnviNFe:\n%s\n\n\n", retorno);
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }

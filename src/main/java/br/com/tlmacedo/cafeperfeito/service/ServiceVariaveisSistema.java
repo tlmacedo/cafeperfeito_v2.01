@@ -38,8 +38,8 @@ public class ServiceVariaveisSistema {
     public void getVariaveisSistema() {
         try {
             //FileInputStream arqConfiSistema = new FileInputStream(getClass().getClassLoader().getResource("xml/configSistema.xml").getFile());
-            String xml = ServiceXmlUtil.FileXml4String(arqConfgSistema);
-            TCONFIG = ServiceXmlUtil.xmlToObject(xml, TConfig.class);
+            String xml = ServiceUtilXml.FileXml4String(arqConfgSistema);
+            TCONFIG = ServiceUtilXml.xmlToObject(xml, TConfig.class);
             MY_LOCALE = new Locale(TCONFIG.getMyLocale().substring(0, 2), TCONFIG.getMyLocale().substring(3));
             Locale.setDefault(MY_LOCALE);
             PATHICONE = TCONFIG.getPaths().getPathIconeSistema();
@@ -53,8 +53,8 @@ public class ServiceVariaveisSistema {
 
     public void getVariaveisSistemaSimples() {
         try {
-            String xml = ServiceXmlUtil.FileXml4String(arqConfgSistema);
-            TCONFIG = ServiceXmlUtil.xmlToObject(xml, TConfig.class);
+            String xml = ServiceUtilXml.FileXml4String(arqConfgSistema);
+            TCONFIG = ServiceUtilXml.xmlToObject(xml, TConfig.class);
             MY_LOCALE = new Locale(TCONFIG.getMyLocale().substring(0, 2), TCONFIG.getMyLocale().substring(3));
             Locale.setDefault(MY_LOCALE);
         } catch (JAXBException e) {
@@ -65,8 +65,8 @@ public class ServiceVariaveisSistema {
     public static void getVariaveisSistemaBasica() {
         try {
             FileReader arqConfiSistema = new FileReader(ServiceVariaveisSistema.class.getClassLoader().getResource("configSistema.xml").getFile());
-            String xml = ServiceXmlUtil.FileXml4String(arqConfiSistema);
-            TCONFIG = ServiceXmlUtil.xmlToObject(xml, TConfig.class);
+            String xml = ServiceUtilXml.FileXml4String(arqConfiSistema);
+            TCONFIG = ServiceUtilXml.xmlToObject(xml, TConfig.class);
             MY_LOCALE = new Locale(TCONFIG.getMyLocale().substring(0, 2), TCONFIG.getMyLocale().substring(3));
             Locale.setDefault(MY_LOCALE);
         } catch (JAXBException | FileNotFoundException e) {
