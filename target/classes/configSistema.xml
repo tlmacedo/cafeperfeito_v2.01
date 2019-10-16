@@ -73,7 +73,8 @@
         <tpAmb>2</tpAmb>
         <finNFe>1</finNFe>
         <procEmi>0</procEmi>
-        <verProc>v2.01</verProc>
+        <verProc>v1.03</verProc>
+        <CRT>3</CRT>
         <infRespTec>
             <cnpj>08009246000136</cnpj>
             <xContato>THIAGO LEIROS MACEDO</xContato>
