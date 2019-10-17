@@ -72,7 +72,11 @@ public class ServiceValidarDado {
                     new RecebimentoDAO().getAll(classe, String.format("dtCadastro BETWEEN '%s' AND '%s'",
                             dtDocumento.atTime(0, 0, 0),
                             dtDocumento.atTime(23, 59, 59)), "dtCadastro DESC").stream()
-                            .filter(o -> !((Recebimento) o).documentoProperty().getValue().equals(""))
+                            .filter(o -> {
+                                if (((Recebimento) o).documentoProperty().getValue().length() > 0)
+                                    return Character.isDigit(((Recebimento) o).documentoProperty().getValue().charAt(0));
+                                return false;
+                            })
                             .count() + 1
             );
             System.out.printf("value: [%s]\n", value.substring(2));

@@ -292,7 +292,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             if (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
                                     .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0) {
                                 boolean utilizaCredito = false;
-                                BigDecimal credito;
+                                BigDecimal credito = BigDecimal.ZERO;
                                 if ((credito = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2)).compareTo(BigDecimal.ZERO) < 0) {
                                     setAlertMensagem(new ServiceAlertMensagem());
                                     getAlertMensagem().setCabecalho("Crédito disponível");
@@ -303,8 +303,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
                                         return;
                                     utilizaCredito = (btnResult == ButtonType.YES);
-                                } else {
-                                    credito = BigDecimal.ZERO;
+//                                } else {
+//                                    credito = BigDecimal.ZERO;
                                 }
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
                                     if (utilizaCredito) {
@@ -318,8 +318,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                         } catch (Exception ex) {
                                             getTmodelSaidaProduto().getContasAReceberDAO().transactionRollback();
                                         }
-                                    } else {
-                                        credito = BigDecimal.ZERO;
+//                                    } else {
+//                                        credito = BigDecimal.ZERO;
                                     }
 //                                getEmpresaObservableList().stream()
 //                                        .filter(empresa1 -> empresa1.idProperty().getValue() == empresaProperty().getValue().idProperty().getValue())

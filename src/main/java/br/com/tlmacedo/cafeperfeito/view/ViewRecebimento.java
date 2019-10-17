@@ -32,6 +32,7 @@ public class ViewRecebimento {
     }
 
     public void openViewRecebimento(ContasAReceber aReceber, BigDecimal saldo) {
+        setaReceber(new ContasAReceber());
         if (aReceber != null)
             setaReceber(aReceber);
         setSaldo(saldo);

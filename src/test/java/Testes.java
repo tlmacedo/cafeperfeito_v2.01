@@ -1,10 +1,7 @@
-import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
-import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
-import br.com.tlmacedo.cafeperfeito.nfe.v400.NotaFiscal;
-import br.com.tlmacedo.cafeperfeito.service.ServiceUtilXml;
-import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
-import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
-import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
+import br.com.tlmacedo.cafeperfeito.model.dao.RecebimentoDAO;
+import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
+
+import java.time.LocalDate;
 
 public class Testes {
 
@@ -12,35 +9,35 @@ public class Testes {
     public static void main(String[] args) {
 
         try {
+            LocalDate dtDocumento = LocalDate.of(2019, 10, 15);
+            new RecebimentoDAO().getAll(Recebimento.class, String.format("dtCadastro BETWEEN '%s' AND '%s'",
+                    dtDocumento.atTime(0, 0, 0),
+                    dtDocumento.atTime(23, 59, 59)), "dtCadastro DESC").stream()
+                    .filter(o -> {
+                        if (o.documentoProperty().getValue().length() > 0)
+                            return Character.isDigit(((Recebimento) o).documentoProperty().getValue().charAt(0));
+                        return false;
+                    })
+                    .forEach(recebimento -> {
+                        System.out.printf("Doc00: [%s]\n", recebimento.documentoProperty().getValue());
+                        System.out.printf("Doc01: [%s]\n", recebimento.documentoProperty().getValue().startsWith("U"));
+                        System.out.printf("Doc02: [%s]\n", recebimento.documentoProperty().getValue().replaceAll("\\d", "")
+                                .replace("-", ""));
+                    });
 
-//            AAA aaa = new AAA();
+//            new ServiceVariaveisSistema().getVariaveisSistema();
 //
-//            aaa.setDescricao("Thiago Macedo");
-//            aaa.setId("001");
-//            System.out.printf("%s\n", aaa);
-
-
-//            Testando testando = new Testando();
+////            new NotaFiscal(
+////                    new SaidaProdutoDAO().getById(SaidaProduto.class, 87L));
 //
-//            testando.setDescricao("Thiago Macedo");
-//            testando.setId("001");
+//            NotaFiscal notaFiscal = new NotaFiscal(
+//                    new SaidaProdutoDAO().getById(SaidaProduto.class, 85L)
+//            );
 //
-//            System.out.printf("%s\n", testando);
-
-
-            new ServiceVariaveisSistema().getVariaveisSistema();
-
-//            new NotaFiscal(
-//                    new SaidaProdutoDAO().getById(SaidaProduto.class, 87L));
-
-            NotaFiscal notaFiscal = new NotaFiscal(
-                    new SaidaProdutoDAO().getById(SaidaProduto.class, 85L)
-            );
-
-            TEnviNFe tEnviNFe = new EnviNfe_v400(notaFiscal.getEnviNfeVO()).gettEnviNFe();
-
-            String retorno = ServiceUtilXml.objectToXml(tEnviNFe);
-            System.out.printf("strEnviNFe:\n%s\n\n\n", retorno);
+//            TEnviNFe tEnviNFe = new EnviNfe_v400(notaFiscal.getEnviNfeVO()).gettEnviNFe();
+//
+//            String retorno = ServiceUtilXml.objectToXml(tEnviNFe);
+//            System.out.printf("strEnviNFe:\n%s\n\n\n", retorno);
 
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -1,11 +1,10 @@
 package br.com.tlmacedo.cafeperfeito.nfe.v400;
 
+import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
+import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
-import br.com.tlmacedo.nfe.model.vo.EnviNfeVO;
-import br.com.tlmacedo.nfe.model.vo.IdeVO;
-import br.com.tlmacedo.nfe.model.vo.InfNfeVO;
-import br.com.tlmacedo.nfe.model.vo.NfeVO;
+import br.com.tlmacedo.nfe.model.vo.*;
 
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
@@ -26,7 +25,7 @@ public class NotaFiscal {
         getEnviNfeVO().setNfe(nfeVO);
 
         InfNfeVO infNfeVO = new InfNfeVO();
-        nfeVO.setInfNfeVO(infNfeVO);
+        nfeVO.setInfNfe(infNfeVO);
 
         infNfeVO.setVersao(TCONFIG.getNfe().getVersao());
 
@@ -52,6 +51,18 @@ public class NotaFiscal {
         ideVO.setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));
         ideVO.setVerProc(TCONFIG.getNfe().getVerProc());
         infNfeVO.setId(ServiceValidarDado.gerarChaveNfe(ideVO));
+
+        Empresa emissor = new EmpresaDAO().getById(Empresa.class, Long.valueOf(TCONFIG.getInfLoja().getId()));
+        EnderVO enderVO = new EnderVO();
+        EmitVO emitVO = new EmitVO();
+        infNfeVO.setEmit(emitVO);
+        emitVO.setEnder(enderVO);
+        emitVO.setCnpj(emissor.getCnpj());
+        emitVO.setxNome(emissor.getRazao());
+        emitVO.setxFant(emissor.getFantasia());
+        emitVO.setIE(emissor.getIe());
+        emitVO.setCRT(String.valueOf(TCONFIG.getNfe().getCRT()));
+        infNfeVO.setEmit(emitVO);
 
 
     }

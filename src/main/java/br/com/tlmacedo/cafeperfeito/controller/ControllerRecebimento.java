@@ -130,9 +130,9 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
         getCboPagamentoModalidade().getSelectionModel().select(getRecebimento().getPagamentoModalidade());
         getCboSituacao().getSelectionModel().select(getRecebimento().getPagamentoSituacao());
 
-        if (getSaldo().compareTo(BigDecimal.ZERO) < 0)
-            getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue().add(getSaldo()), 2));
-        else
+//        if (getSaldo().compareTo(BigDecimal.ZERO) < 0)
+//            getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue().add(getSaldo()), 2));
+//        else
             getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
 
         getDtpDtPagamento().setValue(getRecebimento().dtPagamentoProperty().getValue() != null
