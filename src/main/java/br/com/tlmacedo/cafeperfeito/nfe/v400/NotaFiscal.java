@@ -2,6 +2,7 @@ package br.com.tlmacedo.cafeperfeito.nfe.v400;
 
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
+import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
@@ -62,6 +63,19 @@ public class NotaFiscal {
         emitVO.setxFant(emissor.getFantasia());
         emitVO.setIE(emissor.getIe());
         emitVO.setCRT(String.valueOf(TCONFIG.getNfe().getCRT()));
+        Endereco endereco = emissor.getEndereco();
+        enderVO.setxLgr(endereco.getLogradouro());
+        enderVO.setNro();
+        enderVO.setxCpl();
+        enderVO.setxBairro();
+        enderVO.setcMun();
+        enderVO.setxMun();
+        enderVO.setUF();
+        enderVO.setCEP();
+        enderVO.setcPais(TCONFIG.getNfe().getCPais());
+        enderVO.setxPais(TCONFIG.getNfe().getNPais());
+        enderVO.setFone();
+
         infNfeVO.setEmit(emitVO);
 
 
