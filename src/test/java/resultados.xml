@@ -1,31 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <enviNFe versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe">
-    <idLote>000000000000085</idLote>
+    <idLote>000000000000091</idLote>
     <indSinc>0</indSinc>
     <NFe>
-        <infNFe versao="4.00" Id="13190908009246000136550010000008771201909305">
+        <infNFe versao="4.00" Id="13191008009246000136550010000008781201910181">
             <ide>
                 <cUF>13</cUF>
-                <cNF>20190930</cNF>
+                <cNF>20191018</cNF>
                 <natOp>DENTRO DO ESTADO</natOp>
                 <mod>55</mod>
                 <serie>1</serie>
-                <nNF>877</nNF>
-                <dhEmi>2019-09-30T17:03:12.541066</dhEmi>
-                <dhSaiEnt>2019-09-30T08:00</dhSaiEnt>
+                <nNF>878</nNF>
+                <dhEmi>2019-10-18T11:39:30.640179</dhEmi>
+                <dhSaiEnt>2019-10-18T11:39:30.640179</dhSaiEnt>
                 <tpNF>1</tpNF>
                 <idDest>1</idDest>
                 <cMunFG>1302603</cMunFG>
                 <tpImp>1</tpImp>
                 <tpEmis>1</tpEmis>
-                <cDV>5</cDV>
+                <cDV>1</cDV>
                 <tpAmb>2</tpAmb>
                 <finNFe>1</finNFe>
-                <indFinal>1</indFinal>
+                <indFinal>0</indFinal>
                 <indPres>3</indPres>
                 <procEmi>0</procEmi>
-                <verProc>v1.03</verProc>
+                <verProc>2.01</verProc>
             </ide>
+            <emit>
+                <CNPJ>99999999000191</CNPJ>
+                <xNome>NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL</xNome>
+                <xFant>CAFE PERFEITO</xFant>
+                <enderEmit>
+                    <xLgr>R TREZE DE MAIO</xLgr>
+                    <nro>159</nro>
+                    <xBairro>COROADO</xBairro>
+                    <cMun>1302603</cMun>
+                    <xMun>MANAUS</xMun>
+                    <UF>AM</UF>
+                    <CEP>69080440</CEP>
+                    <cPais>1058</cPais>
+                    <xPais>BRASIL</xPais>
+                    <fone>92981686148</fone>
+                </enderEmit>
+                <IE>042171865</IE>
+                <CRT>3</CRT>
+            </emit>
+            <dest>
+                <CNPJ>08009246000136</CNPJ>
+                <xNome>T. L. MACEDO (CAFE PERFEITO)</xNome>
+                <enderDest>
+                    <xLgr>R TREZE DE MAIO</xLgr>
+                    <nro>159</nro>
+                    <xBairro>COROADO</xBairro>
+                    <cMun>1302603</cMun>
+                    <xMun>MANAUS</xMun>
+                    <UF>AM</UF>
+                    <CEP>69080440</CEP>
+                    <cPais>1058</cPais>
+                    <xPais>BRASIL</xPais>
+                    <fone>92981686148</fone>
+                </enderDest>
+                <indIEDest>1</indIEDest>
+                <IE>042171865</IE>
+                <email>cafeperfeito@cafeperfeito.com.br</email>
+            </dest>
+            <entrega>
+                <CNPJ>08009246000136</CNPJ>
+                <xNome>T. L. MACEDO (CAFE PERFEITO)</xNome>
+                <xLgr>TRAVESSA NOVA OLINDA (CJ JD PETRÓPOLIS)</xLgr>
+                <nro>90</nro>
+                <xBairro>PETRÓPOLIS</xBairro>
+                <cMun>1302603</cMun>
+                <xMun>MANAUS</xMun>
+                <UF>AM</UF>
+                <CEP>69067360</CEP>
+                <cPais>1058</cPais>
+                <xPais>BRASIL</xPais>
+                <fone>92981686148</fone>
+                <email>cafeperfeito@cafeperfeito.com.br</email>
+                <IE>042171865</IE>
+            </entrega>
         </infNFe>
     </NFe>
 </enviNFe>

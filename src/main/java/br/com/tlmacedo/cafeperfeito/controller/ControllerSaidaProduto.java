@@ -242,23 +242,32 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             } else {
                 produtoEscolhido = getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue();
             }
-
+            Integer finalIdProd = idProd;
             if (getSaidaProdutoProdutoObservableList().stream()
-                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue().equals(produtoEscolhido.tblLoteProperty().getValue()))
+                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue().equals(produtoEscolhido.tblLoteProperty().getValue())
+                            && saidaProdutoProduto.idProdProperty().getValue().intValue() == finalIdProd)
                     .findFirst().orElse(null) == null) {
                 getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(idProd, produtoEscolhido, TipoSaidaProduto.VENDA, 1));
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().fireEvent(ServiceComandoTecladoMouse.pressTecla(KeyCode.F8));
                 if (getTmodelSaidaProduto().empresaProperty().getValue() != null)
                     getTmodelSaidaProduto().calculaDescontoCliente();
             } else {
-                final int[] row = {0};
-                for (SaidaProdutoProduto saida : getSaidaProdutoProdutoObservableList()) {
-                    if (saida.loteProperty().getValue().equals(produtoEscolhido.tblLoteProperty().getValue()))
-                        break;
-                    row[0]++;
+                for (int i = 0; i < getSaidaProdutoProdutoObservableList().size(); i++) {
+                    SaidaProdutoProduto saida = getSaidaProdutoProdutoObservableList().get(i);
+                    if (saida.loteProperty().getValue().equals(produtoEscolhido.tblLoteProperty().getValue())
+                            && saida.idProdProperty().getValue().intValue() == finalIdProd) {
+                        getTvItensPedido().requestFocus();
+                        getTvItensPedido().getSelectionModel().select(i, getTmodelSaidaProduto().getColQtd());
+                    }
                 }
-                getTvItensPedido().requestFocus();
-                getTvItensPedido().getSelectionModel().select(row[0], getTmodelSaidaProduto().getColQtd());
+//                final int[] row = {0};
+//                for (SaidaProdutoProduto saida : getSaidaProdutoProdutoObservableList()) {
+//                    if (saida.loteProperty().getValue().equals(produtoEscolhido.tblLoteProperty().getValue()))
+//                        break;
+//                    row[0]++;
+//                }
+//                getTvItensPedido().requestFocus();
+//                getTvItensPedido().getSelectionModel().select(row[0], getTmodelSaidaProduto().getColQtd());
             }
         });
 

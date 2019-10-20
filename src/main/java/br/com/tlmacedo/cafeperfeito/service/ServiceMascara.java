@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.service;
 
+import br.com.tlmacedo.cafeperfeito.model.enums.TipoEndereco;
 import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import com.google.common.base.Splitter;
@@ -133,7 +134,7 @@ public class ServiceMascara {
     public static String getDataExtenso(String municipio, LocalDate localDate) {
         if (municipio == null) {
             Endereco endereco;
-            if ((endereco = UsuarioLogado.getUsuario().getLojaAtivo().getEndereco()) != null)
+            if ((endereco = UsuarioLogado.getUsuario().getLojaAtivo().getEndereco(TipoEndereco.PRINCIPAL)) != null)
                 municipio = endereco.getMunicipio().getDescricao();
             else
                 municipio = TCONFIG.getInfLoja().getMunicipio();

@@ -38,6 +38,9 @@
         <municipio>Manaus</municipio>
         <cMunFG>1302603</cMunFG>
         <ddd>92</ddd>
+        <banco>ITAU</banco>
+        <agencia>1677</agencia>
+        <contaCorrente>35.456-3</contaCorrente>
         <imageDefaultProduto>
             <width>250</width>
             <height>250</height>
@@ -73,10 +76,11 @@
         <tpAmb>2</tpAmb>
         <finNFe>1</finNFe>
         <procEmi>0</procEmi>
-        <verProc>v1.03</verProc>
+        <verProc>2.01</verProc>
         <cPais>1058</cPais>
         <nPais>BRASIL</nPais>
         <CRT>3</CRT>
+        <infAdic>TOTAL R$ %s DADOS BANCARIOS PARA TRANSFERENCIA BANCO %s AG: %s C/C: %s</infAdic>
         <infRespTec>
             <cnpj>08009246000136</cnpj>
             <xContato>THIAGO LEIROS MACEDO</xContato>

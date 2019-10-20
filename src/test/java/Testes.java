@@ -1,11 +1,12 @@
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
 import br.com.tlmacedo.cafeperfeito.nfe.v400.NotaFiscal;
-import br.com.tlmacedo.cafeperfeito.service.ServiceUtilJSon;
 import br.com.tlmacedo.cafeperfeito.service.ServiceUtilXml;
 import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
+
+import java.util.Scanner;
 
 public class Testes {
 
@@ -15,14 +16,18 @@ public class Testes {
         try {
             new ServiceVariaveisSistema().getVariaveisSistema();
 
-//            new NotaFiscal(
-//                    new SaidaProdutoDAO().getById(SaidaProduto.class, 87L));
+            SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
 
-            Long nPed = 85L;
-            SaidaProduto saidaProduto = new SaidaProdutoDAO().getById(SaidaProduto.class, nPed);
-            ServiceUtilJSon.printJsonFromObject(saidaProduto, String.format("Pedido [%d]\n", nPed));
+            System.out.printf("\nqual saida de produto vc que gerar NF? ");
+            Long nPed = Long.valueOf(new Scanner(System.in).nextLine().replaceAll("\\D", ""));
 
-            NotaFiscal notaFiscal = new NotaFiscal(saidaProduto);
+//            Long nPed = 85L;
+            SaidaProduto saidaProduto = saidaProdutoDAO.getById(SaidaProduto.class, nPed);
+            //ServiceUtilJSon.printJsonFromObject(saidaProduto, String.format("Pedido [%d]\n", nPed));
+
+            NotaFiscal notaFiscal = new NotaFiscal(saidaProdutoDAO, saidaProduto);
+
+            //ServiceUtilJSon.printJsonFromObject(notaFiscal, String.format("Nota [%d]\n", nPed));
 
             TEnviNFe tEnviNFe = new EnviNfe_v400(notaFiscal.getEnviNfeVO()).gettEnviNFe();
 

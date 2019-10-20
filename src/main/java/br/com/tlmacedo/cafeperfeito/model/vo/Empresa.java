@@ -43,6 +43,8 @@ public class Empresa implements Serializable {
     private ObjectProperty<BigDecimal> limite = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private IntegerProperty prazo = new SimpleIntegerProperty(0);
     private BooleanProperty prazoDiaUtil = new SimpleBooleanProperty(false);
+    private StringProperty iSuframa = new SimpleStringProperty();
+    private StringProperty iMunicpipal = new SimpleStringProperty();
 
     private List<EmpresaCondicoes> empresaCondicoes = new ArrayList<>();
 
@@ -299,6 +301,32 @@ public class Empresa implements Serializable {
         this.prazoDiaUtil.set(prazoDiaUtil);
     }
 
+    @Column(length = 9)
+    public String getiSuframa() {
+        return iSuframa.get();
+    }
+
+    public StringProperty iSuframaProperty() {
+        return iSuframa;
+    }
+
+    public void setiSuframa(String iSuframa) {
+        this.iSuframa.set(iSuframa);
+    }
+
+    @Column(length = 15)
+    public String getiMunicpipal() {
+        return iMunicpipal.get();
+    }
+
+    public StringProperty iMunicpipalProperty() {
+        return iMunicpipal;
+    }
+
+    public void setiMunicpipal(String iMunicpipal) {
+        this.iMunicpipal.set(iMunicpipal);
+    }
+
     @JsonIgnore
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<EmpresaCondicoes> getEmpresaCondicoes() {
@@ -412,39 +440,65 @@ public class Empresa implements Serializable {
         this.vlrTickeMedio.set(vlrTickeMedio);
     }
 
+    @Transient
+    @JsonIgnore
+    public String getxNome(int tamanho) {
+        String xNome = String.format("%s%s", getRazao(),
+                !getFantasia().equals("")
+                        ? String.format(" (%s)", getFantasia())
+                        : "");
+        if (xNome.length() > tamanho)
+            xNome = xNome.substring(0, tamanho);
+        return xNome;
+    }
 
     @Transient
     @JsonIgnore
-    public Endereco getEndereco() {
+    public Endereco getEndereco(TipoEndereco tipoEndereco) {
+        if (tipoEndereco == null)
+            tipoEndereco = TipoEndereco.PRINCIPAL;
+        TipoEndereco finalTipoEndereco = tipoEndereco;
         return getEnderecoList().stream()
-                .filter(endereco -> endereco.getTipo() == TipoEndereco.PRINCIPAL)
+                .filter(endereco -> endereco.getTipo() == finalTipoEndereco)
                 .findFirst().orElse(null);
     }
 
     @Transient
     @JsonIgnore
-    public String getEnderecoPrincipal() {
-        if (getEndereco() == null)
+    public String getEndereco(Endereco end) {
+        if (end == null)
             return "";
         return String.format("%s, %s - %s",
-                getEndereco().logradouroProperty().getValue(),
-                getEndereco().numeroProperty().getValue(),
-                getEndereco().bairroProperty().getValue());
+                end.logradouroProperty().getValue(),
+                end.numeroProperty().getValue(),
+                end.bairroProperty().getValue());
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getEnderecoPrincipal() {
+        return getEndereco(getEndereco(TipoEndereco.PRINCIPAL));
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getEnderecoEntrega() {
+        return getEndereco(getEndereco(TipoEndereco.ENTREGA));
     }
 
     @Transient
     @JsonIgnore
     public String getMunicipio() {
-        Endereco end = getEndereco();
-        if (end == null) return TCONFIG.getInfLoja().getMunicipio();
+        Endereco end;
+        if ((end = getEndereco(TipoEndereco.PRINCIPAL)) == null) return TCONFIG.getInfLoja().getMunicipio();
         return end.getMunicipio().getDescricao();
     }
 
     @Transient
     @JsonIgnore
     public String getUf() {
-        Endereco end = getEndereco();
-        if (end == null) return TCONFIG.getInfLoja().getUf();
+        Endereco end;
+        if ((end = getEndereco(TipoEndereco.PRINCIPAL)) == null) return TCONFIG.getInfLoja().getUf();
         return end.getMunicipio().getUf().getSigla();
     }
 

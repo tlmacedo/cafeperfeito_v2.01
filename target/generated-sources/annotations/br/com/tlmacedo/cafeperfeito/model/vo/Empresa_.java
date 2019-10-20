@@ -13,17 +13,19 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-10-17T14:03:08")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-10-19T23:39:18")
 @StaticMetamodel(Empresa.class)
 public class Empresa_ { 
 
     public static volatile ListAttribute<Empresa, Telefone> telefoneList;
     public static volatile SingularAttribute<Empresa, SituacaoCadastroEmpresa> situacao;
+    public static volatile SingularAttribute<Empresa, String> iSuframa;
     public static volatile SingularAttribute<Empresa, LocalDateTime> dtCadastro;
     public static volatile SingularAttribute<Empresa, Integer> prazo;
     public static volatile SingularAttribute<Empresa, String> cnpj;
     public static volatile SingularAttribute<Empresa, BigDecimal> limite;
     public static volatile ListAttribute<Empresa, EmpresaCondicoes> empresaCondicoes;
+    public static volatile SingularAttribute<Empresa, String> iMunicpipal;
     public static volatile SingularAttribute<Empresa, String> razao;
     public static volatile SingularAttribute<Empresa, Boolean> transportadora;
     public static volatile SingularAttribute<Empresa, LocalDateTime> dtAtualizacao;
