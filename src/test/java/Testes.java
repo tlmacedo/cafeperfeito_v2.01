@@ -1,6 +1,6 @@
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
-import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
 import br.com.tlmacedo.cafeperfeito.nfe.v400.NotaFiscal;
+import br.com.tlmacedo.cafeperfeito.service.ServiceUtilJSon;
 import br.com.tlmacedo.cafeperfeito.service.ServiceUtilXml;
 import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
@@ -22,12 +22,12 @@ public class Testes {
             Long nPed = Long.valueOf(new Scanner(System.in).nextLine().replaceAll("\\D", ""));
 
 //            Long nPed = 85L;
-            SaidaProduto saidaProduto = saidaProdutoDAO.getById(SaidaProduto.class, nPed);
+//            SaidaProduto saidaProduto = saidaProdutoDAO.getById(SaidaProduto.class, nPed);
             //ServiceUtilJSon.printJsonFromObject(saidaProduto, String.format("Pedido [%d]\n", nPed));
 
-            NotaFiscal notaFiscal = new NotaFiscal(saidaProdutoDAO, saidaProduto);
+            NotaFiscal notaFiscal = new NotaFiscal(nPed);
 
-            //ServiceUtilJSon.printJsonFromObject(notaFiscal, String.format("Nota [%d]\n", nPed));
+            ServiceUtilJSon.printJsonFromObject(notaFiscal, String.format("Nota [%d]\n", nPed));
 
             TEnviNFe tEnviNFe = new EnviNfe_v400(notaFiscal.getEnviNfeVO()).gettEnviNFe();
 

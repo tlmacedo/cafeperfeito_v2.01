@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoProduto;
@@ -11,7 +12,7 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-10-17T14:03:08")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-10-22T17:12:02")
 @StaticMetamodel(SaidaProduto.class)
 public class SaidaProduto_ { 
 
@@ -22,5 +23,6 @@ public class SaidaProduto_ {
     public static volatile SingularAttribute<SaidaProduto, LocalDateTime> dtCadastro;
     public static volatile SingularAttribute<SaidaProduto, LocalDate> dtSaida;
     public static volatile SingularAttribute<SaidaProduto, Long> id;
+    public static volatile SingularAttribute<SaidaProduto, ContasAReceber> contasAReceber;
 
 }

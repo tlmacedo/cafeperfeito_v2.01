@@ -327,6 +327,7 @@ public class Produto implements Serializable {
         this.cest.set(cest);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public FiscalCstOrigem getFiscalCstOrigem() {
         return fiscalCstOrigem.get();
@@ -340,6 +341,7 @@ public class Produto implements Serializable {
         this.fiscalCstOrigem.set(fiscalCstOrigem);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public FiscalIcms getFiscalIcms() {
         return fiscalIcms.get();
@@ -353,6 +355,7 @@ public class Produto implements Serializable {
         this.fiscalIcms.set(fiscalIcms);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public FiscalPisCofins getFiscalPis() {
         return fiscalPis.get();
@@ -366,6 +369,7 @@ public class Produto implements Serializable {
         this.fiscalPis.set(fiscalPis);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public FiscalPisCofins getFiscalCofins() {
         return fiscalCofins.get();
@@ -495,6 +499,14 @@ public class Produto implements Serializable {
 
     public void setProdutoCodigoBarraList(List<ProdutoCodigoBarra> produtoCodigoBarraList) {
         this.produtoCodigoBarraList = produtoCodigoBarraList;
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getCEAN() {
+        if (produtoCodigoBarraList != null)
+            return produtoCodigoBarraList.get(0).getCodigoBarra();
+        return "";
     }
 
     @Override

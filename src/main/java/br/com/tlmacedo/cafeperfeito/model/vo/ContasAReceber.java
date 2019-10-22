@@ -52,7 +52,7 @@ public class ContasAReceber implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     public SaidaProduto getSaidaProduto() {
         return saidaProduto.get();
     }

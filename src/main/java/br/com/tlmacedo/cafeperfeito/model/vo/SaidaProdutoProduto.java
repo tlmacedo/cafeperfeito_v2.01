@@ -1,6 +1,5 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.TipoSaidaProduto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
@@ -17,7 +16,7 @@ public class SaidaProdutoProduto implements Serializable {
 
     private LongProperty id = new SimpleLongProperty();
     private ObjectProperty<SaidaProduto> saidaProduto = new SimpleObjectProperty<>();
-    private LongProperty idProd = new SimpleLongProperty();
+    private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
     private StringProperty codigo = new SimpleStringProperty();
     private StringProperty descricao = new SimpleStringProperty();
     private TipoSaidaProduto tipoSaidaProduto;
@@ -34,14 +33,14 @@ public class SaidaProdutoProduto implements Serializable {
     private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>();
     private IntegerProperty estoque = new SimpleIntegerProperty();
 
-    private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
-
     public SaidaProdutoProduto() {
     }
 
-    public SaidaProdutoProduto(Integer idProd, Produto produto, TipoSaidaProduto tipSaida, Integer qtd) {
-        this.produto.setValue(new ProdutoDAO().getById(Produto.class, idProd.longValue()));
-        this.idProd = getProduto().idProperty();
+    public SaidaProdutoProduto(Produto produto, TipoSaidaProduto tipSaida, Integer qtd) {
+        Produto prod = new Produto();
+        prod = produto;
+        this.produto.setValue(prod);
+        //this.idProd = getProduto().idProperty();
         this.codigo = getProduto().codigoProperty();
         this.descricao = getProduto().descricaoProperty();
         this.tipoSaidaProduto = tipSaida;
@@ -87,18 +86,18 @@ public class SaidaProdutoProduto implements Serializable {
         this.saidaProduto.set(saidaProduto);
     }
 
-    @Column(length = 20, nullable = false)
-    public long getIdProd() {
-        return idProd.get();
-    }
-
-    public LongProperty idProdProperty() {
-        return idProd;
-    }
-
-    public void setIdProd(long idProd) {
-        this.idProd.set(idProd);
-    }
+//    @Column(length = 20, nullable = false)
+//    public long getIdProd() {
+//        return idProd.get();
+//    }
+//
+//    public LongProperty idProdProperty() {
+//        return idProd;
+//    }
+//
+//    public void setIdProd(long idProd) {
+//        this.idProd.set(idProd);
+//    }
 
     @Column(length = 15, nullable = false)
     public String getCodigo() {
@@ -252,7 +251,7 @@ public class SaidaProdutoProduto implements Serializable {
     }
 
     @JsonIgnore
-    @Transient
+    @ManyToOne(fetch = FetchType.LAZY)
     public Produto getProduto() {
         return produto.get();
     }
@@ -263,6 +262,12 @@ public class SaidaProdutoProduto implements Serializable {
 
     public void setProduto(Produto produto) {
         this.produto.set(produto);
+    }
+
+    @JsonIgnore
+    @Transient
+    public Long getIdProd() {
+        return produto.get().idProperty().getValue();
     }
 
     @Transient
@@ -296,7 +301,7 @@ public class SaidaProdutoProduto implements Serializable {
         return "SaidaProdutoProduto{" +
                 "id=" + id +
                 //", saidaProduto=" + saidaProduto +
-                ", idProd=" + idProd +
+//                ", idProd=" + idProd +
                 ", codigo=" + codigo +
                 ", descricao=" + descricao +
                 ", tipoSaidaProduto=" + tipoSaidaProduto +

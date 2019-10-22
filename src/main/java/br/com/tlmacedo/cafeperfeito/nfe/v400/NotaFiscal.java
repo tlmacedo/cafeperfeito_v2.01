@@ -4,15 +4,16 @@ import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
-import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
-import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
-import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
-import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
+import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
@@ -21,12 +22,11 @@ public class NotaFiscal {
     EnviNfeVO enviNfeVO;
     SaidaProduto saidaProduto;
     SaidaProdutoNfe nfe;
-    SaidaProdutoDAO saidaProdutoDAO;
+    SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
 
-    public NotaFiscal(SaidaProdutoDAO saidaProdutoDAO, SaidaProduto saidaProduto) {
+    public NotaFiscal(Long nPed) {
         setEnviNfeVO(new EnviNfeVO());
-        setSaidaProduto(saidaProduto);
-        setSaidaProdutoDAO(saidaProdutoDAO);
+        setSaidaProduto(getSaidaProdutoDAO().getById(SaidaProduto.class, nPed));
 
         getEnviNfeVO().setVersao(TCONFIG.getNfe().getVersao());
         getEnviNfeVO().setIdLote(String.format("%015d", getSaidaProduto().idProperty().getValue()));
@@ -123,6 +123,80 @@ public class NotaFiscal {
         destEnderVO.setcPais(TCONFIG.getNfe().getCPais());
         destEnderVO.setxPais(TCONFIG.getNfe().getNPais());
         destEnderVO.setFone(destinatario.getFonePrincipal());
+
+        TotalVO totalVO = new TotalVO();
+        infNfeVO.setTotal(totalVO);
+        IcmsTotVO icmsTotVO = new IcmsTotVO();
+        totalVO.setIcmsTot(icmsTotVO);
+
+        if (getSaidaProduto().getSaidaProdutoProdutoList().size() > 0) {
+            List<DetVO> detVOList = new ArrayList<>();
+
+            for (int i = 0; i < getSaidaProduto().getSaidaProdutoProdutoList().size(); i++) {
+                DetVO detVO = new DetVO();
+                detVO.setnItem(String.valueOf(i + 1));
+                detVO.setProd(newNfeProd(getSaidaProduto().getSaidaProdutoProdutoList().get(i)));
+                detVO.setImposto(newNfeImposto(getSaidaProduto().getSaidaProdutoProdutoList().get(i).getProduto()));
+
+                detVOList.add(detVO);
+
+                if (!detVO.getProd().getvProd().equals(""))
+                    icmsTotVO.setvProd(icmsTotVO.getvProd().add(new BigDecimal(detVO.getProd().getvProd())));
+                if (!detVO.getProd().getvFrete().equals(""))
+                    icmsTotVO.setvFrete(icmsTotVO.getvFrete().add(new BigDecimal(detVO.getProd().getvFrete())));
+                if (!detVO.getProd().getvSeg().equals(""))
+                    icmsTotVO.setvSeg(icmsTotVO.getvSeg().add(new BigDecimal(detVO.getProd().getvSeg())));
+                if (!detVO.getProd().getvDesc().equals(""))
+                    icmsTotVO.setvDesc(icmsTotVO.getvDesc().add(new BigDecimal(detVO.getProd().getvDesc())));
+            }
+            icmsTotVO.setvNF(icmsTotVO.getvProd().subtract(icmsTotVO.getvDesc()));
+
+            infNfeVO.setDetList(detVOList);
+        }
+
+        TranspVO transpVO = new TranspVO();
+        infNfeVO.setTransp(transpVO);
+        transpVO.setModFrete(String.valueOf(getSaidaProduto().getSaidaProdutoNfe().getModFrete().ordinal()));
+        if (Integer.parseInt(transpVO.getModFrete()) < 3) {
+            TransportaVO transportaVO = new TransportaVO();
+            transpVO.setTransporta(transportaVO);
+            Empresa tranportadora = getSaidaProduto().getSaidaProdutoNfe().getTransportador();
+            if (tranportadora.isPessoaJuridica())
+                transportaVO.setCNPJ(tranportadora.getCnpj());
+            else
+                transportaVO.setCPF(tranportadora.getCnpj());
+            transportaVO.setxNome(tranportadora.getxNome(60));
+
+            if (!tranportadora.ieProperty().getValue().equals(""))
+                transportaVO.setIE(tranportadora.ieProperty().getValue());
+
+            Endereco end = tranportadora.getEndereco(TipoEndereco.PRINCIPAL);
+            transportaVO.setxEnder(tranportadora.getEndereco(end));
+
+            transportaVO.setxMun(end.getMunicipio().getDescricao().toUpperCase());
+            transportaVO.setUF(end.getMunicipio().getUf().getSigla().toUpperCase());
+        }
+
+        CobrVO cobrVO = new CobrVO();
+        infNfeVO.setCobr(cobrVO);
+        FatVO fatVO = new FatVO();
+        cobrVO.setFat(fatVO);
+        if (getSaidaProduto().getContasAReceber().getRecebimentoList().size() > 0)
+            fatVO.setnFat(getSaidaProduto().getContasAReceber().getRecebimentoList().get(0).getDocumento());
+        if (fatVO.getnFat().equals(""))
+            fatVO.setnFat(ideVO.getnNF());
+
+        fatVO.setvOrig(icmsTotVO.getvProd());
+        fatVO.setvDesc(icmsTotVO.getvDesc());
+        fatVO.setvLiq(icmsTotVO.getvNF());
+        if (getSaidaProduto().getContasAReceber() != null) {
+            DupVO dupVO = new DupVO();
+            cobrVO.getDupVOList().add(dupVO);
+            dupVO.setnDup("001");
+            dupVO.setdVenc(getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue());
+            dupVO.setvDup(fatVO.getvLiq());
+        }
+
     }
 
     private IdeVO newNfeIde(SaidaProdutoNfe nfe) {
@@ -202,6 +276,120 @@ public class NotaFiscal {
         return ideVO;
     }
 
+    private ProdVO newNfeProd(SaidaProdutoProduto saidaProdutoProduto) {
+        Produto produto = saidaProdutoProduto.getProduto();
+        ProdVO prodVO = new ProdVO();
+
+        prodVO.setcProd(produto.getCodigo());
+        prodVO.setcEAN(produto.getCEAN());
+        prodVO.setxProd(produto.getDescricao());
+        prodVO.setNCM(produto.getNcm());
+        prodVO.setNVE("");
+        prodVO.setCEST(produto.getCest());
+        prodVO.setIndEscala("");
+        prodVO.setCNPJFab("");
+        prodVO.setcBenef("");
+        prodVO.setEXTIPI("");
+        prodVO.setCFOP("5" + saidaProdutoProduto.getTipoSaidaProduto().getCod());
+        prodVO.setuCom(produto.getUnidadeComercial().getDescricao());
+        BigDecimal qCom = new BigDecimal(saidaProdutoProduto.qtdProperty().getValue());
+        prodVO.setqCom(qCom.setScale(4).toString());
+        prodVO.setvUnCom(saidaProdutoProduto.vlrVendaProperty().getValue().setScale(10).toString());
+        prodVO.setvProd(saidaProdutoProduto.vlrBrutoProperty().getValue().setScale(2, RoundingMode.HALF_UP).toString());
+        prodVO.setcEANTrib(produto.getCEAN());
+        prodVO.setuTrib(produto.getUnidadeComercial().getDescricao());
+        prodVO.setqTrib(qCom.setScale(4).toString());
+        prodVO.setvUnTrib(saidaProdutoProduto.vlrVendaProperty().getValue().setScale(10).toString());
+        prodVO.setvFrete("");
+        prodVO.setvSeg("");
+        prodVO.setvDesc(saidaProdutoProduto.vlrDescontoProperty().getValue().setScale(2, RoundingMode.HALF_UP).toString());
+        prodVO.setvOutro("");
+        prodVO.setIndTot("1");
+
+        return prodVO;
+    }
+
+    private ImpostoVO newNfeImposto(Produto produto) {
+        ImpostoVO impostoVO = new ImpostoVO();
+        if (produto.fiscalIcmsProperty().getValue() != null) {
+            IcmsVO icmsVO = new IcmsVO();
+            impostoVO.setIcms(icmsVO);
+            switch (produto.fiscalIcmsProperty().getValue().idProperty().getValue().intValue()) {
+                case 0:
+                    Icms00VO icms00VO = new Icms00VO();
+                    icmsVO.setIcms00(icms00VO);
+                    icms00VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms00VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 10:
+                    Icms10VO icms10VO = new Icms10VO();
+                    icmsVO.setIcms10(icms10VO);
+                    icms10VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms10VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 20:
+                    Icms20VO icms20VO = new Icms20VO();
+                    icmsVO.setIcms20(icms20VO);
+                    icms20VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms20VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 30:
+                    Icms30VO icms30VO = new Icms30VO();
+                    icmsVO.setIcms30(icms30VO);
+                    icms30VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms30VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 40:
+                    Icms40_41_50VO icms404150VO = new Icms40_41_50VO();
+                    icmsVO.setIcms40_41_50(icms404150VO);
+                    icms404150VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms404150VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 50:
+                    Icms51VO icms51VO = new Icms51VO();
+                    icmsVO.setIcms51(icms51VO);
+                    icms51VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms51VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 60:
+                    Icms60VO icms60VO = new Icms60VO();
+                    icmsVO.setIcms60(icms60VO);
+                    icms60VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms60VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 70:
+                    Icms70VO icms70VO = new Icms70VO();
+                    icmsVO.setIcms70(icms70VO);
+                    icms70VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms70VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 90:
+                    Icms90VO icms90VO = new Icms90VO();
+                    icmsVO.setIcms90(icms90VO);
+                    icms90VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms90VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+            }
+        }
+
+        if (produto.fiscalPisProperty().getValue() != null) {
+            PisVO pisVO = new PisVO();
+            impostoVO.setPis(pisVO);
+            PisNTVO pisNTVO = new PisNTVO();
+            pisVO.setPisNT(pisNTVO);
+            pisNTVO.setCST(String.format("%02d", produto.fiscalPisProperty().getValue().idProperty().getValue()));
+        }
+
+        if (produto.fiscalCofinsProperty().getValue() != null) {
+            CofinsVO cofinsVO = new CofinsVO();
+            impostoVO.setCofins(cofinsVO);
+            CofinsNTVO cofinsNTVO = new CofinsNTVO();
+            cofinsVO.setCofinsNT(cofinsNTVO);
+            cofinsNTVO.setCST(String.format("%02d", produto.fiscalCofinsProperty().getValue().idProperty().getValue()));
+        }
+
+        return impostoVO;
+    }
 
     /**
      * Begin Getters and Setters
@@ -215,6 +403,7 @@ public class NotaFiscal {
         this.enviNfeVO = enviNfeVO;
     }
 
+    @JsonIgnore
     public SaidaProduto getSaidaProduto() {
         return saidaProduto;
     }
@@ -223,6 +412,7 @@ public class NotaFiscal {
         this.saidaProduto = saidaProduto;
     }
 
+    @JsonIgnore
     public SaidaProdutoNfe getNfe() {
         return nfe;
     }
@@ -231,6 +421,7 @@ public class NotaFiscal {
         this.nfe = nfe;
     }
 
+    @JsonIgnore
     public SaidaProdutoDAO getSaidaProdutoDAO() {
         return saidaProdutoDAO;
     }

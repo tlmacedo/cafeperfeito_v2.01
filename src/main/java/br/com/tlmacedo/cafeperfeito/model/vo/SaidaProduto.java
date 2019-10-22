@@ -29,6 +29,8 @@ public class SaidaProduto implements Serializable {
 
     private ObjectProperty<SaidaProdutoNfe> saidaProdutoNfe = new SimpleObjectProperty<>();
 
+    private ObjectProperty<ContasAReceber> contasAReceber = new SimpleObjectProperty<>();
+
     public SaidaProduto() {
     }
 
@@ -120,6 +122,19 @@ public class SaidaProduto implements Serializable {
 
     public void setSaidaProdutoNfe(SaidaProdutoNfe saidaProdutoNfe) {
         this.saidaProdutoNfe.set(saidaProdutoNfe);
+    }
+
+    @OneToOne(mappedBy = "saidaProduto")
+    public ContasAReceber getContasAReceber() {
+        return contasAReceber.get();
+    }
+
+    public ObjectProperty<ContasAReceber> contasAReceberProperty() {
+        return contasAReceber;
+    }
+
+    public void setContasAReceber(ContasAReceber contasAReceber) {
+        this.contasAReceber.set(contasAReceber);
     }
 
     //    public List<SaidaProdutoProduto> getSaidaProdutoProdutoList() {

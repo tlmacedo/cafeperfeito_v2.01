@@ -234,20 +234,23 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                     || getTtvProdutos().getSelectionModel().getSelectedItem() == null
                     || getTtvProdutos().getSelectionModel().getSelectedItem().getValue().tblEstoqueProperty().get() <= 0)
                 return;
-            Produto produtoEscolhido;
-            Integer idProd;
-            if ((idProd = getTtvProdutos().getSelectionModel().getSelectedItem().getValue().idProperty().getValue().intValue()) == 0) {
-                produtoEscolhido = getTtvProdutos().getSelectionModel().getSelectedItem().getValue();
-                idProd = getTtvProdutos().getSelectionModel().getSelectedItem().getParent().getValue().idProperty().getValue().intValue();
+            Produto produtoEscolhido = new Produto();
+            produtoEscolhido = getTtvProdutos().getSelectionModel().getSelectedItem().getValue();
+//            Integer idProd;
+            if (produtoEscolhido.getId() == 0) {
+                produtoEscolhido.setId(getTtvProdutos().getSelectionModel().getSelectedItem().getParent().getValue().idProperty().getValue().intValue());
             } else {
-                produtoEscolhido = getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue();
+                produtoEscolhido.setTblEstoque(getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblEstoque());
+                produtoEscolhido.setTblLote(getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblLote());
+                produtoEscolhido.setTblValidade(getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblValidade());
             }
-            Integer finalIdProd = idProd;
+            Produto finalProdutoEscolhido = produtoEscolhido;
             if (getSaidaProdutoProdutoObservableList().stream()
-                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue().equals(produtoEscolhido.tblLoteProperty().getValue())
-                            && saidaProdutoProduto.idProdProperty().getValue().intValue() == finalIdProd)
+                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue().equals(finalProdutoEscolhido.tblLoteProperty().getValue())
+                            && saidaProdutoProduto.getProduto().idProperty().getValue().intValue() == finalProdutoEscolhido.idProperty().getValue().intValue())
                     .findFirst().orElse(null) == null) {
-                getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(idProd, produtoEscolhido, TipoSaidaProduto.VENDA, 1));
+                ServiceUtilJSon.printJsonFromObject(produtoEscolhido, "ProdutoEscolhido");
+                getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoEscolhido, TipoSaidaProduto.VENDA, 1));
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().fireEvent(ServiceComandoTecladoMouse.pressTecla(KeyCode.F8));
                 if (getTmodelSaidaProduto().empresaProperty().getValue() != null)
                     getTmodelSaidaProduto().calculaDescontoCliente();
@@ -255,7 +258,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 for (int i = 0; i < getSaidaProdutoProdutoObservableList().size(); i++) {
                     SaidaProdutoProduto saida = getSaidaProdutoProdutoObservableList().get(i);
                     if (saida.loteProperty().getValue().equals(produtoEscolhido.tblLoteProperty().getValue())
-                            && saida.idProdProperty().getValue().intValue() == finalIdProd) {
+                            && saida.produtoProperty().getValue().idProperty().getValue().intValue()
+                            == finalProdutoEscolhido.idProperty().getValue().intValue()) {
                         getTvItensPedido().requestFocus();
                         getTvItensPedido().getSelectionModel().select(i, getTmodelSaidaProduto().getColQtd());
                     }
@@ -274,11 +278,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         getTvItensPedido().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
             if (keyEvent.getCode() != KeyCode.HELP) return;
             Produto produtoEscolhido = new Produto();
-            produtoEscolhido.idProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().idProdProperty().getValue());
+            produtoEscolhido.idProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().produtoProperty().getValue().idProperty().getValue());
             produtoEscolhido.tblEstoqueProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().estoqueProperty().getValue());
             produtoEscolhido.tblLoteProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().loteProperty().getValue());
             produtoEscolhido.tblValidadeProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().dtValidadeProperty().getValue());
-            getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoEscolhido.idProperty().getValue().intValue(), produtoEscolhido, TipoSaidaProduto.AMOSTRA, 1));
+            getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoEscolhido, TipoSaidaProduto.AMOSTRA, 1));
         });
 
         setEventHandlerSaidaProduto(new EventHandler<KeyEvent>() {
@@ -388,15 +392,27 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             }
         });
 
-        ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-            if (n == null) return;
-            if (n.getText().equals(getNomeTab()))
-                ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().addEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
-            else
-                ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
-        });
+        ControllerPrincipal.getCtrlPrincipal().
 
-        new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
+                getTabPaneViewPrincipal().
+
+                getSelectionModel().
+
+                selectedItemProperty().
+
+                addListener((ov, o, n) ->
+
+                {
+                    if (n == null) return;
+                    if (n.getText().equals(getNomeTab()))
+                        ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().addEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
+                    else
+                        ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
+                });
+
+        new
+
+                ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
 
 //        getCboEmpresa().focusedProperty().addListener((ov, o, n) -> {
 //            if (!n) {
@@ -419,81 +435,121 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 //            showStatusBar();
 //        });
 
-        empresaProperty().bind(Bindings.createObjectBinding(() -> {
-                    if (getCboEmpresa().getValue() == null)
-                        return new Empresa();
-                    return getCboEmpresa().getValue();
-                }, getCboEmpresa().valueProperty())
-        );
+        empresaProperty().
 
-        empresaProperty().addListener((ov, o, n) -> {
-            getDtpDtSaida().setValue(LocalDate.now());
-            getTmodelSaidaProduto().empresaProperty().setValue(n);
+                bind(Bindings.createObjectBinding(() ->
+
+                        {
+                            if (getCboEmpresa().getValue() == null)
+                                return new Empresa();
+                            return getCboEmpresa().getValue();
+                        },
+
+                        getCboEmpresa().
+
+                                valueProperty())
+                );
+
+        empresaProperty().
+
+                addListener((ov, o, n) ->
+
+                {
+                    getDtpDtSaida().setValue(LocalDate.now());
+                    getTmodelSaidaProduto().empresaProperty().setValue(n);
 //            if (n == null) {
 //                empresaProperty().setValue(getEmpresaObservableList().get(0));
 //                return;
 //            }
 
-            getLblLimite().setText(ServiceMascara.getMoeda(n.limiteProperty().getValue(), 2));
-            getLblLimiteUtilizado().setText(ServiceMascara.getMoeda(n.limiteUtilizadoProperty().getValue(), 2));
+                    getLblLimite().setText(ServiceMascara.getMoeda(n.limiteProperty().getValue(), 2));
+                    getLblLimiteUtilizado().setText(ServiceMascara.getMoeda(n.limiteUtilizadoProperty().getValue(), 2));
 
-            getTmodelSaidaProduto().prazoProperty().setValue(n.prazoProperty().getValue());
+                    getTmodelSaidaProduto().prazoProperty().setValue(n.prazoProperty().getValue());
 
-            getLblUltimoPedidoDt().setText(n.dtUltimoPedidoProperty().getValue() != null ? n.dtUltimoPedidoProperty().getValue().format(DTF_DATA) : "");
+                    getLblUltimoPedidoDt().setText(n.dtUltimoPedidoProperty().getValue() != null ? n.dtUltimoPedidoProperty().getValue().format(DTF_DATA) : "");
 
-            getLblUltimoPedidoDias().setText(n == null
-                    ? ""
-                    : (n.dtUltimoPedidoProperty().getValue() != null
-                    ? String.valueOf(DAYS.between(n.dtUltimoPedidoProperty().getValue(), LocalDate.now()))
-                    : (n.dtCadastroProperty().getValue() == null
-                    ? ""
-                    : String.valueOf(DAYS.between(n.dtCadastroProperty().getValue().toLocalDate(), LocalDate.now())))));
-            getLblUltimoPedidoVlr().setText(ServiceMascara.getMoeda(n.vlrUltimoPedidoProperty().getValue(), 2));
-            getLblQtdPedidos().setText(n.qtdPedidosProperty().getValue().toString());
-            getLblTicketMedioVlr().setText(ServiceMascara.getMoeda(n.vlrTickeMedioProperty().getValue(), 2));
+                    getLblUltimoPedidoDias().setText(n == null
+                            ? ""
+                            : (n.dtUltimoPedidoProperty().getValue() != null
+                            ? String.valueOf(DAYS.between(n.dtUltimoPedidoProperty().getValue(), LocalDate.now()))
+                            : (n.dtCadastroProperty().getValue() == null
+                            ? ""
+                            : String.valueOf(DAYS.between(n.dtCadastroProperty().getValue().toLocalDate(), LocalDate.now())))));
+                    getLblUltimoPedidoVlr().setText(ServiceMascara.getMoeda(n.vlrUltimoPedidoProperty().getValue(), 2));
+                    getLblQtdPedidos().setText(n.qtdPedidosProperty().getValue().toString());
+                    getLblTicketMedioVlr().setText(ServiceMascara.getMoeda(n.vlrTickeMedioProperty().getValue(), 2));
 
-            enderecoListProperty().setValue(n.getEnderecoList());
-            telefoneListProperty().setValue(n.getTelefoneList());
+                    enderecoListProperty().setValue(n.getEnderecoList());
+                    telefoneListProperty().setValue(n.getTelefoneList());
 
-            getCboEndereco().getSelectionModel().select(0);
-            getCboTelefone().getSelectionModel().select(0);
-            n.getEnderecoList().stream()
-                    .filter(endereco1 -> endereco1.getTipo().equals(TipoEndereco.ENTREGA))
-                    .findFirst().ifPresent(endereco1 -> getCboEndereco().getSelectionModel().select(endereco1));
+                    getCboEndereco().getSelectionModel().select(0);
+                    getCboTelefone().getSelectionModel().select(0);
+                    n.getEnderecoList().stream()
+                            .filter(endereco1 -> endereco1.getTipo().equals(TipoEndereco.ENTREGA))
+                            .findFirst().ifPresent(endereco1 -> getCboEndereco().getSelectionModel().select(endereco1));
 
-            showStatusBar();
-        });
+                    showStatusBar();
+                });
 
-        getLblLimiteDisponivel().textProperty().bind(Bindings.createStringBinding(() -> {
-                    try {
-                        return ServiceMascara.getMoeda(
-                                empresaProperty().getValue().limiteProperty().getValue()
-                                        .subtract(empresaProperty().getValue().limiteUtilizadoProperty().getValue()), 2);
-                    } catch (Exception ex) {
-                        return "0,00";
+        getLblLimiteDisponivel().
+
+                textProperty().
+
+                bind(Bindings.createStringBinding(() ->
+
+                        {
+                            try {
+                                return ServiceMascara.getMoeda(
+                                        empresaProperty().getValue().limiteProperty().getValue()
+                                                .subtract(empresaProperty().getValue().limiteUtilizadoProperty().getValue()), 2);
+                            } catch (Exception ex) {
+                                return "0,00";
+                            }
+                        },
+
+                        getLblLimite().
+
+                                textProperty(), getLblLimiteUtilizado().
+
+                                textProperty())
+                );
+
+        enderecoListProperty().
+
+                addListener((ov, o, n) ->
+
+                {
+                    if (n != null)
+                        getCboEndereco().setItems(FXCollections.observableArrayList(n));
+                    else
+                        getCboEndereco().getItems().clear();
+                });
+
+        enderecoProperty().
+
+                bind(Bindings.createObjectBinding(() ->
+
+                        getCboEndereco().
+
+                                getValue(), getCboEndereco().
+
+                        valueProperty()));
+
+        enderecoProperty().
+
+                addListener((ov, o, n) ->
+
+                {
+                    if (n == null) {
+                        limpaEndereco();
+                        return;
                     }
-                }, getLblLimite().textProperty(), getLblLimiteUtilizado().textProperty())
-        );
-
-        enderecoListProperty().addListener((ov, o, n) -> {
-            if (n != null)
-                getCboEndereco().setItems(FXCollections.observableArrayList(n));
-            else
-                getCboEndereco().getItems().clear();
-        });
-
-        enderecoProperty().bind(Bindings.createObjectBinding(() -> getCboEndereco().getValue(), getCboEndereco().valueProperty()));
-
-        enderecoProperty().addListener((ov, o, n) -> {
-            if (n == null) {
-                limpaEndereco();
-                return;
-            }
-            getLblLogradoruro().setText(n.getLogradouro());
-            getLblNumero().setText(n.getNumero());
-            getLblBairro().setText(n.getBairro());
-            getLblComplemento().setText(n.getComplemento());
-        });
+                    getLblLogradoruro().setText(n.getLogradouro());
+                    getLblNumero().setText(n.getNumero());
+                    getLblBairro().setText(n.getBairro());
+                    getLblComplemento().setText(n.getComplemento());
+                });
 
 
 //        getTmodelSaidaProduto().prazoProperty().bind(Bindings.createIntegerBinding(() -> {
@@ -503,15 +559,23 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 //                }, empresaProperty()
 //        ));
 
-        getCboEmpresa().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (getCboEmpresa().getSelectionModel().getSelectedItem() != null)
-                getTxtPesquisa().requestFocus();
-        });
+        getCboEmpresa().
 
-        getCboEndereco().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (getCboEndereco().getSelectionModel().getSelectedItem() != null)
-                getTxtPesquisa().requestFocus();
-        });
+                addEventHandler(KeyEvent.KEY_PRESSED, keyEvent ->
+
+                {
+                    if (getCboEmpresa().getSelectionModel().getSelectedItem() != null)
+                        getTxtPesquisa().requestFocus();
+                });
+
+        getCboEndereco().
+
+                addEventHandler(KeyEvent.KEY_PRESSED, keyEvent ->
+
+                {
+                    if (getCboEndereco().getSelectionModel().getSelectedItem() != null)
+                        getTxtPesquisa().requestFocus();
+                });
 
 //        getLblLimiteDisponivel().textProperty().bind(Bindings.createStringBinding(() -> {
 //            BigDecimal vLimite = ServiceMascara.getBigDecimalFromTextField(getLblLimite().getText(), 2);
@@ -519,16 +583,28 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 //            return ServiceMascara.getMoeda(vLimite.subtract(vUtilizado).setScale(2, RoundingMode.HALF_UP), 2);
 //        }, getLblLimite().textProperty(), getLblLimiteUtilizado().textProperty()));
 
-        getTmodelSaidaProduto().prazoProperty().addListener((ov, o, n) -> {
-            if (n == null) return;
-            getLblPrazo().setText(n.toString());
-            getDtpDtVencimento().setValue(getDtpDtSaida().getValue().plusDays(n.longValue()));
-        });
+        getTmodelSaidaProduto().
 
-        getDtpDtSaida().valueProperty().addListener((ov, o, n) -> {
-            if (n == null) return;
-            getDtpDtVencimento().setValue(getDtpDtSaida().getValue().plusDays(Integer.parseInt(getLblPrazo().getText())));
-        });
+                prazoProperty().
+
+                addListener((ov, o, n) ->
+
+                {
+                    if (n == null) return;
+                    getLblPrazo().setText(n.toString());
+                    getDtpDtVencimento().setValue(getDtpDtSaida().getValue().plusDays(n.longValue()));
+                });
+
+        getDtpDtSaida().
+
+                valueProperty().
+
+                addListener((ov, o, n) ->
+
+                {
+                    if (n == null) return;
+                    getDtpDtVencimento().setValue(getDtpDtSaida().getValue().plusDays(Integer.parseInt(getLblPrazo().getText())));
+                });
 
 //        getCboEndereco().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
 //            if (n == null) {
@@ -541,58 +617,163 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 //            getLblComplemento().setText(n.getComplemento());
 //        });
 
-        getTabNfeInformacoes().selectedProperty().addListener((ov, o, n) -> {
-            int diff = 21;
-            if (!n) diff = (diff * (-1));
-            organizaPosicaoCampos(diff);
-        });
+        getTabNfeInformacoes().
 
-        getTpnNfe().expandedProperty().addListener((ov, o, n) -> {
-            int diff = 85;
-            if (!n) diff = (diff * (-1));
-            organizaPosicaoCampos(diff);
-        });
+                selectedProperty().
 
-        getTpnNfe().setExpanded(false);
+                addListener((ov, o, n) ->
 
-        getTxtPesquisa().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode() != KeyCode.ENTER) return;
-            getTtvProdutos().requestFocus();
-            getTtvProdutos().getSelectionModel().selectFirst();
-        });
+                {
+                    int diff = 21;
+                    if (!n) diff = (diff * (-1));
+                    organizaPosicaoCampos(diff);
+                });
 
-        getLblTotalQtdItem().textProperty().bind(Bindings.createStringBinding(() ->
-                        getTmodelSaidaProduto().totalQtdItemProperty().getValue().toString(),
-                getTmodelSaidaProduto().totalQtdItemProperty()
-        ));
+        getTpnNfe().
 
-        getLblTotalQtdProduto().textProperty().bind(Bindings.createStringBinding(() ->
-                        getTmodelSaidaProduto().totalQtdProdutoProperty().getValue().toString(),
-                getTmodelSaidaProduto().totalQtdProdutoProperty()
-        ));
+                expandedProperty().
 
-        getLblTotalQtdVolume().textProperty().bind(Bindings.createStringBinding(() ->
-                        getTmodelSaidaProduto().totalQtdVolumeProperty().getValue().toString(),
-                getTmodelSaidaProduto().totalQtdVolumeProperty()
-        ));
+                addListener((ov, o, n) ->
 
-        getLblTotalBruto().textProperty().bind(Bindings.createStringBinding(() ->
-                        ServiceMascara.getMoeda(getTmodelSaidaProduto().totalBrutoProperty().getValue(), 2),
-                getTmodelSaidaProduto().totalBrutoProperty()
-        ));
+                {
+                    int diff = 85;
+                    if (!n) diff = (diff * (-1));
+                    organizaPosicaoCampos(diff);
+                });
 
-        getLblTotalDesconto().textProperty().bind(Bindings.createStringBinding(() ->
-                        ServiceMascara.getMoeda(getTmodelSaidaProduto().totalDescontoProperty().getValue(), 2),
-                getTmodelSaidaProduto().totalDescontoProperty()
-        ));
+        getTpnNfe().
 
-        getLblTotalLiquido().textProperty().bind(Bindings.createStringBinding(() ->
-                        ServiceMascara.getMoeda(getTmodelSaidaProduto().totalLiquidoProperty().get().setScale(2), 2),
-                getTmodelSaidaProduto().totalLiquidoProperty()));
+                setExpanded(false);
 
-        getSaidaProdutoProdutoObservableList().addListener((ListChangeListener<? super SaidaProdutoProduto>) change -> {
-            showStatusBar();
-        });
+        getTxtPesquisa().
+
+                addEventHandler(KeyEvent.KEY_PRESSED, keyEvent ->
+
+                {
+                    if (keyEvent.getCode() != KeyCode.ENTER) return;
+                    getTtvProdutos().requestFocus();
+                    getTtvProdutos().getSelectionModel().selectFirst();
+                });
+
+        getLblTotalQtdItem().
+
+                textProperty().
+
+                bind(Bindings.createStringBinding(() ->
+
+                                getTmodelSaidaProduto().
+
+                                        totalQtdItemProperty().
+
+                                        getValue().
+
+                                        toString(),
+
+                        getTmodelSaidaProduto().
+
+                                totalQtdItemProperty()
+                ));
+
+        getLblTotalQtdProduto().
+
+                textProperty().
+
+                bind(Bindings.createStringBinding(() ->
+
+                                getTmodelSaidaProduto().
+
+                                        totalQtdProdutoProperty().
+
+                                        getValue().
+
+                                        toString(),
+
+                        getTmodelSaidaProduto().
+
+                                totalQtdProdutoProperty()
+                ));
+
+        getLblTotalQtdVolume().
+
+                textProperty().
+
+                bind(Bindings.createStringBinding(() ->
+
+                                getTmodelSaidaProduto().
+
+                                        totalQtdVolumeProperty().
+
+                                        getValue().
+
+                                        toString(),
+
+                        getTmodelSaidaProduto().
+
+                                totalQtdVolumeProperty()
+                ));
+
+        getLblTotalBruto().
+
+                textProperty().
+
+                bind(Bindings.createStringBinding(() ->
+                                ServiceMascara.getMoeda(
+
+                                        getTmodelSaidaProduto().
+
+                                                totalBrutoProperty().
+
+                                                getValue(), 2),
+
+                        getTmodelSaidaProduto().
+
+                                totalBrutoProperty()
+                ));
+
+        getLblTotalDesconto().
+
+                textProperty().
+
+                bind(Bindings.createStringBinding(() ->
+                                ServiceMascara.getMoeda(
+
+                                        getTmodelSaidaProduto().
+
+                                                totalDescontoProperty().
+
+                                                getValue(), 2),
+
+                        getTmodelSaidaProduto().
+
+                                totalDescontoProperty()
+                ));
+
+        getLblTotalLiquido().
+
+                textProperty().
+
+                bind(Bindings.createStringBinding(() ->
+                                ServiceMascara.getMoeda(
+
+                                        getTmodelSaidaProduto().
+
+                                                totalLiquidoProperty().
+
+                                                get().
+
+                                                setScale(2), 2),
+
+                        getTmodelSaidaProduto().
+
+                                totalLiquidoProperty()));
+
+        getSaidaProdutoProdutoObservableList().
+
+                addListener((ListChangeListener<? super SaidaProdutoProduto>) change ->
+
+                {
+                    showStatusBar();
+                });
 
     }
 

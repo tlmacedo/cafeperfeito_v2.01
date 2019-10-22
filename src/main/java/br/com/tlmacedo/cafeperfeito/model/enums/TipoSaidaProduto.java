@@ -7,12 +7,12 @@ import java.util.List;
 
 public enum TipoSaidaProduto {
 
-    VENDA(0, "venda"),
-    BONIFICACAO(1, "bonif"),
-    RETIRADA(2, "retirada"),
-    CORTESIA(3, "cortesia"),
-    AMOSTRA(4, "amostra"),
-    TESTE(5, "teste");
+    VENDA(102, "venda"),
+    BONIFICACAO(910, "bonif"),
+    RETIRADA(557, "retirada"),
+    CORTESIA(910, "cortesia"),
+    AMOSTRA(911, "amostra"),
+    TESTE(912, "teste");
 
     private int cod;
     private String descricao;

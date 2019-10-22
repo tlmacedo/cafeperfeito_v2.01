@@ -87,7 +87,7 @@ public class TmodelSaidaProduto {
         setColProdId(new TableColumn<>("idP"));
         getColProdId().setPrefWidth(48);
         getColProdId().setStyle("-fx-alignment: center-right;");
-        getColProdId().setCellValueFactory(param -> param.getValue().idProdProperty().asString());
+        getColProdId().setCellValueFactory(param -> param.getValue().produtoProperty().getValue().idProperty().asString());
 
         setColProdCod(new TableColumn<>("cód"));
         getColProdCod().setPrefWidth(60);
@@ -295,7 +295,7 @@ public class TmodelSaidaProduto {
                 });
         setTotalQtdVolume(qtdVol[0]);
         setTotalQtdItem(getSaidaProdutoProdutoObservableList().stream()
-                .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd)).size());
+                .collect(Collectors.groupingBy(SaidaProdutoProduto::getProduto)).size());
         setTotalQtdProduto(getSaidaProdutoProdutoObservableList().stream()
                 .collect(Collectors.summingInt(SaidaProdutoProduto::getQtd)));
         setTotalBruto(getSaidaProdutoProdutoObservableList().stream()
@@ -317,7 +317,7 @@ public class TmodelSaidaProduto {
                         (aLong, saidaProdutos) -> {
                             EmpresaCondicoes condicoes;
                             if ((condicoes = empresaProperty().get().getEmpresaCondicoes().stream()
-                                    .filter(empresaCondicoes -> empresaCondicoes.getProduto().idProperty().get() == aLong
+                                    .filter(empresaCondicoes -> empresaCondicoes.getProduto().idProperty().getValue() == aLong
                                             && empresaCondicoes.validadeProperty().get().compareTo(LocalDate.now()) >= 0)
                                     .sorted(Comparator.comparing(EmpresaCondicoes::getValidade))
                                     .findFirst().orElse(null)) == null) {
@@ -412,7 +412,7 @@ public class TmodelSaidaProduto {
                                                         .forEach((s, produtoEstoques) -> {
                                                             if (restoBonif[0] > 0) {
                                                                 Integer qtdSaiu = saidaProdutos.stream()
-                                                                        .filter(saidaProdutoProduto -> saidaProdutoProduto.idProdProperty().getValue() == produtoEstoques.get(0).getProduto().idProperty().getValue()
+                                                                        .filter(saidaProdutoProduto -> saidaProdutoProduto.getIdProd() == produtoEstoques.get(0).getProduto().idProperty().getValue()
                                                                                 && saidaProdutoProduto.loteProperty().getValue().equals(s))
                                                                         .collect(Collectors.summingInt(SaidaProdutoProduto::getQtd));
                                                                 Integer qtdEstoque = produtoEstoques.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd));
@@ -426,7 +426,7 @@ public class TmodelSaidaProduto {
                                                                     restoBonif[0] -= qtdAdd;
                                                                     SaidaProdutoProduto sProd;
                                                                     if ((sProd = saidaProdutos.stream()
-                                                                            .filter(saidaProdutoProduto -> saidaProdutoProduto.idProdProperty().getValue() == produtoEstoques.get(0).getProduto().idProperty().getValue()
+                                                                            .filter(saidaProdutoProduto -> saidaProdutoProduto.produtoProperty().getValue().idProperty().getValue() == produtoEstoques.get(0).getProduto().idProperty().getValue()
                                                                                     && saidaProdutoProduto.loteProperty().getValue().equals(s) && saidaProdutoProduto.getTipoSaidaProduto().equals(finalTSaidaProduto))
                                                                             .findFirst().orElse(null)) == null) {
                                                                         Produto prod = new Produto();
@@ -434,7 +434,7 @@ public class TmodelSaidaProduto {
                                                                         prod.tblEstoqueProperty().setValue(qtdEstoque);
                                                                         prod.tblLoteProperty().setValue(s);
                                                                         prod.tblValidadeProperty().setValue(produtoEstoques.get(0).validadeProperty().getValue());
-                                                                        getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(prod.idProperty().getValue().intValue(), prod, finalTSaidaProduto, qtdAdd));
+                                                                        getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(prod, finalTSaidaProduto, qtdAdd));
                                                                     } else {
                                                                         sProd.qtdProperty().setValue(sProd.qtdProperty().getValue() + qtdAdd);
                                                                     }
@@ -470,7 +470,7 @@ public class TmodelSaidaProduto {
 
     public Integer validEstoque(Integer newQtd, Integer oldQtd) {
         if (getSaidaProdutoProdutoObservableList().stream()
-                .filter(saidaProdutoProduto -> saidaProdutoProduto.idProdProperty().getValue() == getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).idProdProperty().getValue()
+                .filter(saidaProdutoProduto -> saidaProdutoProduto.produtoProperty().getValue().idProperty().getValue() == getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).produtoProperty().getValue().idProperty().getValue()
                         && saidaProdutoProduto.loteProperty().getValue().equals(getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).loteProperty().getValue())).count() == 1) {
             if (newQtd.compareTo(getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).estoqueProperty().getValue()) > 0)
                 return getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).estoqueProperty().getValue();
@@ -478,7 +478,7 @@ public class TmodelSaidaProduto {
                 return newQtd;
         } else {
             Integer qtdSaiu = getSaidaProdutoProdutoObservableList().stream()
-                    .filter(saidaProdutoProduto -> saidaProdutoProduto.idProdProperty().getValue() == getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).idProdProperty().getValue()
+                    .filter(saidaProdutoProduto -> saidaProdutoProduto.produtoProperty().getValue().idProperty().getValue() == getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).produtoProperty().getValue().idProperty().getValue()
                             && saidaProdutoProduto.loteProperty().getValue().equals(getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).loteProperty().getValue()))
                     .collect(Collectors.summingInt(SaidaProdutoProduto::getQtd)) - oldQtd;
             Integer qtdSaida = qtdSaiu + newQtd;
