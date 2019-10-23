@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.nfe.v400;
 
+import br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
@@ -27,6 +28,8 @@ public class NotaFiscal {
     public NotaFiscal(Long nPed) {
         setEnviNfeVO(new EnviNfeVO());
         setSaidaProduto(getSaidaProdutoDAO().getById(SaidaProduto.class, nPed));
+
+        //ServiceUtilJSon.printJsonFromObject(getSaidaProduto(), String.format("Pedido [%d]\n", nPed));
 
         getEnviNfeVO().setVersao(TCONFIG.getNfe().getVersao());
         getEnviNfeVO().setIdLote(String.format("%015d", getSaidaProduto().idProperty().getValue()));
@@ -197,6 +200,25 @@ public class NotaFiscal {
             dupVO.setvDup(fatVO.getvLiq());
         }
 
+        PagVO pagVO = new PagVO();
+        infNfeVO.setPag(pagVO);
+        DetPagVO detPagVO = new DetPagVO();
+        pagVO.setDetPag(detPagVO);
+        detPagVO.setIndPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoIndicador().getCod());
+        detPagVO.settPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoMeio().getCod());
+        detPagVO.setvPag(fatVO.getvLiq());
+
+        InfAdicVO infAdicVO = new InfAdicVO();
+        infNfeVO.setInfAdic(infAdicVO);
+        infAdicVO.setInfCpl(getSaidaProduto().getSaidaProdutoNfe().informacaoAdicionalProperty().getValue());
+
+        InfRespTecVO infRespTecVO = new InfRespTecVO();
+        infNfeVO.setInfRespTec(infRespTecVO);
+        infRespTecVO.setCnpj(TCONFIG.getNfe().getInfRespTec().getCnpj());
+        infRespTecVO.setxContato(TCONFIG.getNfe().getInfRespTec().getXContato());
+        infRespTecVO.setEmail(TCONFIG.getNfe().getInfRespTec().getEmail());
+        infRespTecVO.setFone(TCONFIG.getNfe().getInfRespTec().getFone());
+
     }
 
     private IdeVO newNfeIde(SaidaProdutoNfe nfe) {
@@ -218,13 +240,20 @@ public class NotaFiscal {
             nfe.serieProperty().setValue(nfeTemp.serieProperty().getValue());
             nfe.numeroProperty().setValue(nfeTemp.numeroProperty().getValue() + 1);
             nfe.cobrancaNumeroProperty().setValue(nfe.numeroProperty().getValue().toString());
+            nfe.setPagamentoIndicador(NfeCobrancaDuplicataPagamentoIndicador.PRAZO);
+            nfe.setPagamentoMeio(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
             nfe.dtHoraEmissaoProperty().setValue(getSaidaProduto().getDtCadastro());
             nfe.setInformacaoAdicional(String.format(TCONFIG.getNfe().getInfAdic(),
                     ServiceMascara.getMoeda(getSaidaProduto().getSaidaProdutoProdutoList().stream().map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
                             .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
                             .reduce(BigDecimal.ZERO, BigDecimal::add), 2),
+                    (getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue() != null)
+                            ? String.format(" dt. Venc.: %s",
+                            getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue().format(Regex_Convert.DTF_DATA))
+                            : "",
                     TCONFIG.getInfLoja().getBanco(),
-                    TCONFIG.getInfLoja().getAgencia(), TCONFIG.getInfLoja().getContaCorrente()));
+                    TCONFIG.getInfLoja().getAgencia(), TCONFIG.getInfLoja().getContaCorrente())
+                    .toUpperCase());
             nfe.xmlAssinaturaProperty().setValue("");
             nfe.xmlProtNfeProperty().setValue("");
             if (getSaidaProduto().getDtSaida().compareTo(getSaidaProduto().getDtCadastro().toLocalDate()) <= 0) {

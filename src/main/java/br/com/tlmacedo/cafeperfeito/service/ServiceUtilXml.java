@@ -58,7 +58,7 @@ private static final String TENVINFE = "TEnviNFe";
 
         JAXBContext context = null;
         JAXBElement<?> element = null;
-        System.out.printf("element: [%s]\n", obj.getClass().getSimpleName());
+//        System.out.printf("element: [%s]\n", obj.getClass().getSimpleName());
         switch (obj.getClass().getSimpleName()) {
             case STATUS:
                 context = JAXBContext.newInstance(TConsStatServ.class);

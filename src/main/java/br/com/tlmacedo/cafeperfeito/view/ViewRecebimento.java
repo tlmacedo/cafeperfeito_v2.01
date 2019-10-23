@@ -11,7 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 import static javafx.stage.StageStyle.UNDECORATED;
@@ -21,23 +20,16 @@ public class ViewRecebimento {
     private static Stage stage;
     private static ContasAReceber aReceber;
     private static Recebimento recebimento;
-    private static BigDecimal saldo;
 
     public void openViewRecebimento(Recebimento recebimento) {
-        if (recebimento != null) {
-            setRecebimento(recebimento);
-            setaReceber(recebimento.getaReceber());
-        }
+        setRecebimento(recebimento);
+        setaReceber(getRecebimento().aReceberProperty().getValue());
         openViewRecebimento();
     }
 
-    public void openViewRecebimento(ContasAReceber aReceber, BigDecimal saldo) {
-        setaReceber(new ContasAReceber());
-        if (aReceber != null)
-            setaReceber(aReceber);
-        setSaldo(saldo);
-        if (getSaldo() == null)
-            setSaldo(BigDecimal.ZERO);
+    public void openViewRecebimento(ContasAReceber aReceber) {
+        setaReceber(aReceber);
+        setRecebimento(null);
         openViewRecebimento();
     }
 
@@ -88,11 +80,4 @@ public class ViewRecebimento {
         ViewRecebimento.recebimento = recebimento;
     }
 
-    public static BigDecimal getSaldo() {
-        return saldo;
-    }
-
-    public static void setSaldo(BigDecimal saldo) {
-        ViewRecebimento.saldo = saldo;
-    }
 }

@@ -223,7 +223,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                         fechar();
                         break;
                     case HELP:
-                        new ViewRecebimento().openViewRecebimento(aReceberProperty().getValue(), null);
+                        new ViewRecebimento().openViewRecebimento(aReceberProperty().getValue());
                         break;
                     case P:
                         if (event.isControlDown()) {

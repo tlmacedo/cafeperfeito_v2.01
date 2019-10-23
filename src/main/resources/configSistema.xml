@@ -80,7 +80,7 @@
         <cPais>1058</cPais>
         <nPais>BRASIL</nPais>
         <CRT>3</CRT>
-        <infAdic>TOTAL R$ %s DADOS BANCARIOS PARA TRANSFERENCIA BANCO %s AG: %s C/C: %s</infAdic>
+        <infAdic>TOTAL R$ %s%s DADOS BANCARIOS PARA TRANSFERENCIA BANCO %s AG: %s C/C: %s</infAdic>
         <infRespTec>
             <cnpj>08009246000136</cnpj>
             <xContato>THIAGO LEIROS MACEDO</xContato>

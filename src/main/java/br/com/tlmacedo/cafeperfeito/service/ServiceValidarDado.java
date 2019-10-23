@@ -79,14 +79,12 @@ public class ServiceValidarDado {
                             })
                             .count() + 1
             );
-            System.out.printf("value: [%s]\n", value.substring(2));
             return gerarCodigoCafePerfeito(value.substring(2));
         }
         return "não gerado";
     }
 
     public static String gerarCodigoCafePerfeito(String value) {
-        System.out.printf("meuValue: [%s]\n", value);
         //value = value.replaceAll("\\D", "");
         value = String.format("%09d", Long.valueOf(value.replaceAll("\\D", "")));
         return String.format("%s-%s", value, calculaDv(value, pesoCafe));

@@ -47,6 +47,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     public DatePicker dtpDtPagamento;
     public ComboBox<PagamentoSituacao> cboSituacao;
     public TextField txtValor;
+    public Button btnPrintOK;
     public Button btnOK;
     public Button btnCancel;
 
@@ -58,7 +59,6 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     private ContasAReceber aReceber;
     private Recebimento recebimento;
     private RecebimentoDAO recebimentoDAO = new RecebimentoDAO();
-    private BigDecimal saldo = BigDecimal.ZERO;
 
     private BooleanProperty deshabilita = new SimpleBooleanProperty(true);
 
@@ -66,7 +66,6 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
         setRecebimento(ViewRecebimento.getRecebimento());
         if (getRecebimento() == null) {
             setaReceber(ViewRecebimento.getaReceber());
-            setSaldo(ViewRecebimento.getSaldo());
             getEnumsTasksList().add(EnumsTasks.ADD_RECEBIMENTO);
         } else {
             setRecebimento(ViewRecebimento.getRecebimento());
@@ -100,6 +99,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
     @Override
     public void fechar() {
+        getEnumsTasksList().clear();
         getRecebimentoStage().close();
     }
 
@@ -117,6 +117,9 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                         .collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
         if (getRecebimento() == null) {
+            getBtnPrintOK().setDefaultButton(true);
+            getBtnOK().setDefaultButton(false);
+
             setRecebimento(new Recebimento());
             getRecebimento().setaReceber(getaReceber());
             getRecebimento().setPagamentoModalidade(PagamentoModalidade.DINHEIRO);
@@ -125,6 +128,9 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                     .subtract(getaReceber().getRecebimentoList().stream()
                             .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)));
             getRecebimento().dtPagamentoProperty().setValue(getaReceber().dtVencimentoProperty().getValue());
+        } else {
+            getBtnPrintOK().setDefaultButton(false);
+            getBtnOK().setDefaultButton(true);
         }
         getTxtDocumento().setText(getRecebimento().documentoProperty().getValue());
         getCboPagamentoModalidade().getSelectionModel().select(getRecebimento().getPagamentoModalidade());
@@ -133,7 +139,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 //        if (getSaldo().compareTo(BigDecimal.ZERO) < 0)
 //            getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue().add(getSaldo()), 2));
 //        else
-            getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
+        getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
 
         getDtpDtPagamento().setValue(getRecebimento().dtPagamentoProperty().getValue() != null
                 ? getRecebimento().dtPagamentoProperty().getValue()
@@ -182,6 +188,16 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                     fechar();
                 else
                     getCboPagamentoModalidade().requestFocus();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        getBtnPrintOK().setOnAction(actionEvent -> {
+            try {
+                getEnumsTasksList().add(EnumsTasks.RELATORIO_IMPRIME_RECIBO);
+                if (new ServiceSegundoPlano().executaListaTarefas(newTaskRecebimento(), "imprimir recibo"))
+                    fechar();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -242,6 +258,11 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                             if (!salvarRecebimento()) {
                                 Thread.currentThread().interrupt();
                             }
+                            break;
+                        case RELATORIO_IMPRIME_RECIBO:
+                            if (!salvarRecebimento())
+                                Thread.currentThread().interrupt();
+                            new ServiceRecibo().imprimeRecibo(getRecebimento());
                             break;
                     }
                 }
@@ -330,6 +351,14 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
         this.txtValor = txtValor;
     }
 
+    public Button getBtnPrintOK() {
+        return btnPrintOK;
+    }
+
+    public void setBtnPrintOK(Button btnPrintOK) {
+        this.btnPrintOK = btnPrintOK;
+    }
+
     public Button getBtnOK() {
         return btnOK;
     }
@@ -412,14 +441,6 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
     public void setNomeController(String nomeController) {
         this.nomeController = nomeController;
-    }
-
-    public BigDecimal getSaldo() {
-        return saldo;
-    }
-
-    public void setSaldo(BigDecimal saldo) {
-        this.saldo = saldo;
     }
 
     public ImageView getImgNewDocumento() {

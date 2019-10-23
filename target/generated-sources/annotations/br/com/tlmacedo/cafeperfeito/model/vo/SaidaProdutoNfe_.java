@@ -1,5 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import br.com.tlmacedo.cafeperfeito.model.enums.NfeCobrancaDuplicataPagamentoIndicador;
+import br.com.tlmacedo.cafeperfeito.model.enums.NfeCobrancaDuplicataPagamentoMeio;
 import br.com.tlmacedo.cafeperfeito.model.enums.NfeDadosDestinoOperacao;
 import br.com.tlmacedo.cafeperfeito.model.enums.NfeDadosIndicadorConsumidorFinal;
 import br.com.tlmacedo.cafeperfeito.model.enums.NfeDadosIndicadorPresenca;
@@ -14,7 +16,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-10-17T14:03:08")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-10-23T11:03:46")
 @StaticMetamodel(SaidaProdutoNfe.class)
 public class SaidaProdutoNfe_ { 
 
@@ -25,7 +27,9 @@ public class SaidaProdutoNfe_ {
     public static volatile SingularAttribute<SaidaProdutoNfe, String> chave;
     public static volatile SingularAttribute<SaidaProdutoNfe, SaidaProduto> saidaProduto;
     public static volatile SingularAttribute<SaidaProdutoNfe, NfeStatusSefaz> statusSefaz;
+    public static volatile SingularAttribute<SaidaProdutoNfe, NfeCobrancaDuplicataPagamentoIndicador> pagamentoIndicador;
     public static volatile SingularAttribute<SaidaProdutoNfe, NfeDadosModelo> modelo;
+    public static volatile SingularAttribute<SaidaProdutoNfe, NfeCobrancaDuplicataPagamentoMeio> pagamentoMeio;
     public static volatile SingularAttribute<SaidaProdutoNfe, Empresa> transportador;
     public static volatile SingularAttribute<SaidaProdutoNfe, String> xmlProtNfe;
     public static volatile SingularAttribute<SaidaProdutoNfe, String> cobrancaNumero;

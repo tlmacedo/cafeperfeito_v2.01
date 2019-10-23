@@ -150,6 +150,7 @@
             </transp>
             <cobr>
                 <fat>
+                    <nFat>878</nFat>
                     <vOrig>43.00</vOrig>
                     <vDesc>43.00</vDesc>
                     <vLiq>0.00</vLiq>
@@ -160,6 +161,24 @@
                     <vDup>0.00</vDup>
                 </dup>
             </cobr>
+            <pag>
+                <detPag>
+                    <indPag>1</indPag>
+                    <tPag>99</tPag>
+                    <vPag>0.00</vPag>
+                </detPag>
+            </pag>
+            <infAdic>
+                <infCpl>TOTAL R$ 0,00 dt. Venc.: 18/10/2019 DADOS BANCARIOS PARA TRANSFERENCIA BANCO ITAU AG: 1677 C/C:
+                    35.456-3
+                </infCpl>
+            </infAdic>
+            <infRespTec>
+                <CNPJ>08009246000136</CNPJ>
+                <xContato>THIAGO LEIROS MACEDO</xContato>
+                <email>tl.macedo@hotmail.com</email>
+                <fone>92 98168-6148</fone>
+            </infRespTec>
         </infNFe>
     </NFe>
 </enviNFe>

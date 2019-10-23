@@ -30,6 +30,8 @@ public class SaidaProdutoNfe implements Serializable {
     private NfeTransporteModFrete modFrete;
     private ObjectProperty<Empresa> transportador;
     private StringProperty cobrancaNumero = new SimpleStringProperty();
+    private NfeCobrancaDuplicataPagamentoIndicador pagamentoIndicador;
+    private NfeCobrancaDuplicataPagamentoMeio pagamentoMeio;
     private StringProperty informacaoAdicional = new SimpleStringProperty();
     private StringProperty xmlAssinatura = new SimpleStringProperty();
     private StringProperty xmlProtNfe = new SimpleStringProperty();
@@ -221,6 +223,24 @@ public class SaidaProdutoNfe implements Serializable {
         this.cobrancaNumero.set(cobrancaNumero);
     }
 
+    @Enumerated(EnumType.ORDINAL)
+    public NfeCobrancaDuplicataPagamentoIndicador getPagamentoIndicador() {
+        return pagamentoIndicador;
+    }
+
+    public void setPagamentoIndicador(NfeCobrancaDuplicataPagamentoIndicador pagamentoIndicador) {
+        this.pagamentoIndicador = pagamentoIndicador;
+    }
+
+    @Enumerated(EnumType.ORDINAL)
+    public NfeCobrancaDuplicataPagamentoMeio getPagamentoMeio() {
+        return pagamentoMeio;
+    }
+
+    public void setPagamentoMeio(NfeCobrancaDuplicataPagamentoMeio pagamentoMeio) {
+        this.pagamentoMeio = pagamentoMeio;
+    }
+
     @Column(length = 5000, nullable = false)
     public String getInformacaoAdicional() {
         return informacaoAdicional.get();
@@ -279,6 +299,8 @@ public class SaidaProdutoNfe implements Serializable {
                 ", modFrete=" + modFrete +
                 ", transportador=" + transportador +
                 ", cobrancaNumero=" + cobrancaNumero +
+                ", pagamentoIndicador=" + pagamentoIndicador +
+                ", pagamentoMeio=" + pagamentoMeio +
                 ", informacaoAdicional=" + informacaoAdicional +
                 ", xmlAssinatura=" + xmlAssinatura +
                 ", xmlProtNfe=" + xmlProtNfe +
