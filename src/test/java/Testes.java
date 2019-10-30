@@ -1,38 +1,51 @@
-import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
-import br.com.tlmacedo.cafeperfeito.nfe.v400.NotaFiscal;
+import br.com.tlmacedo.cafeperfeito.nfe.MeuCertificado;
+import br.com.tlmacedo.cafeperfeito.nfe.NotaFiscal;
 import br.com.tlmacedo.cafeperfeito.service.ServiceUtilJSon;
 import br.com.tlmacedo.cafeperfeito.service.ServiceUtilXml;
 import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
+import br.com.tlmacedo.nfe.service.AutorizacaoNFe;
+import br.com.tlmacedo.nfe.service.ServiceAssinarXml;
+import br.com.tlmacedo.nfe.service.ServiceOutputXML;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 
 import java.util.Scanner;
 
-public class Testes {
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
+import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
+public class Testes {
 
     public static void main(String[] args) {
 
         try {
             new ServiceVariaveisSistema().getVariaveisSistema();
 
-            SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
-
             System.out.printf("\nqual saida de produto vc que gerar NF? ");
             Long nPed = Long.valueOf(new Scanner(System.in).nextLine().replaceAll("\\D", ""));
-
-//            Long nPed = 85L;
-//            SaidaProduto saidaProduto = saidaProdutoDAO.getById(SaidaProduto.class, nPed);
-            //ServiceUtilJSon.printJsonFromObject(saidaProduto, String.format("Pedido [%d]\n", nPed));
 
             NotaFiscal notaFiscal = new NotaFiscal(nPed);
 
             ServiceUtilJSon.printJsonFromObject(notaFiscal, String.format("Nota [%d]\n", nPed));
 
-            TEnviNFe tEnviNFe = new EnviNfe_v400(notaFiscal.getEnviNfeVO()).gettEnviNFe();
+            TEnviNFe tEnviNFe = new EnviNfe_v400(notaFiscal.getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe();
 
-            String retorno = ServiceUtilXml.objectToXml(tEnviNFe);
-            System.out.printf("strEnviNFe:\n%s\n\n\n", retorno);
+            String xmlNFe = ServiceUtilXml.objectToXml(tEnviNFe);
+            System.out.printf("strEnviNFe:\n%s\n\n\n", xmlNFe);
+
+            MeuCertificado meuCertificado = new MeuCertificado();
+            meuCertificado.getCertificates().loadToken();
+            meuCertificado.getCertificates().loadSocketDinamico();
+
+            ServiceAssinarXml assinarXml = new ServiceAssinarXml(xmlNFe, meuCertificado.getCertificates());
+            String xmlNfe_Assinado = ServiceOutputXML.outputXML(assinarXml.getDocument());
+            System.out.printf("xmlNfe_Assinado:\n%s\n\n", xmlNfe_Assinado);
+
+            AutorizacaoNFe autorizacaoNFe = new AutorizacaoNFe(xmlNfe_Assinado, (TCONFIG.getNfe().getTpAmb()));
+            String xmlNfe_Autorizacao = autorizacaoNFe.getResultAutorizacaoNFe();
+            System.out.printf("xmlNfe_Autorizacao:\n%s\n\n", xmlNfe_Autorizacao);
+
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }

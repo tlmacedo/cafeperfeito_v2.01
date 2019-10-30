@@ -110,7 +110,9 @@ public class ServiceValidarDado {
                 ideVO.getcUF(),
                 String.format("%02d%02d", ideVO.getDhEmi().getYear() % 100,
                         ideVO.getDhEmi().getMonthValue()),
-                TCONFIG.getInfLoja().getCnpj(),
+                TCONFIG.getNfe().getTpAmb() == 2
+                        ? "99999999000191"
+                        : TCONFIG.getInfLoja().getCnpj(),
                 String.format("%02d", Integer.parseInt(ideVO.getMod())),
                 String.format("%03d", Integer.parseInt(ideVO.getSerie())),
                 String.format("%09d", Integer.parseInt(ideVO.getnNF())),

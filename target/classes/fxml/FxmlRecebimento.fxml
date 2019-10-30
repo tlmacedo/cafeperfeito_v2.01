@@ -111,15 +111,28 @@
                                 </TextField>
                             </children>
                         </VBox>
-                        <Button fx:id="btnOK" defaultButton="true" layoutX="258.0" layoutY="90.0"
-                                mnemonicParsing="false" prefHeight="17.0" prefWidth="40.0" text="OK"
-                                textAlignment="CENTER" AnchorPane.rightAnchor="75.0" AnchorPane.topAnchor="80.0">
+                        <Button fx:id="btnPrintOK" layoutX="200.0" layoutY="90.0" mnemonicParsing="false"
+                                prefHeight="27.0" prefWidth="20.0" textAlignment="CENTER">
+                            <cursor>
+                                <Cursor fx:constant="HAND"/>
+                            </cursor>
+                            <graphic>
+                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../image/ico/ic_printer2_dp24.png"/>
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button fx:id="btnOK" layoutX="258.0" layoutY="90.0" mnemonicParsing="false" prefHeight="30.0"
+                                prefWidth="40.0" text="OK" textAlignment="CENTER" AnchorPane.rightAnchor="75.0"
+                                AnchorPane.topAnchor="80.0">
                             <cursor>
                                 <Cursor fx:constant="HAND"/>
                             </cursor>
                         </Button>
                         <Button fx:id="btnCancel" cancelButton="true" layoutX="264.0" layoutY="90.0"
-                                mnemonicParsing="false" prefHeight="17.0" prefWidth="70.0" text="Cancela"
+                                mnemonicParsing="false" prefHeight="30.0" prefWidth="70.0" text="Cancela"
                                 textAlignment="CENTER" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
                             <cursor>
                                 <Cursor fx:constant="HAND"/>

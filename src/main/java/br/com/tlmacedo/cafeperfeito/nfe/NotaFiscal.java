@@ -1,4 +1,4 @@
-package br.com.tlmacedo.cafeperfeito.nfe.v400;
+package br.com.tlmacedo.cafeperfeito.nfe;
 
 import br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
@@ -12,7 +12,6 @@ import br.com.tlmacedo.nfe.model.vo.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +51,15 @@ public class NotaFiscal {
         EmitVO emitVO = new EmitVO();
         infNfeVO.setEmit(emitVO);
         emitVO.setEnder(emitEnderVO);
-        emitVO.setCnpj(emissor.getCnpj());
-        emitVO.setxNome(emissor.getRazao());
-        emitVO.setxFant(emissor.getFantasia());
+        if (ideVO.getTpAmb().equals("2")) {
+            emitVO.setCnpj("99999999000191");
+            emitVO.setxNome("NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
+            emitVO.setxFant("");
+        } else {
+            emitVO.setCnpj(emissor.getCnpj());
+            emitVO.setxNome(emissor.getRazao(60));
+            emitVO.setxFant(emissor.getFantasia(60));
+        }
         emitVO.setIE(emissor.getIe());
         emitVO.setCRT(String.valueOf(TCONFIG.getNfe().getCRT()));
         Endereco emissorEndereco = emissor.getEndereco(TipoEndereco.PRINCIPAL);
@@ -83,7 +88,7 @@ public class NotaFiscal {
         if (destinatario.getIe().length() > 0)
             destVO.setIndIEDest("1");
         else
-            destVO.setIndIEDest("2");
+            destVO.setIndIEDest("9");
         destVO.setIE(destinatario.getIe());
         if (destinatario.getiSuframa() != null)
             destVO.setISUF(destinatario.getiSuframa());
@@ -143,14 +148,14 @@ public class NotaFiscal {
 
                 detVOList.add(detVO);
 
-                if (!detVO.getProd().getvProd().equals(""))
-                    icmsTotVO.setvProd(icmsTotVO.getvProd().add(new BigDecimal(detVO.getProd().getvProd())));
-                if (!detVO.getProd().getvFrete().equals(""))
-                    icmsTotVO.setvFrete(icmsTotVO.getvFrete().add(new BigDecimal(detVO.getProd().getvFrete())));
-                if (!detVO.getProd().getvSeg().equals(""))
-                    icmsTotVO.setvSeg(icmsTotVO.getvSeg().add(new BigDecimal(detVO.getProd().getvSeg())));
-                if (!detVO.getProd().getvDesc().equals(""))
-                    icmsTotVO.setvDesc(icmsTotVO.getvDesc().add(new BigDecimal(detVO.getProd().getvDesc())));
+                if (detVO.getProd().getvProd() != null)
+                    icmsTotVO.setvProd(icmsTotVO.getvProd().add(detVO.getProd().getvProd()));
+                if (detVO.getProd().getvFrete() != null)
+                    icmsTotVO.setvFrete(icmsTotVO.getvFrete().add(detVO.getProd().getvFrete()));
+                if (detVO.getProd().getvSeg() != null)
+                    icmsTotVO.setvSeg(icmsTotVO.getvSeg().add(detVO.getProd().getvSeg()));
+                if (detVO.getProd().getvDesc() != null)
+                    icmsTotVO.setvDesc(icmsTotVO.getvDesc().add(detVO.getProd().getvDesc()));
             }
             icmsTotVO.setvNF(icmsTotVO.getvProd().subtract(icmsTotVO.getvDesc()));
 
@@ -286,8 +291,15 @@ public class NotaFiscal {
         ideVO.setFinNFe(String.valueOf(TCONFIG.getNfe().getFinNFe()));
         ideVO.setIndFinal(String.valueOf(nfe.getConsumidorFinal().getCod()));
         ideVO.setIndPres(String.valueOf(nfe.getIndicadorPresenca().getCod()));
+        System.out.printf("ideVO.getProcEmi(): [%s]\n", ideVO.getProcEmi());
+        System.out.printf("ideVO.getVerProc(): [%s]\n", ideVO.getVerProc());
+        System.out.printf("TCONFIG.getNfe().getProcEmi(): [%s]\n", TCONFIG.getNfe().getProcEmi());
+        System.out.printf("TCONFIG.getNfe().getVerProc(): [%s]\n", TCONFIG.getNfe().getVerProc());
+        System.out.printf("\n\n");
         ideVO.setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));
         ideVO.setVerProc(TCONFIG.getNfe().getVerProc());
+        System.out.printf("ideVO.getProcEmi(): [%s]\n", ideVO.getProcEmi());
+        System.out.printf("ideVO.getVerProc(): [%s]\n", ideVO.getVerProc());
 
         if (salvar) {
             nfe.chaveProperty().setValue(ServiceValidarDado.gerarChaveNfe(ideVO));
@@ -322,17 +334,18 @@ public class NotaFiscal {
         prodVO.setCFOP("5" + saidaProdutoProduto.getTipoSaidaProduto().getCod());
         prodVO.setuCom(produto.getUnidadeComercial().getDescricao());
         BigDecimal qCom = new BigDecimal(saidaProdutoProduto.qtdProperty().getValue());
-        prodVO.setqCom(qCom.setScale(4).toString());
-        prodVO.setvUnCom(saidaProdutoProduto.vlrVendaProperty().getValue().setScale(10).toString());
-        prodVO.setvProd(saidaProdutoProduto.vlrBrutoProperty().getValue().setScale(2, RoundingMode.HALF_UP).toString());
+        prodVO.setqCom(qCom);
+        prodVO.setvUnCom(saidaProdutoProduto.vlrVendaProperty().getValue());
+        prodVO.setvProd(saidaProdutoProduto.vlrBrutoProperty().getValue());
         prodVO.setcEANTrib(produto.getCEAN());
         prodVO.setuTrib(produto.getUnidadeComercial().getDescricao());
-        prodVO.setqTrib(qCom.setScale(4).toString());
-        prodVO.setvUnTrib(saidaProdutoProduto.vlrVendaProperty().getValue().setScale(10).toString());
-        prodVO.setvFrete("");
-        prodVO.setvSeg("");
-        prodVO.setvDesc(saidaProdutoProduto.vlrDescontoProperty().getValue().setScale(2, RoundingMode.HALF_UP).toString());
-        prodVO.setvOutro("");
+        prodVO.setqTrib(qCom);
+        prodVO.setvUnTrib(saidaProdutoProduto.vlrVendaProperty().getValue());
+        prodVO.setvFrete(null);
+        prodVO.setvSeg(null);
+        if (saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+            prodVO.setvDesc(saidaProdutoProduto.vlrDescontoProperty().getValue());
+        prodVO.setvOutro(null);
         prodVO.setIndTot("1");
 
         return prodVO;

@@ -454,6 +454,30 @@ public class Empresa implements Serializable {
 
     @Transient
     @JsonIgnore
+    public String getRazaoFantasia(int tamanho) {
+        if (getRazaoFantasia().length() > tamanho)
+            return getRazaoFantasia().substring(0, tamanho);
+        return getRazaoFantasia();
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getRazao(int tamanho) {
+        if (getRazao().length() > tamanho)
+            return getRazao().substring(0, tamanho);
+        return getRazao();
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getFantasia(int tamanho) {
+        if (getFantasia().length() > tamanho)
+            return getFantasia().substring(0, tamanho);
+        return getFantasia();
+    }
+
+    @Transient
+    @JsonIgnore
     public Endereco getEndereco(TipoEndereco tipoEndereco) {
         if (tipoEndereco == null)
             tipoEndereco = TipoEndereco.PRINCIPAL;
