@@ -20,16 +20,22 @@ import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONF
 
 public class NotaFiscal {
 
-    EnviNfeVO enviNfeVO;
+    EnviNfeVO enviNfeVO = new EnviNfeVO();
     SaidaProduto saidaProduto;
     SaidaProdutoNfe nfe;
     SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
 
     public NotaFiscal(Long nPed) {
-        setEnviNfeVO(new EnviNfeVO());
         setSaidaProduto(getSaidaProdutoDAO().getById(SaidaProduto.class, nPed));
+        gerarNovaNotaFiscal();
+    }
 
-        //ServiceUtilJSon.printJsonFromObject(getSaidaProduto(), String.format("Pedido [%d]\n", nPed));
+    public NotaFiscal(SaidaProduto saidaProduto) {
+        setSaidaProduto(saidaProduto);
+        gerarNovaNotaFiscal();
+    }
+
+    public void gerarNovaNotaFiscal() {
 
         getEnviNfeVO().setVersao(TCONFIG.getNfe().getVersao());
         getEnviNfeVO().setIdLote(String.format("%015d", getSaidaProduto().idProperty().getValue()));
@@ -206,15 +212,15 @@ public class NotaFiscal {
                 dupVO.setdVenc(getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue());
                 dupVO.setvDup(fatVO.getvLiq());
             }
-
-            PagVO pagVO = new PagVO();
-            infNfeVO.setPag(pagVO);
-            DetPagVO detPagVO = new DetPagVO();
-            pagVO.setDetPag(detPagVO);
-            detPagVO.setIndPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoIndicador().getCod());
-            detPagVO.settPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoMeio().getCod());
-            detPagVO.setvPag(fatVO.getvLiq());
         }
+        PagVO pagVO = new PagVO();
+        infNfeVO.setPag(pagVO);
+        DetPagVO detPagVO = new DetPagVO();
+        pagVO.setDetPag(detPagVO);
+        detPagVO.setIndPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoIndicador().getCod());
+        detPagVO.settPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoMeio().getCod());
+        detPagVO.setvPag(icmsTotVO.getvNF());
+
 
         InfAdicVO infAdicVO = new InfAdicVO();
         infNfeVO.setInfAdic(infAdicVO);
@@ -262,8 +268,8 @@ public class NotaFiscal {
                     TCONFIG.getInfLoja().getBanco(),
                     TCONFIG.getInfLoja().getAgencia(), TCONFIG.getInfLoja().getContaCorrente())
                     .toUpperCase());
-            nfe.xmlAssinaturaProperty().setValue("");
-            nfe.xmlProtNfeProperty().setValue("");
+            nfe.setXmlAssinatura(null);
+            nfe.setXmlProtNfe(null);
             if (getSaidaProduto().getDtSaida().compareTo(getSaidaProduto().getDtCadastro().toLocalDate()) <= 0) {
                 nfe.dtHoraSaidaProperty().setValue(getSaidaProduto().getDtCadastro());
             } else {
@@ -314,6 +320,8 @@ public class NotaFiscal {
                 getSaidaProdutoDAO().transactionRollback();
             }
         }
+
+        setNfe(getSaidaProduto().getSaidaProdutoNfe());
 
         return ideVO;
     }

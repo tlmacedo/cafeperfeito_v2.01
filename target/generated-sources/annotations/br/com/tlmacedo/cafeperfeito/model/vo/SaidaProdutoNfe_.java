@@ -11,19 +11,20 @@ import br.com.tlmacedo.cafeperfeito.model.enums.NfeStatusSefaz;
 import br.com.tlmacedo.cafeperfeito.model.enums.NfeTransporteModFrete;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
+import java.sql.Blob;
 import java.time.LocalDateTime;
 import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-10-30T15:05:15")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-10-31T14:48:27")
 @StaticMetamodel(SaidaProdutoNfe.class)
 public class SaidaProdutoNfe_ { 
 
     public static volatile SingularAttribute<SaidaProdutoNfe, NfeTransporteModFrete> modFrete;
     public static volatile SingularAttribute<SaidaProdutoNfe, Integer> numero;
     public static volatile SingularAttribute<SaidaProdutoNfe, LocalDateTime> dtHoraEmissao;
-    public static volatile SingularAttribute<SaidaProdutoNfe, String> xmlAssinatura;
+    public static volatile SingularAttribute<SaidaProdutoNfe, Blob> xmlAssinatura;
     public static volatile SingularAttribute<SaidaProdutoNfe, String> chave;
     public static volatile SingularAttribute<SaidaProdutoNfe, SaidaProduto> saidaProduto;
     public static volatile SingularAttribute<SaidaProdutoNfe, NfeStatusSefaz> statusSefaz;
@@ -31,7 +32,7 @@ public class SaidaProdutoNfe_ {
     public static volatile SingularAttribute<SaidaProdutoNfe, NfeDadosModelo> modelo;
     public static volatile SingularAttribute<SaidaProdutoNfe, NfeCobrancaDuplicataPagamentoMeio> pagamentoMeio;
     public static volatile SingularAttribute<SaidaProdutoNfe, Empresa> transportador;
-    public static volatile SingularAttribute<SaidaProdutoNfe, String> xmlProtNfe;
+    public static volatile SingularAttribute<SaidaProdutoNfe, Blob> xmlProtNfe;
     public static volatile SingularAttribute<SaidaProdutoNfe, String> cobrancaNumero;
     public static volatile SingularAttribute<SaidaProdutoNfe, NfeDadosNaturezaOperacao> naturezaOperacao;
     public static volatile SingularAttribute<SaidaProdutoNfe, NfeDadosIndicadorConsumidorFinal> consumidorFinal;

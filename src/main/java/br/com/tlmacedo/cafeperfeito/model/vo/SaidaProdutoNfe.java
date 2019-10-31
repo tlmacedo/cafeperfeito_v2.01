@@ -7,6 +7,7 @@ import javafx.beans.property.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Blob;
 import java.time.LocalDateTime;
 
 @Entity(name = "SaidaProdutoNfe")
@@ -33,8 +34,8 @@ public class SaidaProdutoNfe implements Serializable {
     private NfeCobrancaDuplicataPagamentoIndicador pagamentoIndicador;
     private NfeCobrancaDuplicataPagamentoMeio pagamentoMeio;
     private StringProperty informacaoAdicional = new SimpleStringProperty();
-    private StringProperty xmlAssinatura = new SimpleStringProperty();
-    private StringProperty xmlProtNfe = new SimpleStringProperty();
+    private Blob xmlAssinatura;
+    private Blob xmlProtNfe;
 
     public SaidaProdutoNfe() {
     }
@@ -254,30 +255,24 @@ public class SaidaProdutoNfe implements Serializable {
         this.informacaoAdicional.set(informacaoAdicional);
     }
 
-    @Column(length = 5000, nullable = false)
-    public String getXmlAssinatura() {
-        return xmlAssinatura.get();
-    }
-
-    public StringProperty xmlAssinaturaProperty() {
+    @JsonIgnore
+    @SuppressWarnings("JpaAttributeTypeInspection")
+    public Blob getXmlAssinatura() {
         return xmlAssinatura;
     }
 
-    public void setXmlAssinatura(String xmlAssinatura) {
-        this.xmlAssinatura.set(xmlAssinatura);
+    public void setXmlAssinatura(Blob xmlAssinatura) {
+        this.xmlAssinatura = xmlAssinatura;
     }
 
-    @Column(length = 5000, nullable = false)
-    public String getXmlProtNfe() {
-        return xmlProtNfe.get();
-    }
-
-    public StringProperty xmlProtNfeProperty() {
+    @JsonIgnore
+    @SuppressWarnings("JpaAttributeTypeInspection")
+    public Blob getXmlProtNfe() {
         return xmlProtNfe;
     }
 
-    public void setXmlProtNfe(String xmlProtNfe) {
-        this.xmlProtNfe.set(xmlProtNfe);
+    public void setXmlProtNfe(Blob xmlProtNfe) {
+        this.xmlProtNfe = xmlProtNfe;
     }
 
     @Override

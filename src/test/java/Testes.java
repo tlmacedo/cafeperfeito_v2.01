@@ -11,6 +11,7 @@ import br.inf.portalfiscal.xsd.nfe.procNFe.TNFe;
 import br.inf.portalfiscal.xsd.nfe.procNFe.TProtNFe;
 import br.inf.portalfiscal.xsd.nfe.retEnviNFe.TRetEnviNFe;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.util.Scanner;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
@@ -51,7 +52,6 @@ public class Testes {
             System.out.printf("xmlNfe_Autorizacao:\n%s\n\n", xmlNfe_Autorizacao);
 
 
-            System.out.printf("testando:\n%s\n\n", ServiceUtilXml.objectToXml(ServiceUtilXml.xmlToObject(xmlNfe_Autorizacao, TRetEnviNFe.class)));
             TRetEnviNFe tRetEnviNFe = ServiceUtilXml.xmlToObject(xmlNfe_Autorizacao, TRetEnviNFe.class);
             NFeRetAutorizacao nFeRetAutorizacao = new NFeRetAutorizacao(tRetEnviNFe);
             String xmlConsReciNFe = ServiceUtilXml.objectToXml(nFeRetAutorizacao.gettConsReciNFe());
@@ -68,8 +68,14 @@ public class Testes {
 
             try {
                 saidaProdutoNfeDAO.transactionBegin();
-                saidaProdutoNfe.setXmlAssinatura(xmlNfe_Assinado);
-                saidaProdutoNfe.setXmlProtNfe(xmlNFe_Proc);
+                saidaProdutoNfe.setXmlAssinatura(
+                        new SerialBlob(String.format("%s%s",
+                                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                                xmlNfe_Assinado)
+                                .getBytes()
+                        )
+                );
+                saidaProdutoNfe.setXmlProtNfe(new SerialBlob(xmlNFe_Proc.getBytes()));
                 saidaProdutoNfe = saidaProdutoNfeDAO.setTransactionPersist(saidaProdutoNfe);
                 saidaProdutoNfeDAO.transactionCommit();
             } catch (Exception e) {
