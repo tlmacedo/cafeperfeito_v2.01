@@ -1,13 +1,15 @@
+import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
+import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
 import br.com.tlmacedo.cafeperfeito.nfe.MeuCertificado;
 import br.com.tlmacedo.cafeperfeito.nfe.NotaFiscal;
-import br.com.tlmacedo.cafeperfeito.service.ServiceUtilJSon;
 import br.com.tlmacedo.cafeperfeito.service.ServiceUtilXml;
 import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
-import br.com.tlmacedo.nfe.service.AutorizacaoNFe;
-import br.com.tlmacedo.nfe.service.ServiceAssinarXml;
-import br.com.tlmacedo.nfe.service.ServiceOutputXML;
+import br.com.tlmacedo.nfe.service.*;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
+import br.inf.portalfiscal.xsd.nfe.procNFe.TNFe;
+import br.inf.portalfiscal.xsd.nfe.procNFe.TProtNFe;
+import br.inf.portalfiscal.xsd.nfe.retEnviNFe.TRetEnviNFe;
 
 import java.util.Scanner;
 
@@ -26,8 +28,11 @@ public class Testes {
 
             NotaFiscal notaFiscal = new NotaFiscal(nPed);
 
-            ServiceUtilJSon.printJsonFromObject(notaFiscal, String.format("Nota [%d]\n", nPed));
+            SaidaProdutoNfeDAO saidaProdutoNfeDAO = new SaidaProdutoNfeDAO();
+            SaidaProdutoNfe saidaProdutoNfe = notaFiscal.getNfe();
 
+//            ServiceUtilJSon.printJsonFromObject(notaFiscal, String.format("Nota [%d]\n", nPed));
+//
             TEnviNFe tEnviNFe = new EnviNfe_v400(notaFiscal.getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe();
 
             String xmlNFe = ServiceUtilXml.objectToXml(tEnviNFe);
@@ -37,13 +42,40 @@ public class Testes {
             meuCertificado.getCertificates().loadToken();
             meuCertificado.getCertificates().loadSocketDinamico();
 
-            ServiceAssinarXml assinarXml = new ServiceAssinarXml(xmlNFe, meuCertificado.getCertificates());
-            String xmlNfe_Assinado = ServiceOutputXML.outputXML(assinarXml.getDocument());
+            NFeAssinarXml nFeAssinarXml = new NFeAssinarXml(xmlNFe, meuCertificado.getCertificates());
+            String xmlNfe_Assinado = ServiceOutputXML.outputXML(nFeAssinarXml.getDocument());
             System.out.printf("xmlNfe_Assinado:\n%s\n\n", xmlNfe_Assinado);
 
-            AutorizacaoNFe autorizacaoNFe = new AutorizacaoNFe(xmlNfe_Assinado, (TCONFIG.getNfe().getTpAmb()));
-            String xmlNfe_Autorizacao = autorizacaoNFe.getResultAutorizacaoNFe();
+            NFeAutorizacao nFeAutorizacao = new NFeAutorizacao(xmlNfe_Assinado, TCONFIG.getNfe().getTpAmb());
+            String xmlNfe_Autorizacao = nFeAutorizacao.getResultAutorizacaoNFe();
             System.out.printf("xmlNfe_Autorizacao:\n%s\n\n", xmlNfe_Autorizacao);
+
+
+            System.out.printf("testando:\n%s\n\n", ServiceUtilXml.objectToXml(ServiceUtilXml.xmlToObject(xmlNfe_Autorizacao, TRetEnviNFe.class)));
+            TRetEnviNFe tRetEnviNFe = ServiceUtilXml.xmlToObject(xmlNfe_Autorizacao, TRetEnviNFe.class);
+            NFeRetAutorizacao nFeRetAutorizacao = new NFeRetAutorizacao(tRetEnviNFe);
+            String xmlConsReciNFe = ServiceUtilXml.objectToXml(nFeRetAutorizacao.gettConsReciNFe());
+            String xmlNfe_RetAutorizacao = nFeRetAutorizacao.getResultRetAutorizacaoNFe(xmlConsReciNFe);
+            System.out.printf("xmlNfe_RetAutorizacao:\n%s\n\n", xmlNfe_RetAutorizacao);
+
+            NFeProc nFeProc = new NFeProc(xmlNfe_Assinado, xmlNfe_RetAutorizacao);
+            nFeProc.setStrVersao(tRetEnviNFe.getVersao());
+            nFeProc.setTnFe(ServiceUtilXml.xmlToObject(nFeProc.getStringTNFe(), TNFe.class));
+            nFeProc.settProtNFe(ServiceUtilXml.xmlToObject(nFeProc.getStringTProtNFe(), TProtNFe.class));
+            String xmlNFe_Proc = ServiceUtilXml.objectToXml(nFeProc.getResultNFeProc());
+            System.out.printf("xmlNfe_Proc:\n%s\n\n", xmlNFe_Proc);
+
+
+            try {
+                saidaProdutoNfeDAO.transactionBegin();
+                saidaProdutoNfe.setXmlAssinatura(xmlNfe_Assinado);
+                saidaProdutoNfe.setXmlProtNfe(xmlNFe_Proc);
+                saidaProdutoNfe = saidaProdutoNfeDAO.setTransactionPersist(saidaProdutoNfe);
+                saidaProdutoNfeDAO.transactionCommit();
+            } catch (Exception e) {
+                saidaProdutoNfeDAO.transactionRollback();
+                e.printStackTrace();
+            }
 
 
         } catch (Exception ex) {

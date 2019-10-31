@@ -1,7 +1,11 @@
 package br.com.tlmacedo.cafeperfeito.service;
 
+import br.inf.portalfiscal.xsd.nfe.consReciNFe.TConsReciNFe;
 import br.inf.portalfiscal.xsd.nfe.consStatServ.TConsStatServ;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
+import br.inf.portalfiscal.xsd.nfe.nfe.TNFe;
+import br.inf.portalfiscal.xsd.nfe.procNFe.TNfeProc;
+import br.inf.portalfiscal.xsd.nfe.retEnviNFe.TRetEnviNFe;
 
 import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
@@ -10,19 +14,19 @@ import java.io.*;
 public class ServiceUtilXml {
 
     private static final String STATUS = "TConsStatServ";
-//    private static final String RECIBO = "TRecibo";
+    //    private static final String RECIBO = "TRecibo";
 //    private static final String SITUACAO_NFE = "TConsSitNFe";
-private static final String TENVINFE = "TEnviNFe";
-//    private static final String DIST_DFE = "DistDFeInt";
+    private static final String TENVINFE = "TEnviNFe";
+    //    private static final String DIST_DFE = "DistDFeInt";
 //    private static final String INUTILIZACAO = "TInutNFe";
-//    private static final String TNFE = "TNFe";
-//    private static final String NFEPROC = "TNfeProc";
-//    private static final String EVENTO = "TEnvEvento";
+    private static final String TNFE = "TNFe";
+    private static final String TNFEPROC = "TNfeProc";
+    //    private static final String EVENTO = "TEnvEvento";
 //    private static final String TPROCEVENTO = "TProcEvento";
-//    private static final String TCONSRECINFE = "TConsReciNFe";
-//    private static final String TConsCad = "TConsCad";
+    private static final String TCONSRECINFE = "TConsReciNFe";
+    //    private static final String TConsCad = "TConsCad";
 //    private static final String TPROCINUT = "TProcInutNFe";
-//    private static final String RETORNO_ENVIO = "TRetEnviNFe";
+    private static final String RETORNO_ENVIO = "TRetEnviNFe";
 //    private static final String SITUACAO_NFE_RET = "TRetConsSitNFe";
 //    private static final String TRETCONSRECINFE = "TRetConsReciNFe";
 //
@@ -60,13 +64,29 @@ private static final String TENVINFE = "TEnviNFe";
         JAXBElement<?> element = null;
 //        System.out.printf("element: [%s]\n", obj.getClass().getSimpleName());
         switch (obj.getClass().getSimpleName()) {
-            case STATUS:
+            case "TConsStatServ":
                 context = JAXBContext.newInstance(TConsStatServ.class);
                 element = new br.inf.portalfiscal.xsd.nfe.consStatServ.ObjectFactory().createConsStatServ((TConsStatServ) obj);
                 break;
-            case TENVINFE:
+            case "TEnviNFe":
                 context = JAXBContext.newInstance(TEnviNFe.class);
                 element = new br.inf.portalfiscal.xsd.nfe.enviNFe.ObjectFactory().createEnviNFe((TEnviNFe) obj);
+                break;
+            case "TConsReciNFe":
+                context = JAXBContext.newInstance(TConsReciNFe.class);
+                element = new br.inf.portalfiscal.xsd.nfe.consReciNFe.ObjectFactory().createConsReciNFe((TConsReciNFe) obj);
+                break;
+            case "TRetEnviNFe":
+                context = JAXBContext.newInstance(TRetEnviNFe.class);
+                element = new br.inf.portalfiscal.xsd.nfe.retEnviNFe.ObjectFactory().createRetEnviNFe((TRetEnviNFe) obj);
+                break;
+            case "TNFe":
+                context = JAXBContext.newInstance(TNFe.class);
+                element = new br.inf.portalfiscal.xsd.nfe.nfe.ObjectFactory().createNFe((TNFe) obj);
+                break;
+            case "TNfeProc":
+                context = JAXBContext.newInstance(TNfeProc.class);
+                element = new br.inf.portalfiscal.xsd.nfe.procNFe.ObjectFactory().createNfeProc((TNfeProc) obj);
                 break;
         }
 

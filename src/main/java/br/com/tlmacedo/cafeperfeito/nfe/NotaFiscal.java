@@ -12,6 +12,7 @@ import br.com.tlmacedo.nfe.model.vo.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,15 +52,15 @@ public class NotaFiscal {
         EmitVO emitVO = new EmitVO();
         infNfeVO.setEmit(emitVO);
         emitVO.setEnder(emitEnderVO);
-        if (ideVO.getTpAmb().equals("2")) {
-            emitVO.setCnpj("99999999000191");
-            emitVO.setxNome("NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
-            emitVO.setxFant("");
-        } else {
-            emitVO.setCnpj(emissor.getCnpj());
-            emitVO.setxNome(emissor.getRazao(60));
-            emitVO.setxFant(emissor.getFantasia(60));
-        }
+//        if (ideVO.getTpAmb().equals("2")) {
+//            emitVO.setCnpj("99999999000191");
+//            emitVO.setxNome("NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
+//            emitVO.setxFant("");
+//        } else {
+        emitVO.setCnpj(emissor.getCnpj());
+        emitVO.setxNome(emissor.getRazao(60));
+        emitVO.setxFant(emissor.getFantasia(60));
+//        }
         emitVO.setIE(emissor.getIe());
         emitVO.setCRT(String.valueOf(TCONFIG.getNfe().getCRT()));
         Endereco emissorEndereco = emissor.getEndereco(TipoEndereco.PRINCIPAL);
@@ -185,33 +186,35 @@ public class NotaFiscal {
             transportaVO.setUF(end.getMunicipio().getUf().getSigla().toUpperCase());
         }
 
-        CobrVO cobrVO = new CobrVO();
-        infNfeVO.setCobr(cobrVO);
-        FatVO fatVO = new FatVO();
-        cobrVO.setFat(fatVO);
-        if (getSaidaProduto().getContasAReceber().getRecebimentoList().size() > 0)
-            fatVO.setnFat(getSaidaProduto().getContasAReceber().getRecebimentoList().get(0).getDocumento());
-        if (fatVO.getnFat().equals(""))
-            fatVO.setnFat(ideVO.getnNF());
+        if (totalVO.getIcmsTot().getvNF().compareTo(BigDecimal.ZERO) != 0) {
+            CobrVO cobrVO = new CobrVO();
+            infNfeVO.setCobr(cobrVO);
+            FatVO fatVO = new FatVO();
+            cobrVO.setFat(fatVO);
+            if (getSaidaProduto().getContasAReceber().getRecebimentoList().size() > 0)
+                fatVO.setnFat(getSaidaProduto().getContasAReceber().getRecebimentoList().get(0).getDocumento());
+            if (fatVO.getnFat().equals(""))
+                fatVO.setnFat(ideVO.getnNF());
 
-        fatVO.setvOrig(icmsTotVO.getvProd());
-        fatVO.setvDesc(icmsTotVO.getvDesc());
-        fatVO.setvLiq(icmsTotVO.getvNF());
-        if (getSaidaProduto().getContasAReceber() != null) {
-            DupVO dupVO = new DupVO();
-            cobrVO.getDupVOList().add(dupVO);
-            dupVO.setnDup("001");
-            dupVO.setdVenc(getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue());
-            dupVO.setvDup(fatVO.getvLiq());
+            fatVO.setvOrig(icmsTotVO.getvProd());
+            fatVO.setvDesc(icmsTotVO.getvDesc());
+            fatVO.setvLiq(icmsTotVO.getvNF());
+            if (getSaidaProduto().getContasAReceber() != null) {
+                DupVO dupVO = new DupVO();
+                cobrVO.getDupVOList().add(dupVO);
+                dupVO.setnDup("001");
+                dupVO.setdVenc(getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue());
+                dupVO.setvDup(fatVO.getvLiq());
+            }
+
+            PagVO pagVO = new PagVO();
+            infNfeVO.setPag(pagVO);
+            DetPagVO detPagVO = new DetPagVO();
+            pagVO.setDetPag(detPagVO);
+            detPagVO.setIndPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoIndicador().getCod());
+            detPagVO.settPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoMeio().getCod());
+            detPagVO.setvPag(fatVO.getvLiq());
         }
-
-        PagVO pagVO = new PagVO();
-        infNfeVO.setPag(pagVO);
-        DetPagVO detPagVO = new DetPagVO();
-        pagVO.setDetPag(detPagVO);
-        detPagVO.setIndPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoIndicador().getCod());
-        detPagVO.settPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoMeio().getCod());
-        detPagVO.setvPag(fatVO.getvLiq());
 
         InfAdicVO infAdicVO = new InfAdicVO();
         infNfeVO.setInfAdic(infAdicVO);
@@ -280,8 +283,13 @@ public class NotaFiscal {
         ideVO.setMod(nfe.getModelo().getDescricao());
         ideVO.setSerie(nfe.serieProperty().getValue().toString());
         ideVO.setnNF(nfe.numeroProperty().getValue().toString());
-        ideVO.setDhEmi(nfe.dtHoraEmissaoProperty().getValue());
-        ideVO.setDhSaiEnt(nfe.dtHoraSaidaProperty().getValue());
+        if (TCONFIG.getNfe().getTpAmb() == 2) {
+            ideVO.setDhEmi(LocalDateTime.now());
+            ideVO.setDhSaiEnt(LocalDateTime.now());
+        } else {
+            ideVO.setDhEmi(nfe.dtHoraEmissaoProperty().getValue());
+            ideVO.setDhSaiEnt(nfe.dtHoraSaidaProperty().getValue());
+        }
         ideVO.setTpNF(String.valueOf(TCONFIG.getNfe().getTpNF()));
         ideVO.setIdDest(String.valueOf(nfe.getDestinoOperacao().getCod()));
         ideVO.setcMunFG(String.valueOf(TCONFIG.getInfLoja().getCMunFG()));
@@ -291,15 +299,8 @@ public class NotaFiscal {
         ideVO.setFinNFe(String.valueOf(TCONFIG.getNfe().getFinNFe()));
         ideVO.setIndFinal(String.valueOf(nfe.getConsumidorFinal().getCod()));
         ideVO.setIndPres(String.valueOf(nfe.getIndicadorPresenca().getCod()));
-        System.out.printf("ideVO.getProcEmi(): [%s]\n", ideVO.getProcEmi());
-        System.out.printf("ideVO.getVerProc(): [%s]\n", ideVO.getVerProc());
-        System.out.printf("TCONFIG.getNfe().getProcEmi(): [%s]\n", TCONFIG.getNfe().getProcEmi());
-        System.out.printf("TCONFIG.getNfe().getVerProc(): [%s]\n", TCONFIG.getNfe().getVerProc());
-        System.out.printf("\n\n");
         ideVO.setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));
         ideVO.setVerProc(TCONFIG.getNfe().getVerProc());
-        System.out.printf("ideVO.getProcEmi(): [%s]\n", ideVO.getProcEmi());
-        System.out.printf("ideVO.getVerProc(): [%s]\n", ideVO.getVerProc());
 
         if (salvar) {
             nfe.chaveProperty().setValue(ServiceValidarDado.gerarChaveNfe(ideVO));
