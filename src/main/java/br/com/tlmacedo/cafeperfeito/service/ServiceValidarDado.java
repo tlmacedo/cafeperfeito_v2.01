@@ -3,6 +3,7 @@ package br.com.tlmacedo.cafeperfeito.service;
 
 import br.com.tlmacedo.cafeperfeito.model.dao.RecebimentoDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
+import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import br.com.tlmacedo.nfe.model.vo.IdeVO;
 import org.apache.maven.surefire.shade.common.org.apache.commons.lang3.StringUtils;
@@ -110,9 +111,6 @@ public class ServiceValidarDado {
                 ideVO.getcUF(),
                 String.format("%02d%02d", ideVO.getDhEmi().getYear() % 100,
                         ideVO.getDhEmi().getMonthValue()),
-//                TCONFIG.getNfe().getTpAmb() == 2
-//                        ? "99999999000191"
-//                        :
                 TCONFIG.getInfLoja().getCnpj(),
                 String.format("%02d", Integer.parseInt(ideVO.getMod())),
                 String.format("%03d", Integer.parseInt(ideVO.getSerie())),
@@ -124,6 +122,37 @@ public class ServiceValidarDado {
         return String.format("%s%s",
                 chave,
                 ideVO.getcDV());
+    }
+
+    public static String gerarChaveNfe(SaidaProdutoNfe saidaProdutoNfe) {
+        String cUF = String.format("%02d", TCONFIG.getInfLoja().getCUF());
+        String aAMM = String.format("%02d%02d",
+                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getYear() % 100,
+                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getMonthValue());
+        String cnpj = TCONFIG.getInfLoja().getCnpj();
+        String mod = String.format("%02d", saidaProdutoNfe.getModelo().getCod());
+        String serie = String.format("%03d", saidaProdutoNfe.serieProperty().getValue());
+        String nNF = String.format("%09d", saidaProdutoNfe.numeroProperty().getValue());
+        String tpEmis = String.format("%d", TCONFIG.getNfe().getTpEmis());
+        String cNF = String.format("%04d%02d%02d",
+                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getYear(),
+                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getMonthValue(),
+                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getDayOfMonth());
+
+        String chave = String.format("%s%s%s%s%s%s%s%s",
+                cUF,
+                aAMM,
+                cnpj,
+                mod,
+                serie,
+                nNF,
+                tpEmis,
+                cNF);
+
+        String cDV = String.valueOf(nfeDv(chave));
+        return String.format("%s%s",
+                chave,
+                cDV);
     }
 
 //    public static WebTipo isEmailHomePageValido(final String value, boolean getMsgFaill) {

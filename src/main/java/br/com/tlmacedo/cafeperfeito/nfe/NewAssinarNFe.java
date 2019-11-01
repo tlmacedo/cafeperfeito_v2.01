@@ -9,7 +9,7 @@ public class NewAssinarNFe {
     public NewAssinarNFe(String xmlNfe, MeuCertificado meuCertificado) {
 
         NFeAssinarXml nFeAssinarXml = new NFeAssinarXml(xmlNfe, meuCertificado.getCertificates());
-        setXmlNfe_AssinadoNFe(nFeAssinarXml.getXmlAssinado());
+        setXmlNfe_AssinadoNFe(nFeAssinarXml.getXmlAssinadoNFe());
     }
 
     /**

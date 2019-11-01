@@ -26,6 +26,9 @@ public class SaidaProdutoNfe implements Serializable {
     private ObjectProperty<LocalDateTime> dtHoraEmissao = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtHoraSaida = new SimpleObjectProperty<>();
     private NfeDadosDestinoOperacao destinoOperacao;
+    private NfeImpressaoTpImp impressaoTpImp;
+    private NfeImpressaoTpEmis impressaoTpEmis;
+    private NfeImpressaoFinNFe impressaoFinNFe;
     private NfeDadosIndicadorConsumidorFinal consumidorFinal;
     private NfeDadosIndicadorPresenca indicadorPresenca;
     private NfeTransporteModFrete modFrete;
@@ -275,6 +278,37 @@ public class SaidaProdutoNfe implements Serializable {
         this.xmlProtNfe = xmlProtNfe;
     }
 
+
+    @Transient
+    @JsonIgnore
+    public NfeImpressaoTpImp getImpressaoTpImp() {
+        return impressaoTpImp;
+    }
+
+    public void setImpressaoTpImp(NfeImpressaoTpImp impressaoTpImp) {
+        this.impressaoTpImp = impressaoTpImp;
+    }
+
+    @Transient
+    @JsonIgnore
+    public NfeImpressaoTpEmis getImpressaoTpEmis() {
+        return impressaoTpEmis;
+    }
+
+    public void setImpressaoTpEmis(NfeImpressaoTpEmis impressaoTpEmis) {
+        this.impressaoTpEmis = impressaoTpEmis;
+    }
+
+    @Transient
+    @JsonIgnore
+    public NfeImpressaoFinNFe getImpressaoFinNFe() {
+        return impressaoFinNFe;
+    }
+
+    public void setImpressaoFinNFe(NfeImpressaoFinNFe impressaoFinNFe) {
+        this.impressaoFinNFe = impressaoFinNFe;
+    }
+
     @Override
     public String toString() {
         return "SaidaProdutoNfe{" +
@@ -289,6 +323,9 @@ public class SaidaProdutoNfe implements Serializable {
                 ", dtHoraEmissao=" + dtHoraEmissao +
                 ", dtHoraSaida=" + dtHoraSaida +
                 ", destinoOperacao=" + destinoOperacao +
+                ", impressaoTpImp=" + impressaoTpImp +
+                ", impressaoTpEmis=" + impressaoTpEmis +
+                ", impressaoFinNFe=" + impressaoFinNFe +
                 ", consumidorFinal=" + consumidorFinal +
                 ", indicadorPresenca=" + indicadorPresenca +
                 ", modFrete=" + modFrete +

@@ -18,7 +18,7 @@ public class NewEnviNFe {
     public NewEnviNFe(SaidaProduto saidaProduto) throws JAXBException {
         setSaidaProduto(saidaProduto);
 
-        settEnviNFe(new EnviNfe_v400(new NotaFiscal(getSaidaProduto()).getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe());
+        settEnviNFe(new EnviNfe_v400(new NewNotaFiscal(getSaidaProduto()).getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe());
 
         setXmlNFe(ServiceUtilXml.objectToXml(gettEnviNFe()));
     }

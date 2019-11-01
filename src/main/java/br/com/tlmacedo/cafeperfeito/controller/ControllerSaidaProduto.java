@@ -8,11 +8,14 @@ import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
+import br.com.tlmacedo.cafeperfeito.nfe.NewEnviNFe;
+import br.com.tlmacedo.cafeperfeito.nfe.NewNotaFiscal;
 import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
+import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -34,6 +37,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -133,7 +138,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private FilteredList<Produto> produtoFilteredList;
     private TmodelSaidaProduto tmodelSaidaProduto;
     private ObservableList<Empresa> empresaObservableList = FXCollections.observableArrayList(
-            new EmpresaDAO().getAll(Empresa.class, "cliente=1", "razao, fantasia"));
+            new EmpresaDAO().getAll(Empresa.class, null, "razao, fantasia"));
     private ContasAReceberDAO aReceberDAO = new ContasAReceberDAO();
     private ObservableList<ContasAReceber> aReceberObservableList =
             FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC"));
@@ -331,28 +336,14 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                         } catch (Exception ex) {
                                             getTmodelSaidaProduto().getContasAReceberDAO().transactionRollback();
                                         }
-//                                    } else {
-//                                        credito = BigDecimal.ZERO;
                                     }
-//                                getEmpresaObservableList().stream()
-//                                        .filter(empresa1 -> empresa1.idProperty().getValue() == empresaProperty().getValue().idProperty().getValue())
-//                                        .findFirst().ifPresent(empresa1 -> empresa1.limiteUtilizadoProperty().setValue(
-//                                        empresa1.limiteUtilizadoProperty().getValue().add(
-//                                                ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)
-//                                        )));
 
                                     new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber());
                                     atualizaTotaisCliente(getTmodelSaidaProduto().getaReceber());
 
-//                                getaReceberObservableList().add(getTmodelSaidaProduto().getaReceber());
-//                                getaReceberObservableList().sorted();
-//                                setaReceberObservableList(
-//                                        FXCollections.observableArrayList(getaReceberObservableList().add(getTmodelSaidaProduto().getaReceber()))
-//                                );
-                                    //setaReceberObservableList(FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC")));
-                                    //getaReceberObservableList().add(getTmodelSaidaProduto().getaReceber());
+                                    if (getTmodelSaidaProduto().getSaidaProduto().getSaidaProdutoNfe() != null)
+                                        gerarDanfe();
 
-                                    //informacoesAdicionais();
                                     limpaCampos(getPainelViewSaidaProduto());
                                 }
                             } else {
@@ -647,13 +638,52 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
                                 informacoesAdicionais();
 
-                                getCboEmpresa().setItems(getEmpresaObservableList());
+                                getCboEmpresa().setItems(getEmpresaObservableList().stream()
+                                        .filter(clientes -> clientes.isCliente())
+                                        .collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
 
                                 getCboEmpresa().getItems().add(0, new Empresa());
 
                                 getCboNfeDadosNaturezaOperacao().setItems(
                                         Arrays.stream(NfeDadosNaturezaOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeDadosModelo().setItems(
+                                        Arrays.stream(NfeDadosModelo.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeDadosDestinoOperacao().setItems(
+                                        Arrays.stream(NfeDadosDestinoOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeDadosIndicadorConsumidorFinal().setItems(
+                                        Arrays.stream(NfeDadosIndicadorConsumidorFinal.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeDadosIndicadorPresenca().setItems(
+                                        Arrays.stream(NfeDadosIndicadorPresenca.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeImpressaoTpImp().setItems(
+                                        Arrays.stream(NfeImpressaoTpImp.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeImpressaoFinNFe().setItems(
+                                        Arrays.stream(NfeImpressaoFinNFe.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeTransporteModFrete().setItems(
+                                        Arrays.stream(NfeTransporteModFrete.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeTransporteTransportadora().setItems(
+                                        getEmpresaObservableList().stream()
+                                                .filter(tranportadoras -> tranportadoras.isTransportadora())
+                                                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeCobrancaDuplicataNumeros().setItems(
+                                        Arrays.stream(NfeCobrancaDuplicataNumero.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeCobrancaPagamentoIndicador().setItems(
+                                        Arrays.stream(NfeCobrancaDuplicataPagamentoIndicador.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+                                getCboNfeCobrancaPagamentoMeio().setItems(
+                                        Arrays.stream(NfeCobrancaDuplicataPagamentoMeio.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+
                                 break;
 
                             case TABELA_PREENCHER:
@@ -664,6 +694,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
                             case SALVAR_SAIDA:
                                 if (getTmodelSaidaProduto().guardarSaidaProduto()) {
+                                    if (getTpnNfe().isExpanded())
+                                        guardarNfe();
                                     if (getTmodelSaidaProduto().salvarSaidaProduto()) {
                                         getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, "descricao"));
                                         getTtvProdutos().refresh();
@@ -854,6 +886,67 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                         vlrCreditoABaixar[0] = vlrCreditoABaixar[0].add(saldoConta);
                     }
                 });
+    }
+
+    private void guardarNfe() {
+        getTmodelSaidaProduto().getSaidaProduto().setSaidaProdutoNfe(new SaidaProdutoNfe());
+        SaidaProdutoNfe nfe = getTmodelSaidaProduto().getSaidaProduto().getSaidaProdutoNfe();
+        nfe.saidaProdutoProperty().setValue(getTmodelSaidaProduto().getSaidaProduto());
+        try {
+            nfe.setNaturezaOperacao(getCboNfeDadosNaturezaOperacao().getValue());
+            nfe.numeroProperty().setValue(Integer.parseInt(getTxtNfeDadosNumero().getText().replaceAll("\\D", "")));
+            nfe.serieProperty().setValue(Integer.parseInt(getTxtNfeDadosSerie().getText().replaceAll("\\D", "")));
+            nfe.setModelo(getCboNfeDadosModelo().getValue());
+            LocalDateTime dtHoraEmissao, dtHoraSaida;
+            LocalTime horaEmissao, horaSaida;
+            horaEmissao = LocalTime.of(Integer.parseInt(getTxtNfeDadosHoraEmissao().getText().substring(0, 2)), Integer.parseInt(getTxtNfeDadosHoraEmissao().getText().substring(3)));
+            horaSaida = LocalTime.of(Integer.parseInt(getTxtNfeDadosHoraSaida().getText().substring(0, 2)), Integer.parseInt(getTxtNfeDadosHoraSaida().getText().substring(3)));
+            dtHoraEmissao = getDtpNfeDadosDtEmissao().getValue().atTime(horaEmissao);
+            dtHoraSaida = getDtpNfeDadosDtSaida().getValue().atTime(horaSaida);
+            nfe.dtHoraEmissaoProperty().setValue(dtHoraEmissao);
+            nfe.dtHoraSaidaProperty().setValue(dtHoraSaida);
+            nfe.setDestinoOperacao(getCboNfeDadosDestinoOperacao().getValue());
+            nfe.setConsumidorFinal(getCboNfeDadosIndicadorConsumidorFinal().getValue());
+            nfe.setIndicadorPresenca(getCboNfeDadosIndicadorPresenca().getValue());
+            nfe.setModFrete(getCboNfeTransporteModFrete().getValue());
+            if (getCboNfeTransporteTransportadora().getSelectionModel().getSelectedIndex() >= 0)
+                nfe.setTransportador(getCboNfeTransporteTransportadora().getValue());
+            else
+                nfe.setTransportador(null);
+            String nCobranca;
+
+            if (getTmodelSaidaProduto().getaReceber().getRecebimentoList().size() > 0)
+                nCobranca = getTmodelSaidaProduto().getaReceber().getRecebimentoList()
+                        .get(getTmodelSaidaProduto().getaReceber().getRecebimentoList().size() - 1)
+                        .documentoProperty().getValue();
+            else
+                nCobranca = ServiceValidarDado.gerarCodigoCafePerfeito(
+                        Recebimento.class,
+                        getTmodelSaidaProduto().getaReceber().dtCadastroProperty().getValue().toLocalDate());
+
+            nfe.cobrancaNumeroProperty().setValue(nCobranca);
+            nfe.informacaoAdicionalProperty().setValue(getTxaNfeInformacoesAdicionais().getText());
+
+            nfe.setChave(ServiceValidarDado.gerarChaveNfe(nfe));
+            nfe.setStatusSefaz(NfeStatusSefaz.DIGITACAO);
+
+            getTmodelSaidaProduto().getSaidaProdutoDAO().transactionBegin();
+            getTmodelSaidaProduto().setSaidaProduto(getTmodelSaidaProduto().getSaidaProdutoDAO().setTransactionPersist(getTmodelSaidaProduto().getSaidaProduto()));
+            getTmodelSaidaProduto().getSaidaProdutoDAO().transactionCommit();
+
+            TEnviNFe tEnviNFe = new NewEnviNFe(getTmodelSaidaProduto().getSaidaProduto()).gettEnviNFe();
+
+            ServiceFileXmlSave.saveTEnviNFeToFile(tEnviNFe);
+
+
+        } catch (Exception ex) {
+            getTmodelSaidaProduto().getSaidaProdutoDAO().transactionRollback();
+            ex.printStackTrace();
+        }
+    }
+
+    private void gerarDanfe() {
+        NewNotaFiscal notaFiscal = new NewNotaFiscal(getTmodelSaidaProduto().getSaidaProduto());
     }
 
     /**

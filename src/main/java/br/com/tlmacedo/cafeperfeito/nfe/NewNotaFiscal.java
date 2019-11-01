@@ -18,19 +18,19 @@ import java.util.List;
 
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
-public class NotaFiscal {
+public class NewNotaFiscal {
 
     EnviNfeVO enviNfeVO = new EnviNfeVO();
     SaidaProduto saidaProduto;
     SaidaProdutoNfe nfe;
     SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
 
-    public NotaFiscal(Long nPed) {
+    public NewNotaFiscal(Long nPed) {
         setSaidaProduto(getSaidaProdutoDAO().getById(SaidaProduto.class, nPed));
         gerarNovaNotaFiscal();
     }
 
-    public NotaFiscal(SaidaProduto saidaProduto) {
+    public NewNotaFiscal(SaidaProduto saidaProduto) {
         setSaidaProduto(saidaProduto);
         gerarNovaNotaFiscal();
     }
@@ -58,17 +58,12 @@ public class NotaFiscal {
         EmitVO emitVO = new EmitVO();
         infNfeVO.setEmit(emitVO);
         emitVO.setEnder(emitEnderVO);
-//        if (ideVO.getTpAmb().equals("2")) {
-//            emitVO.setCnpj("99999999000191");
-//            emitVO.setxNome("NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
-//            emitVO.setxFant("");
-//        } else {
         emitVO.setCnpj(emissor.getCnpj());
         emitVO.setxNome(emissor.getRazao(60));
         emitVO.setxFant(emissor.getFantasia(60));
-//        }
         emitVO.setIE(emissor.getIe());
         emitVO.setCRT(String.valueOf(TCONFIG.getNfe().getCRT()));
+
         Endereco emissorEndereco = emissor.getEndereco(TipoEndereco.PRINCIPAL);
         emitEnderVO.setxLgr(emissorEndereco.getLogradouro());
         emitEnderVO.setNro(emissorEndereco.getNumero());
@@ -299,10 +294,10 @@ public class NotaFiscal {
         ideVO.setTpNF(String.valueOf(TCONFIG.getNfe().getTpNF()));
         ideVO.setIdDest(String.valueOf(nfe.getDestinoOperacao().getCod()));
         ideVO.setcMunFG(String.valueOf(TCONFIG.getInfLoja().getCMunFG()));
-        ideVO.setTpImp(String.valueOf(TCONFIG.getNfe().getTpImp()));
-        ideVO.setTpEmis(String.valueOf(TCONFIG.getNfe().getTpEmis()));
+        ideVO.setTpImp(String.valueOf(nfe.getImpressaoTpImp().getCod()));
+        ideVO.setTpEmis(String.valueOf(nfe.getImpressaoTpEmis().getCod()));
         ideVO.setTpAmb(String.valueOf(TCONFIG.getNfe().getTpAmb()));
-        ideVO.setFinNFe(String.valueOf(TCONFIG.getNfe().getFinNFe()));
+        ideVO.setFinNFe(String.valueOf(nfe.getImpressaoFinNFe().getCod()));
         ideVO.setIndFinal(String.valueOf(nfe.getConsumidorFinal().getCod()));
         ideVO.setIndPres(String.valueOf(nfe.getIndicadorPresenca().getCod()));
         ideVO.setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));

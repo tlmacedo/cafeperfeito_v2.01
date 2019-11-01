@@ -1,11 +1,14 @@
+import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
+import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
 import br.com.tlmacedo.cafeperfeito.nfe.MeuCertificado;
-import br.com.tlmacedo.cafeperfeito.nfe.NotaFiscal;
+import br.com.tlmacedo.cafeperfeito.nfe.NewNotaFiscal;
 import br.com.tlmacedo.cafeperfeito.service.ServiceUtilXml;
 import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
 import br.com.tlmacedo.nfe.service.*;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
+import br.inf.portalfiscal.xsd.nfe.consReciNFe.TConsReciNFe;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 import br.inf.portalfiscal.xsd.nfe.procNFe.TNFe;
 import br.inf.portalfiscal.xsd.nfe.procNFe.TProtNFe;
@@ -15,7 +18,6 @@ import javax.sql.rowset.serial.SerialBlob;
 import java.util.Scanner;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
-import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 public class Testes {
 
@@ -27,7 +29,7 @@ public class Testes {
             System.out.printf("\nqual saida de produto vc que gerar NF? ");
             Long nPed = Long.valueOf(new Scanner(System.in).nextLine().replaceAll("\\D", ""));
 
-            NotaFiscal notaFiscal = new NotaFiscal(nPed);
+            NewNotaFiscal notaFiscal = new NewNotaFiscal(new SaidaProdutoDAO().getById(SaidaProduto.class, nPed));
 
             SaidaProdutoNfeDAO saidaProdutoNfeDAO = new SaidaProdutoNfeDAO();
             SaidaProdutoNfe saidaProdutoNfe = notaFiscal.getNfe();
@@ -43,23 +45,23 @@ public class Testes {
             meuCertificado.getCertificates().loadToken();
             meuCertificado.getCertificates().loadSocketDinamico();
 
-            NFeAssinarXml nFeAssinarXml = new NFeAssinarXml(xmlNFe, meuCertificado.getCertificates());
-            String xmlNfe_Assinado = ServiceOutputXML.outputXML(nFeAssinarXml.getDocument());
+            NFeAssinarXml assinarXml = new NFeAssinarXml(xmlNFe, meuCertificado.getCertificates());
+            String xmlNfe_Assinado = ServiceOutputXML.outputXML(assinarXml.getDocument());
             System.out.printf("xmlNfe_Assinado:\n%s\n\n", xmlNfe_Assinado);
 
-            NFeAutorizacao nFeAutorizacao = new NFeAutorizacao(xmlNfe_Assinado, TCONFIG.getNfe().getTpAmb());
-            String xmlNfe_Autorizacao = nFeAutorizacao.getResultAutorizacaoNFe();
+            NFeAutorizacao NFeAutorizacao = new NFeAutorizacao(xmlNfe_Assinado, 2);
+            String xmlNfe_Autorizacao = NFeAutorizacao.getXmlAutorizacaoNFe();
             System.out.printf("xmlNfe_Autorizacao:\n%s\n\n", xmlNfe_Autorizacao);
 
-
-            TRetEnviNFe tRetEnviNFe = ServiceUtilXml.xmlToObject(xmlNfe_Autorizacao, TRetEnviNFe.class);
-            NFeRetAutorizacao nFeRetAutorizacao = new NFeRetAutorizacao(tRetEnviNFe);
-            String xmlConsReciNFe = ServiceUtilXml.objectToXml(nFeRetAutorizacao.gettConsReciNFe());
-            String xmlNfe_RetAutorizacao = nFeRetAutorizacao.getResultRetAutorizacaoNFe(xmlConsReciNFe);
+            TConsReciNFe tConsReciNFe =
+                    new NFeRetConsReciNfe(ServiceUtilXml.xmlToObject(xmlNfe_Autorizacao, TRetEnviNFe.class))
+                            .gettConsReciNFe();
+            NFeRetAutorizacao NFeRetAutorizacao = new NFeRetAutorizacao(ServiceUtilXml.objectToXml(tConsReciNFe));
+            String xmlNfe_RetAutorizacao = NFeRetAutorizacao.getXmlRetAutorizacaoNFe();
             System.out.printf("xmlNfe_RetAutorizacao:\n%s\n\n", xmlNfe_RetAutorizacao);
 
             NFeProc nFeProc = new NFeProc(xmlNfe_Assinado, xmlNfe_RetAutorizacao);
-            nFeProc.setStrVersao(tRetEnviNFe.getVersao());
+            nFeProc.setStrVersao(tConsReciNFe.getVersao());
             nFeProc.setTnFe(ServiceUtilXml.xmlToObject(nFeProc.getStringTNFe(), TNFe.class));
             nFeProc.settProtNFe(ServiceUtilXml.xmlToObject(nFeProc.getStringTProtNFe(), TProtNFe.class));
             String xmlNFe_Proc = ServiceUtilXml.objectToXml(nFeProc.getResultNFeProc());

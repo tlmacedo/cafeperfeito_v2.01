@@ -555,6 +555,7 @@ public class TmodelSaidaProduto {
             });
 
             getSaidaProduto().setSaidaProdutoProdutoList(getSaidaProdutoProdutoObservableList());
+
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;

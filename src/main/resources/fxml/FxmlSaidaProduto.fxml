@@ -401,7 +401,7 @@
                                                             </padding>
                                                         </Label>
                                                         <ComboBox fx:id="cboNfeDadosModelo"
-                                                                  accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                  accessibleText="len::;type::;value::0;seteditable::;binding::;"
                                                                   prefWidth="434.0">
                                                             <VBox.margin>
                                                                 <Insets/>
@@ -599,7 +599,7 @@
                                                             </padding>
                                                         </Label>
                                                         <ComboBox fx:id="cboNfeImpressaoTpEmis"
-                                                                  accessibleText="len::;type::;value::1;seteditable::;binding::;"
+                                                                  accessibleText="len::;type::;value::0;seteditable::;binding::;"
                                                                   prefWidth="434.0">
                                                             <VBox.margin>
                                                                 <Insets/>
@@ -623,7 +623,7 @@
                                                             </padding>
                                                         </Label>
                                                         <ComboBox fx:id="cboNfeImpressaoFinNFe"
-                                                                  accessibleText="len::;type::;value::1;seteditable::;binding::;"
+                                                                  accessibleText="len::;type::;value::0;seteditable::;binding::;"
                                                                   prefWidth="434.0">
                                                             <VBox.margin>
                                                                 <Insets/>
@@ -779,7 +779,7 @@
                                                             </padding>
                                                         </Label>
                                                         <ComboBox fx:id="cboNfeCobrancaPagamentoMeio"
-                                                                  accessibleText="len::;type::;value::0;seteditable::;binding::;"
+                                                                  accessibleText="len::;type::;value::11;seteditable::;binding::;"
                                                                   prefWidth="434.0">
                                                             <VBox.margin>
                                                                 <Insets/>
