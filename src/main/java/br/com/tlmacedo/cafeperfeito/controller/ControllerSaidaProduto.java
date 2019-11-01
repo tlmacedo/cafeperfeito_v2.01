@@ -4,6 +4,7 @@ import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.ContasAReceberDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
+import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
@@ -18,7 +19,9 @@ import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -144,6 +147,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC"));
     private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList;
 
+    private IntegerProperty nfeLastNumber = new SimpleIntegerProperty(0);
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
     private ObjectProperty<List<Endereco>> enderecoList = new SimpleObjectProperty<>();
     private ObjectProperty<Endereco> endereco = new SimpleObjectProperty<>();
@@ -368,10 +372,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             break;
                         case F9:
                             getTpnNfe().setExpanded(!getTpnNfe().isExpanded());
-                            if (getTpnNfe().isExpanded())
-                                getCboNfeDadosNaturezaOperacao().requestFocus();
-                            else
-                                getTxtPesquisa().requestFocus();
                             break;
                         case F12:
                             fechar();
@@ -546,6 +546,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             int diff = 85;
             if (!n) diff = (diff * (-1));
             organizaPosicaoCampos(diff);
+            if (n) {
+                getCboNfeDadosNaturezaOperacao().requestFocus();
+                getTxtNfeDadosNumero().setText(String.valueOf(nfeLastNumberProperty().getValue() + 1));
+            } else {
+                getTxtPesquisa().requestFocus();
+            }
+
         });
 
         getTpnNfe().setExpanded(false);
@@ -635,6 +642,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 getTmodelSaidaProduto().escutaLista();
                                 break;
                             case COMBOS_PREENCHER:
+                                setNfeLastNumber(new SaidaProdutoNfeDAO().getLast(SaidaProdutoNfe.class, "numero").getNumero());
 
                                 informacoesAdicionais();
 
@@ -663,6 +671,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 getCboNfeImpressaoTpImp().setItems(
                                         Arrays.stream(NfeImpressaoTpImp.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
+                                getCboNfeImpressaoTpEmis().setItems(
+                                        Arrays.stream(NfeImpressaoTpEmis.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
                                 getCboNfeImpressaoFinNFe().setItems(
                                         Arrays.stream(NfeImpressaoFinNFe.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
@@ -682,7 +693,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
                                 getCboNfeCobrancaPagamentoMeio().setItems(
                                         Arrays.stream(NfeCobrancaDuplicataPagamentoMeio.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-
 
                                 break;
 
@@ -734,6 +744,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private void limpaCampos(AnchorPane anchorPane) {
         ServiceCampoPersonalizado.fieldClear(anchorPane);
+        txtNfeDadosSerie.setText();
         if (anchorPane == getPainelViewSaidaProduto()) {
             getCboEmpresa().getEditor().clear();
             getCboEmpresa().requestFocus();
@@ -1680,6 +1691,18 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setaReceberObservableList(ObservableList<ContasAReceber> aReceberObservableList) {
         this.aReceberObservableList = aReceberObservableList;
+    }
+
+    public int getNfeLastNumber() {
+        return nfeLastNumber.get();
+    }
+
+    public IntegerProperty nfeLastNumberProperty() {
+        return nfeLastNumber;
+    }
+
+    public void setNfeLastNumber(int nfeLastNumber) {
+        this.nfeLastNumber.set(nfeLastNumber);
     }
 
     /**

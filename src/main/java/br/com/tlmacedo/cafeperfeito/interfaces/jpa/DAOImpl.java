@@ -105,6 +105,20 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
     }
 
     @Override
+    public T getLast(Class<T> classe, String campo) {
+        try {
+            Query select;
+            String sql = String.format("from %s ORDER BY %s DESC",
+                    classe.getSimpleName(), campo);
+            System.out.printf("sql: [%s]\n", sql);
+            return (T) getConexao().getEntityManager().createQuery(sql).setMaxResults(1).getSingleResult();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
     public EntityManager getEntityManager() {
         if (getConexao() == null)
             setConexao(new ConnectionFactory());

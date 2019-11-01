@@ -24,6 +24,8 @@ public interface DAO<T, I extends Serializable> {
 
     public List<T> getAll(Class<T> classe, String personalizaBusca, String orderBy);
 
+    public T getLast(Class<T> classe, String campo);
+
     public EntityManager getEntityManager();
 
     public EntityTransaction getTransaction();
