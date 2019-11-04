@@ -1,10 +1,10 @@
 package br.com.tlmacedo.cafeperfeito.controller;
 
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
+import br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert;
 import br.com.tlmacedo.cafeperfeito.model.dao.ContasAReceberDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
-import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
@@ -19,10 +19,7 @@ import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -46,6 +43,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
+import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito {
@@ -148,6 +146,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList;
 
     private IntegerProperty nfeLastNumber = new SimpleIntegerProperty(0);
+    private StringProperty informacaoNFE = new SimpleStringProperty();
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
     private ObjectProperty<List<Endereco>> enderecoList = new SimpleObjectProperty<>();
     private ObjectProperty<Endereco> endereco = new SimpleObjectProperty<>();
@@ -243,22 +242,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                     || getTtvProdutos().getSelectionModel().getSelectedItem() == null
                     || getTtvProdutos().getSelectionModel().getSelectedItem().getValue().tblEstoqueProperty().get() <= 0)
                 return;
-            Produto produtoEscolhido = new Produto();
-            produtoEscolhido = getTtvProdutos().getSelectionModel().getSelectedItem().getValue();
-//            Integer idProd;
-            if (produtoEscolhido.getId() == 0) {
-                produtoEscolhido.setId(getTtvProdutos().getSelectionModel().getSelectedItem().getParent().getValue().idProperty().getValue().intValue());
-            } else {
-                produtoEscolhido.setTblEstoque(getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblEstoque());
-                produtoEscolhido.setTblLote(getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblLote());
-                produtoEscolhido.setTblValidade(getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblValidade());
-            }
-            Produto finalProdutoEscolhido = produtoEscolhido;
+            Produto produtoEscolhido = getProdutoSelecionado();
             if (getSaidaProdutoProdutoObservableList().stream()
-                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue().equals(finalProdutoEscolhido.tblLoteProperty().getValue())
-                            && saidaProdutoProduto.getProduto().idProperty().getValue().intValue() == finalProdutoEscolhido.idProperty().getValue().intValue())
+                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue().equals(produtoEscolhido.tblLoteProperty().getValue())
+                            && saidaProdutoProduto.getProduto().idProperty().getValue().intValue() == produtoEscolhido.idProperty().getValue().intValue())
                     .findFirst().orElse(null) == null) {
-                //ServiceUtilJSon.printJsonFromObject(produtoEscolhido, "ProdutoEscolhido");
                 getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoEscolhido, TipoSaidaProduto.VENDA, 1));
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().fireEvent(ServiceComandoTecladoMouse.pressTecla(KeyCode.F8));
                 if (getTmodelSaidaProduto().empresaProperty().getValue() != null)
@@ -268,7 +256,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                     SaidaProdutoProduto saida = getSaidaProdutoProdutoObservableList().get(i);
                     if (saida.loteProperty().getValue().equals(produtoEscolhido.tblLoteProperty().getValue())
                             && saida.produtoProperty().getValue().idProperty().getValue().intValue()
-                            == finalProdutoEscolhido.idProperty().getValue().intValue()) {
+                            == produtoEscolhido.idProperty().getValue().intValue()) {
                         getTvItensPedido().requestFocus();
                         getTvItensPedido().getSelectionModel().select(i, getTmodelSaidaProduto().getColQtd());
                     }
@@ -286,12 +274,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         getTvItensPedido().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
             if (keyEvent.getCode() != KeyCode.HELP) return;
-            Produto produtoEscolhido = new Produto();
-            produtoEscolhido.idProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().produtoProperty().getValue().idProperty().getValue());
-            produtoEscolhido.tblEstoqueProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().estoqueProperty().getValue());
-            produtoEscolhido.tblLoteProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().loteProperty().getValue());
-            produtoEscolhido.tblValidadeProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().dtValidadeProperty().getValue());
-            getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoEscolhido, TipoSaidaProduto.AMOSTRA, 1));
+            Produto produtoAdicional = new Produto(getTvItensPedido().getSelectionModel().getSelectedItem().produtoProperty().getValue());
+            getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoAdicional, TipoSaidaProduto.AMOSTRA, 1));
+//            Produto produtoEscolhido = new Produto(getTvItensPedido().getSelectionModel().getSelectedItem().produtoProperty().getValue());
+//            produtoEscolhido.tblEstoqueProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().estoqueProperty().getValue());
+//            produtoEscolhido.tblLoteProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().loteProperty().getValue());
+//            produtoEscolhido.tblValidadeProperty().setValue(getTvItensPedido().getSelectionModel().getSelectedItem().dtValidadeProperty().getValue());
+//            getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoEscolhido, TipoSaidaProduto.AMOSTRA, 1));
         });
 
         setEventHandlerSaidaProduto(new EventHandler<KeyEvent>() {
@@ -550,12 +539,19 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 getCboNfeDadosNaturezaOperacao().requestFocus();
                 getTxtNfeDadosNumero().setText(String.valueOf(nfeLastNumberProperty().getValue() + 1));
             } else {
+                limpaCampos(getTpnNfe());
                 getTxtPesquisa().requestFocus();
             }
 
         });
 
         getTpnNfe().setExpanded(false);
+
+        getCboNfeTransporteModFrete().disableProperty().bind(Bindings.createBooleanBinding(() ->
+                        getCboNfeTransporteModFrete().getSelectionModel().getSelectedItem().equals(NfeTransporteModFrete.REMETENTE),
+                getCboNfeTransporteModFrete().getSelectionModel().selectedItemProperty())
+        );
+
 
         getTxtPesquisa().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
             if (keyEvent.getCode() != KeyCode.ENTER) return;
@@ -587,6 +583,15 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                         ServiceMascara.getMoeda(getTmodelSaidaProduto().totalDescontoProperty().getValue(), 2),
                 getTmodelSaidaProduto().totalDescontoProperty()
         ));
+
+        informacaoNFEProperty().bind(Bindings.createStringBinding(() ->
+                getNFeInfAdicionas(), getLblTotalLiquido().textProperty(), getDtpDtVencimento().valueProperty())
+        );
+
+        informacaoNFEProperty().addListener((ov, o, n) -> {
+            if (n != null)
+                getTxaNfeInformacoesAdicionais().setText(n);
+        });
 
         getLblTotalLiquido().textProperty().bind(Bindings.createStringBinding(() ->
                         ServiceMascara.getMoeda(getTmodelSaidaProduto().totalLiquidoProperty().get().setScale(2), 2),
@@ -642,7 +647,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 getTmodelSaidaProduto().escutaLista();
                                 break;
                             case COMBOS_PREENCHER:
-                                setNfeLastNumber(new SaidaProdutoNfeDAO().getLast(SaidaProdutoNfe.class, "numero").getNumero());
 
                                 informacoesAdicionais();
 
@@ -740,16 +744,19 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private void limpaCampos(TitledPane titledPane) {
         limpaCampos((AnchorPane) titledPane.getContent());
+        if (titledPane.equals("tpnNfe"))
+            getTxaNfeInformacoesAdicionais().setText(getNFeInfAdicionas());
     }
 
     private void limpaCampos(AnchorPane anchorPane) {
         ServiceCampoPersonalizado.fieldClear(anchorPane);
-        txtNfeDadosSerie.setText();
+        //txtNfeDadosSerie.setText();
         if (anchorPane == getPainelViewSaidaProduto()) {
             getCboEmpresa().getEditor().clear();
             getCboEmpresa().requestFocus();
             getTmodelSaidaProduto().limpaCampos();
         }
+
     }
 
     private void limpaEndereco() {
@@ -806,6 +813,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                     .map(ContasAReceber::getSaidaProduto)
                     .collect(Collectors.groupingBy(SaidaProduto::getCliente, LinkedHashMap::new, Collectors.toList()))
                     .forEach((empresa, saidaProdutos) -> {
+                        saidaProdutos.stream().map(SaidaProduto::getSaidaProdutoNfe)
+                                .forEach(saidaProdutoNfe -> {
+                                    if (saidaProdutoNfe != null && saidaProdutoNfe.getNumero() > getNfeLastNumber())
+                                        setNfeLastNumber(saidaProdutoNfe.getNumero());
+                                });
                         BigDecimal vlrLimiteUtilizado =
                                 getaReceberObservableList().stream()
                                         .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresa.idProperty().getValue())
@@ -960,6 +972,32 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         NewNotaFiscal notaFiscal = new NewNotaFiscal(getTmodelSaidaProduto().getSaidaProduto());
     }
 
+    private String getNFeInfAdicionas() {
+        String strInf = String.format(TCONFIG.getNfe().getInfAdic(),
+                getLblTotalLiquido().getText(),
+                (getDtpDtVencimento().getValue() != null)
+                        ? String.format(" dt. Venc.: %s",
+                        getDtpDtVencimento().getValue().format(Regex_Convert.DTF_DATA))
+                        : "",
+                TCONFIG.getInfLoja().getBanco(),
+                TCONFIG.getInfLoja().getAgencia(), TCONFIG.getInfLoja().getContaCorrente())
+                .toUpperCase();
+
+        int start = 0, end = 0;
+        String retorno = strInf;
+        if (getTxaNfeInformacoesAdicionais().getText().length() > 0) {
+            start = getTxaNfeInformacoesAdicionais().getText().indexOf("-** ");
+            end = getTxaNfeInformacoesAdicionais().getText().indexOf(" **-");
+            if (end > 0)
+                retorno = getTxaNfeInformacoesAdicionais().getText().replace(
+                        getTxaNfeInformacoesAdicionais().getText().substring(start, end + 4),
+                        strInf
+                );
+        }
+        return retorno;
+    }
+
+
     /**
      * END voids
      */
@@ -985,6 +1023,23 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         recebimento.setUsuarioCadastro(UsuarioLogado.getUsuario());
         return recebimento;
     }
+
+    private Produto getProdutoSelecionado() {
+        Produto produtoEscolhido;
+        if (getTtvProdutos().getSelectionModel().getSelectedItem().getValue().idProperty().getValue() != 0) {
+            produtoEscolhido = new Produto(getTtvProdutos().getSelectionModel().getSelectedItem().getValue());
+            produtoEscolhido.setTblEstoque(getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblEstoque());
+            produtoEscolhido.setTblLote(getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblLote());
+            produtoEscolhido.setTblValidade(getTtvProdutos().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblValidade());
+        } else {
+            produtoEscolhido = new Produto(getTtvProdutos().getSelectionModel().getSelectedItem().getParent().getValue());
+            produtoEscolhido.setTblEstoque(getTtvProdutos().getSelectionModel().getSelectedItem().getValue().getTblEstoque());
+            produtoEscolhido.setTblLote(getTtvProdutos().getSelectionModel().getSelectedItem().getValue().getTblLote());
+            produtoEscolhido.setTblValidade(getTtvProdutos().getSelectionModel().getSelectedItem().getValue().getTblValidade());
+        }
+        return produtoEscolhido;
+    }
+
 
     /**
      * END returns
@@ -1703,6 +1758,18 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setNfeLastNumber(int nfeLastNumber) {
         this.nfeLastNumber.set(nfeLastNumber);
+    }
+
+    public String getInformacaoNFE() {
+        return informacaoNFE.get();
+    }
+
+    public StringProperty informacaoNFEProperty() {
+        return informacaoNFE;
+    }
+
+    public void setInformacaoNFE(String informacaoNFE) {
+        this.informacaoNFE.set(informacaoNFE);
     }
 
     /**

@@ -37,10 +37,8 @@ public class SaidaProdutoProduto implements Serializable {
     }
 
     public SaidaProdutoProduto(Produto produto, TipoSaidaProduto tipSaida, Integer qtd) {
-        Produto prod = new Produto();
-        prod = produto;
-        this.produto.setValue(prod);
-        //this.idProd = getProduto().idProperty();
+//        Produto prod = new Produto(produto);
+        this.produtoProperty().setValue(produto);
         this.codigo = getProduto().codigoProperty();
         this.descricao = getProduto().descricaoProperty();
         this.tipoSaidaProduto = tipSaida;

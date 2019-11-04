@@ -101,8 +101,8 @@ public interface Regex_Convert {
     LocalDateTime DATAHORA_LOCAL = LocalDateTime.now().atZone(MY_ZONE_TIME).toLocalDateTime();
     DataFormat DT_DATA = new DataFormat("dd/MM/yyyy");
     DateTimeFormatter DTF_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    DateTimeFormatter DTF_HORA_HM = DateTimeFormatter.ofPattern("HH:mm:ss", LOCALE);
-    DateTimeFormatter DTF_HORA_HMS = DateTimeFormatter.ofPattern("HH:mm", LOCALE);
+    DateTimeFormatter DTF_HORA_HM = DateTimeFormatter.ofPattern("HH:mm", LOCALE);
+    DateTimeFormatter DTF_HORA_HMS = DateTimeFormatter.ofPattern("HH:mm:ss", LOCALE);
     DateTimeFormatter DTF_DATAHORA_HM = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", LOCALE);
     DateTimeFormatter DTF_DATAHORA_HMS = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", LOCALE);
     DateTimeFormatter DTF_NFE_TO_LOCAL_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX", LOCALE);

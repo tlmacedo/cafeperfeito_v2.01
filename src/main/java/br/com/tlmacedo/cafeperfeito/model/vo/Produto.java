@@ -66,21 +66,55 @@ public class Produto implements Serializable {
     public Produto() {
     }
 
-    public Produto(ProdutoEstoque estoque) {
-        this.tblEstoque = estoque.qtdProperty();
-        this.tblLote = estoque.loteProperty();
-        this.tblValidade = estoque.validadeProperty();
+
+    public Produto(Produto prod) {
+        this.id = new SimpleLongProperty(prod.idProperty().getValue());
+        this.codigo = new SimpleStringProperty(prod.codigoProperty().getValue());
+        this.descricao = new SimpleStringProperty(prod.descricaoProperty().getValue());
+        this.peso = new SimpleObjectProperty<>(prod.pesoProperty().getValue());
+        this.unidadeComercial = prod.getUnidadeComercial();
+        this.situacao = prod.getSituacao();
+        this.precoCompra = new SimpleObjectProperty<>(prod.precoCompraProperty().getValue());
+        this.precoVenda = new SimpleObjectProperty<>(prod.precoVendaProperty().getValue());
+        this.varejo = new SimpleIntegerProperty(prod.varejoProperty().getValue());
+        this.ultImpostoSefaz = new SimpleObjectProperty<>(prod.ultImpostoSefazProperty().getValue());
+        this.ultFrete = new SimpleObjectProperty<>(prod.ultFreteProperty().getValue());
+        this.comissao = new SimpleObjectProperty<>(prod.comissaoProperty().getValue());
+        this.usuarioCadastro = new SimpleObjectProperty<>(prod.usuarioCadastroProperty().getValue());
+        this.dtCadastro = new SimpleObjectProperty<>(prod.dtCadastroProperty().getValue());
+        this.usuarioAtualizacao = new SimpleObjectProperty<>(prod.usuarioAtualizacaoProperty().getValue());
+        this.dtAtualizacao = new SimpleObjectProperty<>(prod.dtAtualizacaoProperty().getValue());
+        this.nfeGenero = new SimpleStringProperty(prod.nfeGeneroProperty().getValue());
+        this.ncm = new SimpleStringProperty(prod.ncmProperty().getValue());
+        this.cest = new SimpleStringProperty(prod.cestProperty().getValue());
+        this.fiscalCstOrigem = new SimpleObjectProperty<>(prod.fiscalCstOrigemProperty().getValue());
+        this.fiscalIcms = new SimpleObjectProperty<>(prod.fiscalIcmsProperty().getValue());
+        this.fiscalPis = new SimpleObjectProperty<>(prod.fiscalPisProperty().getValue());
+        this.fiscalCofins = new SimpleObjectProperty<>(prod.fiscalCofinsProperty().getValue());
+//        this.imgProduto = prod.getImgProduto();
+//        this.imgProdutoBack = prod.getImgProdutoBack();
+        this.tblEstoque = new SimpleIntegerProperty(prod.tblEstoqueProperty().getValue());
+        this.tblLote = new SimpleStringProperty(prod.tblLoteProperty().getValue());
+        this.tblValidade = new SimpleObjectProperty<>(prod.tblValidadeProperty().getValue());
+        this.produtoCodigoBarraList = new ArrayList<>(prod.getProdutoCodigoBarraList());
+        this.produtoEstoqueList = new ArrayList<>(prod.getProdutoEstoqueList());
     }
 
-    public Produto(Integer qtdEstoq, String lote, LocalDate validade) {
-        this.tblEstoque = new SimpleIntegerProperty(qtdEstoq);
-        this.tblLote = new SimpleStringProperty(lote);
-        this.tblValidade = new SimpleObjectProperty<>(validade);
+    public Produto(ProdutoEstoque estoque) {
+        this.tblEstoque = new SimpleIntegerProperty(estoque.qtdProperty().getValue());
+        this.tblLote = new SimpleStringProperty(estoque.loteProperty().getValue());
+        this.tblValidade = new SimpleObjectProperty<>(estoque.validadeProperty().getValue());
     }
+
+//    public Produto(Integer qtdEstoq, String lote, LocalDate validade) {
+//        this.tblEstoque = new SimpleIntegerProperty(qtdEstoq);
+//        this.tblLote = new SimpleStringProperty(lote);
+//        this.tblValidade = new SimpleObjectProperty<>(validade);
+//    }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public Produto clone() throws CloneNotSupportedException {
+        return (Produto) super.clone();
     }
 
     @Id

@@ -110,7 +110,6 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
             Query select;
             String sql = String.format("from %s ORDER BY %s DESC",
                     classe.getSimpleName(), campo);
-            System.out.printf("sql: [%s]\n", sql);
             return (T) getConexao().getEntityManager().createQuery(sql).setMaxResults(1).getSingleResult();
         } catch (Exception ex) {
             ex.printStackTrace();
