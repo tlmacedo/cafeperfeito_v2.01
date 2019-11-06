@@ -468,6 +468,30 @@ public class TmodelSaidaProduto {
      * Begin Returns
      */
 
+    public boolean updateSaidaProduto() {
+        try {
+            getSaidaProdutoDAO().transactionBegin();
+            setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
+            getSaidaProdutoDAO().transactionCommit();
+        } catch (Exception e) {
+            getSaidaProdutoDAO().transactionRollback();
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public boolean updateContasAReceber() {
+        try {
+            getContasAReceberDAO().transactionBegin();
+            setaReceber(getContasAReceberDAO().setTransactionPersist(getaReceber()));
+            getContasAReceberDAO().transactionCommit();
+        } catch (Exception ex) {
+            getContasAReceberDAO().transactionRollback();
+            return false;
+        }
+        return true;
+    }
+
     public Integer validEstoque(Integer newQtd, Integer oldQtd) {
         if (getSaidaProdutoProdutoObservableList().stream()
                 .filter(saidaProdutoProduto -> saidaProdutoProduto.produtoProperty().getValue().idProperty().getValue() == getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).produtoProperty().getValue().idProperty().getValue()

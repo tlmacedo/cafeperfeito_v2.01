@@ -61,6 +61,28 @@ public class ServiceAlertMensagem {
         //getDialogPane().setConte DialogPane(jasperViewer.getContentPane());
     }
 
+    public Optional<ButtonType> alertYesNo() {
+        loadDialog();
+        loadDialogPane();
+
+        setBtnYes(new Button());
+        getBtns().add(getBtnYes());
+
+        setBtnNo(new Button());
+        getBtns().add(getBtnNo());
+
+        addButton();
+
+//        getDialog().setResultConverter(o -> {
+//            if (o == ButtonType.YES)
+//                return true;
+//            return false;
+//        });
+
+        return getDialog().showAndWait();
+    }
+
+
     public Optional<ButtonType> alertYesNoCancel() {
         loadDialog();
         loadDialogPane();

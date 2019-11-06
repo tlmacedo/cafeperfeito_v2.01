@@ -9,13 +9,14 @@ import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
+import br.com.tlmacedo.cafeperfeito.nfe.MeuCertificado;
 import br.com.tlmacedo.cafeperfeito.nfe.NewEnviNFe;
-import br.com.tlmacedo.cafeperfeito.nfe.NewNotaFiscal;
 import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
+import br.com.tlmacedo.nfe.service.NFeAssinarXml;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -33,6 +34,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
+import javax.xml.bind.JAXBException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -147,6 +149,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private IntegerProperty nfeLastNumber = new SimpleIntegerProperty(0);
     private StringProperty informacaoNFE = new SimpleStringProperty();
+    private ObjectProperty<NewEnviNFe> enviNFe = new SimpleObjectProperty<>();
+    private ObjectProperty<MeuCertificado> meuCertificado = new SimpleObjectProperty<>();
+    private ObjectProperty<NFeAssinarXml> nFeAssinarXml = new SimpleObjectProperty<>();
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
     private ObjectProperty<List<Endereco>> enderecoList = new SimpleObjectProperty<>();
     private ObjectProperty<Endereco> endereco = new SimpleObjectProperty<>();
@@ -319,16 +324,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 }
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
                                     if (utilizaCredito) {
-                                        try {
-                                            getTmodelSaidaProduto().getContasAReceberDAO().transactionBegin();
-                                            baixaCredito(credito);
-                                            getTmodelSaidaProduto().getaReceber().getRecebimentoList().add(addRecebimento(getTmodelSaidaProduto().getaReceber(),
-                                                    PagamentoModalidade.CREDITO, credito));
-                                            getTmodelSaidaProduto().setaReceber(getaReceberDAO().setTransactionPersist(getTmodelSaidaProduto().getaReceber()));
-                                            getTmodelSaidaProduto().getContasAReceberDAO().transactionCommit();
-                                        } catch (Exception ex) {
-                                            getTmodelSaidaProduto().getContasAReceberDAO().transactionRollback();
-                                        }
+                                        baixaCredito(credito);
+                                        getTmodelSaidaProduto().getaReceber().getRecebimentoList().add(addRecebimento(getTmodelSaidaProduto().getaReceber(),
+                                                PagamentoModalidade.CREDITO, credito));
+                                        getTmodelSaidaProduto().updateContasAReceber();
                                     }
 
                                     new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber());
@@ -750,11 +749,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private void limpaCampos(AnchorPane anchorPane) {
         ServiceCampoPersonalizado.fieldClear(anchorPane);
-        //txtNfeDadosSerie.setText();
         if (anchorPane == getPainelViewSaidaProduto()) {
             getCboEmpresa().getEditor().clear();
             getCboEmpresa().requestFocus();
             getTmodelSaidaProduto().limpaCampos();
+            enviNFeProperty().setValue(null);
         }
 
     }
@@ -953,9 +952,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             nfe.setChave(ServiceValidarDado.gerarChaveNfe(nfe));
             nfe.setStatusSefaz(NfeStatusSefaz.DIGITACAO);
 
-            getTmodelSaidaProduto().getSaidaProdutoDAO().transactionBegin();
-            getTmodelSaidaProduto().setSaidaProduto(getTmodelSaidaProduto().getSaidaProdutoDAO().setTransactionPersist(getTmodelSaidaProduto().getSaidaProduto()));
-            getTmodelSaidaProduto().getSaidaProdutoDAO().transactionCommit();
+            getTmodelSaidaProduto().updateSaidaProduto();
 
             TEnviNFe tEnviNFe = new NewEnviNFe(getTmodelSaidaProduto().getSaidaProduto()).gettEnviNFe();
 
@@ -968,8 +965,43 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         }
     }
 
-    private void gerarDanfe() {
-        NewNotaFiscal notaFiscal = new NewNotaFiscal(getTmodelSaidaProduto().getSaidaProduto());
+    private void gerarDanfe() throws JAXBException {
+        enviNFeProperty().setValue(new NewEnviNFe(getTmodelSaidaProduto().getSaidaProduto()));
+    }
+
+    private boolean errLoadCertificadoA3() {
+        if (meuCertificadoProperty().getValue() == null)
+            meuCertificadoProperty().setValue(new MeuCertificado());
+
+        try {
+            meuCertificadoProperty().getValue().getCertificates().loadToken();
+            meuCertificadoProperty().getValue().getCertificates().loadSocketDinamico();
+        } catch (Exception ex) {
+            setMeuCertificado(null);
+            ex.printStackTrace();
+            ServiceAlertMensagem alertMensagem = new ServiceAlertMensagem();
+            alertMensagem.setCabecalho("Certificado digital");
+            alertMensagem.setContentText("erro no certificado, deseja tentar novamente?");
+            if (alertMensagem.alertYesNo().get() == ButtonType.NO)
+                return false;
+            else
+                return true;
+        }
+        return false;
+    }
+
+    private void assinarXmlDanfe() {
+        boolean errCertificado = true;
+        while (errCertificado) {
+            errCertificado = errLoadCertificadoA3();
+        }
+
+        if (meuCertificadoProperty().getValue() == null) return;
+
+        setnFeAssinarXml(new NFeAssinarXml(enviNFeProperty().getValue().getXmlNFe(), meuCertificadoProperty().getValue().getCertificates()));
+//        NFeAssinarXml assinarXml = new NFeAssinarXml(xmlNFe, meuCertificado.getCertificates());
+//        String xmlNfe_Assinado = ServiceOutputXML.outputXML(assinarXml.getDocument());
+//        System.out.printf("xmlNfe_Assinado:\n%s\n\n", xmlNfe_Assinado);
     }
 
     private String getNFeInfAdicionas() {
@@ -1770,6 +1802,42 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setInformacaoNFE(String informacaoNFE) {
         this.informacaoNFE.set(informacaoNFE);
+    }
+
+    public NewEnviNFe getEnviNFe() {
+        return enviNFe.get();
+    }
+
+    public ObjectProperty<NewEnviNFe> enviNFeProperty() {
+        return enviNFe;
+    }
+
+    public void setEnviNFe(NewEnviNFe enviNFe) {
+        this.enviNFe.set(enviNFe);
+    }
+
+    public MeuCertificado getMeuCertificado() {
+        return meuCertificado.get();
+    }
+
+    public ObjectProperty<MeuCertificado> meuCertificadoProperty() {
+        return meuCertificado;
+    }
+
+    public void setMeuCertificado(MeuCertificado meuCertificado) {
+        this.meuCertificado.set(meuCertificado);
+    }
+
+    public NFeAssinarXml getnFeAssinarXml() {
+        return nFeAssinarXml.get();
+    }
+
+    public ObjectProperty<NFeAssinarXml> nFeAssinarXmlProperty() {
+        return nFeAssinarXml;
+    }
+
+    public void setnFeAssinarXml(NFeAssinarXml nFeAssinarXml) {
+        this.nFeAssinarXml.set(nFeAssinarXml);
     }
 
     /**
