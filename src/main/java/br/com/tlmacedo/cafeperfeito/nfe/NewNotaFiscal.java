@@ -9,6 +9,8 @@ import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
+import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
+import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
@@ -16,14 +18,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 public class NewNotaFiscal {
 
     EnviNfeVO enviNfeVO = new EnviNfeVO();
     SaidaProduto saidaProduto;
-    SaidaProdutoNfe nfe;
+    SaidaProdutoNfe myNfe;
     SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
+    TEnviNFe tEnviNFe;
 
     public NewNotaFiscal(Long nPed) {
         setSaidaProduto(getSaidaProdutoDAO().getById(SaidaProduto.class, nPed));
@@ -49,7 +53,8 @@ public class NewNotaFiscal {
 
         infNfeVO.setVersao(TCONFIG.getNfe().getVersao());
 
-        IdeVO ideVO = newNfeIde(getSaidaProduto().getSaidaProdutoNfe());
+        setMyNfe(getSaidaProduto().getSaidaProdutoNfeList().stream().filter(saidaProdutoNfe -> !saidaProdutoNfe.isCancelada()).findFirst().orElse(null));
+        IdeVO ideVO = newNfeIde();
         infNfeVO.setIde(ideVO);
         infNfeVO.setId(ServiceValidarDado.gerarChaveNfe(ideVO));
 
@@ -166,11 +171,11 @@ public class NewNotaFiscal {
 
         TranspVO transpVO = new TranspVO();
         infNfeVO.setTransp(transpVO);
-        transpVO.setModFrete(String.valueOf(getSaidaProduto().getSaidaProdutoNfe().getModFrete().ordinal()));
+        transpVO.setModFrete(String.valueOf(getMyNfe().getModFrete().ordinal()));
         if (Integer.parseInt(transpVO.getModFrete()) < 3) {
             TransportaVO transportaVO = new TransportaVO();
             transpVO.setTransporta(transportaVO);
-            Empresa tranportadora = getSaidaProduto().getSaidaProdutoNfe().getTransportador();
+            Empresa tranportadora = getMyNfe().getTransportador();
             if (tranportadora.isPessoaJuridica())
                 transportaVO.setCNPJ(tranportadora.getCnpj());
             else
@@ -212,14 +217,14 @@ public class NewNotaFiscal {
         infNfeVO.setPag(pagVO);
         DetPagVO detPagVO = new DetPagVO();
         pagVO.setDetPag(detPagVO);
-        detPagVO.setIndPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoIndicador().getCod());
-        detPagVO.settPag(getSaidaProduto().getSaidaProdutoNfe().getPagamentoMeio().getCod());
+        detPagVO.setIndPag(getMyNfe().getPagamentoIndicador().getCod());
+        detPagVO.settPag(getMyNfe().getPagamentoMeio().getCod());
         detPagVO.setvPag(icmsTotVO.getvNF());
 
 
         InfAdicVO infAdicVO = new InfAdicVO();
         infNfeVO.setInfAdic(infAdicVO);
-        infAdicVO.setInfCpl(getSaidaProduto().getSaidaProdutoNfe().informacaoAdicionalProperty().getValue());
+        infAdicVO.setInfCpl(getMyNfe().informacaoAdicionalProperty().getValue());
 
         InfRespTecVO infRespTecVO = new InfRespTecVO();
         infNfeVO.setInfRespTec(infRespTecVO);
@@ -228,31 +233,33 @@ public class NewNotaFiscal {
         infRespTecVO.setEmail(TCONFIG.getNfe().getInfRespTec().getEmail());
         infRespTecVO.setFone(TCONFIG.getNfe().getInfRespTec().getFone());
 
+        settEnviNFe(new EnviNfe_v400(getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe());
     }
 
-    private IdeVO newNfeIde(SaidaProdutoNfe nfe) {
+    private IdeVO newNfeIde() {
         IdeVO ideVO = new IdeVO();
         boolean salvar = false;
-        if (nfe == null) {
+        if (getMyNfe() == null) {
             SaidaProdutoNfe nfeTemp = new SaidaProdutoNfeDAO().getAll(SaidaProdutoNfe.class, null, "numero DESC")
                     .stream().findFirst().orElse(null);
-            nfe = new SaidaProdutoNfe();
+            setMyNfe(new SaidaProdutoNfe());
+            getSaidaProduto().getSaidaProdutoNfeList().add(getMyNfe());
             if (nfeTemp == null) {
                 nfeTemp.serieProperty().setValue(1);
                 nfeTemp.numeroProperty().setValue(0);
             }
-            nfe.setSaidaProduto(getSaidaProduto());
-            nfe.setStatusSefaz(NfeStatusSefaz.DIGITACAO);
-            nfe.setNaturezaOperacao(NfeDadosNaturezaOperacao.INTERNA);
-            nfe.setModelo(NfeDadosModelo.MOD55);
-            nfe.setModFrete(NfeTransporteModFrete.REMETENTE);
-            nfe.serieProperty().setValue(nfeTemp.serieProperty().getValue());
-            nfe.numeroProperty().setValue(nfeTemp.numeroProperty().getValue() + 1);
-            nfe.cobrancaNumeroProperty().setValue(nfe.numeroProperty().getValue().toString());
-            nfe.setPagamentoIndicador(NfeCobrancaDuplicataPagamentoIndicador.PRAZO);
-            nfe.setPagamentoMeio(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
-            nfe.dtHoraEmissaoProperty().setValue(getSaidaProduto().getDtCadastro());
-            nfe.setInformacaoAdicional(String.format(TCONFIG.getNfe().getInfAdic(),
+            getMyNfe().setSaidaProduto(getSaidaProduto());
+            getMyNfe().setStatusSefaz(NfeStatusSefaz.DIGITACAO);
+            getMyNfe().setNaturezaOperacao(NfeDadosNaturezaOperacao.INTERNA);
+            getMyNfe().setModelo(NfeDadosModelo.MOD55);
+            getMyNfe().setModFrete(NfeTransporteModFrete.REMETENTE);
+            getMyNfe().serieProperty().setValue(nfeTemp.serieProperty().getValue());
+            getMyNfe().numeroProperty().setValue(nfeTemp.numeroProperty().getValue() + 1);
+            getMyNfe().cobrancaNumeroProperty().setValue(getMyNfe().numeroProperty().getValue().toString());
+            getMyNfe().setPagamentoIndicador(NfeCobrancaDuplicataPagamentoIndicador.PRAZO);
+            getMyNfe().setPagamentoMeio(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
+            getMyNfe().dtHoraEmissaoProperty().setValue(getSaidaProduto().getDtCadastro());
+            getMyNfe().setInformacaoAdicional(String.format(TCONFIG.getNfe().getInfAdic(),
                     ServiceMascara.getMoeda(getSaidaProduto().getSaidaProdutoProdutoList().stream().map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
                             .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
                             .reduce(BigDecimal.ZERO, BigDecimal::add), 2),
@@ -263,51 +270,50 @@ public class NewNotaFiscal {
                     TCONFIG.getInfLoja().getBanco(),
                     TCONFIG.getInfLoja().getAgencia(), TCONFIG.getInfLoja().getContaCorrente())
                     .toUpperCase());
-            nfe.setXmlAssinatura(null);
-            nfe.setXmlProtNfe(null);
+            getMyNfe().setXmlAssinatura(null);
+            getMyNfe().setXmlProtNfe(null);
             if (getSaidaProduto().getDtSaida().compareTo(getSaidaProduto().getDtCadastro().toLocalDate()) <= 0) {
-                nfe.dtHoraSaidaProperty().setValue(getSaidaProduto().getDtCadastro());
+                getMyNfe().dtHoraSaidaProperty().setValue(getSaidaProduto().getDtCadastro());
             } else {
-                nfe.dtHoraSaidaProperty().setValue(getSaidaProduto().getDtSaida().atTime(8, 0, 0));
+                getMyNfe().dtHoraSaidaProperty().setValue(getSaidaProduto().getDtSaida().atTime(8, 0, 0));
             }
-            nfe.setDestinoOperacao(NfeDadosDestinoOperacao.INTERNA);
+            getMyNfe().setDestinoOperacao(NfeDadosDestinoOperacao.INTERNA);
             if (getSaidaProduto().getCliente().ieProperty().getValue().equals(""))
-                nfe.setConsumidorFinal(NfeDadosIndicadorConsumidorFinal.FINAL);
+                getMyNfe().setConsumidorFinal(NfeDadosIndicadorConsumidorFinal.FINAL);
             else
-                nfe.setConsumidorFinal(NfeDadosIndicadorConsumidorFinal.NORMAL);
-            nfe.setIndicadorPresenca(NfeDadosIndicadorPresenca.TELEATENDIMENTO);
+                getMyNfe().setConsumidorFinal(NfeDadosIndicadorConsumidorFinal.NORMAL);
+            getMyNfe().setIndicadorPresenca(NfeDadosIndicadorPresenca.TELEATENDIMENTO);
             salvar = true;
         }
 
         ideVO.setcUF(String.valueOf(TCONFIG.getInfLoja().getCUF()));
-        ideVO.setNatOp(nfe.getNaturezaOperacao().getDescricao());
-        ideVO.setMod(nfe.getModelo().getDescricao());
-        ideVO.setSerie(nfe.serieProperty().getValue().toString());
-        ideVO.setnNF(nfe.numeroProperty().getValue().toString());
+        ideVO.setNatOp(getMyNfe().getNaturezaOperacao().getDescricao());
+        ideVO.setMod(getMyNfe().getModelo().getDescricao());
+        ideVO.setSerie(getMyNfe().serieProperty().getValue().toString());
+        ideVO.setnNF(getMyNfe().numeroProperty().getValue().toString());
         if (TCONFIG.getNfe().getTpAmb() == 2) {
             ideVO.setDhEmi(LocalDateTime.now());
             ideVO.setDhSaiEnt(LocalDateTime.now());
         } else {
-            ideVO.setDhEmi(nfe.dtHoraEmissaoProperty().getValue());
-            ideVO.setDhSaiEnt(nfe.dtHoraSaidaProperty().getValue());
+            ideVO.setDhEmi(getMyNfe().dtHoraEmissaoProperty().getValue());
+            ideVO.setDhSaiEnt(getMyNfe().dtHoraSaidaProperty().getValue());
         }
         ideVO.setTpNF(String.valueOf(TCONFIG.getNfe().getTpNF()));
-        ideVO.setIdDest(String.valueOf(nfe.getDestinoOperacao().getCod()));
+        ideVO.setIdDest(String.valueOf(getMyNfe().getDestinoOperacao().getCod()));
         ideVO.setcMunFG(String.valueOf(TCONFIG.getInfLoja().getCMunFG()));
-        ideVO.setTpImp(String.valueOf(nfe.getImpressaoTpImp().getCod()));
-        ideVO.setTpEmis(String.valueOf(nfe.getImpressaoTpEmis().getCod()));
+        ideVO.setTpImp(String.valueOf(getMyNfe().getImpressaoTpImp().getCod()));
+        ideVO.setTpEmis(String.valueOf(getMyNfe().getImpressaoTpEmis().getCod()));
         ideVO.setTpAmb(String.valueOf(TCONFIG.getNfe().getTpAmb()));
-        ideVO.setFinNFe(String.valueOf(nfe.getImpressaoFinNFe().getCod()));
-        ideVO.setIndFinal(String.valueOf(nfe.getConsumidorFinal().getCod()));
-        ideVO.setIndPres(String.valueOf(nfe.getIndicadorPresenca().getCod()));
+        ideVO.setFinNFe(String.valueOf(getMyNfe().getImpressaoFinNFe().getCod()));
+        ideVO.setIndFinal(String.valueOf(getMyNfe().getConsumidorFinal().getCod()));
+        ideVO.setIndPres(String.valueOf(getMyNfe().getIndicadorPresenca().getCod()));
         ideVO.setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));
         ideVO.setVerProc(TCONFIG.getNfe().getVerProc());
 
         if (salvar) {
-            nfe.chaveProperty().setValue(ServiceValidarDado.gerarChaveNfe(ideVO));
+            getMyNfe().chaveProperty().setValue(ServiceValidarDado.gerarChaveNfe(ideVO));
             try {
                 getSaidaProdutoDAO().transactionBegin();
-                getSaidaProduto().setSaidaProdutoNfe(nfe);
                 setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
                 getSaidaProdutoDAO().transactionCommit();
             } catch (Exception e) {
@@ -315,8 +321,6 @@ public class NewNotaFiscal {
                 getSaidaProdutoDAO().transactionRollback();
             }
         }
-
-        setNfe(getSaidaProduto().getSaidaProdutoNfe());
 
         return ideVO;
     }
@@ -459,12 +463,12 @@ public class NewNotaFiscal {
     }
 
     @JsonIgnore
-    public SaidaProdutoNfe getNfe() {
-        return nfe;
+    public SaidaProdutoNfe getMyNfe() {
+        return myNfe;
     }
 
-    public void setNfe(SaidaProdutoNfe nfe) {
-        this.nfe = nfe;
+    public void setMyNfe(SaidaProdutoNfe myNfe) {
+        this.myNfe = myNfe;
     }
 
     @JsonIgnore
@@ -474,6 +478,14 @@ public class NewNotaFiscal {
 
     public void setSaidaProdutoDAO(SaidaProdutoDAO saidaProdutoDAO) {
         this.saidaProdutoDAO = saidaProdutoDAO;
+    }
+
+    public TEnviNFe gettEnviNFe() {
+        return tEnviNFe;
+    }
+
+    public void settEnviNFe(TEnviNFe tEnviNFe) {
+        this.tEnviNFe = tEnviNFe;
     }
 
     /**

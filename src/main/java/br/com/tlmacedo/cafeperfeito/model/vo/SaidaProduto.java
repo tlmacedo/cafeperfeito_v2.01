@@ -27,7 +27,7 @@ public class SaidaProduto implements Serializable {
 
     private List<SaidaProdutoProduto> saidaProdutoProdutoList = new ArrayList<>();
 
-    private ObjectProperty<SaidaProdutoNfe> saidaProdutoNfe = new SimpleObjectProperty<>();
+    private List<SaidaProdutoNfe> saidaProdutoNfeList = new ArrayList<>();
 
     private ObjectProperty<ContasAReceber> contasAReceber = new SimpleObjectProperty<>();
 
@@ -111,17 +111,13 @@ public class SaidaProduto implements Serializable {
         this.saidaProdutoProdutoList = saidaProdutoProdutoList;
     }
 
-    @OneToOne(mappedBy = "saidaProduto", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    public SaidaProdutoNfe getSaidaProdutoNfe() {
-        return saidaProdutoNfe.get();
+    @OneToMany(mappedBy = "saidaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<SaidaProdutoNfe> getSaidaProdutoNfeList() {
+        return saidaProdutoNfeList;
     }
 
-    public ObjectProperty<SaidaProdutoNfe> saidaProdutoNfeProperty() {
-        return saidaProdutoNfe;
-    }
-
-    public void setSaidaProdutoNfe(SaidaProdutoNfe saidaProdutoNfe) {
-        this.saidaProdutoNfe.set(saidaProdutoNfe);
+    public void setSaidaProdutoNfeList(List<SaidaProdutoNfe> saidaProdutoNfeList) {
+        this.saidaProdutoNfeList = saidaProdutoNfeList;
     }
 
     @OneToOne(mappedBy = "saidaProduto")

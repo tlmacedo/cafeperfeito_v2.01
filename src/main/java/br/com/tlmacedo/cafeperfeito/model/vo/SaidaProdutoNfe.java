@@ -16,6 +16,7 @@ public class SaidaProdutoNfe implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
+    private BooleanProperty cancelada = new SimpleBooleanProperty(false);
     private ObjectProperty<SaidaProduto> saidaProduto = new SimpleObjectProperty<>();
     private StringProperty chave = new SimpleStringProperty();
     private NfeStatusSefaz statusSefaz;
@@ -37,6 +38,7 @@ public class SaidaProdutoNfe implements Serializable {
     private NfeCobrancaDuplicataPagamentoIndicador pagamentoIndicador;
     private NfeCobrancaDuplicataPagamentoMeio pagamentoMeio;
     private StringProperty informacaoAdicional = new SimpleStringProperty();
+    private StringProperty digVal = new SimpleStringProperty();
     private Blob xmlAssinatura;
     private Blob xmlProtNfe;
 
@@ -57,8 +59,21 @@ public class SaidaProdutoNfe implements Serializable {
         this.id.set(id);
     }
 
+
+    public boolean isCancelada() {
+        return cancelada.get();
+    }
+
+    public BooleanProperty canceladaProperty() {
+        return cancelada;
+    }
+
+    public void setCancelada(boolean cancelada) {
+        this.cancelada.set(cancelada);
+    }
+
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public SaidaProduto getSaidaProduto() {
         return saidaProduto.get();
     }
@@ -256,6 +271,19 @@ public class SaidaProdutoNfe implements Serializable {
 
     public void setInformacaoAdicional(String informacaoAdicional) {
         this.informacaoAdicional.set(informacaoAdicional);
+    }
+
+    @Column(length = 28)
+    public String getDigVal() {
+        return digVal.get();
+    }
+
+    public StringProperty digValProperty() {
+        return digVal;
+    }
+
+    public void setDigVal(String digVal) {
+        this.digVal.set(digVal);
     }
 
     @JsonIgnore

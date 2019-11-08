@@ -15,7 +15,11 @@ public enum EnumsTasks {
     RELATORIO_IMPRIME_RECIBO(5, "preparando recibo"),
     RELATORIO_IMPRIME_NFE(6, "preparando nfe"),
     ADD_RECEBIMENTO(7, "adicionando recebimento"),
-    UPDATE_RECEBIMENTO(8, "editando recebimento");
+    UPDATE_RECEBIMENTO(8, "editando recebimento"),
+    NFE_GERAR(9, "gerando NFe"),
+    NFE_ASSINAR(10, "assinando NFe"),
+    NFE_TRANSMITIR(11, "transmitindo NFe"),
+    NFE_RETORNO(12, "consultando retorno");
 
     private int cod;
     private String descricao;

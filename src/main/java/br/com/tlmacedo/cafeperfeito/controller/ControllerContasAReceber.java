@@ -271,10 +271,12 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
         ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
             if (n == null) return;
-            if (n.getText().equals(getNomeTab()))
+            if (n.getText().equals(getNomeTab())) {
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().addEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerContasAReceber());
-            else
+                showStatusBar();
+            } else {
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerContasAReceber());
+            }
         });
 
         new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());

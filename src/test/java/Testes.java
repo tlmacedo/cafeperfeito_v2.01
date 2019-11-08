@@ -1,4 +1,4 @@
-import br.com.tlmacedo.cafeperfeito.nfe.MeuCertificado;
+import br.com.tlmacedo.cafeperfeito.nfe.LoadCertificadoA3;
 import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -8,11 +8,11 @@ import java.util.Scanner;
 
 public class Testes {
 
-    ObjectProperty<MeuCertificado> meuCertificado = new SimpleObjectProperty<>();
+    ObjectProperty<LoadCertificadoA3> meuCertificado = new SimpleObjectProperty<>();
 
     private boolean errLoadCertificadoA3() {
         if (meuCertificadoProperty().getValue() == null)
-            meuCertificadoProperty().setValue(new MeuCertificado());
+            meuCertificadoProperty().setValue(new LoadCertificadoA3());
 
         try {
             meuCertificadoProperty().getValue().getCertificates().loadToken();
@@ -38,25 +38,27 @@ public class Testes {
         return false;
     }
 
-    public MeuCertificado getMeuCertificado() {
+    public LoadCertificadoA3 getMeuCertificado() {
         return meuCertificado.get();
     }
 
-    public ObjectProperty<MeuCertificado> meuCertificadoProperty() {
+    public ObjectProperty<LoadCertificadoA3> meuCertificadoProperty() {
         return meuCertificado;
     }
 
-    public void setMeuCertificado(MeuCertificado meuCertificado) {
-        this.meuCertificado.set(meuCertificado);
+    public void setMeuCertificado(LoadCertificadoA3 loadCertificadoA3) {
+        this.meuCertificado.set(loadCertificadoA3);
     }
 
     public static void main(String[] args) throws FileNotFoundException {
         new ServiceVariaveisSistema().getVariaveisSistema();
         Testes testes = new Testes();
-        boolean errCertificado = true;
-        while (errCertificado) {
-            errCertificado = testes.errLoadCertificadoA3();
-        }
+//        boolean errCertificado = true;
+//        while (errCertificado) {
+//            errCertificado = testes.errLoadCertificadoA3();
+//        }
+        while (testes.errLoadCertificadoA3())
+            testes.errLoadCertificadoA3();
 
         if (testes.meuCertificadoProperty().getValue() == null) return;
 

@@ -9,15 +9,21 @@ import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
-import br.com.tlmacedo.cafeperfeito.nfe.MeuCertificado;
+import br.com.tlmacedo.cafeperfeito.nfe.LoadCertificadoA3;
 import br.com.tlmacedo.cafeperfeito.nfe.NewEnviNFe;
+import br.com.tlmacedo.cafeperfeito.nfe.NewNotaFiscal;
 import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
-import br.com.tlmacedo.nfe.service.NFeAssinarXml;
+import br.com.tlmacedo.nfe.service.*;
+import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
+import br.inf.portalfiscal.xsd.nfe.consReciNFe.TConsReciNFe;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
+import br.inf.portalfiscal.xsd.nfe.procNFe.TNFe;
+import br.inf.portalfiscal.xsd.nfe.procNFe.TProtNFe;
+import br.inf.portalfiscal.xsd.nfe.retEnviNFe.TRetEnviNFe;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -35,9 +41,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.rmi.RemoteException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -45,6 +56,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -147,11 +159,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC"));
     private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList;
 
+    private ObjectProperty<LoadCertificadoA3> loadCertificadoA3 = new SimpleObjectProperty<>();
     private IntegerProperty nfeLastNumber = new SimpleIntegerProperty(0);
     private StringProperty informacaoNFE = new SimpleStringProperty();
-    private ObjectProperty<NewEnviNFe> enviNFe = new SimpleObjectProperty<>();
-    private ObjectProperty<MeuCertificado> meuCertificado = new SimpleObjectProperty<>();
-    private ObjectProperty<NFeAssinarXml> nFeAssinarXml = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> valorParcela = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<NFev400> nFev400 = new SimpleObjectProperty<>();
+    private ObjectProperty<TEnviNFe> tEnviNFe = new SimpleObjectProperty<>();
+    private StringProperty xmlNFe = new SimpleStringProperty();
+    private StringProperty xmlNFeAssinado = new SimpleStringProperty();
+    private StringProperty xmlNFeAutorizacao = new SimpleStringProperty();
+    private StringProperty xmlNFeRetAutorizacao = new SimpleStringProperty();
+    private StringProperty xmlNFeProc = new SimpleStringProperty();
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
     private ObjectProperty<List<Endereco>> enderecoList = new SimpleObjectProperty<>();
     private ObjectProperty<Endereco> endereco = new SimpleObjectProperty<>();
@@ -333,7 +351,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber());
                                     atualizaTotaisCliente(getTmodelSaidaProduto().getaReceber());
 
-                                    if (getTmodelSaidaProduto().getSaidaProduto().getSaidaProdutoNfe() != null)
+                                    if (getTmodelSaidaProduto().getSaidaProduto().getSaidaProdutoNfeList().size() > 0)
                                         gerarDanfe();
 
                                     limpaCampos(getPainelViewSaidaProduto());
@@ -373,10 +391,12 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
             if (n == null) return;
-            if (n.getText().equals(getNomeTab()))
+            if (n.getText().equals(getNomeTab())) {
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().addEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
-            else
+                showStatusBar();
+            } else {
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
+            }
         });
 
         new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
@@ -537,6 +557,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             if (n) {
                 getCboNfeDadosNaturezaOperacao().requestFocus();
                 getTxtNfeDadosNumero().setText(String.valueOf(nfeLastNumberProperty().getValue() + 1));
+                getTxtNfeDadosSerie().setText(String.valueOf(TCONFIG.getNfe().getNFeSerie()));
             } else {
                 limpaCampos(getTpnNfe());
                 getTxtPesquisa().requestFocus();
@@ -546,10 +567,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         getTpnNfe().setExpanded(false);
 
-        getCboNfeTransporteModFrete().disableProperty().bind(Bindings.createBooleanBinding(() ->
+        getCboNfeTransporteTransportadora().disableProperty().bind(Bindings.createBooleanBinding(() ->
                         getCboNfeTransporteModFrete().getSelectionModel().getSelectedItem().equals(NfeTransporteModFrete.REMETENTE),
-                getCboNfeTransporteModFrete().getSelectionModel().selectedItemProperty())
-        );
+                getCboNfeTransporteModFrete().getSelectionModel().selectedItemProperty()));
 
 
         getTxtPesquisa().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
@@ -590,6 +610,18 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         informacaoNFEProperty().addListener((ov, o, n) -> {
             if (n != null)
                 getTxaNfeInformacoesAdicionais().setText(n);
+        });
+
+        valorParcelaProperty().bind(Bindings.createObjectBinding(() ->
+                        ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)
+                                .divide(new BigDecimal(getCboNfeCobrancaDuplicataNumeros().getValue().getCod()), 2, RoundingMode.HALF_UP),
+                getLblTotalLiquido().textProperty(), getCboNfeCobrancaDuplicataNumeros().valueProperty()));
+
+        valorParcelaProperty().addListener((ov, o, n) -> {
+            if (n != null)
+                getTxtNfeCobrancaDuplicataValor().setText(ServiceMascara.getMoeda(valorParcelaProperty().getValue(), 2));
+            else
+                getTxtNfeCobrancaDuplicataValor().setText(getLblTotalLiquido().getText());
         });
 
         getLblTotalLiquido().textProperty().bind(Bindings.createStringBinding(() ->
@@ -719,6 +751,27 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     Thread.currentThread().interrupt();
                                 }
                                 break;
+                            case NFE_GERAR:
+                                gerarXmlNFe();
+                                break;
+                            case NFE_ASSINAR:
+                                if (xmlNFeProperty().getValue() == null)
+                                    Thread.currentThread().interrupt();
+                                assinarXmlNFe();
+                                break;
+                            case NFE_TRANSMITIR:
+                                if (xmlNFeAssinadoProperty().getValue() == null)
+                                    Thread.currentThread().interrupt();
+                                transmitirXmlNFe();
+                                break;
+                            case NFE_RETORNO:
+                                if (xmlNFeAutorizacaoProperty().getValue() == null)
+                                    Thread.currentThread().interrupt();
+                                retornoXmlNFe();
+                                if (xmlNFeRetAutorizacaoProperty().getValue() == null)
+                                    Thread.currentThread().interrupt();
+                                retornoProcNFe();
+                                break;
                         }
                     }
                     updateMessage("tarefa concluída!!!");
@@ -753,7 +806,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             getCboEmpresa().getEditor().clear();
             getCboEmpresa().requestFocus();
             getTmodelSaidaProduto().limpaCampos();
-            enviNFeProperty().setValue(null);
         }
 
     }
@@ -812,10 +864,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                     .map(ContasAReceber::getSaidaProduto)
                     .collect(Collectors.groupingBy(SaidaProduto::getCliente, LinkedHashMap::new, Collectors.toList()))
                     .forEach((empresa, saidaProdutos) -> {
-                        saidaProdutos.stream().map(SaidaProduto::getSaidaProdutoNfe)
-                                .forEach(saidaProdutoNfe -> {
-                                    if (saidaProdutoNfe != null && saidaProdutoNfe.getNumero() > getNfeLastNumber())
-                                        setNfeLastNumber(saidaProdutoNfe.getNumero());
+                        saidaProdutos.stream().map(SaidaProduto::getSaidaProdutoNfeList)
+                                .forEach(saidaProdutoNfes -> {
+                                    for (SaidaProdutoNfe nfe : saidaProdutoNfes)
+                                        if (nfe.getNumero() > getNfeLastNumber())
+                                            setNfeLastNumber(nfe.getNumero());
                                 });
                         BigDecimal vlrLimiteUtilizado =
                                 getaReceberObservableList().stream()
@@ -911,8 +964,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private void guardarNfe() {
-        getTmodelSaidaProduto().getSaidaProduto().setSaidaProdutoNfe(new SaidaProdutoNfe());
-        SaidaProdutoNfe nfe = getTmodelSaidaProduto().getSaidaProduto().getSaidaProdutoNfe();
+        setnFev400(new NFev400(TCONFIG.getNfe().getTpAmb()));
+        SaidaProdutoNfe nfe = new SaidaProdutoNfe();
+        getTmodelSaidaProduto().getSaidaProduto().getSaidaProdutoNfeList().add(nfe);
         nfe.saidaProdutoProperty().setValue(getTmodelSaidaProduto().getSaidaProduto());
         try {
             nfe.setNaturezaOperacao(getCboNfeDadosNaturezaOperacao().getValue());
@@ -965,43 +1019,57 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         }
     }
 
-    private void gerarDanfe() throws JAXBException {
-        enviNFeProperty().setValue(new NewEnviNFe(getTmodelSaidaProduto().getSaidaProduto()));
-    }
-
-    private boolean errLoadCertificadoA3() {
-        if (meuCertificadoProperty().getValue() == null)
-            meuCertificadoProperty().setValue(new MeuCertificado());
-
+    private boolean gerarDanfe() {
         try {
-            meuCertificadoProperty().getValue().getCertificates().loadToken();
-            meuCertificadoProperty().getValue().getCertificates().loadSocketDinamico();
+            getEnumsTasksList().clear();
+            getEnumsTasksList().add(EnumsTasks.NFE_GERAR);
+            getEnumsTasksList().add(EnumsTasks.NFE_ASSINAR);
+            getEnumsTasksList().add(EnumsTasks.NFE_TRANSMITIR);
+            getEnumsTasksList().add(EnumsTasks.NFE_RETORNO);
+            return new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Gerando NFe [%d]!", (nfeLastNumberProperty().getValue() + 1)));
         } catch (Exception ex) {
-            setMeuCertificado(null);
             ex.printStackTrace();
-            ServiceAlertMensagem alertMensagem = new ServiceAlertMensagem();
-            alertMensagem.setCabecalho("Certificado digital");
-            alertMensagem.setContentText("erro no certificado, deseja tentar novamente?");
-            if (alertMensagem.alertYesNo().get() == ButtonType.NO)
-                return false;
-            else
-                return true;
+            return false;
         }
-        return false;
     }
 
-    private void assinarXmlDanfe() {
-        boolean errCertificado = true;
-        while (errCertificado) {
-            errCertificado = errLoadCertificadoA3();
-        }
+    private void gerarXmlNFe() throws JAXBException {
+        nFev400Property().getValue().setEnviNfe_v400(new EnviNfe_v400(new NewNotaFiscal(getTmodelSaidaProduto().getSaidaProduto()).getEnviNfeVO(), MY_ZONE_TIME));
+        xmlNFeProperty().setValue(ServiceUtilXml.objectToXml(nFev400Property().getValue().getEnviNfe_v400().gettEnviNFe()));
+    }
 
-        if (meuCertificadoProperty().getValue() == null) return;
+    private void assinarXmlNFe() throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException, JAXBException {
+        if (loadCertificadoA3Property().getValue() == null)
+            loadCertificadoA3Property().setValue(new LoadCertificadoA3());
 
-        setnFeAssinarXml(new NFeAssinarXml(enviNFeProperty().getValue().getXmlNFe(), meuCertificadoProperty().getValue().getCertificates()));
-//        NFeAssinarXml assinarXml = new NFeAssinarXml(xmlNFe, meuCertificado.getCertificates());
-//        String xmlNfe_Assinado = ServiceOutputXML.outputXML(assinarXml.getDocument());
-//        System.out.printf("xmlNfe_Assinado:\n%s\n\n", xmlNfe_Assinado);
+        while (loadCertificadoA3Property().getValue().load())
+            loadCertificadoA3Property().getValue().load();
+
+        nFev400Property().getValue().setAssinarXml(new NFeAssinarXml(xmlNFeProperty().getValue(), loadCertificadoA3Property().getValue().getCertificates()));
+        xmlNFeAssinadoProperty().setValue(nFev400Property().getValue().getAssinarXml().getXmlAssinadoNFe());
+    }
+
+    private void transmitirXmlNFe() throws XMLStreamException, RemoteException {
+        nFev400Property().getValue().setAutorizacaoNFe(new NFeAutorizacao(xmlNFeAssinadoProperty().getValue()));
+        xmlNFeAutorizacaoProperty().setValue(nFev400Property().getValue().getAutorizacaoNFe().getXmlAutorizacaoNFe());
+    }
+
+    private void retornoXmlNFe() throws JAXBException, InterruptedException, XMLStreamException, RemoteException {
+        nFev400Property().getValue().setConsReciNFe(new NFeRetConsReciNfe(ServiceUtilXml.xmlToObject(xmlNFeAutorizacaoProperty().getValue(), TRetEnviNFe.class)));
+        TConsReciNFe tConsReciNFe = nFev400Property().getValue().getConsReciNFe().gettConsReciNFe();
+
+        nFev400Property().getValue().setRetAutorizacaoNFe(new NFeRetAutorizacao(ServiceUtilXml.objectToXml(tConsReciNFe)));
+        xmlNFeRetAutorizacaoProperty().setValue(nFev400Property().getValue().getRetAutorizacaoNFe().getXmlRetAutorizacaoNFe());
+
+    }
+
+    private void retornoProcNFe() throws JAXBException {
+        nFev400Property().getValue().setProcNFe(new NFeProc(xmlNFeAssinadoProperty().getValue(), xmlNFeRetAutorizacaoProperty().getValue()));
+        nFev400Property().getValue().getProcNFe().setStrVersao(nFev400Property().getValue().getConsReciNFe().gettConsReciNFe().getVersao());
+        nFev400Property().getValue().getProcNFe().setTnFe(ServiceUtilXml.xmlToObject(nFev400Property().getValue().getProcNFe().getStringTNFe(), TNFe.class));
+        nFev400Property().getValue().getProcNFe().settProtNFe(ServiceUtilXml.xmlToObject(nFev400Property().getValue().getProcNFe().getStringTProtNFe(), TProtNFe.class));
+
+        xmlNFeProcProperty().setValue(ServiceUtilXml.objectToXml(nFev400Property().getValue().getProcNFe().getResultNFeProc()));
     }
 
     private String getNFeInfAdicionas() {
@@ -1804,42 +1872,113 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.informacaoNFE.set(informacaoNFE);
     }
 
-    public NewEnviNFe getEnviNFe() {
-        return enviNFe.get();
+    public TEnviNFe gettEnviNFe() {
+        return tEnviNFe.get();
     }
 
-    public ObjectProperty<NewEnviNFe> enviNFeProperty() {
-        return enviNFe;
+    public ObjectProperty<TEnviNFe> tEnviNFeProperty() {
+        return tEnviNFe;
     }
 
-    public void setEnviNFe(NewEnviNFe enviNFe) {
-        this.enviNFe.set(enviNFe);
+    public void settEnviNFe(TEnviNFe tEnviNFe) {
+        this.tEnviNFe.set(tEnviNFe);
     }
 
-    public MeuCertificado getMeuCertificado() {
-        return meuCertificado.get();
+    public String getXmlNFe() {
+        return xmlNFe.get();
     }
 
-    public ObjectProperty<MeuCertificado> meuCertificadoProperty() {
-        return meuCertificado;
+    public StringProperty xmlNFeProperty() {
+        return xmlNFe;
     }
 
-    public void setMeuCertificado(MeuCertificado meuCertificado) {
-        this.meuCertificado.set(meuCertificado);
+    public void setXmlNFe(String xmlNFe) {
+        this.xmlNFe.set(xmlNFe);
     }
 
-    public NFeAssinarXml getnFeAssinarXml() {
-        return nFeAssinarXml.get();
+    public String getXmlNFeAssinado() {
+        return xmlNFeAssinado.get();
     }
 
-    public ObjectProperty<NFeAssinarXml> nFeAssinarXmlProperty() {
-        return nFeAssinarXml;
+    public StringProperty xmlNFeAssinadoProperty() {
+        return xmlNFeAssinado;
     }
 
-    public void setnFeAssinarXml(NFeAssinarXml nFeAssinarXml) {
-        this.nFeAssinarXml.set(nFeAssinarXml);
+    public void setXmlNFeAssinado(String xmlNFeAssinado) {
+        this.xmlNFeAssinado.set(xmlNFeAssinado);
     }
 
+    public LoadCertificadoA3 getLoadCertificadoA3() {
+        return loadCertificadoA3.get();
+    }
+
+    public ObjectProperty<LoadCertificadoA3> loadCertificadoA3Property() {
+        return loadCertificadoA3;
+    }
+
+    public void setLoadCertificadoA3(LoadCertificadoA3 loadCertificadoA3) {
+        this.loadCertificadoA3.set(loadCertificadoA3);
+    }
+
+    public NFev400 getnFev400() {
+        return nFev400.get();
+    }
+
+    public ObjectProperty<NFev400> nFev400Property() {
+        return nFev400;
+    }
+
+    public void setnFev400(NFev400 nFev400) {
+        this.nFev400.set(nFev400);
+    }
+
+    public String getXmlNFeAutorizacao() {
+        return xmlNFeAutorizacao.get();
+    }
+
+    public StringProperty xmlNFeAutorizacaoProperty() {
+        return xmlNFeAutorizacao;
+    }
+
+    public void setXmlNFeAutorizacao(String xmlNFeAutorizacao) {
+        this.xmlNFeAutorizacao.set(xmlNFeAutorizacao);
+    }
+
+    public String getXmlNFeRetAutorizacao() {
+        return xmlNFeRetAutorizacao.get();
+    }
+
+    public StringProperty xmlNFeRetAutorizacaoProperty() {
+        return xmlNFeRetAutorizacao;
+    }
+
+    public void setXmlNFeRetAutorizacao(String xmlNFeRetAutorizacao) {
+        this.xmlNFeRetAutorizacao.set(xmlNFeRetAutorizacao);
+    }
+
+    public String getXmlNFeProc() {
+        return xmlNFeProc.get();
+    }
+
+    public StringProperty xmlNFeProcProperty() {
+        return xmlNFeProc;
+    }
+
+    public void setXmlNFeProc(String xmlNFeProc) {
+        this.xmlNFeProc.set(xmlNFeProc);
+    }
+
+    public BigDecimal getValorParcela() {
+        return valorParcela.get();
+    }
+
+    public ObjectProperty<BigDecimal> valorParcelaProperty() {
+        return valorParcela;
+    }
+
+    public void setValorParcela(BigDecimal valorParcela) {
+        this.valorParcela.set(valorParcela);
+    }
     /**
      * END Getters e Setters
      */

@@ -123,10 +123,12 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
         getPainelViewPrincipal().addEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerPrincipal());
 
         getTabPaneViewPrincipal().getTabs().addListener((ListChangeListener<? super Tab>) c -> {
-            if (c.getList().size() > 0)
+            if (c.getList().size() > 0) {
                 getPrincipalStage().getIcons().setAll(getIcoJanelaAtivado());
-            else
+            } else {
                 getPrincipalStage().getIcons().setAll(getIcoJanelaDesativado());
+                getServiceStatusBar().atualizaStatusBar("");
+            }
             getLblImageLogoViewPrincipal().setVisible(getTabPaneViewPrincipal().getTabs().size() == 0);
         });
 
