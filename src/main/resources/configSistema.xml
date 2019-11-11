@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sistema>
     <myLocale>pt_br</myLocale>
-    <timeOut>30</timeOut>
+    <timeOut>240</timeOut>
     <versao>2.01</versao>
     <sis>
         <connect_DB>

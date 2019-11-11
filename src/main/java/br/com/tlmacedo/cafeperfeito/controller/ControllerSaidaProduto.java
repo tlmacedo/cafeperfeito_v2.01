@@ -10,7 +10,6 @@ import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.nfe.LoadCertificadoA3;
-import br.com.tlmacedo.cafeperfeito.nfe.NewEnviNFe;
 import br.com.tlmacedo.cafeperfeito.nfe.NewNotaFiscal;
 import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
@@ -350,6 +349,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
                                     new ViewRecebimento().openViewRecebimento(getTmodelSaidaProduto().getaReceber());
                                     atualizaTotaisCliente(getTmodelSaidaProduto().getaReceber());
+
+                                    if (getTpnNfe().isExpanded())
+                                        guardarNfe();
 
                                     if (getTmodelSaidaProduto().getSaidaProduto().getSaidaProdutoNfeList().size() > 0)
                                         gerarDanfe();
@@ -739,9 +741,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
                             case SALVAR_SAIDA:
                                 if (getTmodelSaidaProduto().guardarSaidaProduto()) {
-                                    if (getTpnNfe().isExpanded())
-                                        guardarNfe();
                                     if (getTmodelSaidaProduto().salvarSaidaProduto()) {
+
                                         getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, "descricao"));
                                         getTtvProdutos().refresh();
                                     } else {
@@ -969,6 +970,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         getTmodelSaidaProduto().getSaidaProduto().getSaidaProdutoNfeList().add(nfe);
         nfe.saidaProdutoProperty().setValue(getTmodelSaidaProduto().getSaidaProduto());
         try {
+            System.out.printf("setImpressaoFinNFe: [%s]\n", getCboNfeImpressaoFinNFe().getValue());
+            nfe.setImpressaoFinNFe(getCboNfeImpressaoFinNFe().getValue());
+            nfe.setPagamentoIndicador(getCboNfeCobrancaPagamentoIndicador().getValue());
+            nfe.setPagamentoMeio(getCboNfeCobrancaPagamentoMeio().getValue());
             nfe.setNaturezaOperacao(getCboNfeDadosNaturezaOperacao().getValue());
             nfe.numeroProperty().setValue(Integer.parseInt(getTxtNfeDadosNumero().getText().replaceAll("\\D", "")));
             nfe.serieProperty().setValue(Integer.parseInt(getTxtNfeDadosSerie().getText().replaceAll("\\D", "")));
@@ -985,6 +990,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             nfe.setConsumidorFinal(getCboNfeDadosIndicadorConsumidorFinal().getValue());
             nfe.setIndicadorPresenca(getCboNfeDadosIndicadorPresenca().getValue());
             nfe.setModFrete(getCboNfeTransporteModFrete().getValue());
+            nfe.setImpressaoTpEmis(getCboNfeImpressaoTpEmis().getValue());
+            nfe.setImpressaoTpImp(getCboNfeImpressaoTpImp().getValue());
             if (getCboNfeTransporteTransportadora().getSelectionModel().getSelectedIndex() >= 0)
                 nfe.setTransportador(getCboNfeTransporteTransportadora().getValue());
             else
@@ -1008,11 +1015,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
             getTmodelSaidaProduto().updateSaidaProduto();
 
-            TEnviNFe tEnviNFe = new NewEnviNFe(getTmodelSaidaProduto().getSaidaProduto()).gettEnviNFe();
-
-            ServiceFileXmlSave.saveTEnviNFeToFile(tEnviNFe);
-
-
+//            TEnviNFe tEnviNFe = new NewEnviNFe(getTmodelSaidaProduto().getSaidaProduto()).gettEnviNFe();
+//
+//            ServiceFileXmlSave.saveTEnviNFeToFile(tEnviNFe);
         } catch (Exception ex) {
             getTmodelSaidaProduto().getSaidaProdutoDAO().transactionRollback();
             ex.printStackTrace();
@@ -1060,7 +1065,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         nFev400Property().getValue().setRetAutorizacaoNFe(new NFeRetAutorizacao(ServiceUtilXml.objectToXml(tConsReciNFe)));
         xmlNFeRetAutorizacaoProperty().setValue(nFev400Property().getValue().getRetAutorizacaoNFe().getXmlRetAutorizacaoNFe());
-
     }
 
     private void retornoProcNFe() throws JAXBException {

@@ -248,6 +248,11 @@ public class NewNotaFiscal {
                 nfeTemp.serieProperty().setValue(1);
                 nfeTemp.numeroProperty().setValue(0);
             }
+            getMyNfe().setImpressaoFinNFe(NfeImpressaoFinNFe.getList().stream()
+                    .filter(impressaoFinNFe -> impressaoFinNFe.getCod() == TCONFIG.getNfe().getFinNFe())
+                    .findFirst().orElse(NfeImpressaoFinNFe.NORMAL));
+            getMyNfe().setPagamentoIndicador(NfeCobrancaDuplicataPagamentoIndicador.PRAZO);
+            getMyNfe().setPagamentoMeio(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
             getMyNfe().setSaidaProduto(getSaidaProduto());
             getMyNfe().setStatusSefaz(NfeStatusSefaz.DIGITACAO);
             getMyNfe().setNaturezaOperacao(NfeDadosNaturezaOperacao.INTERNA);
@@ -301,10 +306,16 @@ public class NewNotaFiscal {
         ideVO.setTpNF(String.valueOf(TCONFIG.getNfe().getTpNF()));
         ideVO.setIdDest(String.valueOf(getMyNfe().getDestinoOperacao().getCod()));
         ideVO.setcMunFG(String.valueOf(TCONFIG.getInfLoja().getCMunFG()));
-        ideVO.setTpImp(String.valueOf(getMyNfe().getImpressaoTpImp().getCod()));
-        ideVO.setTpEmis(String.valueOf(getMyNfe().getImpressaoTpEmis().getCod()));
+        ideVO.setTpImp((getMyNfe().getImpressaoTpImp() != null)
+                ? String.valueOf(getMyNfe().getImpressaoTpImp().getCod())
+                : String.valueOf(TCONFIG.getNfe().getTpImp()));
+        ideVO.setTpEmis((getMyNfe().getImpressaoTpEmis() != null)
+                ? String.valueOf(getMyNfe().getImpressaoTpEmis().getCod())
+                : String.valueOf(TCONFIG.getNfe().getTpEmis()));
         ideVO.setTpAmb(String.valueOf(TCONFIG.getNfe().getTpAmb()));
-        ideVO.setFinNFe(String.valueOf(getMyNfe().getImpressaoFinNFe().getCod()));
+        ideVO.setFinNFe((getMyNfe().getImpressaoFinNFe() != null)
+                ? String.valueOf(getMyNfe().getImpressaoFinNFe().getCod())
+                : String.valueOf(NfeImpressaoFinNFe.NORMAL.getCod()));
         ideVO.setIndFinal(String.valueOf(getMyNfe().getConsumidorFinal().getCod()));
         ideVO.setIndPres(String.valueOf(getMyNfe().getIndicadorPresenca().getCod()));
         ideVO.setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));
