@@ -76,6 +76,7 @@ public class SaidaProduto implements Serializable {
         this.vendedor.set(vendedor);
     }
 
+    @JsonIgnore
     @CreationTimestamp
     public LocalDateTime getDtCadastro() {
         return dtCadastro.get();
@@ -89,6 +90,7 @@ public class SaidaProduto implements Serializable {
         this.dtCadastro.set(dtCadastro);
     }
 
+    @JsonIgnore
     @Column(nullable = false)
     public LocalDate getDtSaida() {
         return dtSaida.get();
@@ -146,10 +148,10 @@ public class SaidaProduto implements Serializable {
     public String toString() {
         return "SaidaProduto{" +
                 "id=" + id +
-                ", cliente=" + cliente +
-                ", vendedor=" + vendedor +
-                ", dtCadastro=" + dtCadastro +
-                ", dtSaida=" + dtSaida +
+//                ", cliente=" + cliente +
+//                ", vendedor=" + vendedor +
+//                ", dtCadastro=" + dtCadastro +
+//                ", dtSaida=" + dtSaida +
                 ", saidaProdutoProdutoList=" + saidaProdutoProdutoList +
                 '}';
     }

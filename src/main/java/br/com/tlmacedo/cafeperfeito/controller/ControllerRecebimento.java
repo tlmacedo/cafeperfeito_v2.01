@@ -217,6 +217,7 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             getRecebimentoDAO().transactionBegin();
             if (getaReceber() != null)
                 getRecebimento().setaReceber(getaReceber());
+            getaReceber().getRecebimentoList().add(getRecebimento());
             getRecebimento().setPagamentoSituacao(getCboSituacao().getValue());
             getRecebimento().documentoProperty().setValue(getTxtDocumento().getText());
             if (getRecebimento().documentoProperty().getValue() == null)

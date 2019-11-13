@@ -1,12 +1,15 @@
 package br.com.tlmacedo.cafeperfeito.model.tm;
 
 import br.com.tlmacedo.cafeperfeito.controller.ControllerPrincipal;
-import br.com.tlmacedo.cafeperfeito.model.dao.*;
+import br.com.tlmacedo.cafeperfeito.model.dao.FichaKardexDAO;
+import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
+import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoEstoqueDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.TipoSaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import br.com.tlmacedo.cafeperfeito.service.format.cell.SetCellFactoryTableCell_ComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.cell.SetCellFactoryTableCell_EdtitingCell;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -30,17 +33,15 @@ public class TmodelSaidaProduto {
     private TablePosition tp;
     private TextField txtPesquisa;
     private TableView<SaidaProdutoProduto> tvSaidaProdutoProduto;
-    private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList = FXCollections.observableArrayList();
+    private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList;// = FXCollections.observableArrayList();
     private ObservableList<TipoSaidaProduto> tipoSaidaObservableList = FXCollections.observableArrayList();
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
-    private SaidaProduto saidaProduto = new SaidaProduto();
+    private SaidaProduto saidaProduto;// = new SaidaProduto();
     private ObjectProperty<DatePicker> dtpDtSaida = new SimpleObjectProperty<>(), dtpDtVencimento = new SimpleObjectProperty<>();
-    private SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
+    //    private SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
     private ProdutoEstoqueDAO produtoEstoqueDAO = new ProdutoEstoqueDAO();
-    private ContasAReceberDAO contasAReceberDAO;
     private FichaKardexDAO fichaKardexDAO = new FichaKardexDAO();
-    private ContasAReceber aReceber;
-    private RecebimentoDAO recebimentoDAO = new RecebimentoDAO();
+//    private RecebimentoDAO recebimentoDAO = new RecebimentoDAO();
 
     private TableColumn<SaidaProdutoProduto, String> colId;
     private TableColumn<SaidaProdutoProduto, String> colProdId;
@@ -453,10 +454,7 @@ public class TmodelSaidaProduto {
 
 
     public void limpaCampos() {
-        setSaidaProduto(new SaidaProduto());
-        setSaidaProdutoDAO(new SaidaProdutoDAO());
         setProdutoEstoqueDAO(new ProdutoEstoqueDAO());
-        setContasAReceberDAO(new ContasAReceberDAO());
         setFichaKardexDAO(new FichaKardexDAO());
         getSaidaProdutoProdutoObservableList().clear();
     }
@@ -468,30 +466,57 @@ public class TmodelSaidaProduto {
      * Begin Returns
      */
 
-    public boolean updateSaidaProduto() {
-        try {
-            getSaidaProdutoDAO().transactionBegin();
-            setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
-            getSaidaProdutoDAO().transactionCommit();
-        } catch (Exception e) {
-            getSaidaProdutoDAO().transactionRollback();
-            e.printStackTrace();
-        }
-        return true;
-    }
-
-    public boolean updateContasAReceber() {
-        try {
-            getContasAReceberDAO().transactionBegin();
-            setaReceber(getContasAReceberDAO().setTransactionPersist(getaReceber()));
-            getContasAReceberDAO().transactionCommit();
-        } catch (Exception ex) {
-            getContasAReceberDAO().transactionRollback();
-            return false;
-        }
-        return true;
-    }
-
+//    public boolean updateSaidaProduto() {
+//        try {
+//            getSaidaProdutoDAO().transactionBegin();
+//            setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
+//            getSaidaProdutoDAO().transactionCommit();
+//        } catch (Exception ex) {
+//            getSaidaProdutoDAO().transactionRollback();
+//            ex.printStackTrace();
+//            return false;
+//        }
+//        return true;
+//    }
+//
+//    public boolean updateContasAReceber() {
+//        try {
+//            getContasAReceberDAO().transactionBegin();
+//            setaReceber(getContasAReceberDAO().setTransactionPersist(getaReceber()));
+//            getContasAReceberDAO().transactionCommit();
+//        } catch (Exception ex) {
+//            getContasAReceberDAO().transactionRollback();
+//            ex.printStackTrace();
+//            return false;
+//        }
+//        return true;
+//    }
+//
+//    public ProdutoEstoque updateEstoque(ProdutoEstoque estoque) {
+//        try {
+//            getProdutoEstoqueDAO().transactionBegin();
+//            estoque = getProdutoEstoqueDAO().setTransactionPersist(estoque);
+//            getProdutoEstoqueDAO().transactionCommit();
+//        } catch (Exception ex) {
+//            getProdutoEstoqueDAO().transactionRollback();
+//            ex.printStackTrace();
+//            return null;
+//        }
+//        return estoque;
+//    }
+//
+//    public FichaKardex updateFichaKardex(FichaKardex kardex) {
+//        try {
+//            getFichaKardexDAO().transactionBegin();
+//            kardex = getFichaKardexDAO().setTransactionPersist(kardex);
+//            getFichaKardexDAO().transactionCommit();
+//        } catch (Exception ex) {
+//            getFichaKardexDAO().transactionRollback();
+//            ex.printStackTrace();
+//            return null;
+//        }
+//        return kardex;
+//    }
     public Integer validEstoque(Integer newQtd, Integer oldQtd) {
         if (getSaidaProdutoProdutoObservableList().stream()
                 .filter(saidaProdutoProduto -> saidaProdutoProduto.produtoProperty().getValue().idProperty().getValue() == getTvSaidaProdutoProduto().getItems().get(getTp().getRow()).produtoProperty().getValue().idProperty().getValue()
@@ -566,121 +591,112 @@ public class TmodelSaidaProduto {
      * Begin booleans
      */
 
-    public boolean guardarSaidaProduto() {
-        try {
-            getSaidaProduto().setCliente(empresaProperty().getValue());
-            getSaidaProduto().setVendedor(UsuarioLogado.getUsuario());
-            getSaidaProduto().setDtSaida(getDtpDtSaida().getValue());
-
-            getSaidaProdutoProdutoObservableList().stream().forEach(saidaProdutoProduto -> {
-                saidaProdutoProduto.setSaidaProduto(getSaidaProduto());
-                saidaProdutoProduto.setVlrEntrada(BigDecimal.ZERO);
-                saidaProdutoProduto.setVlrEntradaBruto(BigDecimal.ZERO);
-            });
-
-            getSaidaProduto().setSaidaProdutoProdutoList(getSaidaProdutoProdutoObservableList());
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    public boolean salvarSaidaProduto() {
-        try {
-            getSaidaProdutoDAO().transactionBegin();
-            setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
-            //setSaidaProdutoProdutoObservableList(getSaidaProduto().getSaidaProdutoProdutoList().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
-            getSaidaProdutoDAO().transactionCommit();
-            if (baixarEstoque()) {
-//                setSaidaProduto(getSaidaProdutoDAO().merger(getSaidaProduto()));
-                getSaidaProdutoDAO().transactionBegin();
-                setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
-                getSaidaProdutoDAO().transactionCommit();
-
-                setaReceber(new ContasAReceber());
-                getContasAReceberDAO().transactionBegin();
-                getaReceber().dtVencimentoProperty().setValue(getDtpDtVencimento().getValue());
-                getaReceber().valorProperty().setValue(getSaidaProdutoProdutoObservableList().stream()
-                        .map(SaidaProdutoProduto::getVlrLiquido)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add));
-                getaReceber().setUsuarioCadastro(UsuarioLogado.getUsuario());
-                getaReceber().setSaidaProduto(getSaidaProduto());
-                setaReceber(getContasAReceberDAO().setTransactionPersist(getaReceber()));
-            }
-            getFichaKardexDAO().transactionCommit();
-            getProdutoEstoqueDAO().transactionCommit();
-            getContasAReceberDAO().transactionCommit();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            getSaidaProdutoDAO().transactionRollback();
-            getFichaKardexDAO().transactionRollback();
-            getProdutoEstoqueDAO().transactionRollback();
-            getContasAReceberDAO().transactionRollback();
-            return false;
-        }
-        return true;
-    }
-
-    private boolean baixarEstoque() throws Exception {
+//    public boolean guardarSaidaProduto() {
+//        try {
+//            getSaidaProduto().setCliente(empresaProperty().getValue());
+//            getSaidaProduto().setVendedor(UsuarioLogado.getUsuario());
+//            getSaidaProduto().setDtSaida(getDtpDtSaida().getValue());
+//
+//            getSaidaProdutoProdutoObservableList().stream().forEach(saidaProdutoProduto -> {
+//                saidaProdutoProduto.setSaidaProduto(getSaidaProduto());
+//                saidaProdutoProduto.setVlrEntrada(BigDecimal.ZERO);
+//                saidaProdutoProduto.setVlrEntradaBruto(BigDecimal.ZERO);
+//            });
+//
+//            getSaidaProduto().setSaidaProdutoProdutoList(getSaidaProdutoProdutoObservableList());
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//            return false;
+//        }
+//        return true;
+//    }
+//
+//    public boolean salvarSaidaProduto() {
+//        try {
+//            getProdutoEstoqueDAO().transactionBegin();
+//            getFichaKardexDAO().transactionBegin();
+//            if (baixarEstoque()) {
+//                getSaidaProdutoDAO().transactionBegin();
+//                ContasAReceber receber = new ContasAReceber();
+//                getSaidaProduto().setContasAReceber(receber);
+//                receber.dtVencimentoProperty().setValue(getDtpDtVencimento().getValue());
+//                receber.valorProperty().setValue(getSaidaProdutoProdutoObservableList().stream()
+//                        .map(SaidaProdutoProduto::getVlrLiquido)
+//                        .reduce(BigDecimal.ZERO, BigDecimal::add));
+//                receber.setUsuarioCadastro(UsuarioLogado.getUsuario());
+//                receber.setSaidaProduto(getSaidaProduto());
+//
+//                setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
+//
+//                getFichaKardexDAO().transactionCommit();
+//                getProdutoEstoqueDAO().transactionCommit();
+//                getSaidaProdutoDAO().transactionCommit();
+//            } else {
+//                getFichaKardexDAO().transactionRollback();
+//                getProdutoEstoqueDAO().transactionRollback();
+//            }
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//            getFichaKardexDAO().transactionRollback();
+//            getProdutoEstoqueDAO().transactionRollback();
+//            getSaidaProdutoDAO().transactionRollback();
+//            return false;
+//        }
+//        return true;
+//    }
+    public boolean baixarEstoque() {
         getProdutoEstoqueDAO().transactionBegin();
         getFichaKardexDAO().transactionBegin();
-        getSaidaProduto().getSaidaProdutoProdutoList().stream()
-                .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd)).sorted(Comparator.comparing(SaidaProdutoProduto::getDtValidade))
-                .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd, LinkedHashMap::new, Collectors.toList()))
-                .forEach((aLong, saidaProdutoProdutos) -> {
-                    saidaProdutoProdutos.stream()
-                            .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote, LinkedHashMap::new, Collectors.toList()))
-                            .forEach((s, saidaProdutoProdutos1) -> {
-                                final Integer[] saldoSaida = {saidaProdutoProdutos1.stream().collect(Collectors.summingInt(SaidaProdutoProduto::getQtd)), 0};
-                                List<ProdutoEstoque> produtoEstoqueList = getProdutoEstoqueDAO().getAll(ProdutoEstoque.class, String.format("produto_id=%s", aLong.toString()), "validade");
-                                produtoEstoqueList.stream().filter(estoque -> estoque.qtdProperty().getValue() > 0
-                                        && estoque.loteProperty().getValue().equals(s))
-                                        .forEach(estoque -> {
-                                            setLucroQtdSaida(0);
-                                            setLucroVlrSaida(BigDecimal.ZERO);
-                                            if (saldoSaida[0] > 0) {
-                                                try {
-                                                    estoque.qtdProperty().setValue(estoque.qtdProperty().getValue() - saldoSaida[0]);
-                                                    if (estoque.qtdProperty().getValue() < 0) {
-                                                        //fichaKardex[0] = newFichaKardex(saldoSaida[0] + estoque.qtdProperty().getValue(), estoque, produtoEstoqueList);
-                                                        getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0] + estoque.qtdProperty().getValue(), estoque, produtoEstoqueList));
-                                                        //getFichaKardexDAO().setTransactionPersist(fichaKardex[0]);
-                                                        saldoSaida[0] = estoque.qtdProperty().getValue() * (-1);
-                                                        estoque.qtdProperty().setValue(0);
-                                                    } else {
-                                                        //fichaKardex[0] = newFichaKardex(saldoSaida[0], estoque, produtoEstoqueList);
-                                                        getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0], estoque, produtoEstoqueList));
-                                                        //getFichaKardexDAO().setTransactionPersist(fichaKardex[0]);
-                                                        saldoSaida[0] = 0;
+        try {
+            getSaidaProduto().getSaidaProdutoProdutoList().stream()
+                    .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd)).sorted(Comparator.comparing(SaidaProdutoProduto::getDtValidade))
+                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd, LinkedHashMap::new, Collectors.toList()))
+                    .forEach((aLong, saidaProdutoProdutos) -> {
+                        saidaProdutoProdutos.stream()
+                                .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote, LinkedHashMap::new, Collectors.toList()))
+                                .forEach((s, saidaProdutoProdutos1) -> {
+                                    final Integer[] saldoSaida = {saidaProdutoProdutos1.stream().collect(Collectors.summingInt(SaidaProdutoProduto::getQtd)), 0};
+                                    List<ProdutoEstoque> produtoEstoqueList = getProdutoEstoqueDAO().getAll(ProdutoEstoque.class, String.format("produto_id=%s", aLong.toString()), "validade");
+                                    produtoEstoqueList.stream().filter(estoque -> estoque.qtdProperty().getValue() > 0
+                                            && estoque.loteProperty().getValue().equals(s))
+                                            .forEach(estoque -> {
+                                                setLucroQtdSaida(0);
+                                                setLucroVlrSaida(BigDecimal.ZERO);
+                                                if (saldoSaida[0] > 0) {
+                                                    try {
+                                                        estoque.qtdProperty().setValue(estoque.qtdProperty().getValue() - saldoSaida[0]);
+                                                        if (estoque.qtdProperty().getValue() < 0) {
+                                                            getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0] + estoque.qtdProperty().getValue(), estoque, produtoEstoqueList));
+                                                            saldoSaida[0] = estoque.qtdProperty().getValue() * (-1);
+                                                            estoque.qtdProperty().setValue(0);
+                                                        } else {
+                                                            getFichaKardexDAO().setTransactionPersist(newFichaKardex(saldoSaida[0], estoque, produtoEstoqueList));
+                                                            saldoSaida[0] = 0;
+                                                        }
+                                                        getProdutoEstoqueDAO().setTransactionPersist(estoque);
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
                                                     }
-                                                    getProdutoEstoqueDAO().setTransactionPersist(estoque);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
                                                 }
-                                            }
-                                            saidaProdutoProdutos.stream()
-                                                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue()
-                                                            .equals(estoque.loteProperty().getValue()))
-                                                    .forEach(saidaProdutoProduto -> {
-                                                        saidaProdutoProduto.setVlrEntradaBruto(getLucroVlrSaida());
-                                                        saidaProdutoProduto.setVlrEntrada(getLucroVlrSaida().divide(BigDecimal.valueOf(getLucroQtdSaida()), 4, RoundingMode.HALF_UP));
-                                                    });
-                                        });
-                            });
-                });
-//        getSaidaProdutoProdutoObservableList().stream()
-//                .forEach(saidaProdutoProduto ->
-//                saidaProdutoProduto.setVlrEntrada(
-//                    new FichaKardexDAO().getAll(FichaKardex.class,
-//                            String.format("produto_id = %d AND documento = %d AND qtdSaida > 0", "id",
-//                                    saidaProdutoProduto.idProdProperty().getValue().toString(),
-//                                    saidaProdutoProduto.getSaidaProduto().idProperty().getValue().toString()),
-//                            null).stream().collect(Collectors.toCollection(FXCollections::observableArrayList))
-//                .stream().map(FichaKardex::getVlrSaida).reduce(BigDecimal.ZERO,BigDecimal::add).divide
-//                });
-        //}
+                                                saidaProdutoProdutos.stream()
+                                                        .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue()
+                                                                .equals(estoque.loteProperty().getValue()))
+                                                        .forEach(saidaProdutoProduto -> {
+                                                            saidaProdutoProduto.setVlrEntradaBruto(getLucroVlrSaida());
+                                                            saidaProdutoProduto.setVlrEntrada(getLucroVlrSaida().divide(BigDecimal.valueOf(getLucroQtdSaida()), 4, RoundingMode.HALF_UP));
+                                                        });
+                                            });
+                                });
+                    });
+            getFichaKardexDAO().transactionCommit();
+            getProdutoEstoqueDAO().transactionCommit();
+        } catch (Exception ex) {
+            getFichaKardexDAO().transactionRollback();
+            getProdutoEstoqueDAO().transactionRollback();
+            ex.printStackTrace();
+            return false;
+        }
         return true;
     }
 
@@ -701,6 +717,7 @@ public class TmodelSaidaProduto {
         this.tipoSaidaObservableList = tipoSaidaObservableList;
     }
 
+    @JsonIgnore
     public TablePosition getTp() {
         return tp;
     }
@@ -949,13 +966,13 @@ public class TmodelSaidaProduto {
         this.saidaProduto = saidaProduto;
     }
 
-    public SaidaProdutoDAO getSaidaProdutoDAO() {
-        return saidaProdutoDAO;
-    }
-
-    public void setSaidaProdutoDAO(SaidaProdutoDAO saidaProdutoDAO) {
-        this.saidaProdutoDAO = saidaProdutoDAO;
-    }
+//    public SaidaProdutoDAO getSaidaProdutoDAO() {
+//        return saidaProdutoDAO;
+//    }
+//
+//    public void setSaidaProdutoDAO(SaidaProdutoDAO saidaProdutoDAO) {
+//        this.saidaProdutoDAO = saidaProdutoDAO;
+//    }
 
     public DatePicker getDtpDtSaida() {
         return dtpDtSaida.get();
@@ -989,14 +1006,6 @@ public class TmodelSaidaProduto {
         this.produtoEstoqueDAO = produtoEstoqueDAO;
     }
 
-    public ContasAReceberDAO getContasAReceberDAO() {
-        return contasAReceberDAO;
-    }
-
-    public void setContasAReceberDAO(ContasAReceberDAO contasAReceberDAO) {
-        this.contasAReceberDAO = contasAReceberDAO;
-    }
-
     public FichaKardexDAO getFichaKardexDAO() {
         return fichaKardexDAO;
     }
@@ -1005,21 +1014,13 @@ public class TmodelSaidaProduto {
         this.fichaKardexDAO = fichaKardexDAO;
     }
 
-    public ContasAReceber getaReceber() {
-        return aReceber;
-    }
-
-    public void setaReceber(ContasAReceber aReceber) {
-        this.aReceber = aReceber;
-    }
-
-    public RecebimentoDAO getRecebimentoDAO() {
-        return recebimentoDAO;
-    }
-
-    public void setRecebimentoDAO(RecebimentoDAO recebimentoDAO) {
-        this.recebimentoDAO = recebimentoDAO;
-    }
+//    public RecebimentoDAO getRecebimentoDAO() {
+//        return recebimentoDAO;
+//    }
+//
+//    public void setRecebimentoDAO(RecebimentoDAO recebimentoDAO) {
+//        this.recebimentoDAO = recebimentoDAO;
+//    }
 
     public BigDecimal getLucroVlrSaida() {
         return lucroVlrSaida.get();

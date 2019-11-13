@@ -7,6 +7,7 @@ import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
+import br.com.tlmacedo.cafeperfeito.service.ServiceUtilJSon;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
@@ -23,23 +25,24 @@ import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONF
 
 public class NewNotaFiscal {
 
-    EnviNfeVO enviNfeVO = new EnviNfeVO();
-    SaidaProduto saidaProduto;
-    SaidaProdutoNfe myNfe;
-    SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
-    TEnviNFe tEnviNFe;
+    private EnviNfeVO enviNfeVO = new EnviNfeVO();
+    private SaidaProduto saidaProduto;
+    private SaidaProdutoNfe myNfe;
+    private SaidaProdutoDAO saidaProdutoDAO;
+    private TEnviNFe tEnviNFe;
 
-    public NewNotaFiscal(Long nPed) {
+    public NewNotaFiscal() throws Exception {
+//        setSaidaProduto(saidaProduto);
+//        gerarNovaNotaFiscal();
+    }
+
+    public void gerarNovaNotaFiscal(Long nPed) throws Exception {
         setSaidaProduto(getSaidaProdutoDAO().getById(SaidaProduto.class, nPed));
         gerarNovaNotaFiscal();
     }
 
-    public NewNotaFiscal(SaidaProduto saidaProduto) {
-        setSaidaProduto(saidaProduto);
-        gerarNovaNotaFiscal();
-    }
-
-    public void gerarNovaNotaFiscal() {
+    public void gerarNovaNotaFiscal() throws Exception {
+        ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getContasAReceber(), "NewNotaFiscal002:");
 
         getEnviNfeVO().setVersao(TCONFIG.getNfe().getVersao());
         getEnviNfeVO().setIdLote(String.format("%015d", getSaidaProduto().idProperty().getValue()));
@@ -52,6 +55,9 @@ public class NewNotaFiscal {
         nfeVO.setInfNfe(infNfeVO);
 
         infNfeVO.setVersao(TCONFIG.getNfe().getVersao());
+
+        getSaidaProduto().getSaidaProdutoNfeList().stream()
+                .forEach(System.out::println);
 
         setMyNfe(getSaidaProduto().getSaidaProdutoNfeList().stream().filter(saidaProdutoNfe -> !saidaProdutoNfe.isCancelada()).findFirst().orElse(null));
         IdeVO ideVO = newNfeIde();
@@ -197,8 +203,11 @@ public class NewNotaFiscal {
             infNfeVO.setCobr(cobrVO);
             FatVO fatVO = new FatVO();
             cobrVO.setFat(fatVO);
-            if (getSaidaProduto().getContasAReceber().getRecebimentoList().size() > 0)
-                fatVO.setnFat(getSaidaProduto().getContasAReceber().getRecebimentoList().get(0).getDocumento());
+            Recebimento rec;
+            if ((rec = getSaidaProduto().getContasAReceber().getRecebimentoList().stream().sorted(Comparator.comparing(Recebimento::getId).reversed())
+                    .findFirst().orElse(null)) != null)
+                fatVO.setnFat(rec.documentoProperty().getValue());
+
             if (fatVO.getnFat().equals(""))
                 fatVO.setnFat(ideVO.getnNF());
 
@@ -220,7 +229,6 @@ public class NewNotaFiscal {
         detPagVO.setIndPag(getMyNfe().getPagamentoIndicador().getCod());
         detPagVO.settPag(getMyNfe().getPagamentoMeio().getCod());
         detPagVO.setvPag(icmsTotVO.getvNF());
-
 
         InfAdicVO infAdicVO = new InfAdicVO();
         infNfeVO.setInfAdic(infAdicVO);
