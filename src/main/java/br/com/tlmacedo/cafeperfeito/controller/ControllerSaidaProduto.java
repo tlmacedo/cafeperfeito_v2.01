@@ -351,21 +351,29 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     credito = BigDecimal.ZERO;
                                 }
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
+                                    getContasAReceberDAO().transactionBegin();
                                     if (utilizaCredito) {
                                         baixaCredito(credito);
-                                        getContasAReceberDAO().transactionBegin();
                                         getContasAReceber().getRecebimentoList().add(addRecebimento(getContasAReceber(), PagamentoModalidade.CREDITO, credito));
-                                        try {
-                                            setContasAReceber(getContasAReceberDAO().setTransactionPersist(getContasAReceber()));
-                                            getContasAReceberDAO().transactionCommit();
-                                        } catch (Exception ex) {
-                                            getContasAReceberDAO().transactionRollback();
-                                        }
+//                                        try {
+//                                            getContasAReceberDAO().transactionBegin();
+                                        setContasAReceber(getContasAReceberDAO().setTransactionPersist(getContasAReceber()));
+//                                            getContasAReceberDAO().transactionCommit();
+//                                        } catch (Exception ex) {
+//                                            getContasAReceberDAO().transactionRollback();
+//                                        }
                                     }
 
                                     ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getContasAReceber(), "SaidaProduto001:");
                                     new ViewRecebimento().openViewRecebimento(getContasAReceber());
                                     atualizaTotaisCliente(getContasAReceber());
+
+                                    try {
+                                        setContasAReceber(getContasAReceberDAO().setTransactionPersist(getContasAReceber()));
+                                        getContasAReceberDAO().transactionCommit();
+                                    } catch (Exception ex) {
+                                        getContasAReceberDAO().transactionRollback();
+                                    }
 
                                     ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getContasAReceber(), "SaidaProduto002:");
                                     //System.out.printf("saidaProduto002:\n***********------\n%s\n------***********", getTmodelSaidaProduto().toString());
@@ -1049,6 +1057,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         try {
             if (getSaidaProdutoNfe() == null) {
                 setSaidaProdutoNfe(new SaidaProdutoNfe());
+                getSaidaProdutoNfe().setSaidaProduto(getSaidaProduto());
                 getSaidaProduto().getSaidaProdutoNfeList().add(getSaidaProdutoNfe());
             }
             setnFev400(new NFev400(TCONFIG.getNfe().getTpAmb()));
@@ -1155,6 +1164,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         getNewNotaFiscal().gerarNovaNotaFiscal();
         nFev400Property().getValue().setEnviNfe_v400(new EnviNfe_v400(getNewNotaFiscal().getEnviNfeVO(), MY_ZONE_TIME));
         xmlNFeProperty().setValue(ServiceUtilXml.objectToXml(nFev400Property().getValue().getEnviNfe_v400().gettEnviNFe()));
+        System.out.printf("xmlNFe:\n%s\n---------------------**********************\n\n", xmlNFeProperty().getValue());
     }
 
     private void assinarXmlNFe() throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException, JAXBException {
@@ -1166,11 +1176,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         nFev400Property().getValue().setAssinarXml(new NFeAssinarXml(xmlNFeProperty().getValue(), loadCertificadoA3Property().getValue().getCertificates()));
         xmlNFeAssinadoProperty().setValue(nFev400Property().getValue().getAssinarXml().getXmlAssinadoNFe());
+        System.out.printf("xmlNFeAssinado:\n%s\n---------------------**********************\n\n", xmlNFeAssinadoProperty().getValue());
     }
 
     private void transmitirXmlNFe() throws XMLStreamException, RemoteException {
         nFev400Property().getValue().setAutorizacaoNFe(new NFeAutorizacao(xmlNFeAssinadoProperty().getValue()));
         xmlNFeAutorizacaoProperty().setValue(nFev400Property().getValue().getAutorizacaoNFe().getXmlAutorizacaoNFe());
+        System.out.printf("xmlNFeAutorizacao:\n%s\n---------------------**********************\n\n", xmlNFeAutorizacaoProperty().getValue());
     }
 
     private void retornoXmlNFe() throws JAXBException, InterruptedException, XMLStreamException, RemoteException {
@@ -1179,6 +1191,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         nFev400Property().getValue().setRetAutorizacaoNFe(new NFeRetAutorizacao(ServiceUtilXml.objectToXml(tConsReciNFe)));
         xmlNFeRetAutorizacaoProperty().setValue(nFev400Property().getValue().getRetAutorizacaoNFe().getXmlRetAutorizacaoNFe());
+        System.out.printf("xmlNFeRetAutorizacao:\n%s\n---------------------**********************\n\n", xmlNFeRetAutorizacaoProperty().getValue());
     }
 
     private void retornoProcNFe() throws JAXBException {
@@ -1188,6 +1201,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         nFev400Property().getValue().getProcNFe().settProtNFe(ServiceUtilXml.xmlToObject(nFev400Property().getValue().getProcNFe().getStringTProtNFe(), TProtNFe.class));
 
         xmlNFeProcProperty().setValue(ServiceUtilXml.objectToXml(nFev400Property().getValue().getProcNFe().getResultNFeProc()));
+        System.out.printf("xmlNFeProc:\n%s\n---------------------**********************\n\n", xmlNFeProcProperty().getValue());
     }
 
     private String getNFeInfAdicionas() {
