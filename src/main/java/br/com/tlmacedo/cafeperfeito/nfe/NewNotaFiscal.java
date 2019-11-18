@@ -324,6 +324,9 @@ public class NewNotaFiscal {
         ideVO.setFinNFe((getMyNfe().getImpressaoFinNFe() != null)
                 ? String.valueOf(getMyNfe().getImpressaoFinNFe().getCod())
                 : String.valueOf(NfeImpressaoFinNFe.NORMAL.getCod()));
+        if (getMyNfe().getConsumidorFinal().equals(NfeDadosIndicadorConsumidorFinal.NORMAL)
+                && getSaidaProduto().getCliente().ieProperty().getValue().equals(""))
+            getMyNfe().setConsumidorFinal(NfeDadosIndicadorConsumidorFinal.FINAL);
         ideVO.setIndFinal(String.valueOf(getMyNfe().getConsumidorFinal().getCod()));
         ideVO.setIndPres(String.valueOf(getMyNfe().getIndicadorPresenca().getCod()));
         ideVO.setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));

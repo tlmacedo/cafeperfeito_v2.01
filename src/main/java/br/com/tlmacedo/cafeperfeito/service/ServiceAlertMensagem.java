@@ -53,6 +53,7 @@ public class ServiceAlertMensagem {
         getBtns().add(getBtnOk());
 
         addButton();
+        getBtnOk().setDisable(false);
 
         getDialog().showAndWait();
     }
