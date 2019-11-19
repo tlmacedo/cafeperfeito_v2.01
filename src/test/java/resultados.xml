@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nfeProc versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe">
     <NFe>
-        <infNFe versao="4.00" Id="NFe13191108009246000136550010000005361201911177">
+        <infNFe versao="4.00" Id="NFe13191108009246000136550010000005481201911194">
             <ide>
                 <cUF>13</cUF>
-                <cNF>20191117</cNF>
+                <cNF>20191119</cNF>
                 <natOp>DENTRO DO ESTADO</natOp>
                 <mod>55</mod>
                 <serie>1</serie>
-                <nNF>536</nNF>
-                <dhEmi>2019-11-17T20:51:02-04:00</dhEmi>
-                <dhSaiEnt>2019-11-17T20:51:02-04:00</dhSaiEnt>
+                <nNF>548</nNF>
+                <dhEmi>2019-11-19T17:10:02-04:00</dhEmi>
+                <dhSaiEnt>2019-11-19T17:10:02-04:00</dhSaiEnt>
                 <tpNF>1</tpNF>
                 <idDest>1</idDest>
                 <cMunFG>1302603</cMunFG>
                 <tpImp>1</tpImp>
                 <tpEmis>1</tpEmis>
-                <cDV>7</cDV>
+                <cDV>4</cDV>
                 <tpAmb>2</tpAmb>
                 <finNFe>1</finNFe>
                 <indFinal>1</indFinal>
@@ -131,14 +131,14 @@
             </transp>
             <cobr>
                 <fat>
-                    <nFat>191117001-25</nFat>
+                    <nFat>191119003-02</nFat>
                     <vOrig>86.00</vOrig>
                     <vDesc>0.00</vDesc>
                     <vLiq>86.00</vLiq>
                 </fat>
                 <dup>
                     <nDup>001</nDup>
-                    <dVenc>2019-11-17</dVenc>
+                    <dVenc>2019-11-19</dVenc>
                     <vDup>86.00</vDup>
                 </dup>
             </cobr>
@@ -150,7 +150,7 @@
                 </detPag>
             </pag>
             <infAdic>
-                <infCpl>TOTAL R$ 86,00 DT. VENC.: 17/11/2019 DADOS BANCARIOS PARA TRANSFERENCIA BANCO ITAU AG: 1677 C/C:
+                <infCpl>TOTAL R$ 86,00 DT. VENC.: 19/11/2019 DADOS BANCARIOS PARA TRANSFERENCIA BANCO ITAU AG: 1677 C/C:
                     35.456-3
                 </infCpl>
             </infAdic>
@@ -165,17 +165,17 @@
             <SignedInfo>
                 <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
                 <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-                <Reference URI="#NFe13191108009246000136550010000005361201911177">
+                <Reference URI="#NFe13191108009246000136550010000005481201911194">
                     <Transforms>
                         <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
                         <Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
                     </Transforms>
                     <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-                    <DigestValue>Lw3N4Hy2RL+7bETe8/EsN0taSQE=</DigestValue>
+                    <DigestValue>L+ca38LFHwd28JA17REJBxKyWSU=</DigestValue>
                 </Reference>
             </SignedInfo>
             <SignatureValue>
-                Ji7xrdV0rHAbTA+COSMidWT8806vEOquxG+jRHa+Rst5/XbaCc/qRZQfqvWK/OPNZZfIbQTEny8IlhuZYqPCH+q1ivXzNPEztpM9Diyv4XCQGKPalukdclHYPPrCI1zz5J3JJ1dmMYsPgcSJc0IwpPLtbtoWR6p/A8W8Mm26V7Qh2fDbzhlN/9WovwL/xo6xC553r+Sd+LkJmI+EF/ukujrMRzMux0TtXVbFXN0YEvyDLdptJY7rOP0za8S3jVpZ/VoVp6dExq4BdxRXg/XXdFfmym1BmVdXmEoU4kTTYTjsgZuf9slLMNuIDzIol86ZX423ERvOoCwrdnbf/7wgng==
+                X09bfIXa1oc5mH6IdyTEjUKAZftnUVHkxdjzO8PZkHWkANnvnzZZB7mHpQEl2jZyFUPfEGjwoljIUDBwhm9vVDzvPhwoYkDy13czkKOfoffWGNmR2VxhmNuBK+pgmHNIbzmxHxiOu+t9LnzzOF2GMRJsyteZSrN0XlecJ3kjMZLT9A7gOmcfnNWHnSwM5DB2RTXA3JI6v/XknGSZM6aWQmVFD8jZxwqPW2D8diSFiGQtLTiODhOZsPBI7NxDD1fv1xBuHCIEhZoGGGLAzfVmmG3Zt3dIx8kNIqtGI8U3g85hNbGPN8IMmPOalMWEnw8N5wY0xgSQ6+g8DQ279+CZMQ==
             </SignatureValue>
             <KeyInfo>
                 <X509Data>
@@ -190,10 +190,10 @@
         <infProt>
             <tpAmb>2</tpAmb>
             <verAplic>AM4.00</verAplic>
-            <chNFe>13191108009246000136550010000005361201911177</chNFe>
-            <dhRecbto>2019-11-17T20:51:07-04:00</dhRecbto>
-            <nProt>113190007599688</nProt>
-            <digVal>Lw3N4Hy2RL+7bETe8/EsN0taSQE=</digVal>
+            <chNFe>13191108009246000136550010000005481201911194</chNFe>
+            <dhRecbto>2019-11-19T17:10:07-04:00</dhRecbto>
+            <nProt>113190007607248</nProt>
+            <digVal>L+ca38LFHwd28JA17REJBxKyWSU=</digVal>
             <cStat>100</cStat>
             <xMotivo>Autorizado o uso da NF-e</xMotivo>
         </infProt>

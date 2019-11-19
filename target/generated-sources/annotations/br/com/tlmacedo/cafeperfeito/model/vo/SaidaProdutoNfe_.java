@@ -17,12 +17,12 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-11-12T14:00:55")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-11-19T17:00:55")
 @StaticMetamodel(SaidaProdutoNfe.class)
 public class SaidaProdutoNfe_ { 
 
     public static volatile SingularAttribute<SaidaProdutoNfe, NfeTransporteModFrete> modFrete;
-    public static volatile SingularAttribute<SaidaProdutoNfe, String> digVal;
+    public static volatile SingularAttribute<SaidaProdutoNfe, Blob> digVal;
     public static volatile SingularAttribute<SaidaProdutoNfe, Boolean> cancelada;
     public static volatile SingularAttribute<SaidaProdutoNfe, Integer> numero;
     public static volatile SingularAttribute<SaidaProdutoNfe, LocalDateTime> dtHoraEmissao;

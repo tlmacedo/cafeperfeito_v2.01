@@ -38,7 +38,7 @@ public class SaidaProdutoNfe implements Serializable {
     private NfeCobrancaDuplicataPagamentoIndicador pagamentoIndicador;
     private NfeCobrancaDuplicataPagamentoMeio pagamentoMeio;
     private StringProperty informacaoAdicional = new SimpleStringProperty();
-    private StringProperty digVal = new SimpleStringProperty();
+    private Blob digVal;
     private Blob xmlAssinatura;
     private Blob xmlProtNfe;
 
@@ -273,17 +273,14 @@ public class SaidaProdutoNfe implements Serializable {
         this.informacaoAdicional.set(informacaoAdicional);
     }
 
-    @Column(length = 28)
-    public String getDigVal() {
-        return digVal.get();
-    }
-
-    public StringProperty digValProperty() {
+    @JsonIgnore
+    @SuppressWarnings("JpaAttributeTypeInspection")
+    public Blob getDigVal() {
         return digVal;
     }
 
-    public void setDigVal(String digVal) {
-        this.digVal.set(digVal);
+    public void setDigVal(Blob digVal) {
+        this.digVal = digVal;
     }
 
     @JsonIgnore

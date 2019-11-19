@@ -353,6 +353,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 } else {
                                     credito = BigDecimal.ZERO;
                                 }
+                                if (getSaidaProdutoNfe() != null)
+                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "Nfe(0)001:");
+                                else System.out.printf("Nfe()001: null");
+
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
                                     if (utilizaCredito) {
                                         baixaCredito(credito);
@@ -367,7 +371,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 //                                    }
 
 
-                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getContasAReceber(), "SaidaProduto001:");
+                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "Nfe(0)002:");
                                     new ViewRecebimento().openViewRecebimento(getContasAReceber());
                                     try {
                                         getContasAReceberDAO().transactionBegin();
@@ -376,24 +380,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     } catch (Exception ex) {
                                         getContasAReceberDAO().transactionRollback();
                                     }
-                                    atualizaTotaisCliente(getContasAReceber());
 
-//                                    try {
-//                                        getRecebimentoDAO().transactionBegin();
-//                                        setContasAReceber(getContasAReceberDAO().setTransactionPersist(getContasAReceber()));
-//                                        getContasAReceberDAO().transactionCommit();
-//                                    } catch (Exception ex) {
-//                                        getContasAReceberDAO().transactionRollback();
-//                                    }
-
-                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getContasAReceber(), "SaidaProduto002:");
-                                    //System.out.printf("saidaProduto002:\n***********------\n%s\n------***********", getTmodelSaidaProduto().toString());
-                                    //System.out.printf("saidaProduto003:\n***********------\n%s\n------***********", getTmodelSaidaProduto().toString());
-
+                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "Nfe(0)003:");
                                     if (getSaidaProdutoNfe() != null)
                                         gerarDanfe();
-                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getContasAReceber(), "SaidaProduto004:");
-                                    //System.out.printf("saidaProduto004:\n***********------\n%s\n------***********", getTmodelSaidaProduto().toString());
+
+                                    atualizaTotaisCliente(getContasAReceber());
+                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "Nfe(0)004:");
 
                                     limpaCampos(getPainelViewSaidaProduto());
                                 }
@@ -1144,12 +1137,12 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private boolean gerarDanfe() {
         try {
-            ServiceUtilJSon.printJsonFromObject(getSaidaProdutoNfe(), "saidaNFe001:");
+            ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "danfeNfe(0)001:");
             getSaidaProdutoNfeDAO().transactionBegin();
             nfeAddCobranca();
             try {
                 setSaidaProdutoNfe(getSaidaProdutoNfeDAO().setTransactionPersist(getSaidaProdutoNfe()));
-                ServiceUtilJSon.printJsonFromObject(getSaidaProdutoNfe(), "saidaNFe002:");
+                ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "danfeNfe(0)002:");
                 getSaidaProdutoNfeDAO().transactionCommit();
             } catch (Exception ex) {
                 getSaidaProdutoNfeDAO().transactionRollback();
@@ -1157,21 +1150,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 return false;
             }
 
-            setAlertMensagem(null);
             getEnumsTasksList().clear();
             getEnumsTasksList().add(EnumsTasks.NFE_GERAR);
             getEnumsTasksList().add(EnumsTasks.NFE_ASSINAR);
             getEnumsTasksList().add(EnumsTasks.NFE_TRANSMITIR);
             getEnumsTasksList().add(EnumsTasks.NFE_RETORNO);
-            if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Gerando NFe [%d]!", (nfeLastNumberProperty().getValue() + 1)))) {
-                setAlertMensagem(new ServiceAlertMensagem());
-                getAlertMensagem().setCabecalho("NFe");
-                getAlertMensagem().setContentText("Nota fiscal eletronica gerada com sucesso!!!");
+            setAlertMensagem(new ServiceAlertMensagem());
+            if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Gerando NFe [%d]!", getTxtNfeDadosNumero().getText().replaceAll("\\D", "")))) {
                 getAlertMensagem().alertOk();
                 return true;
             } else {
-                if (getAlertMensagem() != null)
-                    getAlertMensagem().alertOk();
+                getAlertMensagem().alertOk();
                 return false;
             }
 
@@ -1182,11 +1171,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private void gerarXmlNFe() throws Exception {
-        ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getContasAReceber(), "NewNotaFiscal001:");
+        ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "danfeNfe(0)003:");
 
         setNewNotaFiscal(new NewNotaFiscal());
         getNewNotaFiscal().setSaidaProduto(getSaidaProduto());
-        ServiceUtilJSon.printJsonFromObject(getNewNotaFiscal().getSaidaProduto().getContasAReceber(), "NewNotaFiscal003:");
+        ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "danfeNfe(0)004:");
         getNewNotaFiscal().gerarNovaNotaFiscal();
         nFev400Property().getValue().setEnviNfe_v400(new EnviNfe_v400(getNewNotaFiscal().getEnviNfeVO(), MY_ZONE_TIME));
         xmlNFeProperty().setValue(ServiceUtilXml.objectToXml(nFev400Property().getValue().getEnviNfe_v400().gettEnviNFe()));
@@ -1233,9 +1222,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         if (tProtNFe.getInfProt().getCStat().equals("100")) {
             xmlNFeRetAutorizacaoProperty().setValue(nFev400Property().getValue().getRetAutorizacaoNFe().getXmlRetAutorizacaoNFe());
+            getAlertMensagem().setCabecalho("NFe");
+            getAlertMensagem().setContentText("Nota fiscal eletronica gerada com sucesso!!!");
             System.out.printf("xmlNFeRetAutorizacao:\n%s\n---------------------**********************\n\n", xmlNFeRetAutorizacaoProperty().getValue());
         } else {
-            setAlertMensagem(new ServiceAlertMensagem());
             getAlertMensagem().setCabecalho("Retorno inválido!!!");
             getAlertMensagem().setContentText(String.format("tpAmb: %s\ncStat: %s\nxMotivo: %s",
                     tProtNFe.getInfProt().getTpAmb(),
@@ -1253,6 +1243,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         nFev400Property().getValue().getProcNFe().settProtNFe(ServiceUtilXml.xmlToObject(nFev400Property().getValue().getProcNFe().getStringTProtNFe(), TProtNFe.class));
 
         xmlNFeProcProperty().setValue(ServiceUtilXml.objectToXml(nFev400Property().getValue().getProcNFe().getResultNFeProc()));
+        getSaidaProdutoNfe().setDigVal(new SerialBlob(nFev400Property().getValue().getProcNFe().gettNfeProc().getProtNFe().getInfProt().getDigVal().toString().getBytes()));
         getSaidaProdutoNfe().setXmlProtNfe(new SerialBlob(xmlNFeProcProperty().getValue().getBytes()));
         try {
             getSaidaProdutoNfeDAO().transactionBegin();
