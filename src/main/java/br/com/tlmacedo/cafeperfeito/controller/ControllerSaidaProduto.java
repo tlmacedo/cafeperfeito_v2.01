@@ -353,25 +353,12 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 } else {
                                     credito = BigDecimal.ZERO;
                                 }
-                                if (getSaidaProdutoNfe() != null)
-                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "Nfe(0)001:");
-                                else System.out.printf("Nfe()001: null");
 
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
                                     if (utilizaCredito) {
                                         baixaCredito(credito);
                                         getContasAReceber().getRecebimentoList().add(addRecebimento(getContasAReceber(), PagamentoModalidade.CREDITO, credito));
                                     }
-//                                    try {
-//                                        getContasAReceberDAO().transactionBegin();
-//                                        setContasAReceber(getContasAReceberDAO().setTransactionPersist(getContasAReceber()));
-//                                        getContasAReceberDAO().transactionCommit();
-//                                    } catch (Exception ex) {
-//                                        getContasAReceberDAO().transactionRollback();
-//                                    }
-
-
-                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "Nfe(0)002:");
                                     new ViewRecebimento().openViewRecebimento(getContasAReceber());
                                     try {
                                         getContasAReceberDAO().transactionBegin();
@@ -381,12 +368,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                         getContasAReceberDAO().transactionRollback();
                                     }
 
-                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "Nfe(0)003:");
                                     if (getSaidaProdutoNfe() != null)
                                         gerarDanfe();
 
                                     atualizaTotaisCliente(getContasAReceber());
-                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "Nfe(0)004:");
 
                                     limpaCampos(getPainelViewSaidaProduto());
                                 }
@@ -1137,12 +1122,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private boolean gerarDanfe() {
         try {
-            ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "danfeNfe(0)001:");
             getSaidaProdutoNfeDAO().transactionBegin();
             nfeAddCobranca();
             try {
                 setSaidaProdutoNfe(getSaidaProdutoNfeDAO().setTransactionPersist(getSaidaProdutoNfe()));
-                ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "danfeNfe(0)002:");
                 getSaidaProdutoNfeDAO().transactionCommit();
             } catch (Exception ex) {
                 getSaidaProdutoNfeDAO().transactionRollback();
@@ -1171,11 +1154,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private void gerarXmlNFe() throws Exception {
-        ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "danfeNfe(0)003:");
 
         setNewNotaFiscal(new NewNotaFiscal());
         getNewNotaFiscal().setSaidaProduto(getSaidaProduto());
-        ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getSaidaProdutoNfeList().get(0), "danfeNfe(0)004:");
         getNewNotaFiscal().gerarNovaNotaFiscal();
         nFev400Property().getValue().setEnviNfe_v400(new EnviNfe_v400(getNewNotaFiscal().getEnviNfeVO(), MY_ZONE_TIME));
         xmlNFeProperty().setValue(ServiceUtilXml.objectToXml(nFev400Property().getValue().getEnviNfe_v400().gettEnviNFe()));
