@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sistema>
     <myLocale>pt_br</myLocale>
-    <timeOut>600</timeOut>
+    <timeOut>30</timeOut>
     <versao>2.01</versao>
     <sis>
         <connect_DB>
@@ -141,6 +141,11 @@
             <titulo>Contas a receber</titulo>
             <icone>/image/ico/principal/</icone>
         </contasAReceber>
+        <pedidoNFe>
+            <fxml>/fxml/FxmlPedidoNFe.fxml</fxml>
+            <titulo>Pedidos e Notas Fiscais Eletrônicas</titulo>
+            <icone>/image/ico/principal/</icone>
+        </pedidoNFe>
         <recebimento>
             <fxml>/fxml/FxmlRecebimento.fxml</fxml>
             <titulo>Recebimento</titulo>

@@ -360,13 +360,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                         getContasAReceber().getRecebimentoList().add(addRecebimento(getContasAReceber(), PagamentoModalidade.CREDITO, credito));
                                     }
                                     new ViewRecebimento().openViewRecebimento(getContasAReceber());
-                                    try {
-                                        getContasAReceberDAO().transactionBegin();
-                                        setContasAReceber(getContasAReceberDAO().setTransactionPersist(getContasAReceber()));
-                                        getContasAReceberDAO().transactionCommit();
-                                    } catch (Exception ex) {
-                                        getContasAReceberDAO().transactionRollback();
-                                    }
 
                                     if (getSaidaProdutoNfe() != null)
                                         gerarDanfe();

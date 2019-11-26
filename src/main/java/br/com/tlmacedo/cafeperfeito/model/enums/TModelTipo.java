@@ -9,7 +9,9 @@ public enum TModelTipo {
 
     PROD_VENDA(0, "Produto venda"),
     PROD_CADASTRO(1, "Produto cadastro"),
-    PROD_COMPRA(2, "Produto compra");
+    PROD_COMPRA(2, "Produto compra"),
+    PEDIDO_RECIBO(3, "Pedido recibo"),
+    PEDIDO_NFE(4, "Pedido nfe");
 
     private int cod;
     private String descricao;

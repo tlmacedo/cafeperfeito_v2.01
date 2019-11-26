@@ -256,13 +256,13 @@ public class TmodelProduto {
      * END Voids
      */
 
-    public TModelTipo gettModelTipo() {
-        return tModelTipo;
-    }
-
     /**
      * Begin Gets and Setters
      */
+
+    public TModelTipo gettModelTipo() {
+        return tModelTipo;
+    }
 
     public Label getLblRegistrosLocalizados() {
         return lblRegistrosLocalizados;

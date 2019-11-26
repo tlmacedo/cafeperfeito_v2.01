@@ -6,6 +6,7 @@ import br.com.tlmacedo.cafeperfeito.model.vo.MenuPrincipal;
 import br.com.tlmacedo.cafeperfeito.service.ServiceComandoTecladoMouse;
 import br.com.tlmacedo.cafeperfeito.service.ServiceStatusBar;
 import br.com.tlmacedo.cafeperfeito.view.ViewContasAReceber;
+import br.com.tlmacedo.cafeperfeito.view.ViewPedidoNFe;
 import br.com.tlmacedo.cafeperfeito.view.ViewPrincipal;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import javafx.collections.ListChangeListener;
@@ -200,6 +201,9 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
                     break;
                 case "contasareceber":
                     tab = new ViewContasAReceber().tabContasAReceber(menu.menuLabelProperty().get());
+                    break;
+                case "notafiscal":
+                    tab = new ViewPedidoNFe().tabPedidoNFe(menu.menuLabelProperty().getValue());
                     break;
             }
             if (tab != null) {
