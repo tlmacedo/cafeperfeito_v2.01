@@ -430,7 +430,12 @@ public class TmodelSaidaProduto {
                                                                             .filter(saidaProdutoProduto -> saidaProdutoProduto.produtoProperty().getValue().idProperty().getValue() == produtoEstoques.get(0).getProduto().idProperty().getValue()
                                                                                     && saidaProdutoProduto.loteProperty().getValue().equals(s) && saidaProdutoProduto.getTipoSaidaProduto().equals(finalTSaidaProduto))
                                                                             .findFirst().orElse(null)) == null) {
-                                                                        Produto prod = new Produto();
+                                                                        Produto prod = null;
+                                                                        try {
+                                                                            prod = produtoEstoques.get(0).getProduto().clone();
+                                                                        } catch (CloneNotSupportedException e) {
+                                                                            e.printStackTrace();
+                                                                        }
                                                                         prod.idProperty().setValue(produtoEstoques.get(0).getProduto().idProperty().getValue());
                                                                         prod.tblEstoqueProperty().setValue(qtdEstoque);
                                                                         prod.tblLoteProperty().setValue(s);

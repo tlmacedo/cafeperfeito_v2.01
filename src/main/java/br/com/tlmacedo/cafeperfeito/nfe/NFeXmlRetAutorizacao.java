@@ -10,11 +10,20 @@ import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import java.rmi.RemoteException;
 
-public class NewRetAutorizacaoNFe {
+public class NFeXmlRetAutorizacao {
 
     private String xmlNfe_RetAutorizacaoNFe;
 
-    public NewRetAutorizacaoNFe(String xmlNfe_Autorizacao) throws JAXBException, InterruptedException, XMLStreamException, RemoteException {
+    public static String getXmlRetAutorizacao() {
+//        nFev400Property().getValue().setConsReciNFe(new NFeRetConsReciNfe(ServiceUtilXml.xmlToObject(xmlNFeAutorizacaoProperty().getValue(), TRetEnviNFe.class)));
+//        TConsReciNFe tConsReciNFe = nFev400Property().getValue().getConsReciNFe().gettConsReciNFe();
+//
+//        nFev400Property().getValue().setRetAutorizacaoNFe(new NFeRetAutorizacao(ServiceUtilXml.objectToXml(tConsReciNFe)));
+//        xmlNFeRetAutorizacaoProperty().setValue(nFev400Property().getValue().getRetAutorizacaoNFe().getXmlRetAutorizacaoNFe());
+        return null;
+    }
+
+    public NFeXmlRetAutorizacao(String xmlNfe_Autorizacao) throws JAXBException, InterruptedException, XMLStreamException, RemoteException {
 
         TConsReciNFe tConsReciNFe =
                 new NFeRetConsReciNfe(ServiceUtilXml.xmlToObject(xmlNfe_Autorizacao, TRetEnviNFe.class))

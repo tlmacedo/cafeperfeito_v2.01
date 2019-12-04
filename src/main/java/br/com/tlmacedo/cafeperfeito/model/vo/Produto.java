@@ -23,7 +23,7 @@ import java.util.List;
 
 @Entity(name = "Produto")
 @Table(name = "produto")
-public class Produto implements Serializable {
+public class Produto implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();

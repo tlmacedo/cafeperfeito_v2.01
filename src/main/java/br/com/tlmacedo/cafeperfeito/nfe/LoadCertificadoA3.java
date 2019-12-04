@@ -22,7 +22,7 @@ public class LoadCertificadoA3 {
     public boolean load() {
         try {
             getCertificates().loadToken();
-            ;
+
             getCertificates().loadSocketDinamico();
         } catch (Exception ex) {
             setCertificates(null);

@@ -8,20 +8,22 @@ import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.nfe.LoadCertificadoA3;
-import br.com.tlmacedo.cafeperfeito.nfe.NewNotaFiscal;
+import br.com.tlmacedo.cafeperfeito.nfe.NFeXml;
+import br.com.tlmacedo.cafeperfeito.nfe.NFeXmlAssinar;
+import br.com.tlmacedo.cafeperfeito.nfe.NotaFiscal;
 import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import br.com.tlmacedo.nfe.service.*;
-import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
 import br.inf.portalfiscal.xsd.nfe.consReciNFe.TConsReciNFe;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 import br.inf.portalfiscal.xsd.nfe.procNFe.TNFe;
 import br.inf.portalfiscal.xsd.nfe.procNFe.TProtNFe;
 import br.inf.portalfiscal.xsd.nfe.retConsReciNFe.TRetConsReciNFe;
 import br.inf.portalfiscal.xsd.nfe.retEnviNFe.TRetEnviNFe;
+import com.google.gson.internal.Pair;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -56,7 +58,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
-import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -168,7 +169,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList = FXCollections.observableArrayList();
 
-    private NewNotaFiscal newNotaFiscal;
+    private NotaFiscal notaFiscal;
     private ObjectProperty<LoadCertificadoA3> loadCertificadoA3 = new SimpleObjectProperty<>();
     private IntegerProperty nfeLastNumber = new SimpleIntegerProperty(0);
     private StringProperty informacaoNFE = new SimpleStringProperty();
@@ -361,8 +362,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     }
                                     new ViewRecebimento().openViewRecebimento(getContasAReceber());
 
-                                    if (getSaidaProdutoNfe() != null)
+                                    if (getSaidaProdutoNfe() != null) {
+                                        nfeAddCobranca();
                                         gerarDanfe();
+                                    }
 
                                     atualizaTotaisCliente(getContasAReceber());
 
@@ -1147,24 +1150,14 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private void gerarXmlNFe() throws Exception {
-
-        setNewNotaFiscal(new NewNotaFiscal());
-        getNewNotaFiscal().setSaidaProduto(getSaidaProduto());
-        getNewNotaFiscal().gerarNovaNotaFiscal();
-        nFev400Property().getValue().setEnviNfe_v400(new EnviNfe_v400(getNewNotaFiscal().getEnviNfeVO(), MY_ZONE_TIME));
-        xmlNFeProperty().setValue(ServiceUtilXml.objectToXml(nFev400Property().getValue().getEnviNfe_v400().gettEnviNFe()));
+        xmlNFeProperty().setValue(NFeXml.getXml(getSaidaProduto()));
         System.out.printf("xmlNFe:\n%s\n---------------------**********************\n\n", xmlNFeProperty().getValue());
     }
 
     private void assinarXmlNFe() throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException, JAXBException, SQLException {
-        if (loadCertificadoA3Property().getValue() == null)
-            loadCertificadoA3Property().setValue(new LoadCertificadoA3());
-
-        while (loadCertificadoA3Property().getValue().load())
-            loadCertificadoA3Property().getValue().load();
-
-        nFev400Property().getValue().setAssinarXml(new NFeAssinarXml(xmlNFeProperty().getValue(), loadCertificadoA3Property().getValue().getCertificates()));
-        xmlNFeAssinadoProperty().setValue(nFev400Property().getValue().getAssinarXml().getXmlAssinadoNFe());
+        Pair<String, LoadCertificadoA3> meuPair = NFeXmlAssinar.getXmlAssinado(xmlNFeProperty().getValue());
+        setLoadCertificadoA3(meuPair.second);
+        xmlNFeAssinadoProperty().setValue(meuPair.first);
         getSaidaProdutoNfe().setXmlAssinatura(new SerialBlob(xmlNFeAssinadoProperty().getValue().getBytes()));
         try {
             getSaidaProdutoNfeDAO().transactionBegin();
@@ -1983,12 +1976,12 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.saidaProdutoProdutoObservableList = saidaProdutoProdutoObservableList;
     }
 
-    public NewNotaFiscal getNewNotaFiscal() {
-        return newNotaFiscal;
+    public NotaFiscal getNotaFiscal() {
+        return notaFiscal;
     }
 
-    public void setNewNotaFiscal(NewNotaFiscal newNotaFiscal) {
-        this.newNotaFiscal = newNotaFiscal;
+    public void setNotaFiscal(NotaFiscal notaFiscal) {
+        this.notaFiscal = notaFiscal;
     }
 
     public LoadCertificadoA3 getLoadCertificadoA3() {

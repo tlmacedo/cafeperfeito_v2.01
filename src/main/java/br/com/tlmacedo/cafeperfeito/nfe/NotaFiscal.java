@@ -12,7 +12,6 @@ import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,25 +22,27 @@ import java.util.List;
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
-public class NewNotaFiscal {
+public class NotaFiscal {
 
-    private EnviNfeVO enviNfeVO = new EnviNfeVO();
-    private SaidaProduto saidaProduto;
-    private SaidaProdutoNfe myNfe;
-    private SaidaProdutoDAO saidaProdutoDAO;
-    private TEnviNFe tEnviNFe;
+    private static EnviNfeVO enviNfeVO;
+    private static SaidaProduto saidaProduto;
+    private static SaidaProdutoNfe myNfe;
+    private static SaidaProdutoDAO saidaProdutoDAO;
+    private static TEnviNFe tEnviNFe;
 
-    public NewNotaFiscal() throws Exception {
-//        setSaidaProduto(saidaProduto);
-//        gerarNovaNotaFiscal();
-    }
-
-    public void gerarNovaNotaFiscal(Long nPed) throws Exception {
+    public static EnviNfeVO getEnviNfeVO(Long nPed) throws Exception {
         setSaidaProduto(getSaidaProdutoDAO().getById(SaidaProduto.class, nPed));
-        gerarNovaNotaFiscal();
+        gerarNotaFiscal();
+        return getEnviNfeVO();
     }
 
-    public void gerarNovaNotaFiscal() throws Exception {
+    public static EnviNfeVO getEnviNfeVO(SaidaProduto saidaProduto) throws Exception {
+        setSaidaProduto(saidaProduto);
+        gerarNotaFiscal();
+        return getEnviNfeVO();
+    }
+
+    public static void gerarNotaFiscal() throws Exception {
         ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getContasAReceber(), "NewNotaFiscal002:");
 
         getEnviNfeVO().setVersao(TCONFIG.getNfe().getVersao());
@@ -244,7 +245,7 @@ public class NewNotaFiscal {
         settEnviNFe(new EnviNfe_v400(getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe());
     }
 
-    private IdeVO newNfeIde() {
+    private static IdeVO newNfeIde() {
         IdeVO ideVO = new IdeVO();
         boolean salvar = false;
         if (getMyNfe() == null) {
@@ -347,7 +348,7 @@ public class NewNotaFiscal {
         return ideVO;
     }
 
-    private ProdVO newNfeProd(SaidaProdutoProduto saidaProdutoProduto) {
+    private static ProdVO newNfeProd(SaidaProdutoProduto saidaProdutoProduto) {
         Produto produto = saidaProdutoProduto.getProduto();
         ProdVO prodVO = new ProdVO();
 
@@ -381,7 +382,7 @@ public class NewNotaFiscal {
         return prodVO;
     }
 
-    private ImpostoVO newNfeImposto(Produto produto) {
+    private static ImpostoVO newNfeImposto(Produto produto) {
         ImpostoVO impostoVO = new ImpostoVO();
         if (produto.fiscalIcmsProperty().getValue() != null) {
             IcmsVO icmsVO = new IcmsVO();
@@ -467,47 +468,45 @@ public class NewNotaFiscal {
      * Begin Getters and Setters
      */
 
-    public EnviNfeVO getEnviNfeVO() {
+
+    public static EnviNfeVO getEnviNfeVO() {
         return enviNfeVO;
     }
 
-    public void setEnviNfeVO(EnviNfeVO enviNfeVO) {
-        this.enviNfeVO = enviNfeVO;
+    public static void setEnviNfeVO(EnviNfeVO enviNfeVO) {
+        NotaFiscal.enviNfeVO = enviNfeVO;
     }
 
-    @JsonIgnore
-    public SaidaProduto getSaidaProduto() {
+    public static SaidaProduto getSaidaProduto() {
         return saidaProduto;
     }
 
-    public void setSaidaProduto(SaidaProduto saidaProduto) {
-        this.saidaProduto = saidaProduto;
+    public static void setSaidaProduto(SaidaProduto saidaProduto) {
+        NotaFiscal.saidaProduto = saidaProduto;
     }
 
-    @JsonIgnore
-    public SaidaProdutoNfe getMyNfe() {
+    public static SaidaProdutoNfe getMyNfe() {
         return myNfe;
     }
 
-    public void setMyNfe(SaidaProdutoNfe myNfe) {
-        this.myNfe = myNfe;
+    public static void setMyNfe(SaidaProdutoNfe myNfe) {
+        NotaFiscal.myNfe = myNfe;
     }
 
-    @JsonIgnore
-    public SaidaProdutoDAO getSaidaProdutoDAO() {
+    public static SaidaProdutoDAO getSaidaProdutoDAO() {
         return saidaProdutoDAO;
     }
 
-    public void setSaidaProdutoDAO(SaidaProdutoDAO saidaProdutoDAO) {
-        this.saidaProdutoDAO = saidaProdutoDAO;
+    public static void setSaidaProdutoDAO(SaidaProdutoDAO saidaProdutoDAO) {
+        NotaFiscal.saidaProdutoDAO = saidaProdutoDAO;
     }
 
-    public TEnviNFe gettEnviNFe() {
+    public static TEnviNFe gettEnviNFe() {
         return tEnviNFe;
     }
 
-    public void settEnviNFe(TEnviNFe tEnviNFe) {
-        this.tEnviNFe = tEnviNFe;
+    public static void settEnviNFe(TEnviNFe tEnviNFe) {
+        NotaFiscal.tEnviNFe = tEnviNFe;
     }
 
     /**
