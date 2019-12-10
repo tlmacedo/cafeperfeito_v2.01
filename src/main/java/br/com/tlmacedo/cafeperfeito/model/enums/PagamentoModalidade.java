@@ -15,8 +15,10 @@ public enum PagamentoModalidade {
     RETIRADA(5, "Retirada"),
     BONIFICACAO(6, "Bonificação"),
     AMOSTRA(7, "Amostra"),
-    CREDITO_BAIXA(8, "Crédito baixado"),
-    CREDITO(9, "Crédito");
+    BAIXA_CREDITO(8, "Crédito baixado"),
+    CREDITO(9, "Crédito"),
+    BAIXA_DEBITO(10, "Débito baixado"),
+    DEBITO(11, "Débito");
 
     private int cod;
     private String descricao;

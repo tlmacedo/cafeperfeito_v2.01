@@ -127,6 +127,9 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             getRecebimento().valorProperty().setValue(getaReceber().valorProperty().getValue()
                     .subtract(getaReceber().getRecebimentoList().stream()
                             .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)));
+            if (ViewRecebimento.getCredito() != null)
+                getRecebimento().valorProperty().setValue(
+                        getRecebimento().valorProperty().getValue().add(ViewRecebimento.getCredito()));
             getRecebimento().dtPagamentoProperty().setValue(getaReceber().dtVencimentoProperty().getValue());
         } else {
             getBtnPrintOK().setDefaultButton(false);
@@ -215,9 +218,11 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     private boolean salvarRecebimento() {
         try {
             getRecebimentoDAO().transactionBegin();
-            if (getaReceber() != null)
-                getRecebimento().setaReceber(getaReceber());
-            getaReceber().getRecebimentoList().add(getRecebimento());
+//            if (getaReceber() != null)
+            getRecebimento().setaReceber(getaReceber());
+            if (getaReceber().getRecebimentoList().stream().filter(recebimento1 -> recebimento1.idProperty().getValue().equals(getRecebimento().idProperty().getValue()))
+                    .count() == 0)
+                getaReceber().getRecebimentoList().add(getRecebimento());
             getRecebimento().setPagamentoSituacao(getCboSituacao().getValue());
             getRecebimento().documentoProperty().setValue(getTxtDocumento().getText());
             if (getRecebimento().documentoProperty().getValue() == null)

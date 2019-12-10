@@ -403,13 +403,13 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
      */
 
     private Task newTaskContasAReceber() {
-        int qtdTasks = getEnumsTasksList().size();
-        final int[] cont = {1};
-        return new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                updateMessage("Loading...");
-                try {
+        try {
+            int qtdTasks = getEnumsTasksList().size();
+            final int[] cont = {1};
+            return new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    updateMessage("Loading...");
                     for (EnumsTasks tasks : getEnumsTasksList()) {
                         updateProgress(cont[0]++, qtdTasks);
                         Thread.sleep(200);
@@ -484,15 +484,16 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 //                                break;
                         }
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                    updateMessage("tarefa concluída!!!");
+                    updateProgress(qtdTasks, qtdTasks);
+                    getEnumsTasksList().clear();
+                    return null;
                 }
-                updateMessage("tarefa concluída!!!");
-                updateProgress(qtdTasks, qtdTasks);
-                getEnumsTasksList().clear();
-                return null;
-            }
-        };
+            };
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     /**

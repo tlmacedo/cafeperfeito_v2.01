@@ -52,9 +52,9 @@ public class TmodelPedido_Recibo_NFe {
     private TreeTableColumn<Object, String> colModalidade;
     private TreeTableColumn<Object, String> colSituacao;
     private TreeTableColumn<Object, LocalDate> colDtVencimento_DtPagamento;
-    private TreeTableColumn<Object, String> colVlrPedido;
-    private TreeTableColumn<Object, String> colVlrDesc;
-    private TreeTableColumn<Object, String> colValor;
+    private TreeTableColumn<Object, String> colVlrBruto;
+    private TreeTableColumn<Object, String> colVlrCredDeb;
+    private TreeTableColumn<Object, String> colVlrLiquido;
     private TreeTableColumn<Object, String> colValorPago;
     private TreeTableColumn<Object, String> colValorSaldo;
     private TreeTableColumn<Object, String> colUsuario;
@@ -155,7 +155,7 @@ public class TmodelPedido_Recibo_NFe {
         });
 
         setColDtVenda(new TreeTableColumn("dt. venda"));
-        getColDtVenda().setPrefWidth(90);
+        getColDtVenda().setPrefWidth(75);
         getColDtVenda().setStyle("-fx-alignment: center-right;");
         getColDtVenda().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
@@ -181,7 +181,7 @@ public class TmodelPedido_Recibo_NFe {
         setColModalidade(new TreeTableColumn(String.format("/ %s",
                 gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)
                         ? "mod pag" : "NFe2")));
-        getColModalidade().setPrefWidth(100);
+        getColModalidade().setPrefWidth(70);
         getColModalidade().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof Recebimento) {
                 return new SimpleStringProperty(((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao());
@@ -192,7 +192,7 @@ public class TmodelPedido_Recibo_NFe {
         setColSituacao(new TreeTableColumn(String.format("/ %s",
                 gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)
                         ? "situação" : "NFe3")));
-        getColSituacao().setPrefWidth(80);
+        getColSituacao().setPrefWidth(75);
         getColSituacao().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof Recebimento) {
                 return new SimpleStringProperty(((Recebimento) cellData.getValue().getValue()).getPagamentoSituacao().getDescricao());
@@ -227,36 +227,54 @@ public class TmodelPedido_Recibo_NFe {
             }
         });
 
-        setColVlrPedido(new TreeTableColumn<>("vlr. Ped."));
-        getColVlrPedido().setPrefWidth(90);
-        getColVlrPedido().setStyle("-fx-alignment: center-right;");
-        getColVlrPedido().setCellValueFactory(cellData -> {
+        setColVlrBruto(new TreeTableColumn<>("vlr. Bruto"));
+        getColVlrBruto().setPrefWidth(80);
+        getColVlrBruto().setStyle("-fx-alignment: center-right;");
+        getColVlrBruto().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
                 return new SimpleStringProperty(
-                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrPedidoProperty().getValue(), 2));
+                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrBrutoProperty().getValue(), 2));
             }
             return new SimpleStringProperty("");
         });
 
-        setColVlrDesc(new TreeTableColumn<>("vlr. Desc."));
-        getColVlrDesc().setPrefWidth(90);
-        getColVlrDesc().setStyle("-fx-alignment: center-right;");
-        getColVlrDesc().setCellValueFactory(cellData -> {
-            if (cellData.getValue().getValue() instanceof ContasAReceber)
+        setColVlrCredDeb(new TreeTableColumn<>("Cred/Déb"));
+        getColVlrCredDeb().setPrefWidth(60);
+        getColVlrCredDeb().setStyle("-fx-alignment: center-right;");
+        getColVlrCredDeb().setCellValueFactory(cellData -> {
+            if (cellData.getValue().getValue() instanceof ContasAReceber) {
                 return new SimpleStringProperty(
-                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrDescProperty().getValue(), 2));
+//                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).getRecebimentoList().stream()
+//                                .filter(recebimento -> recebimento.getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
+//                                        || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.DEBITO))
+//                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)
+//                                .setScale(2, RoundingMode.HALF_UP), 2));
+                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).getVlrCredDeb()
+                                .setScale(2, RoundingMode.HALF_UP), 2)
+                );
+            } else if (cellData.getValue().getValue() instanceof Recebimento) {
+                if (((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
+                        || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO)
+                        || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
+                        || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO))
+                    return new SimpleStringProperty(
+                            ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
+            }
             return new SimpleStringProperty("");
         });
 
-        setColValor(new TreeTableColumn("valor R$"));
-        getColValor().setPrefWidth(90);
-        getColValor().setStyle("-fx-alignment: center-right;");
-        getColValor().setCellValueFactory(cellData -> {
+        setColVlrLiquido(new TreeTableColumn("vlr Liq"));
+        getColVlrLiquido().setPrefWidth(80);
+        getColVlrLiquido().setStyle("-fx-alignment: center-right;");
+        getColVlrLiquido().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
                 return new SimpleStringProperty(
-                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).valorProperty().getValue(), 2));
+                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrLiquidoProperty().getValue(), 2));
             } else if (cellData.getValue().getValue() instanceof Recebimento) {
-                if (!((Recebimento) cellData.getValue().getValue()).getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                if (!((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
+                        && !((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO)
+                        && !((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
+                        && !((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO))
                     return new SimpleStringProperty(
                             ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
             }
@@ -264,14 +282,25 @@ public class TmodelPedido_Recibo_NFe {
         });
 
         setColValorPago(new TreeTableColumn("vlr pago R$"));
-        getColValorPago().setPrefWidth(90);
+        getColValorPago().setPrefWidth(80);
         getColValorPago().setStyle("-fx-alignment: center-right;");
         getColValorPago().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
                 return new SimpleStringProperty(
-                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).valorPagoProperty().getValue(), 2));
+                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).getRecebimentoList().stream()
+                                .filter(recebimento -> (!recebimento.getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
+                                        && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO)
+                                        && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
+                                        && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO))
+                                        && recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add), 2));
             } else if (cellData.getValue().getValue() instanceof Recebimento) {
-                if (((Recebimento) cellData.getValue().getValue()).getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                if (
+                        (!((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
+                                && !((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO)
+                                && !((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
+                                && !((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO))
+                                && ((Recebimento) cellData.getValue().getValue()).getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
                     return new SimpleStringProperty(
                             ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
             }
@@ -279,7 +308,7 @@ public class TmodelPedido_Recibo_NFe {
         });
 
         setColValorSaldo(new TreeTableColumn<>("saldo R$"));
-        getColValorSaldo().setPrefWidth(90);
+        getColValorSaldo().setPrefWidth(80);
         getColValorSaldo().setStyle("-fx-alignment: center-right;");
         getColValorSaldo().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
@@ -303,29 +332,44 @@ public class TmodelPedido_Recibo_NFe {
                 getaReceberFilteredList().stream()
 //                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == 64)
                         .forEach(aReceber -> {
-                            final BigDecimal[] vlrPago = {BigDecimal.ZERO};
-                            final BigDecimal[] vlrSaldo = {aReceber.valorProperty().getValue()};
+//                            final BigDecimal[] vlrCredDeb = {BigDecimal.ZERO};
+//                            final BigDecimal[] vlrPago = {BigDecimal.ZERO};
+//                            final BigDecimal[] vlrSaldo = {aReceber.valorProperty().getValue()};
                             TreeItem<Object> paiItem = new TreeItem(aReceber);
                             getPedidoTreeItem().getChildren().add(paiItem);
                             aReceber.getRecebimentoList().stream()
                                     .forEach(recebimento -> {
-                                        if (recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO)) {
-                                            vlrPago[0] = vlrPago[0].add(recebimento.valorProperty().getValue());
-                                            vlrSaldo[0] = vlrSaldo[0].subtract(recebimento.valorProperty().getValue());
-                                        }
                                         TreeItem<Object> filhoItem = new TreeItem(recebimento);
                                         paiItem.getChildren().add(filhoItem);
                                     });
-                            ((ContasAReceber) paiItem.getValue()).valorPagoProperty().setValue(vlrPago[0]);
-                            ((ContasAReceber) paiItem.getValue()).valorSaldoProperty().setValue(vlrSaldo[0]);
-                            ((ContasAReceber) paiItem.getValue()).vlrPedidoProperty().setValue(aReceber.getSaidaProduto().getSaidaProdutoProdutoList().stream()
-                                    .map(SaidaProdutoProduto::getVlrBruto).reduce(BigDecimal.ZERO, BigDecimal::add));
-                            ((ContasAReceber) paiItem.getValue()).vlrDescProperty().setValue(aReceber.getSaidaProduto().getSaidaProdutoProdutoList().stream()
-                                    .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add));
+                            ((ContasAReceber) paiItem.getValue()).vlrBrutoProperty().setValue(aReceber.valorProperty().getValue());
+
+                            ((ContasAReceber) paiItem.getValue()).vlrCredDebProperty().setValue(aReceber.getRecebimentoList().stream()
+                                    .filter(recebimento -> recebimento.getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
+                                            || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO)
+                                            || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
+                                            || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO))
+                                    .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add));
+
+                            ((ContasAReceber) paiItem.getValue()).vlrLiquidoProperty().setValue(((ContasAReceber) paiItem.getValue()).vlrBrutoProperty().getValue()
+                                    .subtract(((ContasAReceber) paiItem.getValue()).vlrCredDebProperty().getValue()));
+
+                            ((ContasAReceber) paiItem.getValue()).valorPagoProperty().setValue(aReceber.getRecebimentoList().stream()
+                                    .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO)
+                                            && (!recebimento.getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
+                                            && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO)
+                                            && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
+                                            && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO)))
+                                    .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add));
+
+                            ((ContasAReceber) paiItem.getValue()).valorSaldoProperty().setValue(((ContasAReceber) paiItem.getValue()).vlrLiquidoProperty().getValue()
+                                    .subtract(((ContasAReceber) paiItem.getValue()).valorPagoProperty().getValue()));
                         });
+
                 getTtvPedido().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda(),
-                        getColModalidade(), getColSituacao(), getColDtVencimento_DtPagamento(), getColVlrPedido(),
-                        getColVlrDesc(), getColValor(), getColValorPago(), getColValorSaldo());
+                        getColModalidade(), getColSituacao(), getColDtVencimento_DtPagamento(), getColVlrBruto(),
+                        getColVlrCredDeb(), getColVlrLiquido(), getColValorPago(), getColValorSaldo());
+
             } else if (gettModelTipo().equals(TModelTipo.PEDIDO_NFE)) {
                 getSaidaProdutoObservableList().stream()
                         .forEach(saidaProduto -> {
@@ -340,8 +384,8 @@ public class TmodelPedido_Recibo_NFe {
                                     });
                         });
                 getTtvPedido().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda(),
-                        getColModalidade(), getColSituacao(), getColDtVencimento_DtPagamento(), getColVlrPedido(),
-                        getColVlrDesc(), getColValor(), getColValorPago(), getColValorSaldo());
+                        getColModalidade(), getColSituacao(), getColDtVencimento_DtPagamento(), getColVlrBruto(),
+                        getColVlrCredDeb(), getColVlrLiquido(), getColValorPago(), getColValorSaldo());
             }
             getTtvPedido().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             getTtvPedido().setRoot(getPedidoTreeItem());
@@ -551,7 +595,7 @@ public class TmodelPedido_Recibo_NFe {
 
             setTotalContas(
                     getaReceberFilteredList().stream()
-                            .map(ContasAReceber::getVlrPedido)
+                            .map(ContasAReceber::getVlrBruto)
                             .reduce(BigDecimal.ZERO, BigDecimal::add)
             );
 
@@ -564,24 +608,24 @@ public class TmodelPedido_Recibo_NFe {
             setTotalContasRetiradas(
                     getaReceberFilteredList().stream()
                             .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) == 0)
-                            .map(ContasAReceber::getVlrPedido)
+                            .map(ContasAReceber::getVlrBruto)
                             .reduce(BigDecimal.ZERO, BigDecimal::add)
             );
 
-            setQtdContasDescontos(
-                    (int) getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-                                    && aReceber.vlrDescProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-                            .count()
-            );
-
-            setTotalContasDescontos(
-                    getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-                                    && aReceber.vlrDescProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-                            .map(ContasAReceber::getVlrDesc)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            );
+//            setQtdContasDescontos(
+//                    (int) getaReceberFilteredList().stream()
+//                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+//                                    && aReceber.vlrDescProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+//                            .count()
+//            );
+//
+//            setTotalContasDescontos(
+//                    getaReceberFilteredList().stream()
+//                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+//                                    && aReceber.vlrDescProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+//                            .map(ContasAReceber::getVlrDesc)
+//                            .reduce(BigDecimal.ZERO, BigDecimal::add)
+//            );
 
             setTotalLucroBruto(getaReceberFilteredList().stream()
                     .map(ContasAReceber::getSaidaProduto)
@@ -647,14 +691,14 @@ public class TmodelPedido_Recibo_NFe {
 
             setQtdContasVencidas(
                     (int) getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                            .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) != 0
                                     && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
                             .count()
             );
 
             setTotalContasVencidas(
                     getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                            .filter(aReceber -> aReceber.valorSaldoProperty().getValue().compareTo(BigDecimal.ZERO) != 0
                                     && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
                             .map(ContasAReceber::getValorSaldo)
                             .reduce(BigDecimal.ZERO, BigDecimal::add)
@@ -731,7 +775,6 @@ public class TmodelPedido_Recibo_NFe {
     /**
      * Begin Getters e Setters
      */
-
 
     public TablePosition getTp() {
         return tp;
@@ -921,28 +964,28 @@ public class TmodelPedido_Recibo_NFe {
         this.colDtVencimento_DtPagamento = colDtVencimento_DtPagamento;
     }
 
-    public TreeTableColumn<Object, String> getColVlrPedido() {
-        return colVlrPedido;
+    public TreeTableColumn<Object, String> getColVlrBruto() {
+        return colVlrBruto;
     }
 
-    public void setColVlrPedido(TreeTableColumn<Object, String> colVlrPedido) {
-        this.colVlrPedido = colVlrPedido;
+    public void setColVlrBruto(TreeTableColumn<Object, String> colVlrBruto) {
+        this.colVlrBruto = colVlrBruto;
     }
 
-    public TreeTableColumn<Object, String> getColVlrDesc() {
-        return colVlrDesc;
+    public TreeTableColumn<Object, String> getColVlrCredDeb() {
+        return colVlrCredDeb;
     }
 
-    public void setColVlrDesc(TreeTableColumn<Object, String> colVlrDesc) {
-        this.colVlrDesc = colVlrDesc;
+    public void setColVlrCredDeb(TreeTableColumn<Object, String> colVlrCredDeb) {
+        this.colVlrCredDeb = colVlrCredDeb;
     }
 
-    public TreeTableColumn<Object, String> getColValor() {
-        return colValor;
+    public TreeTableColumn<Object, String> getColVlrLiquido() {
+        return colVlrLiquido;
     }
 
-    public void setColValor(TreeTableColumn<Object, String> colValor) {
-        this.colValor = colValor;
+    public void setColVlrLiquido(TreeTableColumn<Object, String> colVlrLiquido) {
+        this.colVlrLiquido = colVlrLiquido;
     }
 
     public TreeTableColumn<Object, String> getColValorPago() {

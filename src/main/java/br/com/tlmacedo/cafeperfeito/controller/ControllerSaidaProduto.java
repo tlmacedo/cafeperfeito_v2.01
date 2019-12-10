@@ -339,27 +339,53 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
                             if (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
                                     .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0) {
-                                boolean utilizaCredito = false;
-                                BigDecimal credito = BigDecimal.ZERO;
-                                if ((credito = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2)).compareTo(BigDecimal.ZERO) < 0) {
+                                boolean usarCredDeb = false;
+                                BigDecimal credDeb = BigDecimal.ZERO;
+                                if ((credDeb = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2)).compareTo(BigDecimal.ZERO) < 0) {
+                                    System.out.printf("0credDeb:[%s]\ngetMoeda:[%s]\n\n", credDeb, ServiceMascara.getMoeda(credDeb, 2));
                                     setAlertMensagem(new ServiceAlertMensagem());
                                     getAlertMensagem().setCabecalho("Crédito disponível");
-                                    getAlertMensagem().setContentText(String.format("o Cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
-                                            ServiceMascara.getMoeda(credito, 2)));
+                                    getAlertMensagem().setContentText(String.format("o cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
+                                            ServiceMascara.getMoeda((credDeb.multiply(new BigDecimal("-1."))), 2)));
                                     getAlertMensagem().setStrIco("");
                                     ButtonType btnResult;
                                     if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
                                         return;
-                                    utilizaCredito = (btnResult == ButtonType.YES);
+                                    usarCredDeb = (btnResult == ButtonType.YES);
+                                } else if (credDeb.compareTo(BigDecimal.ZERO) > 0) {
+                                    System.out.printf("1credDeb:[%s]\ngetMoeda:[%s]\n\n", credDeb, ServiceMascara.getMoeda(credDeb, 2));
+                                    setAlertMensagem(new ServiceAlertMensagem());
+                                    getAlertMensagem().setCabecalho("Débito detectado");
+                                    getAlertMensagem().setContentText(String.format("o cliente tem um dédito de R$ %s\ndeseja acrescentar esse valor no pedido atual?",
+                                            ServiceMascara.getMoeda((credDeb.multiply(new BigDecimal("-1."))), 2)));
+                                    getAlertMensagem().setStrIco("");
+                                    ButtonType btnResult;
+                                    if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
+                                        return;
+                                    usarCredDeb = (btnResult == ButtonType.YES);
+
                                 } else {
-                                    credito = BigDecimal.ZERO;
+                                    credDeb = BigDecimal.ZERO;
                                 }
 
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
-                                    if (utilizaCredito) {
-                                        baixaCredito(credito);
-                                        getContasAReceber().getRecebimentoList().add(addRecebimento(getContasAReceber(), PagamentoModalidade.CREDITO, credito));
+                                    if (usarCredDeb) {
+                                        try {
+                                            getContasAReceberDAO().transactionBegin();
+                                            baixaCredito(credDeb);
+                                            PagamentoModalidade tipBaixa = null;
+                                            if (credDeb.compareTo(BigDecimal.ZERO) < 0)
+                                                tipBaixa = PagamentoModalidade.CREDITO;
+                                            else if (credDeb.compareTo(BigDecimal.ZERO) > 0)
+                                                tipBaixa = PagamentoModalidade.DEBITO;
+                                            getContasAReceber().getRecebimentoList().add(addRecebimento(getContasAReceber(), tipBaixa, credDeb));
+                                            getContasAReceberDAO().transactionCommit();
+                                        } catch (Exception ex) {
+                                            getContasAReceberDAO().transactionRollback();
+                                            ex.printStackTrace();
+                                        }
                                     }
+
                                     new ViewRecebimento().openViewRecebimento(getContasAReceber());
 
                                     if (getSaidaProdutoNfe() != null) {
@@ -955,27 +981,39 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private void baixaCredito(BigDecimal vlrCredito) throws Exception {
-        final BigDecimal[] vlrCreditoABaixar = {vlrCredito};
+        final BigDecimal[] vlrCreditoDebitoABaixar = {vlrCredito};
         getContasAReceberObservableList().stream()
                 .sorted(Comparator.comparing(ContasAReceber::getDtCadastro))
                 .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresaProperty().getValue().idProperty().getValue()
                         && aReceber.getRecebimentoList().stream()
                         .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
                         .map(Recebimento::getValor)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add).compareTo(aReceber.valorProperty().getValue()) > 0)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add).compareTo(aReceber.valorProperty().getValue()) != 0)
                 .forEach(aReceber -> {
-                    if (vlrCreditoABaixar[0].compareTo(BigDecimal.ZERO) < 0) {
+                    if (vlrCreditoDebitoABaixar[0].compareTo(BigDecimal.ZERO) < 0) {
                         BigDecimal saldoConta = aReceber.valorProperty().getValue().subtract(aReceber.getRecebimentoList().stream()
                                 .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
                                 .map(Recebimento::getValor)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add));
-                        aReceber.getRecebimentoList().add(addRecebimento(aReceber, PagamentoModalidade.CREDITO_BAIXA, saldoConta));
+                        aReceber.getRecebimentoList().add(addRecebimento(aReceber, PagamentoModalidade.BAIXA_CREDITO, saldoConta));
                         try {
-                            aReceber = null;//getTmodelSaidaProduto().getSaidaProdutoDAO().setTransactionPersist(aReceber);
+                            aReceber = getContasAReceberDAO().setTransactionPersist(aReceber);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        vlrCreditoABaixar[0] = vlrCreditoABaixar[0].add(saldoConta);
+                        vlrCreditoDebitoABaixar[0] = vlrCreditoDebitoABaixar[0].add(saldoConta);
+                    } else if (vlrCreditoDebitoABaixar[0].compareTo(BigDecimal.ZERO) > 0) {
+                        BigDecimal saldoConta = aReceber.valorProperty().getValue().subtract(aReceber.getRecebimentoList().stream()
+                                .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                .map(Recebimento::getValor)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add));
+                        aReceber.getRecebimentoList().add(addRecebimento(aReceber, PagamentoModalidade.BAIXA_DEBITO, saldoConta));
+                        try {
+                            aReceber = getContasAReceberDAO().setTransactionPersist(aReceber);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        vlrCreditoDebitoABaixar[0] = vlrCreditoDebitoABaixar[0].subtract(saldoConta);
                     }
                 });
     }
@@ -1261,14 +1299,33 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private Recebimento addRecebimento(ContasAReceber aReceber, PagamentoModalidade modalidade, BigDecimal vlr) {
         Recebimento recebimento = new Recebimento();
         recebimento.setaReceber(aReceber);
-        recebimento.setPagamentoSituacao(PagamentoSituacao.QUITADO);
+        recebimento.setPagamentoModalidade(modalidade);
+        if (modalidade.getDescricao().toLowerCase().contains("baixa"))
+            recebimento.setPagamentoSituacao(PagamentoSituacao.QUITADO);
+        else
+            recebimento.setPagamentoSituacao(PagamentoSituacao.PENDENTE);
         String codDocRecebimento =
                 ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class, getDtpDtSaida().getValue());
-        recebimento.documentoProperty().setValue(String.format("UC%s", codDocRecebimento));
-        recebimento.setPagamentoModalidade(modalidade);
         recebimento.valorProperty().setValue(vlr);
-        if (modalidade.equals(PagamentoModalidade.CREDITO))
-            recebimento.valorProperty().setValue(vlr.multiply(new BigDecimal("-1.0")));
+
+
+        switch (modalidade) {
+            case CREDITO:
+                recebimento.valorProperty().setValue(vlr.multiply(new BigDecimal("-1.0")));
+            case BAIXA_CREDITO:
+                recebimento.setPagamentoSituacao(PagamentoSituacao.QUITADO);
+                recebimento.documentoProperty().setValue(String.format("UC%s", codDocRecebimento));
+                break;
+
+            case DEBITO:
+                recebimento.valorProperty().setValue(vlr.multiply(new BigDecimal("-1.0")));
+            case BAIXA_DEBITO:
+                recebimento.documentoProperty().setValue(String.format("UD%s", codDocRecebimento));
+            default:
+                recebimento.documentoProperty().setValue(codDocRecebimento);
+                break;
+        }
+
         recebimento.setUsuarioPagamento(UsuarioLogado.getUsuario());
         recebimento.dtPagamentoProperty().setValue(LocalDate.now());
         recebimento.setUsuarioCadastro(UsuarioLogado.getUsuario());

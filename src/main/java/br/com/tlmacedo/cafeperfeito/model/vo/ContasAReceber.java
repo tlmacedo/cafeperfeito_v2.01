@@ -29,8 +29,9 @@ public class ContasAReceber implements Serializable {
 
     private List<Recebimento> recebimentoList = new ArrayList<>();
 
-    private ObjectProperty<BigDecimal> vlrPedido = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrDesc = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrCredDeb = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> valorPago = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> valorSaldo = new SimpleObjectProperty<>();
 
@@ -129,29 +130,42 @@ public class ContasAReceber implements Serializable {
     }
 
     @Transient
-    public BigDecimal getVlrPedido() {
-        return vlrPedido.get();
+    public BigDecimal getVlrBruto() {
+        return vlrBruto.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrPedidoProperty() {
-        return vlrPedido;
+    public ObjectProperty<BigDecimal> vlrBrutoProperty() {
+        return vlrBruto;
     }
 
-    public void setVlrPedido(BigDecimal vlrPedido) {
-        this.vlrPedido.set(vlrPedido);
+    public void setVlrBruto(BigDecimal vlrBruto) {
+        this.vlrBruto.set(vlrBruto);
     }
 
     @Transient
-    public BigDecimal getVlrDesc() {
-        return vlrDesc.get();
+    public BigDecimal getVlrCredDeb() {
+        return vlrCredDeb.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrDescProperty() {
-        return vlrDesc;
+    public ObjectProperty<BigDecimal> vlrCredDebProperty() {
+        return vlrCredDeb;
     }
 
-    public void setVlrDesc(BigDecimal vlrDesc) {
-        this.vlrDesc.set(vlrDesc);
+    public void setVlrCredDeb(BigDecimal vlrCredDeb) {
+        this.vlrCredDeb.set(vlrCredDeb);
+    }
+
+    @Transient
+    public BigDecimal getVlrLiquido() {
+        return vlrLiquido.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrLiquidoProperty() {
+        return vlrLiquido;
+    }
+
+    public void setVlrLiquido(BigDecimal vlrLiquido) {
+        this.vlrLiquido.set(vlrLiquido);
     }
 
     @Transient
@@ -189,8 +203,9 @@ public class ContasAReceber implements Serializable {
                 ", valor=" + valor +
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
-                ", vlrPedido=" + vlrPedido +
-                ", vlrDesc=" + vlrDesc +
+                ", vlrBruto=" + vlrBruto +
+                ", vlrCredDeb=" + vlrCredDeb +
+                ", vlrLiquido=" + vlrLiquido +
                 ", valorPago=" + valorPago +
                 ", valorSaldo=" + valorSaldo +
                 '}';
