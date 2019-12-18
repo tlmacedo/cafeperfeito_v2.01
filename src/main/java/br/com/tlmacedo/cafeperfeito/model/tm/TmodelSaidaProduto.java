@@ -33,15 +33,14 @@ public class TmodelSaidaProduto {
     private TablePosition tp;
     private TextField txtPesquisa;
     private TableView<SaidaProdutoProduto> tvSaidaProdutoProduto;
-    private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList;// = FXCollections.observableArrayList();
+    private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList;
     private ObservableList<TipoSaidaProduto> tipoSaidaObservableList = FXCollections.observableArrayList();
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
-    private SaidaProduto saidaProduto;// = new SaidaProduto();
+    private SaidaProduto saidaProduto;
+    //private ObjectProperty<DatePicker> dtpDtSaida, dtpDtVencimento;
     private ObjectProperty<DatePicker> dtpDtSaida = new SimpleObjectProperty<>(), dtpDtVencimento = new SimpleObjectProperty<>();
-    //    private SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
     private ProdutoEstoqueDAO produtoEstoqueDAO = new ProdutoEstoqueDAO();
     private FichaKardexDAO fichaKardexDAO = new FichaKardexDAO();
-//    private RecebimentoDAO recebimentoDAO = new RecebimentoDAO();
 
     private TableColumn<SaidaProdutoProduto, String> colId;
     private TableColumn<SaidaProdutoProduto, String> colProdId;
@@ -311,6 +310,7 @@ public class TmodelSaidaProduto {
     }
 
     public void calculaDescontoCliente() {
+        System.out.printf("empresaProperty()-desconto: [%s]\n", empresaProperty().getValue());
         if (empresaProperty().getValue() == null) return;
         getSaidaProdutoProdutoObservableList().stream()
                 .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd))

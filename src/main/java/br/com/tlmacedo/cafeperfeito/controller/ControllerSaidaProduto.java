@@ -286,7 +286,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                     .findFirst().orElse(null) == null) {
                 getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoEscolhido, TipoSaidaProduto.VENDA, 1));
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().fireEvent(ServiceComandoTecladoMouse.pressTecla(KeyCode.F8));
-                if (getTmodelSaidaProduto().empresaProperty().getValue() != null)
+                System.out.printf("empresaProperty().getValue(): [%s]\n", empresaProperty().getValue());
+                if (empresaProperty().getValue() != null)
                     getTmodelSaidaProduto().calculaDescontoCliente();
             } else {
                 for (int i = 0; i < getSaidaProdutoProdutoObservableList().size(); i++) {
@@ -341,6 +342,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0) {
                                 boolean usarCredDeb = false;
                                 BigDecimal credDeb = BigDecimal.ZERO;
+                                System.out.printf("getLblLimiteUtilizado().getText(): [%s]\n\n", getLblLimiteUtilizado().getText());
                                 if ((credDeb = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2)).compareTo(BigDecimal.ZERO) < 0) {
                                     System.out.printf("0credDeb:[%s]\ngetMoeda:[%s]\n\n", credDeb, ServiceMascara.getMoeda(credDeb, 2));
                                     setAlertMensagem(new ServiceAlertMensagem());
@@ -363,7 +365,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
                                         return;
                                     usarCredDeb = (btnResult == ButtonType.YES);
-
                                 } else {
                                     credDeb = BigDecimal.ZERO;
                                 }
@@ -463,23 +464,25 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 //            showStatusBar();
 //        });
 
+
         empresaProperty().bind(Bindings.createObjectBinding(() -> {
                     if (getCboEmpresa().getValue() == null)
-                        return new Empresa();
+                        return getEmpresaObservableList().get(0);
                     return getCboEmpresa().getValue();
                 }, getCboEmpresa().valueProperty())
         );
 
         empresaProperty().addListener((ov, o, n) -> {
+            System.out.printf("newValue0001: [%s]\n", n);
             getDtpDtSaida().setValue(LocalDate.now());
             getTmodelSaidaProduto().empresaProperty().setValue(n);
 //            if (n == null) {
 //                empresaProperty().setValue(getEmpresaObservableList().get(0));
 //                return;
 //            }
-
             getLblLimite().setText(ServiceMascara.getMoeda(n.limiteProperty().getValue(), 2));
             getLblLimiteUtilizado().setText(ServiceMascara.getMoeda(n.limiteUtilizadoProperty().getValue(), 2));
+            System.out.printf("newLimiteUtilizado: [%s]\n", getLblLimiteUtilizado().getText());
 
             getTmodelSaidaProduto().prazoProperty().setValue(n.prazoProperty().getValue());
 
@@ -713,7 +716,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 getTmodelSaidaProduto().setTxtPesquisa(getTxtPesquisa());
                                 getTmodelSaidaProduto().setDtpDtSaida(getDtpDtSaida());
                                 getTmodelSaidaProduto().setDtpDtVencimento(getDtpDtVencimento());
-                                getTmodelSaidaProduto().empresaProperty().setValue(empresaProperty().getValue());
+//                                empresaProperty().setValue(getTmodelSaidaProduto().empresaProperty().getValue());
+                                getTmodelSaidaProduto().setEmpresa(empresaProperty().getValue());
                                 getTmodelSaidaProduto().setSaidaProduto(getSaidaProduto());
                                 getTmodelSaidaProduto().setSaidaProdutoProdutoObservableList(getSaidaProdutoProdutoObservableList());
 //                                setSaidaProduto(getTmodelSaidaProduto().getSaidaProduto());
@@ -844,7 +848,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private void limpaCampos(AnchorPane anchorPane) {
         ServiceCampoPersonalizado.fieldClear(anchorPane);
         if (anchorPane == getPainelViewSaidaProduto()) {
-            getCboEmpresa().getEditor().clear();
+            getCboEmpresa().getSelectionModel().select(0);
             getCboEmpresa().requestFocus();
             getTmodelSaidaProduto().limpaCampos();
         }
@@ -1042,14 +1046,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     public boolean salvarSaidaProduto() {
         try {
             getSaidaProdutoDAO().transactionBegin();
+            getContasAReceberDAO().transactionBegin();
             if (getContasAReceber() == null)
                 setContasAReceber(new ContasAReceber());
-            setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
-            getSaidaProdutoDAO().transactionCommit();
-            getContasAReceber().setSaidaProduto(getSaidaProduto());
 
             if (getTmodelSaidaProduto().baixarEstoque()) {
-                getContasAReceberDAO().transactionBegin();
 //                if (getContasAReceber() == null)
 //                    setContasAReceber(new ContasAReceber());
 
@@ -1060,16 +1061,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 getContasAReceber().setUsuarioCadastro(UsuarioLogado.getUsuario());
                 getContasAReceber().setSaidaProduto(getSaidaProduto());
 
-                setContasAReceber(getContasAReceberDAO().setTransactionPersist(getContasAReceber()));
-
-                getSaidaProduto().setContasAReceber(getContasAReceber());
-
-                getContasAReceberDAO().transactionCommit();
-
                 if (getTpnNfe().isExpanded())
                     if (!guardarNfe())
                         throw new RuntimeException();
             }
+            setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
+            getSaidaProdutoDAO().transactionCommit();
+
+            getContasAReceber().setSaidaProduto(getSaidaProduto());
+            setContasAReceber(getContasAReceberDAO().setTransactionPersist(getContasAReceber()));
+
+            getContasAReceberDAO().transactionCommit();
         } catch (Exception ex) {
             getContasAReceberDAO().transactionRollback();
             getSaidaProdutoDAO().transactionRollback();

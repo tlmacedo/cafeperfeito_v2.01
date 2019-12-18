@@ -597,6 +597,9 @@ public class TmodelPedido_Recibo_NFe {
                     getaReceberFilteredList().stream()
                             .map(ContasAReceber::getVlrBruto)
                             .reduce(BigDecimal.ZERO, BigDecimal::add)
+                            .subtract(getaReceberFilteredList().stream()
+                                    .map(ContasAReceber::getVlrCredDeb)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add))
             );
 
             setQtdContasRetiradas(
@@ -612,20 +615,26 @@ public class TmodelPedido_Recibo_NFe {
                             .reduce(BigDecimal.ZERO, BigDecimal::add)
             );
 
-//            setQtdContasDescontos(
-//                    (int) getaReceberFilteredList().stream()
-//                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-//                                    && aReceber.vlrDescProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-//                            .count()
-//            );
-//
-//            setTotalContasDescontos(
-//                    getaReceberFilteredList().stream()
-//                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-//                                    && aReceber.vlrDescProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-//                            .map(ContasAReceber::getVlrDesc)
-//                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-//            );
+            setQtdContasDescontos(
+                    (int) getaReceberFilteredList().stream()
+                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                    && aReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
+                                    .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add)
+                                    .compareTo(BigDecimal.ZERO) > 0)
+                            .count()
+            );
+
+            setTotalContasDescontos(
+                    getaReceberFilteredList().stream()
+                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                    && aReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
+                                    .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add)
+                                    .compareTo(BigDecimal.ZERO) > 0)
+                            .map(ContasAReceber::getSaidaProduto).map(SaidaProduto::getSaidaProdutoProdutoList)
+                            .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream().map(SaidaProdutoProduto::getVlrDesconto)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add))
+                            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            );
 
             setTotalLucroBruto(getaReceberFilteredList().stream()
                     .map(ContasAReceber::getSaidaProduto)
