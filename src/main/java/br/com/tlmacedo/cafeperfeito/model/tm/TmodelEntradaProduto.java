@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 
-public class TmodelSaidaProduto {
+public class TmodelEntradaProduto {
 
     private TablePosition tp;
     private TextField txtPesquisa;
@@ -71,7 +71,7 @@ public class TmodelSaidaProduto {
     private IntegerProperty lucroQtdSaida = new SimpleIntegerProperty(0);
 
 
-    public TmodelSaidaProduto() {
+    public TmodelEntradaProduto() {
     }
 
     /**

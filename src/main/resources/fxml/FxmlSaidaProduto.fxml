@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="painelViewSaidaProduto" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
             minWidth="-Infinity" prefHeight="780.0" prefWidth="1350.0" stylesheets="@../style/css/cafeperfeito.css"
-            xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/12.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="br.com.tlmacedo.cafeperfeito.controller.ControllerSaidaProduto">
     <children>
         <TitledPane fx:id="tpnCliente" animated="false" collapsible="false" layoutX="5.0" layoutY="5.0" minHeight="0.0"
@@ -130,7 +130,8 @@
                         </VBox>
                         <VBox alignment="CENTER_LEFT" layoutX="870.0" layoutY="5.0" prefWidth="80.0">
                             <children>
-                                <Label prefWidth="400.0" styleClass="float" text="Últ. pedido">
+                                <Label fx:id="labelUltimoPedidoDt" prefWidth="400.0" styleClass="float"
+                                       text="Últ. pedido">
                                     <padding>
                                         <Insets left="5.0"/>
                                     </padding>

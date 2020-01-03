@@ -26,8 +26,7 @@ public class TmodelProduto {
     private Label lblRegistrosLocalizados;
     private TextField txtPesquisa;
     private TreeTableView<Produto> ttvProduto;
-    private ProdutoDAO produtoDAO = new ProdutoDAO();
-    private ObservableList<Produto> produtoObservableList = FXCollections.observableArrayList(getProdutoDAO().getAll(Produto.class, null, "descricao"));
+    private ObservableList<Produto> produtoObservableList = FXCollections.observableArrayList(new ProdutoDAO().getAll(Produto.class, null, "descricao"));
     private FilteredList<Produto> produtoFilteredList = new FilteredList<>(getProdutoObservableList());
 
     private TreeItem<Produto> produtoTreeItem;
@@ -246,11 +245,10 @@ public class TmodelProduto {
         ));
     }
 
-//    public void atualizarProdutos() {
-//        //System.out.printf("getProdutoDAO(): [%s]\n" ,getProdutoDAO().getAll(Produto.class, null,  "descricao"));
-//        getProdutoObservableList().setAll(getProdutoDAO().getAll(Produto.class, null,  "descricao"));
-//        getTtvProduto().refresh();
-//    }
+    public void atualizarProdutos() {
+        getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, "descricao"));
+        getTtvProduto().refresh();
+    }
 
     /**
      * END Voids
@@ -391,22 +389,6 @@ public class TmodelProduto {
     public void setColValidade(TreeTableColumn<Produto, String> colValidade) {
         this.colValidade = colValidade;
     }
-
-    public ProdutoDAO getProdutoDAO() {
-        return produtoDAO;
-    }
-
-    public void setProdutoDAO(ProdutoDAO produtoDAO) {
-        this.produtoDAO = produtoDAO;
-    }
-
-    //    public TreeTableColumn<Produto, String> getColEstoqueId() {
-//        return colEstoqueId;
-//    }
-//
-//    public void setColEstoqueId(TreeTableColumn<Produto, String> colEstoqueId) {
-//        this.colEstoqueId = colEstoqueId;
-//    }
 
     /**
      * END Gets and Setters
