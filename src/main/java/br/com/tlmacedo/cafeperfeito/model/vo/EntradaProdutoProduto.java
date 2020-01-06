@@ -1,10 +1,8 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
+import br.com.tlmacedo.cafeperfeito.model.enums.TipoCodigoCFOP;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,41 +22,44 @@ public class EntradaProdutoProduto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
+    private ObjectProperty<EntradaProduto> entradaProduto = new SimpleObjectProperty<>();
+    private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
     private StringProperty codigo = new SimpleStringProperty();
     private StringProperty descricao = new SimpleStringProperty();
+    private TipoCodigoCFOP codigoCFOP;
     private StringProperty lote = new SimpleStringProperty();
-    private ObjectProperty<LocalDate> validade = new SimpleObjectProperty<>();
-    private IntegerProperty qtd = new SimpleIntegerProperty(0);
-    private ObjectProperty<BigDecimal> vlrFabrica = new SimpleObjectProperty<>(BigDecimal.ZERO);
-    private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>(BigDecimal.ZERO);
-    private ObjectProperty<BigDecimal> vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO);
-    private ObjectProperty<BigDecimal> vlrImposto = new SimpleObjectProperty<>(BigDecimal.ZERO);
-    private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
-    private IntegerProperty estoque = new SimpleIntegerProperty(0);
-    private IntegerProperty varejo = new SimpleIntegerProperty(0);
-    private IntegerProperty volume = new SimpleIntegerProperty(0);
+    private ObjectProperty<LocalDate> dtValidade = new SimpleObjectProperty<>();
 
-    private Produto produto;
+    private IntegerProperty qtd = new SimpleIntegerProperty();
+    private ObjectProperty<BigDecimal> vlrUnitario = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrDesconto = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrImposto = new SimpleObjectProperty<>();
+
+    private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>();
+    private IntegerProperty estoque = new SimpleIntegerProperty();
+    private IntegerProperty varejo = new SimpleIntegerProperty();
+    private IntegerProperty volume = new SimpleIntegerProperty();
 
     public EntradaProdutoProduto() {
     }
 
-    public EntradaProdutoProduto(Produto produto) {
-        this.codigo = new SimpleStringProperty(produto.codigoProperty().getValue());
-        this.descricao = new SimpleStringProperty(produto.getDescricao());
-        this.lote = new SimpleStringProperty("");
-        this.validade = new SimpleObjectProperty<LocalDate>(LocalDate.now());
-        this.qtd = new SimpleIntegerProperty(1);
-        this.vlrFabrica = new SimpleObjectProperty<>(produto.precoCompraProperty().getValue().setScale(2));
-        this.vlrBruto = new SimpleObjectProperty<>(produto.precoCompraProperty().getValue().setScale(2));
-        this.vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
-        this.vlrImposto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
-        this.vlrLiquido = new SimpleObjectProperty<>(produto.precoCompraProperty().getValue().setScale(2));
-        this.estoque = new SimpleIntegerProperty(produto.tblEstoqueProperty().getValue());
-        this.varejo = new SimpleIntegerProperty(produto.getVarejo());
-        this.volume = new SimpleIntegerProperty(1);
-        this.produto = new ProdutoDAO().getById(Produto.class, produto.getId());
-    }
+//    public EntradaProdutoProduto(Produto produto) {
+//        this.codigo = new SimpleStringProperty(produto.codigoProperty().getValue());
+//        this.descricao = new SimpleStringProperty(produto.getDescricao());
+//        this.lote = new SimpleStringProperty("");
+//        this.validade = new SimpleObjectProperty<LocalDate>(LocalDate.now());
+//        this.qtd = new SimpleIntegerProperty(1);
+//        this.vlrFabrica = new SimpleObjectProperty<>(produto.precoCompraProperty().getValue().setScale(2));
+//        this.vlrBruto = new SimpleObjectProperty<>(produto.precoCompraProperty().getValue().setScale(2));
+//        this.vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
+//        this.vlrImposto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
+//        this.vlrLiquido = new SimpleObjectProperty<>(produto.precoCompraProperty().getValue().setScale(2));
+//        this.estoque = new SimpleIntegerProperty(produto.tblEstoqueProperty().getValue());
+//        this.varejo = new SimpleIntegerProperty(produto.getVarejo());
+//        this.volume = new SimpleIntegerProperty(1);
+//        this.produto = new ProdutoDAO().getById(Produto.class, produto.getId());
+//    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,6 +73,33 @@ public class EntradaProdutoProduto implements Serializable {
 
     public void setId(long id) {
         this.id.set(id);
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public EntradaProduto getEntradaProduto() {
+        return entradaProduto.get();
+    }
+
+    public ObjectProperty<EntradaProduto> entradaProdutoProperty() {
+        return entradaProduto;
+    }
+
+    public void setEntradaProduto(EntradaProduto entradaProduto) {
+        this.entradaProduto.set(entradaProduto);
+    }
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Produto getProduto() {
+        return produto.get();
+    }
+
+    public ObjectProperty<Produto> produtoProperty() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto.set(produto);
     }
 
     @Column(length = 15, nullable = false)
@@ -100,95 +128,104 @@ public class EntradaProdutoProduto implements Serializable {
         this.descricao.set(descricao);
     }
 
+    @Enumerated(EnumType.ORDINAL)
+    public TipoCodigoCFOP getCodigoCFOP() {
+        return codigoCFOP;
+    }
+
+    public void setCodigoCFOP(TipoCodigoCFOP codigoCFOP) {
+        this.codigoCFOP = codigoCFOP;
+    }
+
     @Column(length = 15, nullable = false)
     public String getLote() {
         return lote.get();
-    }
-
-    public void setLote(String lote) {
-        this.lote.set(lote);
     }
 
     public StringProperty loteProperty() {
         return lote;
     }
 
-    @Column(nullable = false)
-    public LocalDate getValidade() {
-        return validade.get() != null ? validade.get() : LocalDate.now();
+    public void setLote(String lote) {
+        this.lote.set(lote);
     }
 
-    public void setValidade(LocalDate validade) {
-        this.validade.set(validade);
+
+    public LocalDate getDtValidade() {
+        return dtValidade.get();
     }
 
-    public ObjectProperty<LocalDate> validadeProperty() {
-        return validade;
+    public ObjectProperty<LocalDate> dtValidadeProperty() {
+        return dtValidade;
     }
 
-    @Column(length = 4, nullable = false)
+    public void setDtValidade(LocalDate dtValidade) {
+        this.dtValidade.set(dtValidade);
+    }
+
+    @Column(length = 5, nullable = false)
     public int getQtd() {
         return qtd.get();
-    }
-
-    public void setQtd(int qtd) {
-        this.qtd.set(qtd);
     }
 
     public IntegerProperty qtdProperty() {
         return qtd;
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
-    public BigDecimal getVlrFabrica() {
-        return vlrFabrica.get();
+    public void setQtd(int qtd) {
+        this.qtd.set(qtd);
     }
 
-    public void setVlrFabrica(BigDecimal vlrFabrica) {
-        this.vlrFabrica.set(vlrFabrica);
+    @Column(length = 19, scale = 4, nullable = false)
+    public BigDecimal getVlrUnitario() {
+        return vlrUnitario.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrFabricaProperty() {
-        return vlrFabrica;
+    public ObjectProperty<BigDecimal> vlrUnitarioProperty() {
+        return vlrUnitario;
     }
 
-    @Transient
+    public void setVlrUnitario(BigDecimal vlrUnitario) {
+        this.vlrUnitario.set(vlrUnitario);
+    }
+
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getVlrBruto() {
         return vlrBruto.get();
-    }
-
-    public void setVlrBruto(BigDecimal vlrBruto) {
-        this.vlrBruto.set(vlrBruto);
     }
 
     public ObjectProperty<BigDecimal> vlrBrutoProperty() {
         return vlrBruto;
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
-    public BigDecimal getVlrDesconto() {
-        return vlrDesconto.get();
+    public void setVlrBruto(BigDecimal vlrBruto) {
+        this.vlrBruto.set(vlrBruto);
     }
 
-    public void setVlrDesconto(BigDecimal vlrDesconto) {
-        this.vlrDesconto.set(vlrDesconto);
+    @Column(length = 19, scale = 4, nullable = false)
+    public BigDecimal getVlrDesconto() {
+        return vlrDesconto.get();
     }
 
     public ObjectProperty<BigDecimal> vlrDescontoProperty() {
         return vlrDesconto;
     }
 
-    @Column(length = 19, scale = 2, nullable = false)
+    public void setVlrDesconto(BigDecimal vlrDesconto) {
+        this.vlrDesconto.set(vlrDesconto);
+    }
+
+    @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getVlrImposto() {
         return vlrImposto.get();
     }
 
-    public void setVlrImposto(BigDecimal vlrImposto) {
-        this.vlrImposto.set(vlrImposto);
-    }
-
     public ObjectProperty<BigDecimal> vlrImpostoProperty() {
         return vlrImposto;
+    }
+
+    public void setVlrImposto(BigDecimal vlrImposto) {
+        this.vlrImposto.set(vlrImposto);
     }
 
     @Transient
@@ -196,38 +233,38 @@ public class EntradaProdutoProduto implements Serializable {
         return vlrLiquido.get();
     }
 
-    public void setVlrLiquido(BigDecimal vlrLiquido) {
-        this.vlrLiquido.set(vlrLiquido);
-    }
-
     public ObjectProperty<BigDecimal> vlrLiquidoProperty() {
         return vlrLiquido;
     }
 
-    @Column(length = 4, nullable = false)
-    public int getEstoque() {
-        return estoque.get();
+    public void setVlrLiquido(BigDecimal vlrLiquido) {
+        this.vlrLiquido.set(vlrLiquido);
     }
 
-    public void setEstoque(int estoque) {
-        this.estoque.set(estoque);
+    @Transient
+    public int getEstoque() {
+        return estoque.get();
     }
 
     public IntegerProperty estoqueProperty() {
         return estoque;
     }
 
-    @Column(length = 2, nullable = false)
+    public void setEstoque(int estoque) {
+        this.estoque.set(estoque);
+    }
+
+    @Transient
     public int getVarejo() {
         return varejo.get();
     }
 
-    public void setVarejo(int varejo) {
-        this.varejo.set(varejo);
-    }
-
     public IntegerProperty varejoProperty() {
         return varejo;
+    }
+
+    public void setVarejo(int varejo) {
+        this.varejo.set(varejo);
     }
 
     @Transient
@@ -235,39 +272,33 @@ public class EntradaProdutoProduto implements Serializable {
         return volume.get();
     }
 
-    public void setVolume(int volume) {
-        this.volume.set(volume);
-    }
-
     public IntegerProperty volumeProperty() {
         return volume;
     }
 
-    public ObservableValue changeProperty() {
-        return Bindings.concat(qtd);
+    public void setVolume(int volume) {
+        this.volume.set(volume);
     }
 
     @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "produto_id", foreignKey = @ForeignKey(name = "fk_entrada_produto_produto_produto"))
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
+    @Transient
+    public Long getIdProd() {
+        return produto.get().idProperty().getValue();
     }
 
     @Override
     public String toString() {
         return "EntradaProdutoProduto{" +
                 "id=" + id +
+                ", entradaProduto=" + entradaProduto +
+                ", produto=" + produto +
                 ", codigo=" + codigo +
                 ", descricao=" + descricao +
+                ", codigoCFOP=" + codigoCFOP +
                 ", lote=" + lote +
-                ", validade=" + validade +
+                ", dtValidade=" + dtValidade +
                 ", qtd=" + qtd +
-                ", vlrFabrica=" + vlrFabrica +
+                ", vlrUnitario=" + vlrUnitario +
                 ", vlrBruto=" + vlrBruto +
                 ", vlrDesconto=" + vlrDesconto +
                 ", vlrImposto=" + vlrImposto +
@@ -275,7 +306,6 @@ public class EntradaProdutoProduto implements Serializable {
                 ", estoque=" + estoque +
                 ", varejo=" + varejo +
                 ", volume=" + volume +
-                ", produto=" + produto +
-                "} " + super.toString();
+                '}';
     }
 }

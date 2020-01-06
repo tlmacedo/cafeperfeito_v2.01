@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public enum TipoSaidaProduto {
+public enum TipoCodigoCFOP {
 
-    VENDA(102, "venda"),
+    COMERCIALIZACAO(102, "comercialização"),
     BONIFICACAO(910, "bonif"),
-    RETIRADA(557, "retirada"),
+    CONSUMO(557, "retirada"),
     CORTESIA(910, "cortesia"),
     AMOSTRA(911, "amostra"),
     TESTE(912, "teste");
@@ -17,16 +17,16 @@ public enum TipoSaidaProduto {
     private int cod;
     private String descricao;
 
-    private TipoSaidaProduto(Integer cod, String descricao) {
+    private TipoCodigoCFOP(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
 
-    public static List<TipoSaidaProduto> getList() {
-        List list = Arrays.asList(TipoSaidaProduto.values());
-        Collections.sort(list, new Comparator<TipoSaidaProduto>() {
+    public static List<TipoCodigoCFOP> getList() {
+        List list = Arrays.asList(TipoCodigoCFOP.values());
+        Collections.sort(list, new Comparator<TipoCodigoCFOP>() {
             @Override
-            public int compare(TipoSaidaProduto e1, TipoSaidaProduto e2) {
+            public int compare(TipoCodigoCFOP e1, TipoCodigoCFOP e2) {
                 return e1.getDescricao().compareTo(e2.getDescricao());
             }
         });

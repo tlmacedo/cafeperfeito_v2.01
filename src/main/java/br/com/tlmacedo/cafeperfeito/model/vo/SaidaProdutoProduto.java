@@ -1,6 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.model.enums.TipoSaidaProduto;
+import br.com.tlmacedo.cafeperfeito.model.enums.TipoCodigoCFOP;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 
@@ -19,7 +19,7 @@ public class SaidaProdutoProduto implements Serializable {
     private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
     private StringProperty codigo = new SimpleStringProperty();
     private StringProperty descricao = new SimpleStringProperty();
-    private TipoSaidaProduto tipoSaidaProduto;
+    private TipoCodigoCFOP tipoCodigoCFOP;
     private StringProperty lote = new SimpleStringProperty();
     private ObjectProperty<LocalDate> dtValidade = new SimpleObjectProperty<>();
 
@@ -36,12 +36,12 @@ public class SaidaProdutoProduto implements Serializable {
     public SaidaProdutoProduto() {
     }
 
-    public SaidaProdutoProduto(Produto produto, TipoSaidaProduto tipSaida, Integer qtd) {
+    public SaidaProdutoProduto(Produto produto, TipoCodigoCFOP tipSaida, Integer qtd) {
 //        Produto prod = new Produto(produto);
         this.produtoProperty().setValue(produto);
         this.codigo = getProduto().codigoProperty();
         this.descricao = getProduto().descricaoProperty();
-        this.tipoSaidaProduto = tipSaida;
+        this.tipoCodigoCFOP = tipSaida;
         this.qtd = new SimpleIntegerProperty(qtd == null ? 1 : qtd);
 
         this.estoque = produto.tblEstoqueProperty();
@@ -49,7 +49,7 @@ public class SaidaProdutoProduto implements Serializable {
         this.dtValidade = produto.tblValidadeProperty();
         this.vlrVenda = getProduto().precoVendaProperty();
         this.vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
-        if (!tipSaida.equals(TipoSaidaProduto.VENDA)) {
+        if (!tipSaida.equals(TipoCodigoCFOP.COMERCIALIZACAO)) {
             this.vlrDesconto = new SimpleObjectProperty<>(vlrVendaProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
         }
         this.vlrBruto = new SimpleObjectProperty<>(vlrVendaProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
@@ -124,12 +124,12 @@ public class SaidaProdutoProduto implements Serializable {
     }
 
     @Enumerated(EnumType.ORDINAL)
-    public TipoSaidaProduto getTipoSaidaProduto() {
-        return tipoSaidaProduto;
+    public TipoCodigoCFOP getTipoCodigoCFOP() {
+        return tipoCodigoCFOP;
     }
 
-    public void setTipoSaidaProduto(TipoSaidaProduto tipoSaidaProduto) {
-        this.tipoSaidaProduto = tipoSaidaProduto;
+    public void setTipoCodigoCFOP(TipoCodigoCFOP tipoCodigoCFOP) {
+        this.tipoCodigoCFOP = tipoCodigoCFOP;
     }
 
     @Column(length = 15)
@@ -302,7 +302,7 @@ public class SaidaProdutoProduto implements Serializable {
 //                ", idProd=" + idProd +
                 ", codigo=" + codigo +
                 ", descricao=" + descricao +
-                ", tipoSaidaProduto=" + tipoSaidaProduto +
+                ", tipoSaidaProduto=" + tipoCodigoCFOP +
                 ", lote=" + lote +
                 ", dtValidade=" + dtValidade +
                 ", qtd=" + qtd +

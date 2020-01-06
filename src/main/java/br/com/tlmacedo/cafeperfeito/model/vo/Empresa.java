@@ -25,6 +25,7 @@ public class Empresa implements Serializable {
 
 
     private LongProperty id = new SimpleLongProperty();
+    private BooleanProperty loja = new SimpleBooleanProperty();
     private BooleanProperty pessoaJuridica = new SimpleBooleanProperty();
     private SituacaoCadastroEmpresa situacao;
     private StringProperty cnpj = new SimpleStringProperty();
@@ -79,6 +80,19 @@ public class Empresa implements Serializable {
 
     public void setId(long id) {
         this.id.set(id);
+    }
+
+    @Column(length = 1, nullable = false)
+    public boolean isLoja() {
+        return loja.get();
+    }
+
+    public BooleanProperty lojaProperty() {
+        return loja;
+    }
+
+    public void setLoja(boolean loja) {
+        this.loja.set(loja);
     }
 
     @Column(length = 1, nullable = false)

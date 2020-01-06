@@ -1,12 +1,14 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.model.dao.EntradaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoEntrada;
 import br.com.tlmacedo.cafeperfeito.service.serialize_deserialize.EntradaProdutoDeserializer;
 import br.com.tlmacedo.cafeperfeito.service.serialize_deserialize.EntradaProdutoSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import javafx.beans.property.*;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -29,30 +31,19 @@ import java.util.List;
 public class EntradaProduto implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private LongProperty id = new SimpleLongProperty(0);
-    private IntegerProperty situacao = new SimpleIntegerProperty(0);
+    private LongProperty id = new SimpleLongProperty();
+    private SituacaoEntrada situacao;
 
-    private Empresa loja = new Empresa();
-    private EntradaNfe entradaNfe = new EntradaNfe();
-    private EntradaCte entradaCte = new EntradaCte();
+    private ObjectProperty<Empresa> loja = new SimpleObjectProperty<>();
+    private ObjectProperty<Empresa> fornecedor = new SimpleObjectProperty<>();
 
-    private Usuario usuarioCadastro = new Usuario();
-    private ObjectProperty<LocalDateTime> dataCadastro = new SimpleObjectProperty<>(LocalDateTime.now());
+    private ObjectProperty<Usuario> usuarioCadastro = new SimpleObjectProperty<>();
+    private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>(LocalDateTime.now());
 
     private List<EntradaProdutoProduto> entradaProdutoProdutoList = new ArrayList<>();
 
     public EntradaProduto() {
     }
-
-    public EntradaProduto(SituacaoEntrada situacao, Empresa loja, EntradaNfe entradaNfe, EntradaCte entradaCte, Usuario usuarioCadastro, LocalDateTime dataCadastro) {
-        this.situacao = new SimpleIntegerProperty(situacao.getCod());
-        this.loja = loja;
-        this.entradaNfe = entradaNfe;
-        this.entradaCte = entradaCte;
-        this.usuarioCadastro = usuarioCadastro;
-        this.dataCadastro = new SimpleObjectProperty<>(dataCadastro);
-    }
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,82 +51,76 @@ public class EntradaProduto implements Serializable {
         return id.get();
     }
 
-    public void setId(long id) {
-        this.id.set(id);
-    }
-
     public LongProperty idProperty() {
         return id;
     }
 
-    @Column(length = 2, nullable = false)
+    public void setId(long id) {
+        this.id.set(id);
+    }
+
+    @Enumerated(EnumType.ORDINAL)
     public SituacaoEntrada getSituacao() {
-        return SituacaoEntrada.toEnum(situacao.get());
-    }
-
-    public void setSituacao(SituacaoEntrada situacao) {
-        this.situacao.set(situacao.getCod());
-    }
-
-    public IntegerProperty situacaoProperty() {
         return situacao;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "loja_id", foreignKey = @ForeignKey(name = "fk_entrada_produto_empresa"))
+    public void setSituacao(SituacaoEntrada situacao) {
+        this.situacao = situacao;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     public Empresa getLoja() {
+        return loja.get();
+    }
+
+    public ObjectProperty<Empresa> lojaProperty() {
         return loja;
     }
 
     public void setLoja(Empresa loja) {
-        this.loja = loja;
+        this.loja.set(loja);
     }
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "entradaNfe_id", foreignKey = @ForeignKey(name = "fk_entrada_produto_entrada_nfe"))
-    public EntradaNfe getEntradaNfe() {
-        return entradaNfe;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    public Empresa getFornecedor() {
+        return fornecedor.get();
     }
 
-    public void setEntradaNfe(EntradaNfe entradaNfe) {
-        this.entradaNfe = entradaNfe;
+    public ObjectProperty<Empresa> fornecedorProperty() {
+        return fornecedor;
     }
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "entradaCte_id", foreignKey = @ForeignKey(name = "fk_entrada_produto_entrada_cte"))
-    public EntradaCte getEntradaCte() {
-        return entradaCte;
+    public void setFornecedor(Empresa fornecedor) {
+        this.fornecedor.set(fornecedor);
     }
 
-    public void setEntradaCte(EntradaCte entradaCte) {
-        this.entradaCte = entradaCte;
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "usuarioCadastro_id", foreignKey = @ForeignKey(name = "fk_entrada_produto_usuario_cadastro"), nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     public Usuario getUsuarioCadastro() {
+        return usuarioCadastro.get();
+    }
+
+    public ObjectProperty<Usuario> usuarioCadastroProperty() {
         return usuarioCadastro;
     }
 
     public void setUsuarioCadastro(Usuario usuarioCadastro) {
-        this.usuarioCadastro = usuarioCadastro;
+        this.usuarioCadastro.set(usuarioCadastro);
     }
 
     @CreationTimestamp
-    @Column(nullable = false)
-    public LocalDateTime getDataCadastro() {
-        return dataCadastro.get();
+    public LocalDateTime getDtCadastro() {
+        return dtCadastro.get();
     }
 
-    public void setDataCadastro(LocalDateTime dataCadastro) {
-        this.dataCadastro.set(dataCadastro);
+    public ObjectProperty<LocalDateTime> dtCadastroProperty() {
+        return dtCadastro;
     }
 
-    public ObjectProperty<LocalDateTime> dataCadastroProperty() {
-        return dataCadastro;
+    public void setDtCadastro(LocalDateTime dtCadastro) {
+        this.dtCadastro.set(dtCadastro);
     }
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "entradaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<EntradaProdutoProduto> getEntradaProdutoProdutoList() {
         return entradaProdutoProdutoList;
     }
@@ -145,23 +130,14 @@ public class EntradaProduto implements Serializable {
     }
 
     @Override
-    public EntradaProduto clone() throws CloneNotSupportedException {
-        EntradaProduto entradaProduto = new EntradaProduto();
-        EntradaProdutoDAO entradaProdutoDAO = new EntradaProdutoDAO();
-        entradaProduto = entradaProdutoDAO.getById(EntradaProduto.class, getId());
-        return entradaProduto;
-    }
-
-    @Override
     public String toString() {
         return "EntradaProduto{" +
                 "id=" + id +
                 ", situacao=" + situacao +
                 ", loja=" + loja +
-                ", entradaNfe=" + entradaNfe +
-                ", entradaCte=" + entradaCte +
+                ", fornecedor=" + fornecedor +
                 ", usuarioCadastro=" + usuarioCadastro +
-                ", dataCadastro=" + dataCadastro +
+                ", dtCadastro=" + dtCadastro +
                 ", entradaProdutoProdutoList=" + entradaProdutoProdutoList +
                 '}';
     }

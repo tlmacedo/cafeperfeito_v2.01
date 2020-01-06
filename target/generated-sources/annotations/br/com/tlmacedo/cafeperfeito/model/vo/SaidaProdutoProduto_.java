@@ -1,6 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.model.enums.TipoSaidaProduto;
+import br.com.tlmacedo.cafeperfeito.model.enums.TipoCodigoCFOP;
 import br.com.tlmacedo.cafeperfeito.model.vo.Produto;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
 import java.math.BigDecimal;
@@ -9,7 +9,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-12-09T15:45:17")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2020-01-06T17:01:20")
 @StaticMetamodel(SaidaProdutoProduto.class)
 public class SaidaProdutoProduto_ { 
 
@@ -23,8 +23,8 @@ public class SaidaProdutoProduto_ {
     public static volatile SingularAttribute<SaidaProdutoProduto, BigDecimal> vlrBruto;
     public static volatile SingularAttribute<SaidaProdutoProduto, String> descricao;
     public static volatile SingularAttribute<SaidaProdutoProduto, Produto> produto;
+    public static volatile SingularAttribute<SaidaProdutoProduto, TipoCodigoCFOP> tipoCodigoCFOP;
     public static volatile SingularAttribute<SaidaProdutoProduto, BigDecimal> vlrEntradaBruto;
-    public static volatile SingularAttribute<SaidaProdutoProduto, TipoSaidaProduto> tipoSaidaProduto;
     public static volatile SingularAttribute<SaidaProdutoProduto, Long> id;
     public static volatile SingularAttribute<SaidaProdutoProduto, BigDecimal> vlrVenda;
 

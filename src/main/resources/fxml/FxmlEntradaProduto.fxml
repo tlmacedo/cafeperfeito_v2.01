@@ -7,7 +7,7 @@
 <AnchorPane fx:id="painelViewEntradaProduto" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
             minWidth="-Infinity" prefHeight="780.0" prefWidth="1350.0" stylesheets="@../style/css/cafeperfeito.css"
             xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="br.com.tlmacedo.cafeperfeito.controller.ControllerEntradaProduto123">
+            fx:controller="br.com.tlmacedo.cafeperfeito.controller.ControllerEntradaProduto">
     <children>
         <TitledPane fx:id="tpnEntradaNfe" collapsible="false" focusTraversable="false" layoutX="5.0" layoutY="5.0"
                     minHeight="0.0" minWidth="0.0" prefHeight="350.0" prefWidth="1340.0" text="Dados da nf-e">
@@ -30,8 +30,9 @@
                                                         <Insets left="5.0"/>
                                                     </padding>
                                                 </Label>
-                                                <ComboBox fx:id="cboNfeLojaDestino" accessibleText="value::;"
-                                                          maxWidth="500.0" promptText="Loja destino">
+                                                <ComboBox fx:id="cboNfeLojaDestino"
+                                                          accessibleText="len::;type::;value::0;seteditable::;binding::;"
+                                                          maxWidth="500.0">
                                                     <tooltip>
                                                         <Tooltip text="loja de destino da entrada"/>
                                                     </tooltip>
@@ -49,8 +50,8 @@
                                                     </padding>
                                                 </Label>
                                                 <TextField fx:id="txtNfeChave"
-                                                           accessibleText="len::44;type::nfe_chave;value::;seteditable::;"
-                                                           promptText="Chave da nfe-e" styleClass="a-direita">
+                                                           accessibleText="len::44;type::nfe_chave;value::;seteditable::;binding::;"
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="chave da nfe de entrada"/>
                                                     </tooltip>
@@ -68,8 +69,8 @@
                                                     </padding>
                                                 </Label>
                                                 <TextField fx:id="txtNfeNumero"
-                                                           accessibleText="len::11;type::nfe_numero;value::;seteditable::;"
-                                                           promptText="Número" styleClass="a-direita">
+                                                           accessibleText="len::11;type::nfe_numero;value::;seteditable::;binding::;"
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="número da nfe de entrada"/>
                                                     </tooltip>
@@ -87,8 +88,8 @@
                                                     </padding>
                                                 </Label>
                                                 <TextField fx:id="txtNfeSerie"
-                                                           accessibleText="len::3;type::numero;value::;seteditable::;"
-                                                           promptText="Série" styleClass="a-direita">
+                                                           accessibleText="len::3;type::numero;value::;seteditable::;binding::;"
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="série da nfe de entrada"/>
                                                     </tooltip>
@@ -105,8 +106,9 @@
                                                         <Insets left="5.0"/>
                                                     </padding>
                                                 </Label>
-                                                <ComboBox fx:id="cboNfeModelo" accessibleText="value::;"
-                                                          maxWidth="600.0" promptText="Modelo">
+                                                <ComboBox fx:id="cboNfeModelo"
+                                                          accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                          maxWidth="600.0">
                                                     <tooltip>
                                                         <Tooltip text="modelo da nfe de entrada"/>
                                                     </tooltip>
@@ -123,8 +125,9 @@
                                                         <Insets left="5.0"/>
                                                     </padding>
                                                 </Label>
-                                                <ComboBox fx:id="cboNfeFornecedor" accessibleText="value::;"
-                                                          maxWidth="600.0" promptText="Fornecedor">
+                                                <ComboBox fx:id="cboNfeFornecedor"
+                                                          accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                          maxWidth="600.0">
                                                     <tooltip>
                                                         <Tooltip text="fornecedor emissor da nfe de entrada"/>
                                                     </tooltip>
@@ -142,8 +145,7 @@
                                                     </padding>
                                                 </Label>
                                                 <DatePicker fx:id="dtpNfeEmissao"
-                                                            accessibleText="len::;type::;value::now;seteditable::;"
-                                                            promptText="Data emissão">
+                                                            accessibleText="len::;type::;value::now;seteditable::;binding::;">
                                                     <tooltip>
                                                         <Tooltip text="data de emissão da nfe de entrada"/>
                                                     </tooltip>
@@ -161,8 +163,7 @@
                                                     </padding>
                                                 </Label>
                                                 <DatePicker fx:id="dtpNfeEntrada"
-                                                            accessibleText="len::;type::;value::now;seteditable::;"
-                                                            promptText="Data entrada">
+                                                            accessibleText="len::;type::dtp;value::now;seteditable::;binding::;">
                                                     <tooltip>
                                                         <Tooltip text="data de entrada da nfe de entrada"/>
                                                     </tooltip>
@@ -170,7 +171,7 @@
                                             </children>
                                         </VBox>
 
-                                        <TitledPane fx:id="tpnNfeFiscal" focusTraversable="false" layoutX="5.0"
+                                        <TitledPane fx:id="tpnNfeDetalheFiscal" focusTraversable="false" layoutX="5.0"
                                                     layoutY="45.0" minHeight="0.0" minWidth="0.0" prefHeight="67.0"
                                                     prefWidth="1320.0" text="Dado imposto nf-e">
                                             <content>
@@ -189,8 +190,7 @@
                                                                     </padding>
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalControle"
-                                                                           accessibleText="len::13;type::numero;value::;seteditable::;"
-                                                                           promptText="N° Controle"
+                                                                           accessibleText="len::13;type::numero;value::;seteditable::;binding::;"
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -212,8 +212,7 @@
                                                                     </padding>
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalOrigem"
-                                                                           accessibleText="len::12;type::fiscal_doc_origem;value::;seteditable::;"
-                                                                           promptText="Doc. origem"
+                                                                           accessibleText="len::12;type::fiscal_doc_origem;value::;seteditable::;binding::;"
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -235,8 +234,8 @@
                                                                     </padding>
                                                                 </Label>
                                                                 <ComboBox fx:id="cboNfeFiscalTributo"
-                                                                          accessibleText="value::;" prefWidth="600.0"
-                                                                          promptText="Descrição do tributo">
+                                                                          accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                          prefWidth="600.0">
                                                                     <tooltip>
                                                                         <Tooltip
                                                                                 text="fornecedor emissor da nfe de entrada"/>
@@ -257,8 +256,7 @@
                                                                     </padding>
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalVlrNFe"
-                                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                                           promptText="Vlr. Nf-e: R$"
+                                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;binding::;"
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -281,7 +279,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalVlrTributo"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                                           promptText="Vlr. tributo: R$"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -304,7 +302,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalVlrMulta"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                                           promptText="Vlr. multa: R$"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -327,7 +325,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalVlrJuros"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                                           promptText="Vlr. juros: R$"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -350,7 +348,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalVlrTaxa"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                                           promptText="Vlr. taxa: R$"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -371,15 +369,26 @@
                                                                         <Insets left="5.0"/>
                                                                     </padding>
                                                                 </Label>
-                                                                <TextField fx:id="txtNfeFiscalVlrTotal"
-                                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
-                                                                           promptText="Total tributo: R$"
-                                                                           styleClass="a-direita">
+                                                                <Label fx:id="lblNfeFiscalVlrTotal"
+                                                                       accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
+                                                                       alignment="CENTER_RIGHT" prefWidth="600.0"
+                                                                       styleClass="lbl_informacao" text="0,00"
+                                                                       textAlignment="RIGHT">
                                                                     <tooltip>
                                                                         <Tooltip
                                                                                 text="valor líquido total do tributo da nfe de entrada"/>
                                                                     </tooltip>
-                                                                </TextField>
+                                                                </Label>
+
+                                                                <!--                                                                <TextField fx:id="txtNfeFiscalVlrTotal"-->
+                                                                <!--                                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"-->
+
+                                                                <!--                                                                           styleClass="a-direita">-->
+                                                                <!--                                                                    <tooltip>-->
+                                                                <!--                                                                        <Tooltip-->
+                                                                <!--                                                                                text="valor líquido total do tributo da nfe de entrada"/>-->
+                                                                <!--                                                                    </tooltip>-->
+                                                                <!--                                                                </TextField>-->
                                                             </children>
                                                         </VBox>
                                                         <VBox alignment="CENTER_LEFT" layoutX="1225.0" layoutY="5.0"
@@ -394,15 +403,16 @@
                                                                         <Insets left="5.0"/>
                                                                     </padding>
                                                                 </Label>
-                                                                <TextField fx:id="txtNfeFiscalVlrPercentual"
-                                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
-                                                                           promptText="Perc. tributo: %"
-                                                                           styleClass="a-direita">
+                                                                <Label fx:id="lblNfeFiscalVlrPercentual"
+                                                                       accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
+                                                                       alignment="CENTER_RIGHT" prefWidth="600.0"
+                                                                       styleClass="lbl_informacao" text="0,00"
+                                                                       textAlignment="RIGHT">
                                                                     <tooltip>
                                                                         <Tooltip
                                                                                 text="percentual do tributo referente a nfe de entrada"/>
                                                                     </tooltip>
-                                                                </TextField>
+                                                                </Label>
                                                             </children>
                                                         </VBox>
 
@@ -432,7 +442,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtCteChave"
                                                            accessibleText="len::44;type::cte_chave;value::;seteditable::;"
-                                                           promptText="Chave da ct-e" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="chave da cte da nfe de entrada"/>
                                                     </tooltip>
@@ -450,7 +460,7 @@
                                                     </padding>
                                                 </Label>
                                                 <ComboBox fx:id="cboCteTomadorServico" accessibleText="value::;"
-                                                          maxWidth="600.0" promptText="Tomador serviço">
+                                                          maxWidth="600.0">
                                                     <tooltip>
                                                         <Tooltip text="tomador do serviço do frete da nfe de entrada"/>
                                                     </tooltip>
@@ -469,7 +479,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtCteNumero"
                                                            accessibleText="len::11;type::cte_numero;value::;seteditable::;"
-                                                           promptText="Número" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="número do cte da nfe de entrada"/>
                                                     </tooltip>
@@ -488,7 +498,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtCteSerie"
                                                            accessibleText="len::3;type::numero;value::;seteditable::;"
-                                                           promptText="Série" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="série do cte da nfe de entrada"/>
                                                     </tooltip>
@@ -506,7 +516,7 @@
                                                     </padding>
                                                 </Label>
                                                 <ComboBox fx:id="cboCteModelo" accessibleText="value::;"
-                                                          promptText="Modelo">
+                                                >
                                                     <tooltip>
                                                         <Tooltip text="modelo cte da nfe de entrada"/>
                                                     </tooltip>
@@ -525,7 +535,7 @@
                                                 </Label>
                                                 <DatePicker fx:id="dtpCteEmissao"
                                                             accessibleText="len::;type::;value::;seteditable::;binding::true;"
-                                                            promptText="Data emissão">
+                                                >
                                                     <tooltip>
                                                         <Tooltip text="data de emissão do cte da nfe de entrada"/>
                                                     </tooltip>
@@ -543,7 +553,7 @@
                                                     </padding>
                                                 </Label>
                                                 <ComboBox fx:id="cboCteTransportadora" accessibleText="value::;"
-                                                          prefWidth="600.0" promptText="Transportadora">
+                                                          prefWidth="600.0">
                                                     <tooltip>
                                                         <Tooltip text="transportadora da nfe de entrada"/>
                                                     </tooltip>
@@ -561,7 +571,7 @@
                                                     </padding>
                                                 </Label>
                                                 <ComboBox fx:id="cboCteSistuacaoTributaria" accessibleText="value::;"
-                                                          prefWidth="600.0" promptText="Situação tributária">
+                                                          prefWidth="600.0">
                                                     <tooltip>
                                                         <Tooltip text="situação tributária do cte da nfe de entrada"/>
                                                     </tooltip>
@@ -580,7 +590,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtCteVlrCte"
                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;"
-                                                           promptText="Total ct-e: R$" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="valor total da nfe de entrada"/>
                                                     </tooltip>
@@ -599,7 +609,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtCteQtdVolume"
                                                            accessibleText="len::3;type::numero;decimal::0;value::0;seteditable::;"
-                                                           promptText="Qtd. volumes:" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="quantidade de volumes do cte da nfe de entrada"/>
                                                     </tooltip>
@@ -618,7 +628,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtCtePesoBruto"
                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                           promptText="Peso bruto: kg" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="peso bruto do cte da nfe de entrada"/>
                                                     </tooltip>
@@ -637,7 +647,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtCteVlrBruto"
                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                           promptText="Frete bruto: R$" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="valor bruto do frete do cte da nfe de entrada"/>
                                                     </tooltip>
@@ -656,7 +666,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtCteVlrTaxa"
                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                           promptText="Taxas: R$" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="valor taxas do frete da nfe de entrada"/>
                                                     </tooltip>
@@ -675,7 +685,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtCteVlrColeta"
                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                           promptText="Coleta: R$" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip
                                                                 text="valor taxa coleta sobre frete da nfe de entrada"/>
@@ -685,7 +695,7 @@
                                         </VBox>
                                         <VBox alignment="CENTER_LEFT" layoutX="1140.0" layoutY="45.0" prefWidth="90.0">
                                             <children>
-                                                <Label prefWidth="600.0" styleClass="float" text="Imposto frete: R$">
+                                                <Label prefWidth="600.0" styleClass="float" text="Imp frete: R$">
                                                     <VBox.margin>
                                                         <Insets/>
                                                     </VBox.margin>
@@ -698,7 +708,7 @@
                                                            layoutX="1010.0" layoutY="43.0" maxHeight="-Infinity"
                                                            maxWidth="-Infinity" minHeight="-Infinity"
                                                            minWidth="-Infinity" prefHeight="20.0" prefWidth="90.0"
-                                                           promptText="Imposto frete: R$" styleClass="a-direita">
+                                                           styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="valor imposto sobre frete da nfe de entrada"/>
                                                     </tooltip>
@@ -707,7 +717,7 @@
                                         </VBox>
                                         <VBox alignment="CENTER_LEFT" layoutX="1235.0" layoutY="45.0" prefWidth="90.0">
                                             <children>
-                                                <Label prefWidth="600.0" styleClass="float" text="Frete líquido: R$">
+                                                <Label prefWidth="600.0" styleClass="float" text="Frete líq: R$">
                                                     <VBox.margin>
                                                         <Insets/>
                                                     </VBox.margin>
@@ -715,16 +725,18 @@
                                                         <Insets left="5.0"/>
                                                     </padding>
                                                 </Label>
-                                                <TextField fx:id="txtCteVlrLiquido"
-                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;"
-                                                           promptText="Frete líquido: R$" styleClass="a-direita">
+                                                <Label fx:id="lblCteVlrLiquido"
+                                                       accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
+                                                       alignment="CENTER_RIGHT" prefWidth="600.0"
+                                                       styleClass="lbl_informacao" text="0,00"
+                                                       textAlignment="RIGHT">
                                                     <tooltip>
                                                         <Tooltip text="valor líquido do frete da nfe de entrada"/>
                                                     </tooltip>
-                                                </TextField>
+                                                </Label>
                                             </children>
                                         </VBox>
-                                        <TitledPane fx:id="tpnCteFiscal" focusTraversable="false" layoutX="5.0"
+                                        <TitledPane fx:id="tpnCteDetalheFiscal" focusTraversable="false" layoutX="5.0"
                                                     layoutY="85.0" minHeight="0.0" minWidth="0.0" prefHeight="67.0"
                                                     prefWidth="1320.0" text="Dado imposto nf-e">
                                             <content>
@@ -744,7 +756,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalControle"
                                                                            accessibleText="len::13;type::numero;value::;seteditable::;"
-                                                                           promptText="N° Controle"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -767,7 +779,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalOrigem"
                                                                            accessibleText="len::12;type::fiscal_doc_origem;value::;seteditable::;"
-                                                                           promptText="Doc. origem"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -789,7 +801,7 @@
                                                                     </padding>
                                                                 </Label>
                                                                 <ComboBox fx:id="cboCteFiscalTributo" prefWidth="600.0"
-                                                                          promptText="Descrição do tributo">
+                                                                >
                                                                     <tooltip>
                                                                         <Tooltip
                                                                                 text="fornecedor emissor do cte de entrada"/>
@@ -809,15 +821,16 @@
                                                                         <Insets left="5.0"/>
                                                                     </padding>
                                                                 </Label>
-                                                                <TextField fx:id="txtCteFiscalVlrCte"
-                                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;"
-                                                                           promptText="Vlr. Ct-e: R$"
-                                                                           styleClass="a-direita">
+                                                                <Label fx:id="lblCteFiscalVlrCte"
+                                                                       accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
+                                                                       alignment="CENTER_RIGHT" prefWidth="600.0"
+                                                                       styleClass="lbl_informacao" text="0,00"
+                                                                       textAlignment="RIGHT">
                                                                     <tooltip>
                                                                         <Tooltip
                                                                                 text="valor bruto do tributo da nfe de entrada"/>
                                                                     </tooltip>
-                                                                </TextField>
+                                                                </Label>
                                                             </children>
                                                         </VBox>
                                                         <VBox alignment="CENTER_LEFT" layoutX="750.0" layoutY="5.0"
@@ -834,7 +847,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalVlrTributo"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                                           promptText="Vlr. tributo: R$"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -857,7 +870,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalVlrMulta"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                                           promptText="Vlr. multa: R$"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -880,7 +893,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalVlrJuros"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                                           promptText="Vlr. juros: R$"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -903,7 +916,7 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalVlrTaxa"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-                                                                           promptText="Vlr. taxa: R$"
+
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -924,15 +937,16 @@
                                                                         <Insets left="5.0"/>
                                                                     </padding>
                                                                 </Label>
-                                                                <TextField fx:id="txtCteFiscalVlrTotal"
-                                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
-                                                                           promptText="Total tributo: R$"
-                                                                           styleClass="a-direita">
+                                                                <Label fx:id="lblCteFiscalVlrTotal"
+                                                                       accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
+                                                                       alignment="CENTER_RIGHT" prefWidth="600.0"
+                                                                       styleClass="lbl_informacao" text="0,00"
+                                                                       textAlignment="RIGHT">
                                                                     <tooltip>
                                                                         <Tooltip
                                                                                 text="valor líquido total do tributo do cte de entrada"/>
                                                                     </tooltip>
-                                                                </TextField>
+                                                                </Label>
                                                             </children>
                                                         </VBox>
                                                         <VBox alignment="CENTER_LEFT" layoutX="1225.0" layoutY="5.0"
@@ -947,15 +961,16 @@
                                                                         <Insets left="5.0"/>
                                                                     </padding>
                                                                 </Label>
-                                                                <TextField fx:id="txtCteFiscalVlrPercentual"
-                                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
-                                                                           promptText="Perc. tributo: %"
-                                                                           styleClass="a-direita">
+                                                                <Label fx:id="lblCteFiscalVlrPercentual"
+                                                                       accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
+                                                                       alignment="CENTER_RIGHT" prefWidth="600.0"
+                                                                       styleClass="lbl_informacao" text="0,00"
+                                                                       textAlignment="RIGHT">
                                                                     <tooltip>
                                                                         <Tooltip
                                                                                 text="percentual do tributo referente o cte de entrada"/>
                                                                     </tooltip>
-                                                                </TextField>
+                                                                </Label>
                                                             </children>
                                                         </VBox>
 
@@ -974,13 +989,14 @@
                 <Font name="SansSerif Bold Italic" size="11.0"/>
             </font>
         </TitledPane>
-        <TitledPane fx:id="tpnItensTotaisNfe" collapsible="false" expanded="true" focusTraversable="false" layoutX="5.0"
+        <TitledPane fx:id="tpnItensTotaisDetalhe" collapsible="false" expanded="true" focusTraversable="false"
+                    layoutX="5.0"
                     layoutY="360.0" minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="1340.0"
                     text="Itens e totais da nf-e">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="1340.0">
                     <children>
-                        <TitledPane fx:id="tpnCadastroProduto" collapsible="false" focusTraversable="false"
+                        <TitledPane collapsible="false" focusTraversable="false"
                                     layoutX="5.0" layoutY="5.0" minHeight="0.0" minWidth="0.0" prefHeight="173.0"
                                     prefWidth="1330.0" text="Cadastro de produto">
                             <content>
@@ -998,7 +1014,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtPesquisaProduto"
                                                            accessibleText="len::80;type::TEXTO;value::;seteditable::;"
-                                                           promptText="Pesquisar produto">
+                                                >
                                                     <tooltip>
                                                         <Tooltip text="campo de pesquisa."/>
                                                     </tooltip>
@@ -1074,7 +1090,8 @@
                         <!--                            <content>-->
                         <!--                                <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="1330.0">-->
                         <!--                                    <children>-->
-                        <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="180.0" prefHeight="155.0"
+                        <VBox fx:id="vBoxItensNfeDetalhe" alignment="CENTER_LEFT" layoutX="5.0" layoutY="180.0"
+                              prefHeight="155.0"
                               prefWidth="1330.0">
                             <children>
                                 <Label prefWidth="1500.0" styleClass="float" text="Itens da nf-e">
@@ -1085,7 +1102,7 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <TableView fx:id="ttvItensNfe"
+                                <TableView fx:id="tvItensNfeDetalhe"
                                            accessibleText="len::;type::;value::;seteditable::;" layoutX="5.0"
                                            nodeOrientation="LEFT_TO_RIGHT">
                                     <tooltip>
@@ -1094,7 +1111,8 @@
                                 </TableView>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="65.0" layoutY="5.0" prefWidth="150.0"
+                        <VBox fx:id="vBoxTotalQtdItem" alignment="CENTER_LEFT" layoutX="65.0" layoutY="5.0"
+                              prefWidth="150.0"
                               AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Qtd Itens">
@@ -1113,7 +1131,8 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="225.0" layoutY="5.0" prefWidth="150.0"
+                        <VBox fx:id="vBoxTotalQtdTotal" alignment="CENTER_LEFT" layoutX="225.0" layoutY="5.0"
+                              prefWidth="150.0"
                               AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Qtd Total">
@@ -1132,7 +1151,8 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="385.0" layoutY="5.0" prefWidth="150.0"
+                        <VBox fx:id="vBoxTotalQtdVolume" alignment="CENTER_LEFT" layoutX="385.0" layoutY="5.0"
+                              prefWidth="150.0"
                               AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Qtd Volumes">
@@ -1151,7 +1171,8 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="545.0" layoutY="5.0" prefWidth="150.0"
+                        <VBox fx:id="vBoxTotalBruto" alignment="CENTER_LEFT" layoutX="545.0" layoutY="5.0"
+                              prefWidth="150.0"
                               AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Bruto">
@@ -1170,7 +1191,8 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="705.0" layoutY="5.0" prefWidth="150.0"
+                        <VBox fx:id="vBoxTotalImposto" alignment="CENTER_LEFT" layoutX="705.0" layoutY="5.0"
+                              prefWidth="150.0"
                               AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Impostos">
@@ -1189,7 +1211,8 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="865.0" layoutY="5.0" prefWidth="150.0"
+                        <VBox fx:id="vBoxTotalFrete" alignment="CENTER_LEFT" layoutX="865.0" layoutY="5.0"
+                              prefWidth="150.0"
                               AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Frete">
@@ -1208,7 +1231,8 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="1025.0" layoutY="5.0" prefWidth="150.0"
+                        <VBox fx:id="vBoxTotalDesconto" alignment="CENTER_LEFT" layoutX="1025.0" layoutY="5.0"
+                              prefWidth="150.0"
                               AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Desconto">
@@ -1227,7 +1251,8 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="1185.0" layoutY="5.0" prefWidth="150.0"
+                        <VBox fx:id="vBoxTotalLiquido" alignment="CENTER_LEFT" layoutX="1185.0" layoutY="5.0"
+                              prefWidth="150.0"
                               AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Líquido">

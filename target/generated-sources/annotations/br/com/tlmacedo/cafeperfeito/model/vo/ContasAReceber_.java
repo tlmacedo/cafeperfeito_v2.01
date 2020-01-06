@@ -11,7 +11,7 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2019-12-10T15:07:20")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2020-01-06T17:01:20")
 @StaticMetamodel(ContasAReceber.class)
 public class ContasAReceber_ { 
 

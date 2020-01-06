@@ -862,7 +862,7 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <TextField fx:id="txtPesquisa"
+                                <TextField fx:id="txtPesquisaProduto"
                                            accessibleText="len::80;type::TEXTO;decimal::;value::;seteditable::;binding::;">
                                     <tooltip>
                                         <Tooltip text="logradouro do endereço de entrega"/>
@@ -897,7 +897,7 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <TreeTableView fx:id="ttvProdutos"/>
+                                <TreeTableView fx:id="ttvProduto"/>
                             </children>
                         </VBox>
                     </children>
@@ -919,7 +919,7 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <TableView fx:id="tvItensPedido" prefHeight="205.0" prefWidth="1328.0">
+                                <TableView fx:id="tvItensNfe" prefHeight="205.0" prefWidth="1328.0">
                                     <columns>
                                         <TableColumn prefWidth="75.0" text="C1"/>
                                         <TableColumn prefWidth="75.0" text="C23"/>

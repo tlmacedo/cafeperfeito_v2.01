@@ -145,10 +145,11 @@ public class ServiceCampoPersonalizado {
     }
 
     public static void fieldTextFormat(AnchorPane anchorPane) {
-        //System.out.printf("AnchorPane: [%s]\n", anchorPane.getId());
-        for (Node node : anchorPane.getChildren())
-            //System.out.printf("\t\tnode: [%s]\n", node.getId());
+//        System.out.printf("AnchorPane: [%s]\n", anchorPane.getId());
+        for (Node node : anchorPane.getChildren()) {
+//            System.out.printf("\t\tnode: [%s]\n", node.getId());
             fieldTextFormat(node);
+        }
     }
 
     public static void fieldTextFormat(Node node) {
