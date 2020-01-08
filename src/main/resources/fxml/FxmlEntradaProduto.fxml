@@ -1102,7 +1102,7 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <TableView fx:id="tvItensNfeDetalhe"
+                                <TableView fx:id="tvItensNfe"
                                            accessibleText="len::;type::;value::;seteditable::;" layoutX="5.0"
                                            nodeOrientation="LEFT_TO_RIGHT">
                                     <tooltip>

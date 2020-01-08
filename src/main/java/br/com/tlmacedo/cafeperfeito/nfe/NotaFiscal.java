@@ -362,7 +362,7 @@ public class NotaFiscal {
         prodVO.setCNPJFab("");
         prodVO.setcBenef("");
         prodVO.setEXTIPI("");
-        prodVO.setCFOP("5" + saidaProdutoProduto.getTipoCodigoCFOP().getCod());
+        prodVO.setCFOP("5" + saidaProdutoProduto.getCodigoCFOP().getCod());
         prodVO.setuCom(produto.getUnidadeComercial().getDescricao());
         BigDecimal qCom = new BigDecimal(saidaProdutoProduto.qtdProperty().getValue());
         prodVO.setqCom(qCom);

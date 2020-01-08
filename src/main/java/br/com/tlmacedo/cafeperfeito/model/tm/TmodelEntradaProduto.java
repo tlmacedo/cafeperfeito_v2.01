@@ -29,16 +29,15 @@ import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 public class TmodelEntradaProduto {
 
     private TablePosition tp;
-    private TextField txtPesquisaProduto;
     private TableView<EntradaProdutoProduto> tvItensNfe;
     private ObservableList<EntradaProdutoProduto> entradaProdutoProdutoObservableList;
-    private EntradaProdutoProduto entradaProdutoProduto;
+    private TextField txtPesquisaProduto;
 
     private TableColumn<EntradaProdutoProduto, String> colId;
     private TableColumn<EntradaProdutoProduto, String> colProdId;
     private TableColumn<EntradaProdutoProduto, String> colProdCod;
     private TableColumn<EntradaProdutoProduto, String> colProdDescricao;
-    private TableColumn<EntradaProdutoProduto, TipoCodigoCFOP> colTipoSaidaProduto;
+    private TableColumn<EntradaProdutoProduto, TipoCodigoCFOP> colCFOP;
     private TableColumn<EntradaProdutoProduto, String> colProdLote;
     private TableColumn<EntradaProdutoProduto, String> colProdValidade;
     private TableColumn<EntradaProdutoProduto, String> colQtd;
@@ -57,6 +56,7 @@ public class TmodelEntradaProduto {
     private IntegerProperty totalQtdVolume = new SimpleIntegerProperty(0);
     private ObjectProperty<BigDecimal> totalBruto = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> totalDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> totalImposto = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> totalLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
 
@@ -87,12 +87,12 @@ public class TmodelEntradaProduto {
         getColProdDescricao().setPrefWidth(450);
         getColProdDescricao().setCellValueFactory(param -> param.getValue().descricaoProperty());
 
-        setColTipoSaidaProduto(new TableColumn<>("tipo saida"));
-        getColTipoSaidaProduto().setPrefWidth(100);
-        getColTipoSaidaProduto().setCellValueFactory(param ->
+        setColCFOP(new TableColumn<>("CFOP"));
+        getColCFOP().setPrefWidth(100);
+        getColCFOP().setCellValueFactory(param ->
                 new SimpleObjectProperty<>(param.getValue().getCodigoCFOP()));
-        getColTipoSaidaProduto().setCellFactory(param -> new SetCellFactoryTableCell_ComboBox<>(TipoCodigoCFOP.getList()));
-        getColTipoSaidaProduto().setOnEditCommit(editEvent -> {
+        getColCFOP().setCellFactory(param -> new SetCellFactoryTableCell_ComboBox<>(TipoCodigoCFOP.getList()));
+        getColCFOP().setOnEditCommit(editEvent -> {
             editEvent.getRowValue().setCodigoCFOP(editEvent.getNewValue());
             getTvItensNfe().getSelectionModel().selectNext();
             totalizaLinha(editEvent.getRowValue());
@@ -104,7 +104,7 @@ public class TmodelEntradaProduto {
         getColProdLote().setCellValueFactory(param -> param.getValue().loteProperty());
 
         setColProdValidade(new TableColumn<>("validade"));
-        getColProdValidade().setPrefWidth(100);
+        getColProdValidade().setPrefWidth(90);
         getColProdValidade().setStyle("-fx-alignment: center-right;");
         getColProdValidade().setCellValueFactory(param -> new SimpleStringProperty(param.getValue().dtValidadeProperty().get().format(DTF_DATA)));
 
@@ -118,14 +118,7 @@ public class TmodelEntradaProduto {
                 ServiceMascara.getNumeroMask(12, 0)
         ));
         getColQtd().setOnEditCommit(editEvent -> {
-            Integer nVal = Integer.parseInt(editEvent.getNewValue());
-            Integer oVal = Integer.parseInt(editEvent.getOldValue());
-//            if (nVal.compareTo(editEvent.getRowValue().estoqueProperty().getValue()) > 0) {
-//                editEvent.getRowValue().setQtd(editEvent.getRowValue().estoqueProperty().getValue());
-//                getTvSaidaProdutoProduto().refresh();
-//            } else
-            editEvent.getRowValue().setQtd(validEstoque(nVal, oVal));
-//            calculaDescontoCliente();
+            editEvent.getRowValue().setQtd(Integer.parseInt(editEvent.getNewValue()));
             getTvItensNfe().getSelectionModel().selectNext();
             totalizaLinha(editEvent.getRowValue());
         });
@@ -156,6 +149,21 @@ public class TmodelEntradaProduto {
         ));
         getColVlrDesconto().setOnEditCommit(editEvent -> {
             editEvent.getRowValue().setVlrDesconto(ServiceMascara.getBigDecimalFromTextField(editEvent.getNewValue(), 2));
+            getTvItensNfe().getSelectionModel().selectNext();
+            totalizaLinha(editEvent.getRowValue());
+        });
+
+        setColVlrImposto(new TableColumn<>("imp R$"));
+        getColVlrImposto().setPrefWidth(90);
+        getColVlrImposto().setStyle("-fx-alignment: center-right;");
+        getColVlrImposto().setCellValueFactory(param -> new SimpleStringProperty(
+                ServiceMascara.getMoeda(param.getValue().vlrImpostoProperty().get(), 2)
+        ));
+        getColVlrImposto().setCellFactory(param -> new SetCellFactoryTableCell_EdtitingCell<EntradaProdutoProduto, String>(
+                ServiceMascara.getNumeroMask(12, 2)
+        ));
+        getColVlrImposto().setOnEditCommit(editEvent -> {
+            editEvent.getRowValue().setVlrImposto(ServiceMascara.getBigDecimalFromTextField(editEvent.getNewValue(), 2));
             getTxtPesquisaProduto().requestFocus();
             totalizaLinha(editEvent.getRowValue());
         });
@@ -177,9 +185,9 @@ public class TmodelEntradaProduto {
     public void preencheTabela() {
         getTvItensNfe().getColumns().setAll(
                 //getColId(), getColProdId(),
-                getColProdCod(), getColProdDescricao(), getColTipoSaidaProduto(), getColProdLote(),
+                getColProdCod(), getColProdDescricao(), getColCFOP(), getColProdLote(),
                 getColProdValidade(), getColQtd(), getColVlrUnitario(), getColVlrBruto(), getColVlrDesconto(),
-                getColVlrLiquido()
+                getColVlrImposto(), getColVlrLiquido()
                 //, getColEstoque()
         );
 
@@ -206,7 +214,6 @@ public class TmodelEntradaProduto {
                         getTvItensNfe().getSelectionModel().selectNext();
                 }
 
-
                 if (keyEvent.getCode() == KeyCode.DELETE)
                     if (getTvItensNfe().getEditingCell() == null)
                         getEntradaProdutoProdutoObservableList().remove(getTvItensNfe().getSelectionModel().getSelectedItem());
@@ -214,9 +221,9 @@ public class TmodelEntradaProduto {
 
             getTvItensNfe().setOnKeyPressed(keyEvent -> {
                 if (getTvItensNfe().getSelectionModel().getSelectedItem() == null) return;
-                if (getTp().getTableColumn() == getColTipoSaidaProduto()) {
+                if (getTp().getTableColumn() == getColCFOP()) {
                     if (keyEvent.getCode() == KeyCode.DOWN || keyEvent.getCode() == KeyCode.UP) {
-                        getTvItensNfe().edit(getTp().getRow(), getColTipoSaidaProduto());
+                        getTvItensNfe().edit(getTp().getRow(), getColCFOP());
                     }
                 }
                 if (keyEvent.getCode().isLetterKey()
@@ -261,7 +268,8 @@ public class TmodelEntradaProduto {
         }
 
 
-        entradaProdutoProduto.vlrLiquidoProperty().setValue(entradaProdutoProduto.vlrBrutoProperty().getValue()
+        entradaProdutoProduto.vlrLiquidoProperty().setValue((entradaProdutoProduto.vlrBrutoProperty().getValue()
+                .add(entradaProdutoProduto.vlrImpostoProperty().getValue()))
                 .subtract(entradaProdutoProduto.vlrDescontoProperty().getValue()).setScale(2, RoundingMode.HALF_UP));
 
         getTvItensNfe().refresh();
@@ -289,6 +297,9 @@ public class TmodelEntradaProduto {
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
         setTotalDesconto(getEntradaProdutoProdutoObservableList().stream()
                 .map(EntradaProdutoProduto::getVlrDesconto)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+        setTotalImposto(getEntradaProdutoProdutoObservableList().stream()
+                .map(EntradaProdutoProduto::getVlrImposto)
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
         setTotalLiquido(getEntradaProdutoProdutoObservableList().stream()
                 .map(EntradaProdutoProduto::getVlrLiquido)
@@ -508,65 +519,43 @@ public class TmodelEntradaProduto {
 //        }
 //        return kardex;
 //    }
-
-    public Integer validEstoque(Integer newQtd, Integer oldQtd) {
-        if (getEntradaProdutoProdutoObservableList().stream()
-                .filter(entradaProdutoProduto -> entradaProdutoProduto.produtoProperty().getValue().idProperty().getValue() == getTvItensNfe().getItems().get(getTp().getRow()).produtoProperty().getValue().idProperty().getValue()
-                        && entradaProdutoProduto.loteProperty().getValue().equals(getTvItensNfe().getItems().get(getTp().getRow()).loteProperty().getValue())).count() == 1) {
-            if (newQtd.compareTo(getTvItensNfe().getItems().get(getTp().getRow()).estoqueProperty().getValue()) > 0)
-                return getTvItensNfe().getItems().get(getTp().getRow()).estoqueProperty().getValue();
-            else
-                return newQtd;
-        } else {
-            Integer qtdSaiu = getEntradaProdutoProdutoObservableList().stream()
-                    .filter(entradaProdutoProduto -> entradaProdutoProduto.produtoProperty().getValue().idProperty().getValue() == getTvItensNfe().getItems().get(getTp().getRow()).produtoProperty().getValue().idProperty().getValue()
-                            && entradaProdutoProduto.loteProperty().getValue().equals(getTvItensNfe().getItems().get(getTp().getRow()).loteProperty().getValue()))
-                    .collect(Collectors.summingInt(EntradaProdutoProduto::getQtd)) - oldQtd;
-            Integer qtdSaida = qtdSaiu + newQtd;
-            if (qtdSaida.compareTo(getTvItensNfe().getItems().get(getTp().getRow()).estoqueProperty().getValue()) > 0)
-                return getTvItensNfe().getItems().get(getTp().getRow()).estoqueProperty().getValue() - (qtdSaiu);
-            else
-                return newQtd;
-        }
-    }
-
     private FichaKardex newFichaKardex(Integer qtdSaida, ProdutoEstoque estoque, List<ProdutoEstoque> produtoEstoqueList) {
         FichaKardex fichaKardex = new FichaKardex();
         try {
-            fichaKardex.setProduto(estoque.getProduto());
-            fichaKardex.documentoProperty().setValue(getEntradaProdutoProduto().getEntradaProduto().idProperty().getValue().toString());
-            fichaKardex.detalheProperty().setValue(estoque.loteProperty().getValue());
-            fichaKardex.qtdProperty().setValue(qtdSaida);
-            fichaKardex.vlrUnitarioProperty().setValue(estoque.vlrBrutoProperty().getValue()
-                    .add(estoque.vlrFreteBrutoProperty().getValue())
-                    .add(estoque.vlrImpostoNaEntradaProperty().getValue())
-                    .add(estoque.vlrImpostoFreteNaEntradaProperty().getValue())
-                    .add(estoque.vlrImpostoDentroFreteProperty().getValue())
-                    .add(estoque.vlrFreteTaxaProperty().getValue())
-            );
-
-            fichaKardex.qtdEntradaProperty().setValue(0);
-            fichaKardex.vlrEntradaProperty().setValue(BigDecimal.ZERO);
-
-            fichaKardex.qtdSaidaProperty().setValue(qtdSaida);
-            fichaKardex.vlrSaidaProperty().setValue(fichaKardex.vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdSaida)));
-
-//            setLucroQtdSaida(getLucroQtdSaida() + fichaKardex.qtdSaidaProperty().getValue());
-//            setLucroVlrSaida(getLucroVlrSaida().add(fichaKardex.vlrSaidaProperty().getValue()));
-
-            fichaKardex.saldoProperty().setValue(produtoEstoqueList.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
-
-            fichaKardex.vlrSaldoProperty().setValue(produtoEstoqueList.stream().filter(stq -> stq.qtdProperty().getValue() > 0)
-                    .map(stq ->
-                            (stq.vlrBrutoProperty().getValue()
-                                    .add(stq.vlrFreteBrutoProperty().getValue())
-                                    .add(stq.vlrImpostoNaEntradaProperty().getValue())
-                                    .add(stq.vlrImpostoFreteNaEntradaProperty().getValue())
-                                    .add(stq.vlrImpostoDentroFreteProperty().getValue())
-                                    .add(stq.vlrFreteTaxaProperty().getValue()))
-                                    .multiply(BigDecimal.valueOf(stq.qtdProperty().getValue()))
-                    )
-                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+//            fichaKardex.setProduto(estoque.getProduto());
+//            fichaKardex.documentoProperty().setValue(getEntradaProdutoProduto().getEntradaProduto().idProperty().getValue().toString());
+//            fichaKardex.detalheProperty().setValue(estoque.loteProperty().getValue());
+//            fichaKardex.qtdProperty().setValue(qtdSaida);
+//            fichaKardex.vlrUnitarioProperty().setValue(estoque.vlrBrutoProperty().getValue()
+//                    .add(estoque.vlrFreteBrutoProperty().getValue())
+//                    .add(estoque.vlrImpostoNaEntradaProperty().getValue())
+//                    .add(estoque.vlrImpostoFreteNaEntradaProperty().getValue())
+//                    .add(estoque.vlrImpostoDentroFreteProperty().getValue())
+//                    .add(estoque.vlrFreteTaxaProperty().getValue())
+//            );
+//
+//            fichaKardex.qtdEntradaProperty().setValue(0);
+//            fichaKardex.vlrEntradaProperty().setValue(BigDecimal.ZERO);
+//
+//            fichaKardex.qtdSaidaProperty().setValue(qtdSaida);
+//            fichaKardex.vlrSaidaProperty().setValue(fichaKardex.vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdSaida)));
+//
+////            setLucroQtdSaida(getLucroQtdSaida() + fichaKardex.qtdSaidaProperty().getValue());
+////            setLucroVlrSaida(getLucroVlrSaida().add(fichaKardex.vlrSaidaProperty().getValue()));
+//
+//            fichaKardex.saldoProperty().setValue(produtoEstoqueList.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
+//
+//            fichaKardex.vlrSaldoProperty().setValue(produtoEstoqueList.stream().filter(stq -> stq.qtdProperty().getValue() > 0)
+//                    .map(stq ->
+//                            (stq.vlrBrutoProperty().getValue()
+//                                    .add(stq.vlrFreteBrutoProperty().getValue())
+//                                    .add(stq.vlrImpostoNaEntradaProperty().getValue())
+//                                    .add(stq.vlrImpostoFreteNaEntradaProperty().getValue())
+//                                    .add(stq.vlrImpostoDentroFreteProperty().getValue())
+//                                    .add(stq.vlrFreteTaxaProperty().getValue()))
+//                                    .multiply(BigDecimal.valueOf(stq.qtdProperty().getValue()))
+//                    )
+//                    .reduce(BigDecimal.ZERO, BigDecimal::add));
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -698,21 +687,12 @@ public class TmodelEntradaProduto {
     /**
      * Begin Gets and Setters
      */
-
     public TablePosition getTp() {
         return tp;
     }
 
     public void setTp(TablePosition tp) {
         this.tp = tp;
-    }
-
-    public TextField getTxtPesquisaProduto() {
-        return txtPesquisaProduto;
-    }
-
-    public void setTxtPesquisaProduto(TextField txtPesquisaProduto) {
-        this.txtPesquisaProduto = txtPesquisaProduto;
     }
 
     public TableView<EntradaProdutoProduto> getTvItensNfe() {
@@ -731,12 +711,12 @@ public class TmodelEntradaProduto {
         this.entradaProdutoProdutoObservableList = entradaProdutoProdutoObservableList;
     }
 
-    public EntradaProdutoProduto getEntradaProdutoProduto() {
-        return entradaProdutoProduto;
+    public TextField getTxtPesquisaProduto() {
+        return txtPesquisaProduto;
     }
 
-    public void setEntradaProdutoProduto(EntradaProdutoProduto entradaProdutoProduto) {
-        this.entradaProdutoProduto = entradaProdutoProduto;
+    public void setTxtPesquisaProduto(TextField txtPesquisaProduto) {
+        this.txtPesquisaProduto = txtPesquisaProduto;
     }
 
     public TableColumn<EntradaProdutoProduto, String> getColId() {
@@ -771,12 +751,12 @@ public class TmodelEntradaProduto {
         this.colProdDescricao = colProdDescricao;
     }
 
-    public TableColumn<EntradaProdutoProduto, TipoCodigoCFOP> getColTipoSaidaProduto() {
-        return colTipoSaidaProduto;
+    public TableColumn<EntradaProdutoProduto, TipoCodigoCFOP> getColCFOP() {
+        return colCFOP;
     }
 
-    public void setColTipoSaidaProduto(TableColumn<EntradaProdutoProduto, TipoCodigoCFOP> colTipoSaidaProduto) {
-        this.colTipoSaidaProduto = colTipoSaidaProduto;
+    public void setColCFOP(TableColumn<EntradaProdutoProduto, TipoCodigoCFOP> colCFOP) {
+        this.colCFOP = colCFOP;
     }
 
     public TableColumn<EntradaProdutoProduto, String> getColProdLote() {
@@ -925,6 +905,18 @@ public class TmodelEntradaProduto {
 
     public void setTotalDesconto(BigDecimal totalDesconto) {
         this.totalDesconto.set(totalDesconto);
+    }
+
+    public BigDecimal getTotalImposto() {
+        return totalImposto.get();
+    }
+
+    public ObjectProperty<BigDecimal> totalImpostoProperty() {
+        return totalImposto;
+    }
+
+    public void setTotalImposto(BigDecimal totalImposto) {
+        this.totalImposto.set(totalImposto);
     }
 
     public BigDecimal getTotalLiquido() {

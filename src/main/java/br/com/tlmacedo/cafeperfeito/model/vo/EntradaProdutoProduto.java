@@ -44,22 +44,27 @@ public class EntradaProdutoProduto implements Serializable {
     public EntradaProdutoProduto() {
     }
 
-//    public EntradaProdutoProduto(Produto produto) {
-//        this.codigo = new SimpleStringProperty(produto.codigoProperty().getValue());
-//        this.descricao = new SimpleStringProperty(produto.getDescricao());
-//        this.lote = new SimpleStringProperty("");
-//        this.validade = new SimpleObjectProperty<LocalDate>(LocalDate.now());
-//        this.qtd = new SimpleIntegerProperty(1);
-//        this.vlrFabrica = new SimpleObjectProperty<>(produto.precoCompraProperty().getValue().setScale(2));
-//        this.vlrBruto = new SimpleObjectProperty<>(produto.precoCompraProperty().getValue().setScale(2));
-//        this.vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
-//        this.vlrImposto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
-//        this.vlrLiquido = new SimpleObjectProperty<>(produto.precoCompraProperty().getValue().setScale(2));
-//        this.estoque = new SimpleIntegerProperty(produto.tblEstoqueProperty().getValue());
-//        this.varejo = new SimpleIntegerProperty(produto.getVarejo());
-//        this.volume = new SimpleIntegerProperty(1);
-//        this.produto = new ProdutoDAO().getById(Produto.class, produto.getId());
-//    }
+    public EntradaProdutoProduto(Produto produto, TipoCodigoCFOP codigoCFOP) {
+        this.produtoProperty().setValue(produto);
+        this.codigo = getProduto().codigoProperty();
+        this.descricao = getProduto().descricaoProperty();
+        this.codigoCFOP = codigoCFOP;
+        this.lote = new SimpleStringProperty("");
+        this.dtValidade = new SimpleObjectProperty<>(LocalDate.now());
+        this.qtd = new SimpleIntegerProperty(1);
+
+        this.vlrUnitario = getProduto().precoCompraProperty();
+        this.vlrBruto = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
+        this.vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
+//        if (!codigoCFOP.equals(TipoCodigoCFOP.COMERCIALIZACAO)) {
+//            this.vlrDesconto = new SimpleObjectProperty<>(vlrVendaProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
+//        }
+        this.vlrImposto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
+        this.vlrLiquido = new SimpleObjectProperty<>(vlrBrutoProperty().getValue().subtract(vlrDescontoProperty().getValue()));
+        this.estoque = produto.tblEstoqueProperty();
+        this.varejo = produto.varejoProperty();
+        this.volume = new SimpleIntegerProperty(1);
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -19,7 +19,7 @@ public class SaidaProdutoProduto implements Serializable {
     private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
     private StringProperty codigo = new SimpleStringProperty();
     private StringProperty descricao = new SimpleStringProperty();
-    private TipoCodigoCFOP tipoCodigoCFOP;
+    private TipoCodigoCFOP codigoCFOP;
     private StringProperty lote = new SimpleStringProperty();
     private ObjectProperty<LocalDate> dtValidade = new SimpleObjectProperty<>();
 
@@ -36,12 +36,12 @@ public class SaidaProdutoProduto implements Serializable {
     public SaidaProdutoProduto() {
     }
 
-    public SaidaProdutoProduto(Produto produto, TipoCodigoCFOP tipSaida, Integer qtd) {
+    public SaidaProdutoProduto(Produto produto, TipoCodigoCFOP codigoCFOP, Integer qtd) {
 //        Produto prod = new Produto(produto);
         this.produtoProperty().setValue(produto);
         this.codigo = getProduto().codigoProperty();
         this.descricao = getProduto().descricaoProperty();
-        this.tipoCodigoCFOP = tipSaida;
+        this.codigoCFOP = codigoCFOP;
         this.qtd = new SimpleIntegerProperty(qtd == null ? 1 : qtd);
 
         this.estoque = produto.tblEstoqueProperty();
@@ -49,7 +49,7 @@ public class SaidaProdutoProduto implements Serializable {
         this.dtValidade = produto.tblValidadeProperty();
         this.vlrVenda = getProduto().precoVendaProperty();
         this.vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
-        if (!tipSaida.equals(TipoCodigoCFOP.COMERCIALIZACAO)) {
+        if (!codigoCFOP.equals(TipoCodigoCFOP.COMERCIALIZACAO)) {
             this.vlrDesconto = new SimpleObjectProperty<>(vlrVendaProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
         }
         this.vlrBruto = new SimpleObjectProperty<>(vlrVendaProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
@@ -124,12 +124,12 @@ public class SaidaProdutoProduto implements Serializable {
     }
 
     @Enumerated(EnumType.ORDINAL)
-    public TipoCodigoCFOP getTipoCodigoCFOP() {
-        return tipoCodigoCFOP;
+    public TipoCodigoCFOP getCodigoCFOP() {
+        return codigoCFOP;
     }
 
-    public void setTipoCodigoCFOP(TipoCodigoCFOP tipoCodigoCFOP) {
-        this.tipoCodigoCFOP = tipoCodigoCFOP;
+    public void setCodigoCFOP(TipoCodigoCFOP tipoCodigoCFOP) {
+        this.codigoCFOP = tipoCodigoCFOP;
     }
 
     @Column(length = 15)
@@ -302,7 +302,7 @@ public class SaidaProdutoProduto implements Serializable {
 //                ", idProd=" + idProd +
                 ", codigo=" + codigo +
                 ", descricao=" + descricao +
-                ", tipoSaidaProduto=" + tipoCodigoCFOP +
+                ", tipoSaidaProduto=" + codigoCFOP +
                 ", lote=" + lote +
                 ", dtValidade=" + dtValidade +
                 ", qtd=" + qtd +

@@ -157,20 +157,25 @@ public class TmodelProduto {
                     final int[] estq = {0};
                     TreeItem<Produto> prodTree = new TreeItem<>(produtoTreeItem);
                     getProdutoTreeItem().getChildren().add(prodTree);
-                    produtoTreeItem.getProdutoEstoqueList().stream()
-                            .filter(produtoEstoque -> produtoEstoque.qtdProperty().getValue().compareTo(0) > 0)
-                            .sorted(Comparator.comparing(ProdutoEstoque::getValidade))
-                            .collect(Collectors.groupingBy(ProdutoEstoque::getLote,
-                                    LinkedHashMap::new,
-                                    Collectors.toList()))
-                            .forEach((s, produtoEstoques) -> {
-                                ProdutoEstoque estoque = new ProdutoEstoque();
-                                estoque.qtdProperty().setValue(produtoEstoques.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
-                                estoque.loteProperty().setValue(s);
-                                estoque.validadeProperty().setValue(produtoEstoques.stream().findFirst().orElse(null).validadeProperty().getValue());
-                                estq[0] += estoque.qtdProperty().getValue();
-                                prodTree.getChildren().add(new TreeItem<>(new Produto(estoque)));
-                            });
+                    if (gettModelTipo().equals(TModelTipo.PROD_VENDA))
+                        produtoTreeItem.getProdutoEstoqueList().stream()
+                                .filter(produtoEstoque -> produtoEstoque.qtdProperty().getValue().compareTo(0) > 0)
+                                .sorted(Comparator.comparing(ProdutoEstoque::getValidade))
+                                .collect(Collectors.groupingBy(ProdutoEstoque::getLote,
+                                        LinkedHashMap::new,
+                                        Collectors.toList()))
+                                .forEach((s, produtoEstoques) -> {
+                                    ProdutoEstoque estoque = new ProdutoEstoque();
+                                    estoque.qtdProperty().setValue(produtoEstoques.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
+                                    estoque.loteProperty().setValue(s);
+                                    estoque.validadeProperty().setValue(produtoEstoques.stream().findFirst().orElse(null).validadeProperty().getValue());
+                                    estq[0] += estoque.qtdProperty().getValue();
+
+                                    prodTree.getChildren().add(new TreeItem<>(new Produto(estoque)));
+                                });
+                    else
+                        estq[0] = produtoTreeItem.getProdutoEstoqueList().stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd));
+
                     prodTree.getValue().setTblEstoque(estq[0]);
                 }
         );
@@ -184,6 +189,9 @@ public class TmodelProduto {
 
         if (gettModelTipo().equals(TModelTipo.PROD_VENDA)) {
             getTtvProduto().getColumns().remove(getColPrecoCompra());
+        } else {
+            getTtvProduto().getColumns().remove(getColLote());
+            getTtvProduto().getColumns().remove(getColValidade());
         }
 
         getTtvProduto().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);

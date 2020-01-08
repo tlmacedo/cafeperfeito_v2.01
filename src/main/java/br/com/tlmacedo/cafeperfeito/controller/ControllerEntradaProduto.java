@@ -28,6 +28,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
@@ -38,6 +39,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -120,7 +122,7 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     public Label lblRegistrosLocalizados;
     public TreeTableView<Produto> ttvProduto;
     public VBox vBoxItensNfeDetalhe;
-    public TableView<EntradaProdutoProduto> tvItensNfeDetalhe;
+    public TableView<EntradaProdutoProduto> tvItensNfe;
     public VBox vBoxTotalQtdItem;
     public Label lblQtdItem;
     public VBox vBoxTotalQtdTotal;
@@ -231,6 +233,16 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
             if (n == null)
                 statusBarProperty().setValue(StatusBarEntradaProduto.DIGITACAO);
             showStatusBar();
+        });
+
+        getTtvProduto().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() != KeyCode.ENTER
+                    || getTtvProduto().getSelectionModel().getSelectedItem() == null)
+                return;
+            getEntradaProdutoProdutoObservableList().add(
+                    new EntradaProdutoProduto(getProdutoSelecionado(), TipoCodigoCFOP.COMERCIALIZACAO)
+            );
+            ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().fireEvent(ServiceComandoTecladoMouse.pressTecla(KeyCode.F8));
         });
 
 //        getTtvProduto().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
@@ -363,9 +375,9 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                             getTxtPesquisaProduto().requestFocus();
                             break;
                         case F8:
-                            getTvItensNfeDetalhe().requestFocus();
-                            getTvItensNfeDetalhe().getSelectionModel().select(getEntradaProdutoProdutoObservableList().size() - 1,
-                                    getTmodelEntradaProduto().getColQtd());
+                            getTvItensNfe().requestFocus();
+                            getTvItensNfe().getSelectionModel().select(getEntradaProdutoProdutoObservableList().size() - 1,
+                                    getTmodelEntradaProduto().getColProdLote());
                             break;
                         case F9:
                             getTpnNfeDetalheFiscal().setExpanded(!getTpnNfeDetalheFiscal().isExpanded());
@@ -405,6 +417,13 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
         new ServiceAutoCompleteComboBox(FiscalFreteSituacaoTributaria.class, getCboCteSistuacaoTributaria());
 
         new ServiceAutoCompleteComboBox(FiscalTributosSefazAm.class, getCboCteFiscalTributo());
+
+        getTxtPesquisaProduto().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() != KeyCode.ENTER
+                    && getEntradaProdutoProdutoObservableList().size() <= 0) return;
+            getTtvProduto().requestFocus();
+            getTtvProduto().getSelectionModel().selectFirst();
+        });
 
         getTxtNfeChave().setOnDragOver(event -> {
             if (getTxtNfeChave().isDisable()) return;
@@ -464,6 +483,81 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                 }, getTxtNfeFiscalVlrTributo().textProperty(), getTxtNfeFiscalVlrMulta().textProperty(),
                 getTxtNfeFiscalVlrJuros().textProperty(), getTxtNfeFiscalVlrTaxa().textProperty()
         ));
+
+        getLblNfeFiscalVlrPercentual().textProperty().bind(Bindings.createStringBinding(() -> {
+                    BigDecimal vlrNfe = ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrNFe().getText(), 2);
+                    BigDecimal vlrTotal = ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 2);
+                    try {
+                        return ServiceMascara.getMoeda(vlrTotal
+                                .divide(vlrNfe, 5, RoundingMode.HALF_UP)
+                                .multiply(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP), 2);
+                    } catch (ArithmeticException ae) {
+                        return "0,00";
+                    }
+                }, getTxtNfeFiscalVlrNFe().textProperty(), getLblNfeFiscalVlrTotal().textProperty()
+        ));
+
+        getLblCteVlrLiquido().textProperty().bind(Bindings.createStringBinding(() -> {
+                    BigDecimal vlrBruto = ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrBruto().getText(), 2);
+                    BigDecimal vlrTaxa = ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrTaxa().getText(), 2);
+                    BigDecimal vlrColeta = ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrColeta().getText(), 2);
+                    BigDecimal vlrImposto = ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrImposto().getText(), 2);
+                    return ServiceMascara.getMoeda(vlrBruto.add(vlrTaxa).add(vlrColeta).add(vlrImposto), 2);
+                }, getTxtCteVlrBruto().textProperty(), getTxtCteVlrTaxa().textProperty(),
+                getTxtCteVlrColeta().textProperty(), getTxtCteVlrImposto().textProperty()
+        ));
+
+        getLblCteFiscalVlrCte().textProperty().bind(getLblCteVlrLiquido().textProperty());
+
+        getLblCteFiscalVlrTotal().textProperty().bind(Bindings.createStringBinding(() -> {
+                    BigDecimal vlrTributo = ServiceMascara.getBigDecimalFromTextField(getTxtCteFiscalVlrTributo().getText(), 2);
+                    BigDecimal vlrMulta = ServiceMascara.getBigDecimalFromTextField(getTxtCteFiscalVlrMulta().getText(), 2);
+                    BigDecimal vlrJuros = ServiceMascara.getBigDecimalFromTextField(getTxtCteFiscalVlrJuros().getText(), 2);
+                    BigDecimal vlrTaxa = ServiceMascara.getBigDecimalFromTextField(getTxtCteFiscalVlrTaxa().getText(), 2);
+
+                    return ServiceMascara.getMoeda(vlrTributo.add(vlrMulta).add(vlrJuros).add(vlrTaxa), 2);
+                }, getTxtCteFiscalVlrTributo().textProperty(), getTxtCteFiscalVlrMulta().textProperty(),
+                getTxtCteFiscalVlrJuros().textProperty(), getTxtCteFiscalVlrTaxa().textProperty()
+        ));
+
+        getLblCteFiscalVlrPercentual().textProperty().bind(Bindings.createStringBinding(() -> {
+                    BigDecimal vlrCte = ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrCte().getText(), 2);
+                    BigDecimal vlrTotal = ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2);
+                    try {
+                        return ServiceMascara.getMoeda(vlrTotal
+                                .divide(vlrCte, 5, RoundingMode.HALF_UP)
+                                .multiply(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP), 2);
+                    } catch (ArithmeticException ae) {
+                        return "0,00";
+                    }
+                }, getLblCteFiscalVlrCte().textProperty(), getLblCteFiscalVlrTotal().textProperty()
+        ));
+
+        getLblQtdItem().textProperty().bind(getTmodelEntradaProduto().totalQtdItemProperty().asString());
+        getLblQtdTotal().textProperty().bind(getTmodelEntradaProduto().totalQtdProdutoProperty().asString());
+        getLblQtdVolume().textProperty().bind(getTmodelEntradaProduto().totalQtdVolumeProperty().asString());
+        getLblTotalBruto().textProperty().bind(Bindings.createStringBinding(() ->
+                        ServiceMascara.getMoeda(getTmodelEntradaProduto().totalBrutoProperty().getValue(), 2),
+                getTmodelEntradaProduto().totalBrutoProperty()
+        ));
+        getLblTotalImposto().textProperty().bind(Bindings.createStringBinding(() ->
+                        ServiceMascara.getMoeda(getTmodelEntradaProduto().totalImpostoProperty().getValue()
+                                .add(ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 2))
+                                .add(ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2)), 2),
+                getTmodelEntradaProduto().totalImpostoProperty()
+        ));
+        getLblTotalFrete().textProperty().bind(getLblCteVlrLiquido().textProperty());
+        getLblTotalDesconto().textProperty().bind(Bindings.createStringBinding(() ->
+                        ServiceMascara.getMoeda(getTmodelEntradaProduto().totalDescontoProperty().getValue(), 2),
+                getTmodelEntradaProduto().totalDescontoProperty()
+        ));
+        getLblTotalLiquido().textProperty().bind(Bindings.createStringBinding(() ->
+                        ServiceMascara.getMoeda(getTmodelEntradaProduto().totalLiquidoProperty().getValue()
+                                .add(ServiceMascara.getBigDecimalFromTextField(getLblTotalFrete().getText(), 2)), 2),
+                getTmodelEntradaProduto().totalLiquidoProperty()
+        ));
+
+
     }
 
     /**
@@ -485,85 +579,57 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                                 tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
                         switch (tasks) {
                             case TABELA_CRIAR:
-                                tempo.fim("inicio");
-
-                                tempo.start("setTmodelProduto");
                                 setTmodelProduto(new TmodelProduto(TModelTipo.PROD_COMPRA));
-                                tempo.fim("setTmodelProduto");
-                                tempo.start("getTmodelProduto().criaTabela()");
                                 getTmodelProduto().criaTabela();
-                                tempo.fim("getTmodelProduto().criaTabela()");
 
-//                                setTmodelEntradaProduto(new TmodelEntradaProduto());
-//                                getTmodelEntradaProduto().criaTabela();
+                                setTmodelEntradaProduto(new TmodelEntradaProduto());
+                                getTmodelEntradaProduto().criaTabela();
                                 break;
 
                             case TABELA_VINCULAR:
-                                tempo.start("TABELA_VINCULAR");
                                 getTmodelProduto().setLblRegistrosLocalizados(getLblRegistrosLocalizados());
                                 getTmodelProduto().setTtvProduto(getTtvProduto());
                                 getTmodelProduto().setTxtPesquisa(getTxtPesquisaProduto());
                                 setProdutoFilteredList(getTmodelProduto().getProdutoFilteredList());
-                                tempo.fim("TABELA_VINCULAR");
-                                tempo.start("getTmodelProduto().escutaLista()");
                                 getTmodelProduto().escutaLista();
-                                tempo.fim("getTmodelProduto().escutaLista()");
 
-//                                getTmodelEntradaProduto().setTvItensNfe(getTtvItensNfe());
-//                                getTmodelEntradaProduto().setTxtPesquisaProduto(getTxtPesquisa());
-//                                getTmodelEntradaProduto().setDtpDtSaida(getDtpDtSaida());
-//                                getTmodelEntradaProduto().setDtpDtVencimento(getDtpDtVencimento());
-////                                empresaProperty().setValue(getTmodelSaidaProduto().empresaProperty().getValue());
-//                                getTmodelEntradaProduto().setFornecedor(empresaProperty().getValue());
-//                                getTmodelEntradaProduto().setEntradaProduto(getSaidaProduto());
-//                                getTmodelEntradaProduto().setEntradaProdutoProdutoObservableList(getSaidaProdutoProdutoObservableList());
-////                                setSaidaProduto(getTmodelSaidaProduto().getSaidaProduto());
-////                                setSaidaProdutoProdutoObservableList(getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList());
-//                                getTmodelEntradaProduto().escutaLista();
+                                getTmodelEntradaProduto().setTvItensNfe(getTvItensNfe());
+                                getTmodelEntradaProduto().setTxtPesquisaProduto(getTxtPesquisaProduto());
+                                getTmodelEntradaProduto().setEntradaProdutoProdutoObservableList(getEntradaProdutoProdutoObservableList());
+                                getTmodelEntradaProduto().escutaLista();
                                 break;
                             case COMBOS_PREENCHER:
-//                                ServiceCalculaTempo tempo = new ServiceCalculaTempo();
-                                tempo.start("loadListaEmpresa");
                                 loadListaEmpresas();
-                                tempo.fim("loadListaEmpresa");
 
-                                tempo.start("setCboNfeModelo");
                                 getCboNfeModelo().setItems(
                                         Arrays.stream(NfeCteModelo.values()).collect(Collectors.toCollection(FXCollections::observableArrayList))
                                 );
-                                tempo.fim("setCboNfeModelo");
-                                tempo.start("getCboCteModelo");
+
                                 getCboCteModelo().setItems(
                                         Arrays.stream(NfeCteModelo.values()).collect(Collectors.toCollection(FXCollections::observableArrayList))
                                 );
-                                tempo.fim("getCboCteModelo");
-                                tempo.start("getCboCteSistuacaoTributaria");
+
                                 getCboCteSistuacaoTributaria().setItems(new FiscalFreteSituacaoTributariaDAO()
                                         .getAll(FiscalFreteSituacaoTributaria.class, null, "id").stream()
                                         .collect(Collectors.toCollection(FXCollections::observableArrayList))
                                 );
-                                tempo.fim("getCboCteSistuacaoTributaria");
-                                tempo.start("FiscalTributosSefazAm");
+
                                 ObservableList<FiscalTributosSefazAm> tributosSefazAmObservableList = new FiscalTributosSefazAmDAO()
                                         .getAll(FiscalTributosSefazAm.class, null, "id").stream()
                                         .collect(Collectors.toCollection(FXCollections::observableArrayList));
 
                                 getCboNfeFiscalTributo().setItems(tributosSefazAmObservableList);
                                 getCboCteFiscalTributo().setItems(tributosSefazAmObservableList);
-                                tempo.fim("FiscalTributosSefazAm");
-                                tempo.start("getCboCteTomadorServico");
+
                                 getCboCteTomadorServico().setItems(
                                         Arrays.stream(CteTomadorServico.values()).collect(Collectors.toCollection(FXCollections::observableArrayList))
                                 );
-                                tempo.fim("getCboCteTomadorServico");
                                 break;
 
                             case TABELA_PREENCHER:
-                                tempo.start("getTmodelProduto().preencheTabela()");
                                 getTmodelProduto().preencheTabela();
-                                tempo.fim("getTmodelProduto().preencheTabela()");
 
-//                                getTmodelEntradaProduto().preencheTabela();
+                                getTmodelEntradaProduto().preencheTabela();
                                 break;
 
                             case SALVAR_SAIDA:
@@ -711,6 +777,15 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
         );
     }
 
+    private Produto getProdutoSelecionado() {
+        Produto produtoSelecionado = null;
+        if (getTtvProduto().getSelectionModel().getSelectedItem().getValue().idProperty().getValue() != 0)
+            produtoSelecionado = new Produto(getTtvProduto().getSelectionModel().getSelectedItem().getValue());
+        else
+            produtoSelecionado = new Produto((getTtvProduto().getSelectionModel().getSelectedItem().getParent().getValue()));
+        return produtoSelecionado;
+    }
+
     private void addXmlNfe(File file) {
         if (!file.getName().toLowerCase().contains("nfe")) return;
         TNfeProc nfeProc = null;
@@ -783,9 +858,9 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                 tmpTaxas += Double.parseDouble(comp.getVComp());
         getTxtCteVlrTaxa().setText(BigDecimal.valueOf(tmpTaxas).setScale(2).toString());
 
-        getLblCteVlrLiquido().setText(cteProc.getCTe().getInfCte().getVPrest().getVTPrest());
+        //getLblCteVlrLiquido().setText(cteProc.getCTe().getInfCte().getVPrest().getVTPrest());
 
-        getLblCteFiscalVlrCte().setText(cteProc.getCTe().getInfCte().getVPrest().getVTPrest());
+        //getLblCteFiscalVlrCte().setText(cteProc.getCTe().getInfCte().getVPrest().getVTPrest());
 
         CteProc finalCteProc = cteProc;
         getCboCteTomadorServico().getSelectionModel().select(
@@ -1283,12 +1358,12 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
         this.vBoxItensNfeDetalhe = vBoxItensNfeDetalhe;
     }
 
-    public TableView<EntradaProdutoProduto> getTvItensNfeDetalhe() {
-        return tvItensNfeDetalhe;
+    public TableView<EntradaProdutoProduto> getTvItensNfe() {
+        return tvItensNfe;
     }
 
-    public void setTvItensNfeDetalhe(TableView<EntradaProdutoProduto> tvItensNfeDetalhe) {
-        this.tvItensNfeDetalhe = tvItensNfeDetalhe;
+    public void setTvItensNfe(TableView<EntradaProdutoProduto> tvItensNfe) {
+        this.tvItensNfe = tvItensNfe;
     }
 
     public VBox getvBoxTotalQtdItem() {
