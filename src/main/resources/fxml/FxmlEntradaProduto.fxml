@@ -178,7 +178,7 @@
                                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="1320.0">
                                                     <children>
                                                         <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="5.0"
-                                                              prefWidth="85.0">
+                                                              prefWidth="90.0">
                                                             <children>
                                                                 <Label prefWidth="600.0" styleClass="float"
                                                                        text="N° Controle">
@@ -199,7 +199,7 @@
                                                                 </TextField>
                                                             </children>
                                                         </VBox>
-                                                        <VBox alignment="CENTER_LEFT" layoutX="95.0" layoutY="5.0"
+                                                        <VBox alignment="CENTER_LEFT" layoutX="100.0" layoutY="5.0"
                                                               prefWidth="85.0">
                                                             <children>
                                                                 <Label prefWidth="600.0" styleClass="float"
@@ -221,8 +221,8 @@
                                                                 </TextField>
                                                             </children>
                                                         </VBox>
-                                                        <VBox alignment="CENTER_LEFT" layoutX="185.0" layoutY="5.0"
-                                                              prefWidth="465.0">
+                                                        <VBox alignment="CENTER_LEFT" layoutX="190.0" layoutY="5.0"
+                                                              prefWidth="460.0">
                                                             <children>
                                                                 <Label prefWidth="600.0" styleClass="float"
                                                                        text="Descrição do tributo">
@@ -279,7 +279,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalVlrTributo"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -302,7 +301,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalVlrMulta"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -325,7 +323,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalVlrJuros"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -348,7 +345,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtNfeFiscalVlrTaxa"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -404,7 +400,7 @@
                                                                     </padding>
                                                                 </Label>
                                                                 <Label fx:id="lblNfeFiscalVlrPercentual"
-                                                                       accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
+                                                                       accessibleText="len::12;type::moeda;decimal::4;value::0,0000;seteditable::false;binding::true;"
                                                                        alignment="CENTER_RIGHT" prefWidth="600.0"
                                                                        styleClass="lbl_informacao" text="0,00"
                                                                        textAlignment="RIGHT">
@@ -516,7 +512,7 @@
                                                     </padding>
                                                 </Label>
                                                 <ComboBox fx:id="cboCteModelo" accessibleText="value::;"
-                                                >
+                                                          maxWidth="600.0">
                                                     <tooltip>
                                                         <Tooltip text="modelo cte da nfe de entrada"/>
                                                     </tooltip>
@@ -534,8 +530,7 @@
                                                     </padding>
                                                 </Label>
                                                 <DatePicker fx:id="dtpCteEmissao"
-                                                            accessibleText="len::;type::;value::;seteditable::;binding::true;"
-                                                >
+                                                            accessibleText="len::;type::;value::;seteditable::;binding::true;">
                                                     <tooltip>
                                                         <Tooltip text="data de emissão do cte da nfe de entrada"/>
                                                     </tooltip>
@@ -627,7 +622,7 @@
                                                     </padding>
                                                 </Label>
                                                 <TextField fx:id="txtCtePesoBruto"
-                                                           accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
+                                                           accessibleText="len::12;type::peso;decimal::2;value::0,00;seteditable::;"
                                                            styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="peso bruto do cte da nfe de entrada"/>
@@ -728,8 +723,7 @@
                                                 <Label fx:id="lblCteVlrLiquido"
                                                        accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
                                                        alignment="CENTER_RIGHT" prefWidth="600.0"
-                                                       styleClass="lbl_informacao" text="0,00"
-                                                       textAlignment="RIGHT">
+                                                       styleClass="lbl_informacao" text="0,00" textAlignment="RIGHT">
                                                     <tooltip>
                                                         <Tooltip text="valor líquido do frete da nfe de entrada"/>
                                                     </tooltip>
@@ -743,7 +737,7 @@
                                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="1320.0">
                                                     <children>
                                                         <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="5.0"
-                                                              prefWidth="85.0">
+                                                              prefWidth="90.0">
                                                             <children>
                                                                 <Label prefWidth="600.0" styleClass="float"
                                                                        text="N° Controle">
@@ -756,7 +750,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalControle"
                                                                            accessibleText="len::13;type::numero;value::;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -765,7 +758,7 @@
                                                                 </TextField>
                                                             </children>
                                                         </VBox>
-                                                        <VBox alignment="CENTER_LEFT" layoutX="95.0" layoutY="5.0"
+                                                        <VBox alignment="CENTER_LEFT" layoutX="100.0" layoutY="5.0"
                                                               prefWidth="85.0">
                                                             <children>
                                                                 <Label prefWidth="600.0" styleClass="float"
@@ -779,7 +772,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalOrigem"
                                                                            accessibleText="len::12;type::fiscal_doc_origem;value::;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -788,8 +780,8 @@
                                                                 </TextField>
                                                             </children>
                                                         </VBox>
-                                                        <VBox alignment="CENTER_LEFT" layoutX="185.0" layoutY="5.0"
-                                                              prefWidth="465.0">
+                                                        <VBox alignment="CENTER_LEFT" layoutX="190.0" layoutY="5.0"
+                                                              prefWidth="460.0">
                                                             <children>
                                                                 <Label prefWidth="600.0" styleClass="float"
                                                                        text="Descrição do tributo">
@@ -800,8 +792,7 @@
                                                                         <Insets left="5.0"/>
                                                                     </padding>
                                                                 </Label>
-                                                                <ComboBox fx:id="cboCteFiscalTributo" prefWidth="600.0"
-                                                                >
+                                                                <ComboBox fx:id="cboCteFiscalTributo" prefWidth="600.0">
                                                                     <tooltip>
                                                                         <Tooltip
                                                                                 text="fornecedor emissor do cte de entrada"/>
@@ -847,7 +838,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalVlrTributo"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -870,7 +860,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalVlrMulta"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -893,7 +882,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalVlrJuros"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -916,7 +904,6 @@
                                                                 </Label>
                                                                 <TextField fx:id="txtCteFiscalVlrTaxa"
                                                                            accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::;"
-
                                                                            styleClass="a-direita">
                                                                     <tooltip>
                                                                         <Tooltip
@@ -962,7 +949,7 @@
                                                                     </padding>
                                                                 </Label>
                                                                 <Label fx:id="lblCteFiscalVlrPercentual"
-                                                                       accessibleText="len::12;type::moeda;decimal::2;value::0,00;seteditable::false;binding::true;"
+                                                                       accessibleText="len::12;type::moeda;decimal::4;value::0,0000;seteditable::false;binding::true;"
                                                                        alignment="CENTER_RIGHT" prefWidth="600.0"
                                                                        styleClass="lbl_informacao" text="0,00"
                                                                        textAlignment="RIGHT">
@@ -990,15 +977,14 @@
             </font>
         </TitledPane>
         <TitledPane fx:id="tpnItensTotaisDetalhe" collapsible="false" expanded="true" focusTraversable="false"
-                    layoutX="5.0"
-                    layoutY="360.0" minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="1340.0"
+                    layoutX="5.0" layoutY="360.0" minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="1340.0"
                     text="Itens e totais da nf-e">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="1340.0">
                     <children>
-                        <TitledPane collapsible="false" focusTraversable="false"
-                                    layoutX="5.0" layoutY="5.0" minHeight="0.0" minWidth="0.0" prefHeight="173.0"
-                                    prefWidth="1330.0" text="Cadastro de produto">
+                        <TitledPane collapsible="false" focusTraversable="false" layoutX="5.0" layoutY="5.0"
+                                    minHeight="0.0" minWidth="0.0" prefHeight="173.0" prefWidth="1330.0"
+                                    text="Cadastro de produto">
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="1330.0">
                                     <children>
@@ -1013,8 +999,7 @@
                                                     </padding>
                                                 </Label>
                                                 <TextField fx:id="txtPesquisaProduto"
-                                                           accessibleText="len::80;type::TEXTO;value::;seteditable::;"
-                                                >
+                                                           accessibleText="len::80;type::TEXTO;value::;seteditable::;">
                                                     <tooltip>
                                                         <Tooltip text="campo de pesquisa."/>
                                                     </tooltip>
@@ -1091,8 +1076,7 @@
                         <!--                                <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="1330.0">-->
                         <!--                                    <children>-->
                         <VBox fx:id="vBoxItensNfeDetalhe" alignment="CENTER_LEFT" layoutX="5.0" layoutY="180.0"
-                              prefHeight="155.0"
-                              prefWidth="1330.0">
+                              prefHeight="155.0" prefWidth="1330.0">
                             <children>
                                 <Label prefWidth="1500.0" styleClass="float" text="Itens da nf-e">
                                     <VBox.margin>
@@ -1102,9 +1086,8 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <TableView fx:id="tvItensNfe"
-                                           accessibleText="len::;type::;value::;seteditable::;" layoutX="5.0"
-                                           nodeOrientation="LEFT_TO_RIGHT">
+                                <TableView fx:id="tvItensNfe" accessibleText="len::;type::;value::;seteditable::;"
+                                           layoutX="5.0" nodeOrientation="LEFT_TO_RIGHT">
                                     <tooltip>
                                         <Tooltip text="tabela com lista de produto"/>
                                     </tooltip>
@@ -1112,8 +1095,7 @@
                             </children>
                         </VBox>
                         <VBox fx:id="vBoxTotalQtdItem" alignment="CENTER_LEFT" layoutX="65.0" layoutY="5.0"
-                              prefWidth="150.0"
-                              AnchorPane.bottomAnchor="0.0">
+                              prefWidth="150.0" AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Qtd Itens">
                                     <VBox.margin>
@@ -1123,8 +1105,8 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <Label fx:id="lblQtdItem" maxWidth="600.0"
-                                       styleClass="label-total-valor" text="Qtd Itens">
+                                <Label fx:id="lblQtdItem" maxWidth="600.0" styleClass="label-total-valor"
+                                       text="Qtd Itens">
                                     <tooltip>
                                         <Tooltip text="Qtd itens da entrada de produto"/>
                                     </tooltip>
@@ -1132,8 +1114,7 @@
                             </children>
                         </VBox>
                         <VBox fx:id="vBoxTotalQtdTotal" alignment="CENTER_LEFT" layoutX="225.0" layoutY="5.0"
-                              prefWidth="150.0"
-                              AnchorPane.bottomAnchor="0.0">
+                              prefWidth="150.0" AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Qtd Total">
                                     <VBox.margin>
@@ -1143,8 +1124,8 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <Label fx:id="lblQtdTotal" maxWidth="600.0"
-                                       styleClass="label-total-valor" text="Qtd Total">
+                                <Label fx:id="lblQtdTotal" maxWidth="600.0" styleClass="label-total-valor"
+                                       text="Qtd Total">
                                     <tooltip>
                                         <Tooltip text="Qtd total da entrada de produto"/>
                                     </tooltip>
@@ -1152,8 +1133,7 @@
                             </children>
                         </VBox>
                         <VBox fx:id="vBoxTotalQtdVolume" alignment="CENTER_LEFT" layoutX="385.0" layoutY="5.0"
-                              prefWidth="150.0"
-                              AnchorPane.bottomAnchor="0.0">
+                              prefWidth="150.0" AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Qtd Volumes">
                                     <VBox.margin>
@@ -1163,8 +1143,8 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <Label fx:id="lblQtdVolume" maxWidth="600.0"
-                                       styleClass="label-total-valor" text="Qtd Volumes">
+                                <Label fx:id="lblQtdVolume" maxWidth="600.0" styleClass="label-total-valor"
+                                       text="Qtd Volumes">
                                     <tooltip>
                                         <Tooltip text="Qtd volumes da entrada de produto"/>
                                     </tooltip>
@@ -1172,8 +1152,7 @@
                             </children>
                         </VBox>
                         <VBox fx:id="vBoxTotalBruto" alignment="CENTER_LEFT" layoutX="545.0" layoutY="5.0"
-                              prefWidth="150.0"
-                              AnchorPane.bottomAnchor="0.0">
+                              prefWidth="150.0" AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Bruto">
                                     <VBox.margin>
@@ -1183,8 +1162,8 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <Label fx:id="lblTotalBruto" maxWidth="600.0"
-                                       styleClass="label-total-valor" text="Total Bruto">
+                                <Label fx:id="lblTotalBruto" maxWidth="600.0" styleClass="label-total-valor"
+                                       text="Total Bruto">
                                     <tooltip>
                                         <Tooltip text="Total bruto da entrada de produto"/>
                                     </tooltip>
@@ -1192,8 +1171,7 @@
                             </children>
                         </VBox>
                         <VBox fx:id="vBoxTotalImposto" alignment="CENTER_LEFT" layoutX="705.0" layoutY="5.0"
-                              prefWidth="150.0"
-                              AnchorPane.bottomAnchor="0.0">
+                              prefWidth="150.0" AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Impostos">
                                     <VBox.margin>
@@ -1203,8 +1181,8 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <Label fx:id="lblTotalImposto" maxWidth="600.0"
-                                       styleClass="label-total-valor" text="Total Impostos">
+                                <Label fx:id="lblTotalImposto" maxWidth="600.0" styleClass="label-total-valor"
+                                       text="Total Impostos">
                                     <tooltip>
                                         <Tooltip text="Total impostos da entrada de produto"/>
                                     </tooltip>
@@ -1212,8 +1190,7 @@
                             </children>
                         </VBox>
                         <VBox fx:id="vBoxTotalFrete" alignment="CENTER_LEFT" layoutX="865.0" layoutY="5.0"
-                              prefWidth="150.0"
-                              AnchorPane.bottomAnchor="0.0">
+                              prefWidth="150.0" AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Frete">
                                     <VBox.margin>
@@ -1223,8 +1200,8 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <Label fx:id="lblTotalFrete" maxWidth="600.0"
-                                       styleClass="label-total-valor" text="Total Frete">
+                                <Label fx:id="lblTotalFrete" maxWidth="600.0" styleClass="label-total-valor"
+                                       text="Total Frete">
                                     <tooltip>
                                         <Tooltip text="Total frete da entrada de produto"/>
                                     </tooltip>
@@ -1232,8 +1209,7 @@
                             </children>
                         </VBox>
                         <VBox fx:id="vBoxTotalDesconto" alignment="CENTER_LEFT" layoutX="1025.0" layoutY="5.0"
-                              prefWidth="150.0"
-                              AnchorPane.bottomAnchor="0.0">
+                              prefWidth="150.0" AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Desconto">
                                     <VBox.margin>
@@ -1243,8 +1219,8 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <Label fx:id="lblTotalDesconto" maxWidth="600.0"
-                                       styleClass="label-total-valor" text="Total Desconto">
+                                <Label fx:id="lblTotalDesconto" maxWidth="600.0" styleClass="label-total-valor"
+                                       text="Total Desconto">
                                     <tooltip>
                                         <Tooltip text="Total desconto da entrada de produto"/>
                                     </tooltip>
@@ -1252,8 +1228,7 @@
                             </children>
                         </VBox>
                         <VBox fx:id="vBoxTotalLiquido" alignment="CENTER_LEFT" layoutX="1185.0" layoutY="5.0"
-                              prefWidth="150.0"
-                              AnchorPane.bottomAnchor="0.0">
+                              prefWidth="150.0" AnchorPane.bottomAnchor="0.0">
                             <children>
                                 <Label prefWidth="400.0" styleClass="float" text="Total Líquido">
                                     <VBox.margin>
@@ -1263,8 +1238,8 @@
                                         <Insets left="5.0"/>
                                     </padding>
                                 </Label>
-                                <Label fx:id="lblTotalLiquido" maxWidth="600.0"
-                                       styleClass="label-total-valor" text="Total Líquido">
+                                <Label fx:id="lblTotalLiquido" maxWidth="600.0" styleClass="label-total-valor"
+                                       text="Total Líquido">
                                     <tooltip>
                                         <Tooltip text="Total líquido da entrada de produto"/>
                                     </tooltip>

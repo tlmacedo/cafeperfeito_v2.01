@@ -2,11 +2,8 @@ package br.com.tlmacedo.cafeperfeito.model.tm;
 
 import br.com.tlmacedo.cafeperfeito.controller.ControllerPrincipal;
 import br.com.tlmacedo.cafeperfeito.model.dao.FichaKardexDAO;
-import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoEstoqueDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.TipoCodigoCFOP;
-import br.com.tlmacedo.cafeperfeito.model.vo.EntradaProdutoProduto;
-import br.com.tlmacedo.cafeperfeito.model.vo.FichaKardex;
-import br.com.tlmacedo.cafeperfeito.model.vo.ProdutoEstoque;
+import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import br.com.tlmacedo.cafeperfeito.service.format.cell.SetCellFactoryTableCell_ComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.cell.SetCellFactoryTableCell_EdtitingCell;
@@ -19,9 +16,7 @@ import javafx.scene.input.KeyEvent;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
@@ -102,11 +97,23 @@ public class TmodelEntradaProduto {
         getColProdLote().setPrefWidth(105);
         getColProdLote().setStyle("-fx-alignment: center;");
         getColProdLote().setCellValueFactory(param -> param.getValue().loteProperty());
+        getColProdLote().setCellFactory(param -> new SetCellFactoryTableCell_EdtitingCell<EntradaProdutoProduto, String>(
+                ServiceMascara.getTextoMask(15, "*")));
+        getColProdLote().setOnEditCommit(editEvent -> {
+            editEvent.getRowValue().loteProperty().setValue(editEvent.getNewValue());
+            getTvItensNfe().getSelectionModel().selectNext();
+        });
 
         setColProdValidade(new TableColumn<>("validade"));
         getColProdValidade().setPrefWidth(90);
         getColProdValidade().setStyle("-fx-alignment: center-right;");
         getColProdValidade().setCellValueFactory(param -> new SimpleStringProperty(param.getValue().dtValidadeProperty().get().format(DTF_DATA)));
+        getColProdValidade().setCellFactory(param -> new SetCellFactoryTableCell_EdtitingCell<EntradaProdutoProduto, String>(
+                "##/##/####"));
+        getColProdValidade().setOnEditCommit(editEvent -> {
+            editEvent.getRowValue().dtValidadeProperty().setValue(LocalDate.parse(editEvent.getNewValue(), DTF_DATA));
+            getTvItensNfe().getSelectionModel().selectNext();
+        });
 
         setColQtd(new TableColumn<>("qtd"));
         getColQtd().setPrefWidth(70);
@@ -519,45 +526,44 @@ public class TmodelEntradaProduto {
 //        }
 //        return kardex;
 //    }
-    private FichaKardex newFichaKardex(Integer qtdSaida, ProdutoEstoque estoque, List<ProdutoEstoque> produtoEstoqueList) {
+    private FichaKardex newFichaKardex(EntradaProdutoProduto entradaProdutoProduto, ProdutoEstoque produtoEstoque) {
         FichaKardex fichaKardex = new FichaKardex();
+        FichaKardexDAO fichaKardexDAO = new FichaKardexDAO();
         try {
-//            fichaKardex.setProduto(estoque.getProduto());
-//            fichaKardex.documentoProperty().setValue(getEntradaProdutoProduto().getEntradaProduto().idProperty().getValue().toString());
-//            fichaKardex.detalheProperty().setValue(estoque.loteProperty().getValue());
-//            fichaKardex.qtdProperty().setValue(qtdSaida);
-//            fichaKardex.vlrUnitarioProperty().setValue(estoque.vlrBrutoProperty().getValue()
-//                    .add(estoque.vlrFreteBrutoProperty().getValue())
-//                    .add(estoque.vlrImpostoNaEntradaProperty().getValue())
-//                    .add(estoque.vlrImpostoFreteNaEntradaProperty().getValue())
-//                    .add(estoque.vlrImpostoDentroFreteProperty().getValue())
-//                    .add(estoque.vlrFreteTaxaProperty().getValue())
-//            );
-//
-//            fichaKardex.qtdEntradaProperty().setValue(0);
-//            fichaKardex.vlrEntradaProperty().setValue(BigDecimal.ZERO);
-//
-//            fichaKardex.qtdSaidaProperty().setValue(qtdSaida);
-//            fichaKardex.vlrSaidaProperty().setValue(fichaKardex.vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdSaida)));
-//
-////            setLucroQtdSaida(getLucroQtdSaida() + fichaKardex.qtdSaidaProperty().getValue());
-////            setLucroVlrSaida(getLucroVlrSaida().add(fichaKardex.vlrSaidaProperty().getValue()));
-//
-//            fichaKardex.saldoProperty().setValue(produtoEstoqueList.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
-//
-//            fichaKardex.vlrSaldoProperty().setValue(produtoEstoqueList.stream().filter(stq -> stq.qtdProperty().getValue() > 0)
-//                    .map(stq ->
-//                            (stq.vlrBrutoProperty().getValue()
-//                                    .add(stq.vlrFreteBrutoProperty().getValue())
-//                                    .add(stq.vlrImpostoNaEntradaProperty().getValue())
-//                                    .add(stq.vlrImpostoFreteNaEntradaProperty().getValue())
-//                                    .add(stq.vlrImpostoDentroFreteProperty().getValue())
-//                                    .add(stq.vlrFreteTaxaProperty().getValue()))
-//                                    .multiply(BigDecimal.valueOf(stq.qtdProperty().getValue()))
-//                    )
-//                    .reduce(BigDecimal.ZERO, BigDecimal::add));
-
+            fichaKardexDAO.transactionBegin();
+            fichaKardex.produtoProperty().setValue(produtoEstoque.produtoProperty().getValue());
+            fichaKardex.documentoProperty().setValue(produtoEstoque.docEntradaProperty().getValue());
+            fichaKardex.detalheProperty().setValue(produtoEstoque.loteProperty().getValue());
+            fichaKardex.qtdProperty().setValue(produtoEstoque.qtdProperty().getValue());
+            fichaKardex.vlrUnitarioProperty().setValue(produtoEstoque.vlrUnitarioProperty().getValue()
+                    .add(produtoEstoque.vlrFreteBrutoProperty().getValue())
+                    .add(produtoEstoque.vlrImpostoNaEntradaProperty().getValue())
+                    .add(produtoEstoque.vlrImpostoFreteNaEntradaProperty().getValue())
+                    .add(produtoEstoque.vlrImpostoDentroFreteProperty().getValue())
+                    .add(produtoEstoque.vlrFreteTaxaProperty().getValue()));
+            fichaKardex.qtdEntradaProperty().setValue(fichaKardex.qtdProperty().getValue());
+            fichaKardex.vlrEntradaProperty().setValue(fichaKardex.vlrUnitarioProperty().getValue()
+                    .multiply(BigDecimal.valueOf(fichaKardex.qtdEntradaProperty().getValue())));
+            fichaKardex.qtdSaidaProperty().setValue(0);
+            fichaKardex.vlrSaidaProperty().setValue(BigDecimal.ZERO);
+            fichaKardex.saldoProperty().setValue(entradaProdutoProduto.produtoProperty().getValue()
+                    .getProdutoEstoqueList().stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
+            fichaKardex.vlrSaldoProperty().setValue(entradaProdutoProduto.produtoProperty().getValue()
+                    .getProdutoEstoqueList().stream().filter(stq -> stq.qtdProperty().getValue() > 0)
+                    .map(stq ->
+                            (stq.vlrUnitarioProperty().getValue()
+                                    .add(stq.vlrFreteBrutoProperty().getValue())
+                                    .add(stq.vlrImpostoNaEntradaProperty().getValue())
+                                    .add(stq.vlrImpostoFreteNaEntradaProperty().getValue())
+                                    .add(stq.vlrImpostoDentroFreteProperty().getValue())
+                                    .add(stq.vlrFreteTaxaProperty().getValue()))
+                                    .multiply(BigDecimal.valueOf(stq.qtdProperty().getValue()))
+                    )
+                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+            fichaKardex = fichaKardexDAO.setTransactionPersist(fichaKardex);
+            fichaKardexDAO.transactionCommit();
         } catch (Exception ex) {
+            fichaKardexDAO.transactionRollback();
             ex.printStackTrace();
             return null;
         }
@@ -626,53 +632,41 @@ public class TmodelEntradaProduto {
 //        }
 //        return true;
 //    }
-    public boolean baixarEstoque() {
-        ProdutoEstoqueDAO produtoEstoqueDAO = new ProdutoEstoqueDAO();
-        FichaKardexDAO fichaKardexDAO = new FichaKardexDAO();
+    public boolean incluirEstoque(BigDecimal freteBrutoKg, BigDecimal impEntrada, BigDecimal impFreteEntrada,
+                                  BigDecimal impFrete, BigDecimal taxaFrete, String docEntrada, String chaveNFe) {
         try {
             getEntradaProdutoProdutoObservableList().stream()
-                    .sorted(Comparator.comparing(EntradaProdutoProduto::getIdProd)).sorted(Comparator.comparing(EntradaProdutoProduto::getDtValidade))
-                    .collect(Collectors.groupingBy(EntradaProdutoProduto::getIdProd, LinkedHashMap::new, Collectors.toList()))
-                    .forEach((aLong, entradaProdutoProdutos) -> {
-                        entradaProdutoProdutos.stream()
-                                .collect(Collectors.groupingBy(EntradaProdutoProduto::getLote, LinkedHashMap::new, Collectors.toList()))
-                                .forEach((s, entradaProdutoProdutos1) -> {
-                                    final Integer[] saldoSaida = {entradaProdutoProdutos1.stream().collect(Collectors.summingInt(EntradaProdutoProduto::getQtd)), 0};
-                                    List<ProdutoEstoque> produtoEstoqueList = produtoEstoqueDAO.getAll(ProdutoEstoque.class, String.format("produto_id=%s", aLong.toString()), "validade");
-                                    produtoEstoqueList.stream().filter(estoque -> estoque.qtdProperty().getValue() > 0
-                                            && estoque.loteProperty().getValue().equals(s))
-                                            .forEach(estoque -> {
-                                                if (saldoSaida[0] > 0) {
-                                                    try {
-                                                        estoque.qtdProperty().setValue(estoque.qtdProperty().getValue() - saldoSaida[0]);
-                                                        if (estoque.qtdProperty().getValue() < 0) {
-                                                            fichaKardexDAO.setTransactionPersist(newFichaKardex(saldoSaida[0] + estoque.qtdProperty().getValue(), estoque, produtoEstoqueList));
-                                                            saldoSaida[0] = estoque.qtdProperty().getValue() * (-1);
-                                                            estoque.qtdProperty().setValue(0);
-                                                        } else {
-                                                            fichaKardexDAO.setTransactionPersist(newFichaKardex(saldoSaida[0], estoque, produtoEstoqueList));
-                                                            saldoSaida[0] = 0;
-                                                        }
-                                                        produtoEstoqueDAO.setTransactionPersist(estoque);
-                                                    } catch (Exception e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-//                                                entradaProdutoProdutos.stream()
-//                                                        .filter(entradaProdutoProduto -> entradaProdutoProduto.loteProperty().getValue()
-//                                                                .equals(estoque.loteProperty().getValue()))
-//                                                        .forEach(entradaProdutoProduto -> {
-//                                                            entradaProdutoProduto.setVlrEntradaBruto(getLucroVlrSaida());
-//                                                            entradaProdutoProduto.setVlrEntrada(getLucroVlrSaida().divide(BigDecimal.valueOf(getLucroQtdSaida()), 4, RoundingMode.HALF_UP));
-//                                                        });
-                                            });
-                                });
+                    .forEach(entradaProdutoProduto -> {
+                        Produto produto = entradaProdutoProduto.produtoProperty().getValue();
+                        ProdutoEstoque newEstoque = new ProdutoEstoque();
+                        newEstoque.produtoProperty().setValue(entradaProdutoProduto.produtoProperty().getValue());
+                        newEstoque.qtdProperty().setValue(entradaProdutoProduto.qtdProperty().getValue());
+                        newEstoque.loteProperty().setValue(entradaProdutoProduto.loteProperty().getValue());
+                        newEstoque.dtValidadeProperty().setValue(entradaProdutoProduto.dtValidadeProperty().getValue());
+                        newEstoque.vlrUnitarioProperty().setValue(entradaProdutoProduto.vlrUnitarioProperty().getValue());
+                        newEstoque.vlrFreteBrutoProperty().setValue(freteBrutoKg
+                                .multiply(entradaProdutoProduto.produtoProperty().getValue().pesoProperty().getValue())
+                                .setScale(4, RoundingMode.HALF_UP));
+                        newEstoque.vlrImpostoNaEntradaProperty().setValue(entradaProdutoProduto.produtoProperty().getValue()
+                                .precoCompraProperty().getValue().multiply(impEntrada.divide(new BigDecimal("100."))));
+                        newEstoque.vlrImpostoFreteNaEntradaProperty().setValue(impFreteEntrada);
+                        newEstoque.vlrImpostoDentroFreteProperty().setValue(impFrete);
+                        newEstoque.vlrFreteTaxaProperty().setValue(taxaFrete);
+                        newEstoque.usuarioCadastroProperty().setValue(UsuarioLogado.getUsuario());
+                        newEstoque.docEntradaProperty().setValue(docEntrada);
+                        newEstoque.docEntradaChaveNFeProperty().setValue(chaveNFe);
+
+                        produto.ultFreteProperty().setValue(newEstoque.vlrFreteBrutoProperty().getValue()
+                                .add(newEstoque.vlrFreteTaxaProperty().getValue())
+                                .add(newEstoque.vlrImpostoDentroFreteProperty().getValue()));
+                        produto.setUltImpostoSefaz(newEstoque.vlrImpostoNaEntradaProperty().getValue()
+                                .add(newEstoque.vlrImpostoNaEntradaProperty().getValue())
+                                .add(newEstoque.vlrImpostoFreteNaEntradaProperty().getValue()));
+
+                        produto.getProdutoEstoqueList().add(newEstoque);
+                        newFichaKardex(entradaProdutoProduto, newEstoque);
                     });
-            fichaKardexDAO.transactionCommit();
-            produtoEstoqueDAO.transactionCommit();
         } catch (Exception ex) {
-            fichaKardexDAO.transactionRollback();
-            produtoEstoqueDAO.transactionRollback();
             ex.printStackTrace();
             return false;
         }

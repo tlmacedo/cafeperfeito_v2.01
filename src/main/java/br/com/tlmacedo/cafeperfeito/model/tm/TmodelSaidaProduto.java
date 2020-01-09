@@ -405,7 +405,7 @@ public class TmodelSaidaProduto {
                                             } else {
                                                 new ProdutoDAO().getById(Produto.class, aLong).getProdutoEstoqueList().stream()
                                                         .filter(produtoEstoque -> produtoEstoque.qtdProperty().getValue().compareTo(0) > 0)
-                                                        .sorted(Comparator.comparing(ProdutoEstoque::getValidade)).sorted(Comparator.comparing(ProdutoEstoque::getId))
+                                                        .sorted(Comparator.comparing(ProdutoEstoque::getDtValidade)).sorted(Comparator.comparing(ProdutoEstoque::getId))
                                                         .collect(Collectors.groupingBy(ProdutoEstoque::getLote,
                                                                 LinkedHashMap::new,
                                                                 Collectors.toList()))
@@ -438,7 +438,7 @@ public class TmodelSaidaProduto {
                                                                         prod.idProperty().setValue(produtoEstoques.get(0).getProduto().idProperty().getValue());
                                                                         prod.tblEstoqueProperty().setValue(qtdEstoque);
                                                                         prod.tblLoteProperty().setValue(s);
-                                                                        prod.tblValidadeProperty().setValue(produtoEstoques.get(0).validadeProperty().getValue());
+                                                                        prod.tblValidadeProperty().setValue(produtoEstoques.get(0).dtValidadeProperty().getValue());
                                                                         getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(prod, finalTSaidaProduto, qtdAdd));
                                                                     } else {
                                                                         sProd.qtdProperty().setValue(sProd.qtdProperty().getValue() + qtdAdd);
@@ -549,7 +549,7 @@ public class TmodelSaidaProduto {
             fichaKardex.documentoProperty().setValue(getSaidaProduto().idProperty().getValue().toString());
             fichaKardex.detalheProperty().setValue(estoque.loteProperty().getValue());
             fichaKardex.qtdProperty().setValue(qtdSaida);
-            fichaKardex.vlrUnitarioProperty().setValue(estoque.vlrBrutoProperty().getValue()
+            fichaKardex.vlrUnitarioProperty().setValue(estoque.vlrUnitarioProperty().getValue()
                     .add(estoque.vlrFreteBrutoProperty().getValue())
                     .add(estoque.vlrImpostoNaEntradaProperty().getValue())
                     .add(estoque.vlrImpostoFreteNaEntradaProperty().getValue())
@@ -570,7 +570,7 @@ public class TmodelSaidaProduto {
 
             fichaKardex.vlrSaldoProperty().setValue(produtoEstoqueList.stream().filter(stq -> stq.qtdProperty().getValue() > 0)
                     .map(stq ->
-                            (stq.vlrBrutoProperty().getValue()
+                            (stq.vlrUnitarioProperty().getValue()
                                     .add(stq.vlrFreteBrutoProperty().getValue())
                                     .add(stq.vlrImpostoNaEntradaProperty().getValue())
                                     .add(stq.vlrImpostoFreteNaEntradaProperty().getValue())

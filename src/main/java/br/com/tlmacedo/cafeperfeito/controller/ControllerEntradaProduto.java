@@ -2,6 +2,7 @@ package br.com.tlmacedo.cafeperfeito.controller;
 
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
+import br.com.tlmacedo.cafeperfeito.model.dao.EntradaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.FiscalFreteSituacaoTributariaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.FiscalTributosSefazAmDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
@@ -153,8 +154,8 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     private FilteredList<Produto> produtoFilteredList;
 
     private TmodelEntradaProduto tmodelEntradaProduto;
-    //    private SaidaProduto saidaProduto = new SaidaProduto();
-//    private SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
+    private EntradaProduto entradaProduto;
+    private EntradaProdutoDAO entradaProdutoDAO;
     private ObservableList<EntradaProdutoProduto> entradaProdutoProdutoObservableList = FXCollections.observableArrayList();
 
 //    private ObservableList<Empresa> empresaObservableList = FXCollections.observableArrayList(
@@ -245,40 +246,13 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
             ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().fireEvent(ServiceComandoTecladoMouse.pressTecla(KeyCode.F8));
         });
 
-//        getTtvProduto().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-//            if (event.getCode() != KeyCode.ENTER
-//                    || getTtvProduto().getSelectionModel().getSelectedItem() == null
-//                    || getTtvProduto().getSelectionModel().getSelectedItem().getValue().tblEstoqueProperty().getValue() <= 0)
-//                return;
-//            Produto produtoSelecionado = getProdutoSelecionado();
-//            if (getSaidaProdutoProdutoObservableList().stream()
-//                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue().equals(produtoSelecionado.tblLoteProperty().getValue())
-//                            && saidaProdutoProduto.getProduto().idProperty().getValue().intValue() == produtoSelecionado.idProperty().getValue().intValue())
-//                    .findFirst().orElse(null) == null) {
-//                getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoSelecionado, TipoCodigoCFOP.VENDA, 1));
-//                ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().fireEvent(ServiceComandoTecladoMouse.pressTecla(KeyCode.F8));
-//                if (empresaProperty().getValue() != null)
-//                    getTmodelSaidaProduto().calculaDescontoCliente();
-//            } else {
-//                for (int i = 0; i < getSaidaProdutoProdutoObservableList().size(); i++) {
-//                    SaidaProdutoProduto saida = getSaidaProdutoProdutoObservableList().get(i);
-//                    if (saida.loteProperty().getValue().equals(produtoSelecionado.tblLoteProperty().getValue())
-//                            && saida.produtoProperty().getValue().idProperty().getValue().intValue()
-//                            == produtoSelecionado.idProperty().getValue().intValue()) {
-//                        getTvItensPedido().requestFocus();
-//                        getTvItensPedido().getSelectionModel().select(i, getTmodelSaidaProduto().getColQtd());
-//                    }
-//                }
-//            }
-//        });
-//
-//        getTvItensPedido().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+//        getTvItensNfe().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 //            if (event.getCode() != KeyCode.HELP)
 //                return;
-//            Produto produtoAdicional = new Produto(getTvItensPedido().getSelectionModel().getSelectedItem().produtoProperty().getValue());
-//            getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoAdicional, TipoCodigoCFOP.AMOSTRA, 1));
+//            Produto produtoAdicional = new Produto(getTvItensNfe().getSelectionModel().getSelectedItem().produtoProperty().getValue());
+//            getEntradaProdutoProdutoObservableList().add(new EntradaProdutoProduto(produtoAdicional, TipoCodigoCFOP.COMERCIALIZACAO));
 //        });
-//
+
         setEventHandlerEntradaProduto(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -293,76 +267,20 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                             limpaCampos(getPainelViewEntradaProduto());
                             break;
                         case F2:
-//                            getEnumsTasksList().clear();
-//                            getEnumsTasksList().add(EnumsTasks.SALVAR_SAIDA);
-//
-//                            if (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
-//                                    .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0) {
-//                                boolean usarCredDeb = false;
-//                                BigDecimal credDeb = BigDecimal.ZERO;
-//                                if ((credDeb = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2)).compareTo(BigDecimal.ZERO) < 0) {
-//                                    setAlertMensagem(new ServiceAlertMensagem());
-//                                    getAlertMensagem().setCabecalho("Crédito disponível");
-//                                    getAlertMensagem().setContentText(String.format("o cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
-//                                            ServiceMascara.getMoeda((credDeb.multiply(new BigDecimal("-1."))), 2)));
-//                                    getAlertMensagem().setStrIco("");
-//                                    ButtonType btnResult;
-//                                    if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
-//                                        return;
-//                                    usarCredDeb = (btnResult == ButtonType.YES);
-//                                } else if (credDeb.compareTo(BigDecimal.ZERO) > 0) {
-//                                    setAlertMensagem(new ServiceAlertMensagem());
-//                                    getAlertMensagem().setCabecalho("Débito detectado");
-//                                    getAlertMensagem().setContentText(String.format("o cliente tem um dédito de R$ %s\ndeseja acrescentar esse valor no pedido atual?",
-//                                            ServiceMascara.getMoeda((credDeb.multiply(new BigDecimal("-1."))), 2)));
-//                                    getAlertMensagem().setStrIco("");
-//                                    ButtonType btnResult;
-//                                    if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
-//                                        return;
-//                                    usarCredDeb = (btnResult == ButtonType.YES);
-//                                } else {
-//                                    credDeb = BigDecimal.ZERO;
-//                                }
-//
-//                                if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
-//                                    if (usarCredDeb) {
-//                                        try {
-//                                            getContasAReceberDAO().transactionBegin();
-//                                            baixaCredito(credDeb);
-//                                            PagamentoModalidade tipBaixa = null;
-//                                            if (credDeb.compareTo(BigDecimal.ZERO) < 0)
-//                                                tipBaixa = PagamentoModalidade.CREDITO;
-//                                            else if (credDeb.compareTo(BigDecimal.ZERO) > 0)
-//                                                tipBaixa = PagamentoModalidade.DEBITO;
-//                                            getContasAReceber().getRecebimentoList().add(addRecebimento(getContasAReceber(), tipBaixa, credDeb));
-//                                            getContasAReceberDAO().transactionCommit();
-//                                        } catch (Exception ex) {
-//                                            getContasAReceberDAO().transactionRollback();
-//                                            ex.printStackTrace();
-//                                        }
-//                                    }
-//
-//                                    new ViewRecebimento().openViewRecebimento(getContasAReceber());
-//
-//                                    if (getSaidaProdutoNfe() != null) {
-//                                        nfeAddCobranca();
-//                                        gerarDanfe();
-//                                    }
-//
-//                                    atualizaTotaisCliente(getContasAReceber());
-//                                    System.out.printf("001OiOiOiOiOiOiOiOi\n");
-//
-//                                    limpaCampos(getPainelViewSaidaProduto());
-//                                    System.out.printf("002OiOiOiOiOiOiOiOi\n");
-//                                }
-//                            } else {
-//                                setAlertMensagem(new ServiceAlertMensagem());
-//                                getAlertMensagem().setCabecalho("Limite excedido");
-//                                getAlertMensagem().setContentText("Cliente não possui limite para finalizar o pedido!");
-//                                getAlertMensagem().setStrIco("");
-//                                getAlertMensagem().alertOk();
-//                            }
-//                            System.out.printf("003OiOiOiOiOiOiOiOi\n");
+                            if (getEntradaProdutoProdutoObservableList().size() > 0
+                                    && validarEntrada()) {
+                                getEnumsTasksList().clear();
+                                getEnumsTasksList().add(EnumsTasks.SALVAR_ENT_SAIDA);
+                                if (new ServiceSegundoPlano().executaListaTarefas(newTaskEntradaProduto(), String.format("Salvando %s!", getNomeTab()))) {
+                                    limpaCampos(getPainelViewEntradaProduto());
+                                }
+                            } else {
+                                setAlertMensagem(new ServiceAlertMensagem());
+                                getAlertMensagem().setCabecalho("Entrada invalida");
+                                getAlertMensagem().setContentText("Verifique a entrada de produtos pois está invalida");
+                                getAlertMensagem().setStrIco("");
+                                getAlertMensagem().alertOk();
+                            }
                             break;
                         case F5:
                             getTxtNfeChave().requestFocus();
@@ -632,16 +550,16 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                                 getTmodelEntradaProduto().preencheTabela();
                                 break;
 
-                            case SALVAR_SAIDA:
-//                                if (guardarSaidaProduto()) {
-//                                    if (salvarSaidaProduto()) {
-//                                        getTmodelProduto().atualizarProdutos();
-//                                    } else {
-//                                        Thread.currentThread().interrupt();
-//                                    }
-//                                } else {
-//                                    Thread.currentThread().interrupt();
-//                                }
+                            case SALVAR_ENT_SAIDA:
+                                if (guardarEntradaProduto()) {
+                                    if (salvarEntradaProduto()) {
+                                        getTmodelProduto().atualizarProdutos();
+                                    } else {
+                                        Thread.currentThread().interrupt();
+                                    }
+                                } else {
+                                    Thread.currentThread().interrupt();
+                                }
                                 break;
                             case NFE_GERAR:
 //                                gerarXmlNFe();
@@ -780,9 +698,9 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     private Produto getProdutoSelecionado() {
         Produto produtoSelecionado = null;
         if (getTtvProduto().getSelectionModel().getSelectedItem().getValue().idProperty().getValue() != 0)
-            produtoSelecionado = new Produto(getTtvProduto().getSelectionModel().getSelectedItem().getValue());
+            produtoSelecionado = getTtvProduto().getSelectionModel().getSelectedItem().getValue();
         else
-            produtoSelecionado = new Produto((getTtvProduto().getSelectionModel().getSelectedItem().getParent().getValue()));
+            produtoSelecionado = getTtvProduto().getSelectionModel().getSelectedItem().getParent().getValue();
         return produtoSelecionado;
     }
 
@@ -901,6 +819,220 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     /**
      * Begin returns
      */
+
+    private boolean validarEntrada() {
+        return (validarNfeDetalhe() && validarCteDetalhe());
+    }
+
+    private boolean validarNfeDetalhe() {
+        if (getCboNfeLojaDestino().getValue() == null) {
+            getCboNfeLojaDestino().requestFocus();
+            return false;
+        }
+        if (getTxtNfeChave().getText().length() < 44) {
+            getTxtNfeChave().requestFocus();
+            return false;
+        }
+        if (getTxtNfeNumero().getText().length() == 0) {
+            getTxtNfeNumero().requestFocus();
+            return false;
+        }
+        if (getTxtNfeSerie().getText().length() == 0) {
+            getTxtNfeSerie().requestFocus();
+            return false;
+        }
+        if (getCboNfeModelo().getValue() == null) {
+            getCboNfeModelo().requestFocus();
+            return false;
+        }
+        if (getCboNfeFornecedor().getValue() == null) {
+            getCboNfeFornecedor().requestFocus();
+            return false;
+        }
+        if (getDtpNfeEmissao().getValue().isAfter(LocalDate.now())) {
+            getDtpNfeEmissao().requestFocus();
+            return false;
+        }
+        if (getDtpNfeEntrada().getValue().isAfter(LocalDate.now())) {
+            getDtpNfeEntrada().requestFocus();
+            return false;
+        }
+        if (getDtpNfeEmissao().getValue().isAfter(getDtpNfeEntrada().getValue())) {
+            getDtpNfeEmissao().requestFocus();
+            return false;
+        }
+        return (true && validarNfeFiscal());
+    }
+
+    private boolean validarNfeFiscal() {
+        if (getTpnNfeDetalheFiscal().isExpanded()) {
+            if (getTxtNfeFiscalControle().getText().length() == 0) {
+                getTxtNfeFiscalControle().requestFocus();
+                return false;
+            }
+            if (getTxtNfeFiscalOrigem().getText().length() == 0) {
+                getTxtNfeFiscalOrigem().requestFocus();
+                return false;
+            }
+            if (getCboNfeFiscalTributo().getValue() == null) {
+                getCboNfeFiscalTributo().requestFocus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean validarCteDetalhe() {
+        if (getTxtCteChave().getText().length() < 44) {
+            getTxtCteChave().requestFocus();
+            return false;
+        }
+        if (getCboCteTomadorServico().getValue() == null) {
+            getCboCteTomadorServico().requestFocus();
+            return false;
+        }
+        if (getTxtCteNumero().getText().length() == 0) {
+            getTxtCteNumero().requestFocus();
+            return false;
+        }
+        if (getTxtCteSerie().getText().length() == 0) {
+            getTxtCteSerie().requestFocus();
+            return false;
+        }
+        if (getCboNfeModelo().getValue() == null) {
+            getCboCteModelo().requestFocus();
+            return false;
+        }
+        if (getDtpCteEmissao().getValue().isAfter(LocalDate.now())) {
+            getDtpCteEmissao().requestFocus();
+            return false;
+        }
+        if (getCboCteTransportadora().getValue() == null) {
+            getCboCteTransportadora().requestFocus();
+            return false;
+        }
+        if (getCboCteSistuacaoTributaria().getValue() == null) {
+            getCboCteSistuacaoTributaria().requestFocus();
+            return false;
+        }
+        if (ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrCte().getText(), 2)
+                .compareTo(BigDecimal.ZERO) <= 0) {
+            getTxtCteVlrCte().requestFocus();
+            return false;
+        }
+        if (Integer.parseInt(getTxtCteQtdVolume().getText()) <= 0) {
+            getTxtCteQtdVolume().requestFocus();
+            return false;
+        }
+        if (ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 3)
+                .compareTo(BigDecimal.ZERO) <= 0) {
+            getTxtCtePesoBruto().requestFocus();
+            return false;
+        }
+        if (ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrBruto().getText(), 2)
+                .compareTo(BigDecimal.ZERO) <= 0) {
+            getTxtCteVlrBruto().requestFocus();
+            return false;
+        }
+        if (ServiceMascara.getBigDecimalFromTextField(getLblCteVlrLiquido().getText(), 2)
+                .compareTo(BigDecimal.ZERO) <= 0) {
+            getTxtCteVlrCte().requestFocus();
+            return false;
+        }
+        return (true && validarCteFiscal());
+    }
+
+    private boolean validarCteFiscal() {
+        if (getTpnCteDetalheFiscal().isExpanded()) {
+            if (getTxtCteFiscalControle().getText().length() == 0) {
+                getTxtCteFiscalControle().requestFocus();
+                return false;
+            }
+            if (getTxtCteFiscalOrigem().getText().length() == 0) {
+                getTxtCteFiscalOrigem().requestFocus();
+                return false;
+            }
+            if (getCboCteFiscalTributo().getValue() == null) {
+                getCboCteFiscalTributo().requestFocus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean guardarEntradaProduto() {
+        try {
+            setEntradaProduto(new EntradaProduto());
+
+            getEntradaProduto().setSituacao(SituacaoEntrada.DIGITACAO);
+            getEntradaProduto().setFornecedor(getCboNfeFornecedor().getValue());
+            getEntradaProduto().setLoja(getCboNfeLojaDestino().getValue());
+            getEntradaProduto().setUsuarioCadastro(UsuarioLogado.getUsuario());
+
+            getEntradaProdutoProdutoObservableList().stream()
+                    .forEach(entradaProdutoProduto -> {
+                        entradaProdutoProduto.setEntradaProduto(getEntradaProduto());
+                        getEntradaProduto().getEntradaProdutoProdutoList().add(entradaProdutoProduto);
+                    });
+            //getEntradaProduto().setEntradaProdutoProdutoList(getEntradaProdutoProdutoObservableList());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean salvarEntradaProduto() {
+        try {
+            setEntradaProdutoDAO(new EntradaProdutoDAO());
+            getEntradaProdutoDAO().transactionBegin();
+            //BigDecimal freteBrutoKg,
+            // BigDecimal impEntrada,
+            // BigDecimal impFreteEntrada,
+            // BigDecimal impFrete,
+            // BigDecimal taxaFrete,
+            // String docEntrada,
+            // String chaveNFe
+
+            if (getTmodelEntradaProduto().incluirEstoque(
+                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrBruto().getText(), 2)
+                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
+                                    4, RoundingMode.HALF_UP),
+
+                    (ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrNFe().getText(), 2)
+                            .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 2)) == 0)
+                            ? ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrPercentual().getText(), 4)
+                            : (ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 4)
+                            .multiply(new BigDecimal("100.")))
+                            .divide(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 4),
+                                    4, RoundingMode.HALF_UP),
+
+                    ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2)
+                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
+                                    4, RoundingMode.HALF_UP),
+
+                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrImposto().getText(), 2)
+                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
+                                    4, RoundingMode.HALF_UP),
+
+                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrTaxa().getText(), 2)
+                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
+                                    4, RoundingMode.HALF_UP),
+                    getTxtNfeNumero().getText().replaceAll("\\D", ""),
+                    getTxtNfeChave().getText().replaceAll("\\D", ""))) {
+                ServiceUtilJSon.printJsonFromObject(getEntradaProduto(), "EntradaProduto");
+                setEntradaProduto(getEntradaProdutoDAO().setTransactionPersist(getEntradaProduto()));
+                getEntradaProdutoDAO().transactionCommit();
+            } else {
+                // getEntradaProdutoDAO().closeTransaction();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            getEntradaProdutoDAO().transactionRollback();
+            return false;
+        }
+        return true;
+    }
 
     /**
      * END returns
@@ -1596,6 +1728,22 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
 
     public void setNfeFiscalVlrTotal(String nfeFiscalVlrTotal) {
         this.nfeFiscalVlrTotal.set(nfeFiscalVlrTotal);
+    }
+
+    public EntradaProduto getEntradaProduto() {
+        return entradaProduto;
+    }
+
+    public void setEntradaProduto(EntradaProduto entradaProduto) {
+        this.entradaProduto = entradaProduto;
+    }
+
+    public EntradaProdutoDAO getEntradaProdutoDAO() {
+        return entradaProdutoDAO;
+    }
+
+    public void setEntradaProdutoDAO(EntradaProdutoDAO entradaProdutoDAO) {
+        this.entradaProdutoDAO = entradaProdutoDAO;
     }
 
     /**

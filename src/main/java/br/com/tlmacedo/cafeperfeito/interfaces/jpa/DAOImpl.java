@@ -129,6 +129,10 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
         return getConexao().getEntityManager().getTransaction();
     }
 
+    @Override
+    public void closeTransaction() {
+        getConexao().getEntityManager().close();
+    }
 
     public ConnectionFactory getConexao() {
         return conexao;

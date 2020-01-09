@@ -461,7 +461,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 //                            getTmodelSaidaProduto().preencheTabela();
                                 break;
 
-                            case SALVAR_SAIDA:
+                            case SALVAR_ENT_SAIDA:
 //                            if (getTmodelSaidaProduto().guardarSaidaProduto()) {
 //                                if (getTmodelSaidaProduto().salvarSaidaProduto()) {
 //                                    getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null,  "descricao"));

@@ -103,7 +103,7 @@ public class Produto implements Serializable, Cloneable {
     public Produto(ProdutoEstoque estoque) {
         this.tblEstoque = new SimpleIntegerProperty(estoque.qtdProperty().getValue());
         this.tblLote = new SimpleStringProperty(estoque.loteProperty().getValue());
-        this.tblValidade = new SimpleObjectProperty<>(estoque.validadeProperty().getValue());
+        this.tblValidade = new SimpleObjectProperty<>(estoque.dtValidadeProperty().getValue());
     }
 
 //    public Produto(Integer qtdEstoq, String lote, LocalDate validade) {

@@ -34,6 +34,7 @@ public class EntradaProdutoProduto implements Serializable {
     private ObjectProperty<BigDecimal> vlrUnitario = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrDesconto = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrFrete = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrImposto = new SimpleObjectProperty<>();
 
     private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>();
@@ -45,7 +46,7 @@ public class EntradaProdutoProduto implements Serializable {
     }
 
     public EntradaProdutoProduto(Produto produto, TipoCodigoCFOP codigoCFOP) {
-        this.produtoProperty().setValue(produto);
+        this.produto = new SimpleObjectProperty<>(produto);
         this.codigo = getProduto().codigoProperty();
         this.descricao = getProduto().descricaoProperty();
         this.codigoCFOP = codigoCFOP;
@@ -59,10 +60,11 @@ public class EntradaProdutoProduto implements Serializable {
 //        if (!codigoCFOP.equals(TipoCodigoCFOP.COMERCIALIZACAO)) {
 //            this.vlrDesconto = new SimpleObjectProperty<>(vlrVendaProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
 //        }
+        this.vlrFrete = new SimpleObjectProperty<>(BigDecimal.ZERO);
         this.vlrImposto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
         this.vlrLiquido = new SimpleObjectProperty<>(vlrBrutoProperty().getValue().subtract(vlrDescontoProperty().getValue()));
-        this.estoque = produto.tblEstoqueProperty();
-        this.varejo = produto.varejoProperty();
+        this.estoque = getProduto().tblEstoqueProperty();
+        this.varejo = getProduto().varejoProperty();
         this.volume = new SimpleIntegerProperty(1);
     }
 
@@ -94,7 +96,7 @@ public class EntradaProdutoProduto implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     public Produto getProduto() {
         return produto.get();
     }

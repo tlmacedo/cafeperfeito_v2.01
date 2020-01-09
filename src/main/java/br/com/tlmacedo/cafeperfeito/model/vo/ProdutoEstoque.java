@@ -19,8 +19,8 @@ public class ProdutoEstoque implements Serializable {
     private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
     private IntegerProperty qtd = new SimpleIntegerProperty();
     private StringProperty lote = new SimpleStringProperty();
-    private ObjectProperty<LocalDate> validade = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>();
+    private ObjectProperty<LocalDate> dtValidade = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrUnitario = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrFreteBruto = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrImpostoNaEntrada = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrImpostoFreteNaEntrada = new SimpleObjectProperty<>();
@@ -90,29 +90,29 @@ public class ProdutoEstoque implements Serializable {
         this.lote.set(lote);
     }
 
-    public LocalDate getValidade() {
-        return validade.get();
+    public LocalDate getDtValidade() {
+        return dtValidade.get();
     }
 
-    public ObjectProperty<LocalDate> validadeProperty() {
-        return validade;
+    public ObjectProperty<LocalDate> dtValidadeProperty() {
+        return dtValidade;
     }
 
-    public void setValidade(LocalDate validade) {
-        this.validade.set(validade);
+    public void setDtValidade(LocalDate dtValidade) {
+        this.dtValidade.set(dtValidade);
     }
 
     @Column(length = 19, scale = 4, nullable = false)
-    public BigDecimal getVlrBruto() {
-        return vlrBruto.get();
+    public BigDecimal getVlrUnitario() {
+        return vlrUnitario.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrBrutoProperty() {
-        return vlrBruto;
+    public ObjectProperty<BigDecimal> vlrUnitarioProperty() {
+        return vlrUnitario;
     }
 
-    public void setVlrBruto(BigDecimal vlrBruto) {
-        this.vlrBruto.set(vlrBruto);
+    public void setVlrUnitario(BigDecimal vlrUnitario) {
+        this.vlrUnitario.set(vlrUnitario);
     }
 
     @Column(length = 19, scale = 4, nullable = false)
@@ -240,8 +240,8 @@ public class ProdutoEstoque implements Serializable {
                 ", produto=" + produto +
                 ", qtd=" + qtd +
                 ", lote=" + lote +
-                ", validade=" + validade +
-                ", vlrBruto=" + vlrBruto +
+                ", validade=" + dtValidade +
+                ", vlrBruto=" + vlrUnitario +
                 ", vlrFreteBruto=" + vlrFreteBruto +
                 ", vlrImpostoNaEntrada=" + vlrImpostoNaEntrada +
                 ", vlrImpostoFreteNaEntrada=" + vlrImpostoFreteNaEntrada +

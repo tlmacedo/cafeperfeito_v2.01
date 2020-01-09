@@ -160,7 +160,7 @@ public class TmodelProduto {
                     if (gettModelTipo().equals(TModelTipo.PROD_VENDA))
                         produtoTreeItem.getProdutoEstoqueList().stream()
                                 .filter(produtoEstoque -> produtoEstoque.qtdProperty().getValue().compareTo(0) > 0)
-                                .sorted(Comparator.comparing(ProdutoEstoque::getValidade))
+                                .sorted(Comparator.comparing(ProdutoEstoque::getDtValidade))
                                 .collect(Collectors.groupingBy(ProdutoEstoque::getLote,
                                         LinkedHashMap::new,
                                         Collectors.toList()))
@@ -168,7 +168,7 @@ public class TmodelProduto {
                                     ProdutoEstoque estoque = new ProdutoEstoque();
                                     estoque.qtdProperty().setValue(produtoEstoques.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
                                     estoque.loteProperty().setValue(s);
-                                    estoque.validadeProperty().setValue(produtoEstoques.stream().findFirst().orElse(null).validadeProperty().getValue());
+                                    estoque.dtValidadeProperty().setValue(produtoEstoques.stream().findFirst().orElse(null).dtValidadeProperty().getValue());
                                     estq[0] += estoque.qtdProperty().getValue();
 
                                     prodTree.getChildren().add(new TreeItem<>(new Produto(estoque)));

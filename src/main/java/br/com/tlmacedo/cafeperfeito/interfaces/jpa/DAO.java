@@ -29,4 +29,6 @@ public interface DAO<T, I extends Serializable> {
     public EntityManager getEntityManager();
 
     public EntityTransaction getTransaction();
+
+    public void closeTransaction();
 }

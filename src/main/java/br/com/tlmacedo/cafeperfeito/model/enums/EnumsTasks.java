@@ -11,7 +11,7 @@ public enum EnumsTasks {
     TABELA_VINCULAR(1, "vinculando tModel"),
     TABELA_PREENCHER(2, "preenchendo tabela de "),
     COMBOS_PREENCHER(3, "carregando informações do cadastro"),
-    SALVAR_SAIDA(4, "salvando"),
+    SALVAR_ENT_SAIDA(4, "salvando"),
     RELATORIO_IMPRIME_RECIBO(5, "preparando recibo"),
     RELATORIO_IMPRIME_NFE(6, "preparando nfe"),
     ADD_RECEBIMENTO(7, "adicionando recebimento"),

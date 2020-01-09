@@ -581,7 +581,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 getTmodelSaidaProduto().preencheTabela();
                                 break;
 
-                            case SALVAR_SAIDA:
+                            case SALVAR_ENT_SAIDA:
 //                                if (guardarSaidaProduto()) {
 //                                    if (salvarSaidaProduto()) {
 //                                        getTmodelProduto().atualizarProdutos();
