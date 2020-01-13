@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Entity(name = "FichaKardex")
 @Table(name = "ficha_kardex")
@@ -28,6 +29,36 @@ public class FichaKardex implements Serializable {
     private ObjectProperty<BigDecimal> vlrSaldo = new SimpleObjectProperty<>();
 
     public FichaKardex() {
+    }
+
+    public FichaKardex(EntradaProdutoProduto entradaProdutoProduto) {
+        this.produto = entradaProdutoProduto.produtoProperty();
+        this.documento = entradaProdutoProduto.entradaProdutoProperty().getValue()
+                .entradaNfeProperty().getValue().numeroProperty();
+        this.detalhe = entradaProdutoProduto.loteProperty();
+        this.qtd = entradaProdutoProduto.qtdProperty();
+        this.vlrUnitario = new SimpleObjectProperty<>(((entradaProdutoProduto.vlrBrutoProperty().getValue()
+                .add(entradaProdutoProduto.vlrImpostoProperty().getValue())
+                .add(entradaProdutoProduto.vlrFreteProperty().getValue()))
+                .subtract(entradaProdutoProduto.vlrDescontoProperty().getValue()))
+                .divide(new BigDecimal(qtdProperty().getValue())));
+        this.qtdEntrada = entradaProdutoProduto.qtdProperty();
+        this.vlrEntrada = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue()
+                .multiply(new BigDecimal(qtdProperty().getValue())));
+        this.qtdSaida = new SimpleIntegerProperty(0);
+        this.vlrSaida = new SimpleObjectProperty<>(BigDecimal.ZERO);
+        this.saldo = new SimpleIntegerProperty(entradaProdutoProduto.produtoProperty().getValue()
+                .getProdutoEstoqueList().stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
+        this.vlrSaldo = new SimpleObjectProperty<>(
+                entradaProdutoProduto.produtoProperty().getValue()
+                        .getProdutoEstoqueList().stream().filter(stq -> stq.qtdProperty().getValue() > 0)
+                        .map(stq ->
+                                ((stq.vlrUnitarioProperty().getValue()
+                                        .add(stq.vlrFreteProperty().getValue())
+                                        .add(stq.vlrImpostoProperty().getValue())
+                                        .subtract(stq.vlrDescontoProperty().getValue())))
+                                        .multiply(BigDecimal.valueOf(stq.qtdProperty().getValue())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     @Id

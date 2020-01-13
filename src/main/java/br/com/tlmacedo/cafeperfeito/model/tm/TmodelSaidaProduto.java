@@ -544,46 +544,46 @@ public class TmodelSaidaProduto {
 
     private FichaKardex newFichaKardex(Integer qtdSaida, ProdutoEstoque estoque, List<ProdutoEstoque> produtoEstoqueList) {
         FichaKardex fichaKardex = new FichaKardex();
-        try {
-            fichaKardex.setProduto(estoque.getProduto());
-            fichaKardex.documentoProperty().setValue(getSaidaProduto().idProperty().getValue().toString());
-            fichaKardex.detalheProperty().setValue(estoque.loteProperty().getValue());
-            fichaKardex.qtdProperty().setValue(qtdSaida);
-            fichaKardex.vlrUnitarioProperty().setValue(estoque.vlrUnitarioProperty().getValue()
-                    .add(estoque.vlrFreteBrutoProperty().getValue())
-                    .add(estoque.vlrImpostoNaEntradaProperty().getValue())
-                    .add(estoque.vlrImpostoFreteNaEntradaProperty().getValue())
-                    .add(estoque.vlrImpostoDentroFreteProperty().getValue())
-                    .add(estoque.vlrFreteTaxaProperty().getValue())
-            );
-
-            fichaKardex.qtdEntradaProperty().setValue(0);
-            fichaKardex.vlrEntradaProperty().setValue(BigDecimal.ZERO);
-
-            fichaKardex.qtdSaidaProperty().setValue(qtdSaida);
-            fichaKardex.vlrSaidaProperty().setValue(fichaKardex.vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdSaida)));
-
-            setLucroQtdSaida(getLucroQtdSaida() + fichaKardex.qtdSaidaProperty().getValue());
-            setLucroVlrSaida(getLucroVlrSaida().add(fichaKardex.vlrSaidaProperty().getValue()));
-
-            fichaKardex.saldoProperty().setValue(produtoEstoqueList.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
-
-            fichaKardex.vlrSaldoProperty().setValue(produtoEstoqueList.stream().filter(stq -> stq.qtdProperty().getValue() > 0)
-                    .map(stq ->
-                            (stq.vlrUnitarioProperty().getValue()
-                                    .add(stq.vlrFreteBrutoProperty().getValue())
-                                    .add(stq.vlrImpostoNaEntradaProperty().getValue())
-                                    .add(stq.vlrImpostoFreteNaEntradaProperty().getValue())
-                                    .add(stq.vlrImpostoDentroFreteProperty().getValue())
-                                    .add(stq.vlrFreteTaxaProperty().getValue()))
-                                    .multiply(BigDecimal.valueOf(stq.qtdProperty().getValue()))
-                    )
-                    .reduce(BigDecimal.ZERO, BigDecimal::add));
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
+//        try {
+//            fichaKardex.setProduto(estoque.getProduto());
+//            fichaKardex.documentoProperty().setValue(getSaidaProduto().idProperty().getValue().toString());
+//            fichaKardex.detalheProperty().setValue(estoque.loteProperty().getValue());
+//            fichaKardex.qtdProperty().setValue(qtdSaida);
+//            fichaKardex.vlrUnitarioProperty().setValue(estoque.vlrUnitarioProperty().getValue()
+//                    .add(estoque.vlrFreteBrutoProperty().getValue())
+//                    .add(estoque.vlrImpostoNaEntradaProperty().getValue())
+//                    .add(estoque.vlrImpostoFreteNaEntradaProperty().getValue())
+//                    .add(estoque.vlrImpostoDentroFreteProperty().getValue())
+//                    .add(estoque.vlrFreteTaxaProperty().getValue())
+//            );
+//
+//            fichaKardex.qtdEntradaProperty().setValue(0);
+//            fichaKardex.vlrEntradaProperty().setValue(BigDecimal.ZERO);
+//
+//            fichaKardex.qtdSaidaProperty().setValue(qtdSaida);
+//            fichaKardex.vlrSaidaProperty().setValue(fichaKardex.vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdSaida)));
+//
+//            setLucroQtdSaida(getLucroQtdSaida() + fichaKardex.qtdSaidaProperty().getValue());
+//            setLucroVlrSaida(getLucroVlrSaida().add(fichaKardex.vlrSaidaProperty().getValue()));
+//
+//            fichaKardex.saldoProperty().setValue(produtoEstoqueList.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
+//
+//            fichaKardex.vlrSaldoProperty().setValue(produtoEstoqueList.stream().filter(stq -> stq.qtdProperty().getValue() > 0)
+//                    .map(stq ->
+//                            (stq.vlrUnitarioProperty().getValue()
+//                                    .add(stq.vlrFreteBrutoProperty().getValue())
+//                                    .add(stq.vlrImpostoNaEntradaProperty().getValue())
+//                                    .add(stq.vlrImpostoFreteNaEntradaProperty().getValue())
+//                                    .add(stq.vlrImpostoDentroFreteProperty().getValue())
+//                                    .add(stq.vlrFreteTaxaProperty().getValue()))
+//                                    .multiply(BigDecimal.valueOf(stq.qtdProperty().getValue()))
+//                    )
+//                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//            return null;
+//        }
         return fichaKardex;
     }
 

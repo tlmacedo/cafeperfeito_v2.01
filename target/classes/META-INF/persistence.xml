@@ -15,9 +15,9 @@
         <class>br.com.tlmacedo.cafeperfeito.model.vo.Empresa</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.EmpresaCondicoes</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.Endereco</class>
-        <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaCte</class>-->
-        <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaFiscal</class>-->
-        <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaNfe</class>-->
+        <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaCte</class>
+        <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaFiscal</class>
+        <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaNfe</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaProduto</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.EntradaProdutoProduto</class>
         <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.FiscalCestNcm</class>-->

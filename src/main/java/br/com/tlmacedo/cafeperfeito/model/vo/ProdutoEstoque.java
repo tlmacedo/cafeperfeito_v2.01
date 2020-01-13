@@ -21,11 +21,9 @@ public class ProdutoEstoque implements Serializable {
     private StringProperty lote = new SimpleStringProperty();
     private ObjectProperty<LocalDate> dtValidade = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrUnitario = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrFreteBruto = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrImpostoNaEntrada = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrImpostoFreteNaEntrada = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrImpostoDentroFrete = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrFreteTaxa = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrDesconto = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrFrete = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrImposto = new SimpleObjectProperty<>();
 
     private ObjectProperty<Usuario> usuarioCadastro = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>();
@@ -34,6 +32,29 @@ public class ProdutoEstoque implements Serializable {
     private StringProperty docEntradaChaveNFe = new SimpleStringProperty();
 
     public ProdutoEstoque() {
+    }
+
+    public ProdutoEstoque(EntradaProdutoProduto entradaProdutoProduto) {
+        this.produto = entradaProdutoProduto.produtoProperty();
+        this.qtd = entradaProdutoProduto.qtdProperty();
+        this.lote = entradaProdutoProduto.loteProperty();
+        this.dtValidade = entradaProdutoProduto.dtValidadeProperty();
+        this.vlrUnitario = entradaProdutoProduto.vlrUnitarioProperty();
+        this.vlrDesconto = new SimpleObjectProperty<>(entradaProdutoProduto.vlrDescontoProperty().getValue()
+                .divide(new BigDecimal(getQtd())));
+        this.vlrFrete = new SimpleObjectProperty<>(entradaProdutoProduto.vlrFreteProperty().getValue()
+                .divide(new BigDecimal(getQtd())));
+        this.vlrImposto = new SimpleObjectProperty<>(entradaProdutoProduto.vlrImpostoProperty().getValue()
+                .divide(new BigDecimal(getQtd())));
+        this.usuarioCadastro = UsuarioLogado.usuarioProperty();
+        this.docEntrada = entradaProdutoProduto.entradaProdutoProperty().getValue()
+                .getEntradaNfe().numeroProperty();
+        this.docEntradaChaveNFe = entradaProdutoProduto.entradaProdutoProperty().getValue()
+                .getEntradaNfe().chaveProperty();
+        entradaProdutoProduto.produtoProperty().getValue()
+                .ultFreteProperty().setValue(vlrFreteProperty().getValue());
+        entradaProdutoProduto.produtoProperty().getValue()
+                .ultImpostoSefazProperty().setValue(vlrImpostoProperty().getValue());
     }
 
     @Id
@@ -116,68 +137,42 @@ public class ProdutoEstoque implements Serializable {
     }
 
     @Column(length = 19, scale = 4, nullable = false)
-    public BigDecimal getVlrFreteBruto() {
-        return vlrFreteBruto.get();
+    public BigDecimal getVlrDesconto() {
+        return vlrDesconto.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrFreteBrutoProperty() {
-        return vlrFreteBruto;
+    public ObjectProperty<BigDecimal> vlrDescontoProperty() {
+        return vlrDesconto;
     }
 
-    public void setVlrFreteBruto(BigDecimal vlrFreteBruto) {
-        this.vlrFreteBruto.set(vlrFreteBruto);
-    }
-
-    @Column(length = 19, scale = 4, nullable = false)
-    public BigDecimal getVlrImpostoNaEntrada() {
-        return vlrImpostoNaEntrada.get();
-    }
-
-    public ObjectProperty<BigDecimal> vlrImpostoNaEntradaProperty() {
-        return vlrImpostoNaEntrada;
-    }
-
-    public void setVlrImpostoNaEntrada(BigDecimal vlrImpostoNaEntrada) {
-        this.vlrImpostoNaEntrada.set(vlrImpostoNaEntrada);
+    public void setVlrDesconto(BigDecimal vlrDesconto) {
+        this.vlrDesconto.set(vlrDesconto);
     }
 
     @Column(length = 19, scale = 4, nullable = false)
-    public BigDecimal getVlrImpostoFreteNaEntrada() {
-        return vlrImpostoFreteNaEntrada.get();
+    public BigDecimal getVlrFrete() {
+        return vlrFrete.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrImpostoFreteNaEntradaProperty() {
-        return vlrImpostoFreteNaEntrada;
+    public ObjectProperty<BigDecimal> vlrFreteProperty() {
+        return vlrFrete;
     }
 
-    public void setVlrImpostoFreteNaEntrada(BigDecimal vlrImpostoFreteNaEntrada) {
-        this.vlrImpostoFreteNaEntrada.set(vlrImpostoFreteNaEntrada);
-    }
-
-    @Column(length = 19, scale = 4, nullable = false)
-    public BigDecimal getVlrImpostoDentroFrete() {
-        return vlrImpostoDentroFrete.get();
-    }
-
-    public ObjectProperty<BigDecimal> vlrImpostoDentroFreteProperty() {
-        return vlrImpostoDentroFrete;
-    }
-
-    public void setVlrImpostoDentroFrete(BigDecimal vlrImpostoDentroFrete) {
-        this.vlrImpostoDentroFrete.set(vlrImpostoDentroFrete);
+    public void setVlrFrete(BigDecimal vlrFrete) {
+        this.vlrFrete.set(vlrFrete);
     }
 
     @Column(length = 19, scale = 4, nullable = false)
-    public BigDecimal getVlrFreteTaxa() {
-        return vlrFreteTaxa.get();
+    public BigDecimal getVlrImposto() {
+        return vlrImposto.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrFreteTaxaProperty() {
-        return vlrFreteTaxa;
+    public ObjectProperty<BigDecimal> vlrImpostoProperty() {
+        return vlrImposto;
     }
 
-    public void setVlrFreteTaxa(BigDecimal vlrFreteTaxa) {
-        this.vlrFreteTaxa.set(vlrFreteTaxa);
+    public void setVlrImposto(BigDecimal vlrImposto) {
+        this.vlrImposto.set(vlrImposto);
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -240,13 +235,11 @@ public class ProdutoEstoque implements Serializable {
                 ", produto=" + produto +
                 ", qtd=" + qtd +
                 ", lote=" + lote +
-                ", validade=" + dtValidade +
-                ", vlrBruto=" + vlrUnitario +
-                ", vlrFreteBruto=" + vlrFreteBruto +
-                ", vlrImpostoNaEntrada=" + vlrImpostoNaEntrada +
-                ", vlrImpostoFreteNaEntrada=" + vlrImpostoFreteNaEntrada +
-                ", vlrImpostoDentroFrete=" + vlrImpostoDentroFrete +
-                ", vlrFreteTaxa=" + vlrFreteTaxa +
+                ", dtValidade=" + dtValidade +
+                ", vlrUnitario=" + vlrUnitario +
+                ", vlrDesconto=" + vlrDesconto +
+                ", vlrFrete=" + vlrFrete +
+                ", vlrImposto=" + vlrImposto +
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
                 ", docEntrada=" + docEntrada +

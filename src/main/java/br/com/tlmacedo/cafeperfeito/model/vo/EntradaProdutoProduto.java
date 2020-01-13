@@ -26,7 +26,7 @@ public class EntradaProdutoProduto implements Serializable {
     private ObjectProperty<Produto> produto = new SimpleObjectProperty<>();
     private StringProperty codigo = new SimpleStringProperty();
     private StringProperty descricao = new SimpleStringProperty();
-    private TipoCodigoCFOP codigoCFOP;
+    private ObjectProperty<TipoCodigoCFOP> codigoCFOP = new SimpleObjectProperty<>();
     private StringProperty lote = new SimpleStringProperty();
     private ObjectProperty<LocalDate> dtValidade = new SimpleObjectProperty<>();
 
@@ -49,7 +49,7 @@ public class EntradaProdutoProduto implements Serializable {
         this.produto = new SimpleObjectProperty<>(produto);
         this.codigo = getProduto().codigoProperty();
         this.descricao = getProduto().descricaoProperty();
-        this.codigoCFOP = codigoCFOP;
+        this.codigoCFOP = new SimpleObjectProperty<>(codigoCFOP);
         this.lote = new SimpleStringProperty("");
         this.dtValidade = new SimpleObjectProperty<>(LocalDate.now());
         this.qtd = new SimpleIntegerProperty(1);
@@ -137,11 +137,15 @@ public class EntradaProdutoProduto implements Serializable {
 
     @Enumerated(EnumType.ORDINAL)
     public TipoCodigoCFOP getCodigoCFOP() {
+        return codigoCFOP.get();
+    }
+
+    public ObjectProperty<TipoCodigoCFOP> codigoCFOPProperty() {
         return codigoCFOP;
     }
 
     public void setCodigoCFOP(TipoCodigoCFOP codigoCFOP) {
-        this.codigoCFOP = codigoCFOP;
+        this.codigoCFOP.set(codigoCFOP);
     }
 
     @Column(length = 15, nullable = false)
@@ -220,6 +224,19 @@ public class EntradaProdutoProduto implements Serializable {
 
     public void setVlrDesconto(BigDecimal vlrDesconto) {
         this.vlrDesconto.set(vlrDesconto);
+    }
+
+    @Column(length = 19, scale = 4, nullable = false)
+    public BigDecimal getVlrFrete() {
+        return vlrFrete.get();
+    }
+
+    public ObjectProperty<BigDecimal> vlrFreteProperty() {
+        return vlrFrete;
+    }
+
+    public void setVlrFrete(BigDecimal vlrFrete) {
+        this.vlrFrete.set(vlrFrete);
     }
 
     @Column(length = 19, scale = 4, nullable = false)

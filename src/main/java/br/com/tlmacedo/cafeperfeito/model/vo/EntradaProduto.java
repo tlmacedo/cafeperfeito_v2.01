@@ -32,13 +32,15 @@ public class EntradaProduto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private SituacaoEntrada situacao;
+    private ObjectProperty<SituacaoEntrada> situacao = new SimpleObjectProperty<>();
 
     private ObjectProperty<Empresa> loja = new SimpleObjectProperty<>();
-    private ObjectProperty<Empresa> fornecedor = new SimpleObjectProperty<>();
 
     private ObjectProperty<Usuario> usuarioCadastro = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtCadastro = new SimpleObjectProperty<>(LocalDateTime.now());
+
+    private ObjectProperty<EntradaNfe> entradaNfe = new SimpleObjectProperty<>();
+    private ObjectProperty<EntradaCte> entradaCte = new SimpleObjectProperty<>();
 
     private List<EntradaProdutoProduto> entradaProdutoProdutoList = new ArrayList<>();
 
@@ -61,11 +63,15 @@ public class EntradaProduto implements Serializable {
 
     @Enumerated(EnumType.ORDINAL)
     public SituacaoEntrada getSituacao() {
+        return situacao.get();
+    }
+
+    public ObjectProperty<SituacaoEntrada> situacaoProperty() {
         return situacao;
     }
 
     public void setSituacao(SituacaoEntrada situacao) {
-        this.situacao = situacao;
+        this.situacao.set(situacao);
     }
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -79,19 +85,6 @@ public class EntradaProduto implements Serializable {
 
     public void setLoja(Empresa loja) {
         this.loja.set(loja);
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    public Empresa getFornecedor() {
-        return fornecedor.get();
-    }
-
-    public ObjectProperty<Empresa> fornecedorProperty() {
-        return fornecedor;
-    }
-
-    public void setFornecedor(Empresa fornecedor) {
-        this.fornecedor.set(fornecedor);
     }
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -120,7 +113,33 @@ public class EntradaProduto implements Serializable {
         this.dtCadastro.set(dtCadastro);
     }
 
-    @OneToMany(mappedBy = "entradaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "entradaProduto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    public EntradaNfe getEntradaNfe() {
+        return entradaNfe.get();
+    }
+
+    public ObjectProperty<EntradaNfe> entradaNfeProperty() {
+        return entradaNfe;
+    }
+
+    public void setEntradaNfe(EntradaNfe entradaNfe) {
+        this.entradaNfe.set(entradaNfe);
+    }
+
+    @OneToOne(mappedBy = "entradaProduto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    public EntradaCte getEntradaCte() {
+        return entradaCte.get();
+    }
+
+    public ObjectProperty<EntradaCte> entradaCteProperty() {
+        return entradaCte;
+    }
+
+    public void setEntradaCte(EntradaCte entradaCte) {
+        this.entradaCte.set(entradaCte);
+    }
+
+    @OneToMany(mappedBy = "entradaProduto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     public List<EntradaProdutoProduto> getEntradaProdutoProdutoList() {
         return entradaProdutoProdutoList;
     }
@@ -135,7 +154,6 @@ public class EntradaProduto implements Serializable {
                 "id=" + id +
                 ", situacao=" + situacao +
                 ", loja=" + loja +
-                ", fornecedor=" + fornecedor +
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
                 ", entradaProdutoProdutoList=" + entradaProdutoProdutoList +

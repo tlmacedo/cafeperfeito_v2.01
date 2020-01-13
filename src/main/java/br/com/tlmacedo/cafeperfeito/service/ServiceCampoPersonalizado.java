@@ -155,9 +155,11 @@ public class ServiceCampoPersonalizado {
     public static void fieldTextFormat(Node node) {
         //System.out.printf("\t\t\tnodee: [%s]\n\t\t\t\taccessibleText: [%s]\n", node.getId(), node.getAccessibleText());
         HashMap<String, String> hashMap = null;
-        if (node.getAccessibleText() != null)
+        if (node.getAccessibleText() != null) {
             hashMap = ServiceMascara.getFieldFormatMap(node.getAccessibleText());
-
+            if (hashMap.containsKey("type"))
+                alinhamento(node, hashMap.get("type"));
+        }
         if (node instanceof TextField) {
             if (hashMap == null) return;
             ((TextField) node).setEditable(true);
@@ -180,7 +182,6 @@ public class ServiceCampoPersonalizado {
             if (hashMap.containsKey("type")) {
                 if ((type = hashMap.get("type")).equals(""))
                     type = "TEXTO";
-                ((TextField) node).setStyle("-fx-alignment: center-left;");
                 switch (type) {
                     case "texto":
                         mascara = ServiceMascara.getTextoMask(len, TCONFIG.getSis().getMaskCaracter().getLower());
@@ -197,7 +198,6 @@ public class ServiceCampoPersonalizado {
                     case "valor":
                     case "peso":
                         mascara = ServiceMascara.getNumeroMask(len, decimal);
-                        ((TextField) node).setStyle("-fx-alignment: center-right;");
                         break;
                     case "cnpj":
                         mascara = MASK_CNPJ;
@@ -255,6 +255,37 @@ public class ServiceCampoPersonalizado {
         else if (node instanceof VBox)
             for (Node nod : ((VBox) node).getChildren())
                 fieldTextFormat(nod);
+    }
+
+    public static void alinhamento(Node node, String type) {
+        switch (type) {
+            case "":
+            case "texto":
+            case "Texto":
+            case "TEXTO":
+                node.setStyle("-fx-alignment: center-left;");
+                break;
+            case "numero":
+            case "número":
+            case "moeda":
+            case "valor":
+            case "peso":
+            case "cnpj":
+            case "cpf":
+            case "rg":
+            case "ncm":
+            case "cest":
+            case "cep":
+            case "nfe_chave":
+            case "cte_chave":
+            case "nfe_numero":
+            case "cte_numero":
+            case "fiscal_doc_origem":
+            case "timeHMS":
+            case "timeHM":
+                node.setStyle("-fx-alignment: center-right;");
+                break;
+        }
     }
 
 }

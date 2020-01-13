@@ -70,7 +70,7 @@
                                                 </Label>
                                                 <TextField fx:id="txtNfeNumero"
                                                            accessibleText="len::11;type::nfe_numero;value::;seteditable::;binding::;"
-                                                           styleClass="a-direita">
+                                                           alignment="TOP_RIGHT" styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="número da nfe de entrada"/>
                                                     </tooltip>
@@ -622,7 +622,7 @@
                                                     </padding>
                                                 </Label>
                                                 <TextField fx:id="txtCtePesoBruto"
-                                                           accessibleText="len::12;type::peso;decimal::2;value::0,00;seteditable::;"
+                                                           accessibleText="len::12;type::peso;decimal::4;value::0,00;seteditable::;"
                                                            styleClass="a-direita">
                                                     <tooltip>
                                                         <Tooltip text="peso bruto do cte da nfe de entrada"/>
@@ -792,7 +792,9 @@
                                                                         <Insets left="5.0"/>
                                                                     </padding>
                                                                 </Label>
-                                                                <ComboBox fx:id="cboCteFiscalTributo" prefWidth="600.0">
+                                                                <ComboBox fx:id="cboCteFiscalTributo"
+                                                                          accessibleText="len::;type::;value::;seteditable::;binding::;"
+                                                                          prefWidth="600.0">
                                                                     <tooltip>
                                                                         <Tooltip
                                                                                 text="fornecedor emissor do cte de entrada"/>

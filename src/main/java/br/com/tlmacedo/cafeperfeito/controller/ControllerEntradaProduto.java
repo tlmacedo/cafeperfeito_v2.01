@@ -407,7 +407,7 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                     BigDecimal vlrTotal = ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 2);
                     try {
                         return ServiceMascara.getMoeda(vlrTotal
-                                .divide(vlrNfe, 5, RoundingMode.HALF_UP)
+                                .divide(vlrNfe, 4, RoundingMode.HALF_UP)
                                 .multiply(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP), 2);
                     } catch (ArithmeticException ae) {
                         return "0,00";
@@ -458,20 +458,38 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                         ServiceMascara.getMoeda(getTmodelEntradaProduto().totalBrutoProperty().getValue(), 2),
                 getTmodelEntradaProduto().totalBrutoProperty()
         ));
+        getLblNfeFiscalVlrTotal().textProperty().addListener((ov, o, n) -> {
+            getTmodelEntradaProduto().totalImpEntradaProperty().setValue(
+                    ServiceMascara.getBigDecimalFromTextField(n, 2)
+                            .add(ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2))
+            );
+        });
+        getLblCteFiscalVlrTotal().textProperty().addListener((ov, o, n) -> {
+            getTmodelEntradaProduto().totalImpEntradaProperty().setValue(
+                    ServiceMascara.getBigDecimalFromTextField(n, 2)
+                            .add(ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 2))
+            );
+        });
         getLblTotalImposto().textProperty().bind(Bindings.createStringBinding(() ->
-                        ServiceMascara.getMoeda(getTmodelEntradaProduto().totalImpostoProperty().getValue()
-                                .add(ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 2))
-                                .add(ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2)), 2),
+                        ServiceMascara.getMoeda(getTmodelEntradaProduto().totalImpostoProperty().getValue(), 2),
                 getTmodelEntradaProduto().totalImpostoProperty()
         ));
-        getLblTotalFrete().textProperty().bind(getLblCteVlrLiquido().textProperty());
+
+        getLblCteVlrLiquido().textProperty().addListener((ov, o, n) -> {
+            getTmodelEntradaProduto().setTotalFrete(ServiceMascara.getBigDecimalFromTextField(n, 2));
+        });
+
+        getLblTotalFrete().textProperty().bind(Bindings.createStringBinding(() ->
+                        ServiceMascara.getMoeda(getTmodelEntradaProduto().totalFreteProperty().getValue(), 2),
+                getTmodelEntradaProduto().totalFreteProperty()
+        ));
+
         getLblTotalDesconto().textProperty().bind(Bindings.createStringBinding(() ->
                         ServiceMascara.getMoeda(getTmodelEntradaProduto().totalDescontoProperty().getValue(), 2),
                 getTmodelEntradaProduto().totalDescontoProperty()
         ));
         getLblTotalLiquido().textProperty().bind(Bindings.createStringBinding(() ->
-                        ServiceMascara.getMoeda(getTmodelEntradaProduto().totalLiquidoProperty().getValue()
-                                .add(ServiceMascara.getBigDecimalFromTextField(getLblTotalFrete().getText(), 2)), 2),
+                        ServiceMascara.getMoeda(getTmodelEntradaProduto().totalLiquidoProperty().getValue(), 2),
                 getTmodelEntradaProduto().totalLiquidoProperty()
         ));
 
@@ -705,14 +723,14 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     }
 
     private void addXmlNfe(File file) {
-        if (!file.getName().toLowerCase().contains("nfe")) return;
         TNfeProc nfeProc = null;
         try {
             nfeProc = ServiceUtilXml.xmlToObject(ServiceUtilXml.FileXml4String(new FileReader(file)), TNfeProc.class);
         } catch (JAXBException | FileNotFoundException e) {
             e.printStackTrace();
+            return;
         }
-        if (nfeProc == null) return;
+        if (nfeProc.getNFe() == null) return;
         getTxtNfeChave().setText(nfeProc.getNFe().getInfNFe().getId().replaceAll("\\D", ""));
         getTxtNfeNumero().setText(nfeProc.getNFe().getInfNFe().getIde().getNNF());
         getTxtNfeSerie().setText(nfeProc.getNFe().getInfNFe().getIde().getSerie());
@@ -740,14 +758,14 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     }
 
     private void addXmlCte(File file) {
-        if (!file.getName().toLowerCase().contains("cte")) return;
         CteProc cteProc = null;
         try {
             cteProc = ServiceUtilXml.xmlToObject(ServiceUtilXml.FileXml4String(new FileReader(file)), CteProc.class);
         } catch (JAXBException | FileNotFoundException e) {
             e.printStackTrace();
+            return;
         }
-        if (cteProc == null) return;
+        if (cteProc.getCTe() == null) return;
 
         getTxtCteChave().setText(cteProc.getCTe().getInfCte().getId().replaceAll("\\D", ""));
         getTxtCteNumero().setText(cteProc.getCTe().getInfCte().getIde().getNCT());
@@ -756,18 +774,18 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
         getTxtCteVlrCte().setText(cteProc.getCTe().getInfCte().getVPrest().getVTPrest());
         getTxtCteVlrImposto().setText(cteProc.getCTe().getInfCte().getImp().getICMS().getICMS00().getVICMS());
 
-        for (br.inf.portalfiscal.xsd.cte.procCTe.TCTe.InfCte.InfCTeNorm.InfCarga.InfQ infQ : cteProc.getCTe().getInfCte().getInfCTeNorm().getInfCarga().getInfQ())
+        for (TCTe.InfCte.InfCTeNorm.InfCarga.InfQ infQ : cteProc.getCTe().getInfCte().getInfCTeNorm().getInfCarga().getInfQ())
             switch (infQ.getTpMed().toLowerCase()) {
                 case "volume":
                 case "volumes":
                     getTxtCteQtdVolume().setText(infQ.getQCarga());
                     break;
                 case "peso bruto":
-                    getTxtCtePesoBruto().setText(BigDecimal.valueOf(Double.parseDouble(infQ.getQCarga())).setScale(2).toString());
+                    getTxtCtePesoBruto().setText(BigDecimal.valueOf(Double.parseDouble(infQ.getQCarga())).setScale(4).toString());
             }
 
         double tmpTaxas = 0.;
-        for (br.inf.portalfiscal.xsd.cte.procCTe.TCTe.InfCte.VPrest.Comp comp : cteProc.getCTe().getInfCte().getVPrest().getComp())
+        for (TCTe.InfCte.VPrest.Comp comp : cteProc.getCTe().getInfCte().getVPrest().getComp())
             if (comp.getXNome().toLowerCase().contains("peso"))
                 getTxtCteVlrBruto().setText(comp.getVComp());
             else if (comp.getXNome().toLowerCase().contains("coleta"))
@@ -775,10 +793,6 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
             else
                 tmpTaxas += Double.parseDouble(comp.getVComp());
         getTxtCteVlrTaxa().setText(BigDecimal.valueOf(tmpTaxas).setScale(2).toString());
-
-        //getLblCteVlrLiquido().setText(cteProc.getCTe().getInfCte().getVPrest().getVTPrest());
-
-        //getLblCteFiscalVlrCte().setText(cteProc.getCTe().getInfCte().getVPrest().getVTPrest());
 
         CteProc finalCteProc = cteProc;
         getCboCteTomadorServico().getSelectionModel().select(
@@ -802,13 +816,47 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                         .findFirst().orElse(null)
         );
         getDtpCteEmissao().setValue(LocalDate.parse(cteProc.getCTe().getInfCte().getIde().getDhEmi(), DTF_NFE_TO_LOCAL_DATE));
+        if (cteProc.getCTe().getInfCte().getInfCTeNorm().getInfDoc().getInfNFe() != null)
+            for (TCTe.InfCte.InfCTeNorm.InfDoc.InfNFe infNFe : cteProc.getCTe().getInfCte().getInfCTeNorm().getInfDoc().getInfNFe()) {
+                File fileTmp;
+                if ((fileTmp = ServiceFileFinder.finder(file.getParent(), infNFe.getChave())).exists())
+                    addXmlNfe(fileTmp);
+            }
+    }
 
-        if (getTxtNfeChave().getText().equals("")) {
-            File filetmp = null;
-            for (TCTe.InfCte.InfCTeNorm.InfDoc.InfNFe infNFe : cteProc.getCTe().getInfCte().getInfCTeNorm().getInfDoc().getInfNFe())
-                if ((filetmp = new File(file.getParent() + "/" + infNFe.getChave() + "-nfe.xml")).exists())
-                    addXmlNfe(filetmp);
-        }
+    private void guardarEntradaProdutoProduto() {
+        BigDecimal kgPedido = getEntradaProdutoProdutoObservableList().stream()
+                .map(entradaProdutoProduto -> entradaProdutoProduto.produtoProperty().getValue()
+                        .pesoProperty().getValue().multiply(new BigDecimal(entradaProdutoProduto.qtdProperty().getValue())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal freteKg = ServiceMascara.getBigDecimalFromTextField(getLblCteVlrLiquido().getText(), 2)
+                .divide(kgPedido, 4, RoundingMode.HALF_UP);
+        BigDecimal impSefazNfe = (ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrNFe().getText(), 2)
+                .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 2)) == 0)
+                ? ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrPercentual().getText(), 4)
+                : (ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 4)
+                .multiply(new BigDecimal("100.")))
+                .divide(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 4),
+                        4, RoundingMode.HALF_UP);
+        BigDecimal impSefazFrete = ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2)
+                .divide(kgPedido, 4, RoundingMode.HALF_UP);
+
+        getEntradaProdutoProdutoObservableList().stream()
+                .forEach(entradaProdutoProduto -> {
+                    entradaProdutoProduto.entradaProdutoProperty().setValue(getEntradaProduto());
+                    BigDecimal kgItem = entradaProdutoProduto.produtoProperty().getValue().pesoProperty().getValue()
+                            .multiply(new BigDecimal(entradaProdutoProduto.qtdProperty().getValue()));
+                    entradaProdutoProduto.vlrFreteProperty().setValue(
+                            freteKg.multiply(kgItem)
+                    );
+                    entradaProdutoProduto.vlrImpostoProperty().setValue(
+                            ((impSefazNfe.divide(new BigDecimal("100."), 4, RoundingMode.HALF_UP)).multiply(
+                                    entradaProdutoProduto.vlrBrutoProperty().getValue()
+                                            .subtract(entradaProdutoProduto.vlrDescontoProperty().getValue()))
+                            )
+                                    .add(impSefazFrete.multiply(kgItem))
+                    );
+                });
     }
 
     /**
@@ -964,16 +1012,76 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
         try {
             setEntradaProduto(new EntradaProduto());
 
+            getEntradaProduto().setEntradaProdutoProdutoList(getEntradaProdutoProdutoObservableList());
             getEntradaProduto().setSituacao(SituacaoEntrada.DIGITACAO);
-            getEntradaProduto().setFornecedor(getCboNfeFornecedor().getValue());
             getEntradaProduto().setLoja(getCboNfeLojaDestino().getValue());
             getEntradaProduto().setUsuarioCadastro(UsuarioLogado.getUsuario());
 
-            getEntradaProdutoProdutoObservableList().stream()
-                    .forEach(entradaProdutoProduto -> {
-                        entradaProdutoProduto.setEntradaProduto(getEntradaProduto());
-                        getEntradaProduto().getEntradaProdutoProdutoList().add(entradaProdutoProduto);
-                    });
+            EntradaNfe nfe = new EntradaNfe();
+            getEntradaProduto().entradaNfeProperty().setValue(nfe);
+            nfe.entradaProdutoProperty().setValue(getEntradaProduto());
+            nfe.chaveProperty().setValue(getTxtNfeChave().getText().trim().replaceAll("\\D", ""));
+            nfe.numeroProperty().setValue(getTxtNfeNumero().getText().trim().replaceAll("\\D", ""));
+            nfe.serieProperty().setValue(getTxtNfeSerie().getText().trim().replaceAll("\\D", ""));
+            nfe.modeloProperty().setValue(getCboNfeModelo().getSelectionModel().getSelectedItem());
+            nfe.fornecedorProperty().setValue(getCboNfeFornecedor().getSelectionModel().getSelectedItem());
+            nfe.setDtEmissao(getDtpNfeEmissao().getValue());
+            nfe.setDtEntrada(getDtpNfeEntrada().getValue());
+
+            if (getTpnNfeDetalheFiscal().isExpanded()) {
+                EntradaFiscal nfeFiscal = new EntradaFiscal();
+                nfe.entradaFiscalProperty().setValue(nfeFiscal);
+                nfeFiscal.controleProperty().setValue(getTxtNfeFiscalControle().getText().trim().replaceAll("\\D", ""));
+                nfeFiscal.origemProperty().setValue(getTxtNfeFiscalOrigem().getText().trim().replaceAll("\\D", ""));
+                nfeFiscal.tributosSefazAmProperty().setValue(getCboNfeFiscalTributo().getSelectionModel().getSelectedItem());
+                nfeFiscal.vlrDocumentoProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrNFe().getText(), 4));
+                nfeFiscal.vlrTributoProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrTributo().getText(), 4));
+                nfeFiscal.vlrMultaProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrMulta().getText(), 4));
+                nfeFiscal.vlrJurosProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrJuros().getText(), 4));
+                nfeFiscal.vlrTaxaProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrTaxa().getText(), 4));
+            }
+
+            if (getTpnCteDetalhe().isExpanded()) {
+                EntradaCte cte = new EntradaCte();
+                getEntradaProduto().entradaCteProperty().setValue(cte);
+                cte.entradaProdutoProperty().setValue(getEntradaProduto());
+                cte.chaveProperty().setValue(getTxtCteChave().getText().trim().replaceAll("\\D", ""));
+                cte.tomadorServicoProperty().setValue(getCboCteTomadorServico().getSelectionModel().getSelectedItem());
+                cte.numeroProperty().setValue(getTxtCteNumero().getText().trim().replaceAll("\\D", ""));
+                cte.serieProperty().setValue(getTxtCteSerie().getText().trim().replaceAll("\\D", ""));
+                cte.modeloProperty().setValue(getCboCteModelo().getSelectionModel().getSelectedItem());
+                cte.dtEmissaoProperty().setValue(getDtpCteEmissao().getValue());
+                cte.transportadoraProperty().setValue(getCboCteTransportadora().getSelectionModel().getSelectedItem());
+                cte.situacaoTributariaProperty().setValue(getCboCteSistuacaoTributaria().getSelectionModel().getSelectedItem());
+                cte.vlrCteProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrCte().getText(), 4));
+                cte.qtdVolumeProperty().setValue(Integer.parseInt(getTxtCteQtdVolume().getText().trim().replaceAll("\\D", "")));
+                cte.pesoBrutoProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 4));
+                cte.vlrFreteBrutoProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrBruto().getText(), 4));
+                cte.vlrTaxasProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrTaxa().getText(), 4));
+                cte.vlrColetaProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrColeta().getText(), 4));
+                cte.vlrImpostoFreteProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrImposto().getText(), 4));
+
+                if (getTpnCteDetalheFiscal().isExpanded()) {
+                    EntradaFiscal cteFiscal = new EntradaFiscal();
+                    cte.entradaFiscalProperty().setValue(cteFiscal);
+                    cteFiscal.controleProperty().setValue(getTxtCteFiscalControle().getText().trim().replaceAll("\\D", ""));
+                    cteFiscal.origemProperty().setValue(getTxtCteFiscalOrigem().getText().trim().replaceAll("\\D", ""));
+                    cteFiscal.tributosSefazAmProperty().setValue(getCboCteFiscalTributo().getSelectionModel().getSelectedItem());
+                    cteFiscal.vlrDocumentoProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrCte().getText(), 4));
+                    cteFiscal.vlrTributoProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCteFiscalVlrTributo().getText(), 4));
+                    cteFiscal.vlrMultaProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCteFiscalVlrMulta().getText(), 4));
+                    cteFiscal.vlrJurosProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCteFiscalVlrJuros().getText(), 4));
+                    cteFiscal.vlrTaxaProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtCteFiscalVlrTaxa().getText(), 4));
+                }
+            }
+
+            guardarEntradaProdutoProduto();
+
+//            getEntradaProdutoProdutoObservableList().stream()
+//                    .forEach(entradaProdutoProduto -> {
+//                        entradaProdutoProduto.setEntradaProduto(getEntradaProduto());
+//                        //getEntradaProduto().getEntradaProdutoProdutoList().add(entradaProdutoProduto);
+//                    });
             //getEntradaProduto().setEntradaProdutoProdutoList(getEntradaProdutoProdutoObservableList());
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -983,55 +1091,50 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     }
 
     private boolean salvarEntradaProduto() {
+        boolean retorno;
         try {
             setEntradaProdutoDAO(new EntradaProdutoDAO());
             getEntradaProdutoDAO().transactionBegin();
-            //BigDecimal freteBrutoKg,
-            // BigDecimal impEntrada,
-            // BigDecimal impFreteEntrada,
-            // BigDecimal impFrete,
-            // BigDecimal taxaFrete,
-            // String docEntrada,
-            // String chaveNFe
 
-            if (getTmodelEntradaProduto().incluirEstoque(
-                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrBruto().getText(), 2)
-                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
-                                    4, RoundingMode.HALF_UP),
 
-                    (ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrNFe().getText(), 2)
-                            .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 2)) == 0)
-                            ? ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrPercentual().getText(), 4)
-                            : (ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 4)
-                            .multiply(new BigDecimal("100.")))
-                            .divide(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 4),
-                                    4, RoundingMode.HALF_UP),
+//            retorno = getTmodelEntradaProduto().incluirEstoque(
+//                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrBruto().getText(), 2)
+//                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
+//                                    4, RoundingMode.HALF_UP),
+//
+//
+//                    (ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrNFe().getText(), 2)
+//                            .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 2)) == 0)
+//                            ? ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrPercentual().getText(), 4)
+//                            : (ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 4)
+//                            .multiply(new BigDecimal("100.")))
+//                            .divide(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 4),
+//                                    4, RoundingMode.HALF_UP),
+//
+//                    ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2)
+//                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
+//                                    4, RoundingMode.HALF_UP),
+//
+//                    ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2)
+//                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
+//                                    4, RoundingMode.HALF_UP),
+//
+//                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrTaxa().getText(), 2)
+//                            .add(ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrColeta().getText(), 2))
+//                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
+//                                    4, RoundingMode.HALF_UP),
+//                    getTxtNfeNumero().getText().replaceAll("\\D", ""),
+//                    getTxtNfeChave().getText().replaceAll("\\D", ""));
+            retorno = getTmodelEntradaProduto().incluirEstoque();
+            setEntradaProduto(getEntradaProdutoDAO().setTransactionPersist(getEntradaProduto()));
+            getEntradaProdutoDAO().transactionCommit();
 
-                    ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2)
-                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
-                                    4, RoundingMode.HALF_UP),
-
-                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrImposto().getText(), 2)
-                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
-                                    4, RoundingMode.HALF_UP),
-
-                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrTaxa().getText(), 2)
-                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
-                                    4, RoundingMode.HALF_UP),
-                    getTxtNfeNumero().getText().replaceAll("\\D", ""),
-                    getTxtNfeChave().getText().replaceAll("\\D", ""))) {
-                ServiceUtilJSon.printJsonFromObject(getEntradaProduto(), "EntradaProduto");
-                setEntradaProduto(getEntradaProdutoDAO().setTransactionPersist(getEntradaProduto()));
-                getEntradaProdutoDAO().transactionCommit();
-            } else {
-                // getEntradaProdutoDAO().closeTransaction();
-            }
         } catch (Exception ex) {
             ex.printStackTrace();
             getEntradaProdutoDAO().transactionRollback();
-            return false;
+            retorno = false;
         }
-        return true;
+        return retorno;
     }
 
     /**

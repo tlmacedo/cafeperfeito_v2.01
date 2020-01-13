@@ -150,7 +150,8 @@ public class ServiceMascara {
 
     public static BigDecimal getBigDecimalFromTextField(String value, int decimal) {
         if (value.equals("") || value == null) return BigDecimal.ZERO.setScale(decimal);
-        BigDecimal result = new BigDecimal(formataNumeroDecimal(value, decimal).replace(".", "")
+        BigDecimal ini = new BigDecimal(value.replace(".", "").replace(",", ".")).setScale(decimal, RoundingMode.HALF_UP);
+        BigDecimal result = new BigDecimal(formataNumeroDecimal(ini.toString(), decimal).replace(".", "")
                 .replace(",", ".")).setScale(decimal, RoundingMode.HALF_UP);
         return result.toString() != "0.00" ? result : BigDecimal.ZERO;
     }

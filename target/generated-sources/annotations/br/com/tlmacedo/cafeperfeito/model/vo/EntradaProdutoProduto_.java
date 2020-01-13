@@ -9,7 +9,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2020-01-09T11:04:14")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2020-01-13T12:32:34")
 @StaticMetamodel(EntradaProdutoProduto.class)
 public class EntradaProdutoProduto_ { 
 
@@ -20,6 +20,7 @@ public class EntradaProdutoProduto_ {
     public static volatile SingularAttribute<EntradaProdutoProduto, TipoCodigoCFOP> codigoCFOP;
     public static volatile SingularAttribute<EntradaProdutoProduto, EntradaProduto> entradaProduto;
     public static volatile SingularAttribute<EntradaProdutoProduto, BigDecimal> vlrImposto;
+    public static volatile SingularAttribute<EntradaProdutoProduto, BigDecimal> vlrFrete;
     public static volatile SingularAttribute<EntradaProdutoProduto, BigDecimal> vlrDesconto;
     public static volatile SingularAttribute<EntradaProdutoProduto, BigDecimal> vlrBruto;
     public static volatile SingularAttribute<EntradaProdutoProduto, String> descricao;
