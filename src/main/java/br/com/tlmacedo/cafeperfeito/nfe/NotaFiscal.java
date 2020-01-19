@@ -366,12 +366,12 @@ public class NotaFiscal {
         prodVO.setuCom(produto.getUnidadeComercial().getDescricao());
         BigDecimal qCom = new BigDecimal(saidaProdutoProduto.qtdProperty().getValue());
         prodVO.setqCom(qCom);
-        prodVO.setvUnCom(saidaProdutoProduto.vlrVendaProperty().getValue());
+        prodVO.setvUnCom(saidaProdutoProduto.vlrUnitarioProperty().getValue());
         prodVO.setvProd(saidaProdutoProduto.vlrBrutoProperty().getValue());
         prodVO.setcEANTrib(produto.getCEAN());
         prodVO.setuTrib(produto.getUnidadeComercial().getDescricao());
         prodVO.setqTrib(qCom);
-        prodVO.setvUnTrib(saidaProdutoProduto.vlrVendaProperty().getValue());
+        prodVO.setvUnTrib(saidaProdutoProduto.vlrUnitarioProperty().getValue());
         prodVO.setvFrete(null);
         prodVO.setvSeg(null);
         if (saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)

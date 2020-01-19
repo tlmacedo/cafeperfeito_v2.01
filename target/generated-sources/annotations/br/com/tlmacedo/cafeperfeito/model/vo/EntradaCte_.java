@@ -12,7 +12,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2020-01-13T13:16:19")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2020-01-18T16:26:20")
 @StaticMetamodel(EntradaCte.class)
 public class EntradaCte_ { 
 

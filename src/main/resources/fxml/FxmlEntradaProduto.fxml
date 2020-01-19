@@ -1058,7 +1058,7 @@
                                                         <Insets left="5.0"/>
                                                     </padding>
                                                 </Label>
-                                                <TreeTableView fx:id="ttvProduto"
+                                                <TreeTableView fx:id="ttvProdutoEstoque"
                                                                accessibleText="len::;type::;value::;seteditable::;"
                                                                nodeOrientation="LEFT_TO_RIGHT">
                                                     <tooltip>
@@ -1071,12 +1071,6 @@
                                 </AnchorPane>
                             </content>
                         </TitledPane>
-                        <!--                        <TitledPane fx:id="tpnItensNfe" collapsible="false" focusTraversable="false" layoutX="5.0"-->
-                        <!--                                    layoutY="180.0" minHeight="0.0" minWidth="0.0" prefHeight="215.0" prefWidth="1330.0"-->
-                        <!--                                    text="Itens da nf-e">-->
-                        <!--                            <content>-->
-                        <!--                                <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="1330.0">-->
-                        <!--                                    <children>-->
                         <VBox fx:id="vBoxItensNfeDetalhe" alignment="CENTER_LEFT" layoutX="5.0" layoutY="180.0"
                               prefHeight="155.0" prefWidth="1330.0">
                             <children>
@@ -1248,11 +1242,6 @@
                                 </Label>
                             </children>
                         </VBox>
-
-                        <!--                                    </children>-->
-                        <!--                                </AnchorPane>-->
-                        <!--                            </content>-->
-                        <!--                        </TitledPane>-->
                     </children>
                 </AnchorPane>
             </content>

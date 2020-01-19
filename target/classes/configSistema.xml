@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sistema>
     <myLocale>pt_br</myLocale>
-    <timeOut>300</timeOut>
+    <timeOut>30</timeOut>
     <versao>2.01</versao>
     <sis>
         <connect_DB>
@@ -38,6 +38,7 @@
         <municipio>Manaus</municipio>
         <cMunFG>1302603</cMunFG>
         <ddd>92</ddd>
+        <descMax>0.10</descMax>
         <banco>ITAU</banco>
         <agencia>1677</agencia>
         <contaCorrente>35.456-3</contaCorrente>

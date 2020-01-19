@@ -10,9 +10,13 @@ import br.com.tlmacedo.cafeperfeito.model.tm.TmodelSaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
+import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,7 +31,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -98,26 +101,25 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     public Tab tabNfeInformacoes;
     public TextArea txaNfeInformacoesAdicionais;
 
-    public TitledPane tpnProdutos;
+    public TitledPane tpnItensTotaisDetalhe;
     public TextField txtPesquisaProduto;
+    public Label lblStatus;
     public Label lblRegistrosLocalizados;
-    public TreeTableView<Produto> ttvProduto;
-
-    public TitledPane tpnItensPedido;
+    public TreeTableView<Object> ttvProdutoEstoque;
+    public VBox vBoxItensNfeDetalhe;
     public TableView<SaidaProdutoProduto> tvItensNfe;
     public VBox vBoxTotalQtdItem;
-    public Label lblTotalQtdItem;
-    public VBox vBoxTotalQtdProduto;
-    public Label lblTotalQtdProduto;
+    public Label lblQtdItem;
+    public VBox vBoxTotalQtdTotal;
+    public Label lblQtdTotal;
     public VBox vBoxTotalQtdVolume;
-    public Label lblTotalQtdVolume;
+    public Label lblQtdVolume;
     public VBox vBoxTotalBruto;
     public Label lblTotalBruto;
     public VBox vBoxTotalDesconto;
     public Label lblTotalDesconto;
     public VBox vBoxTotalLiquido;
     public Label lblTotalLiquido;
-
 
     private boolean tabCarregada = false;
     private List<EnumsTasks> enumsTasksList = new ArrayList<>();
@@ -132,29 +134,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private FilteredList<Produto> produtoFilteredList;
 
     private TmodelSaidaProduto tmodelSaidaProduto;
-    private SaidaProduto saidaProduto = new SaidaProduto();
-    private SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
+    private SaidaProduto saidaProduto;
+    private SaidaProdutoDAO saidaProdutoDAO;
     private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList = FXCollections.observableArrayList();
 
-    private ObservableList<Empresa> empresaObservableList = FXCollections.observableArrayList(
-            new EmpresaDAO().getAll(Empresa.class, null, "razao, fantasia"));
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
-    private ObjectProperty<List<Endereco>> enderecoList = new SimpleObjectProperty<>();
-    private ObjectProperty<Endereco> endereco = new SimpleObjectProperty<>();
-    private ObjectProperty<List<Telefone>> telefoneList = new SimpleObjectProperty<>();
-
-//    private NotaFiscal notaFiscal;
-//    private ObjectProperty<LoadCertificadoA3> loadCertificadoA3 = new SimpleObjectProperty<>();
-//    private IntegerProperty nfeLastNumber = new SimpleIntegerProperty(0);
-//    private StringProperty informacaoNFE = new SimpleStringProperty();
-//    private ObjectProperty<BigDecimal> valorParcela = new SimpleObjectProperty<>(BigDecimal.ZERO);
-//    private ObjectProperty<NFev400> nFev400 = new SimpleObjectProperty<>();
-//    private ObjectProperty<TEnviNFe> tEnviNFe = new SimpleObjectProperty<>();
-//    private StringProperty xmlNFe = new SimpleStringProperty();
-//    private StringProperty xmlNFeAssinado = new SimpleStringProperty();
-//    private StringProperty xmlNFeAutorizacao = new SimpleStringProperty();
-//    private StringProperty xmlNFeRetAutorizacao = new SimpleStringProperty();
-//    private StringProperty xmlNFeProc = new SimpleStringProperty();
+    private IntegerProperty prazo = new SimpleIntegerProperty(0);
+    private List<FichaKardex> fichaKardexList;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -208,50 +194,60 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     @Override
-    public void fatorarObjetos() throws Exception {
+    public void fatorarObjetos() {
+        getTpnNfe().setExpanded(false);
 
+        getDtpDtSaida().setDayCellFactory(param -> new FormatDataPicker(null));
+        getDtpDtVencimento().setDayCellFactory(param -> new FormatDataPicker(null));
+        getDtpNfeDadosDtEmissao().setDayCellFactory(param -> new FormatDataPicker(null));
+        getDtpNfeDadosDtSaida().setDayCellFactory(param -> new FormatDataPicker(null));
+
+        getDtpDtSaida().valueProperty().addListener((ov, o, n) -> {
+            if (n == null) return;
+            int prazo = (empresaProperty().getValue() == null
+                    ? 0 : empresaProperty().getValue().prazoProperty().getValue());
+            getDtpDtVencimento().setValue(n.plusDays(prazo));
+            getDtpDtVencimento().setDayCellFactory(param -> new FormatDataPicker(n));
+        });
+
+        getDtpNfeDadosDtEmissao().valueProperty().addListener((ov, o, n) -> {
+            if (n == null) return;
+            getDtpNfeDadosDtSaida().setValue(n);
+            getDtpNfeDadosDtSaida().setDayCellFactory(param -> new FormatDataPicker(n));
+        });
     }
 
     @Override
-    public void escutarTecla() throws Exception {
+    public void escutarTecla() {
+        escutaTitledTab();
         statusBarProperty().addListener((ov, o, n) -> {
             if (n == null)
                 statusBarProperty().setValue(StatusBarSaidaProduto.DIGITACAO);
             showStatusBar();
         });
 
-        getTtvProduto().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() != KeyCode.ENTER
-                    || getTtvProduto().getSelectionModel().getSelectedItem() == null
-                    || getTtvProduto().getSelectionModel().getSelectedItem().getValue().tblEstoqueProperty().getValue() <= 0)
+        getTtvProdutoEstoque().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode() != KeyCode.ENTER
+                    || getTtvProdutoEstoque().getSelectionModel().getSelectedItem() == null
+                    || (getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue() instanceof Produto
+                    && ((Produto) getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue()).tblEstoqueProperty().getValue() <= 0)
+                    || (getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue() instanceof ProdutoEstoque
+                    && ((ProdutoEstoque) getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue()).qtdProperty().getValue() <= 0))
                 return;
-            Produto produtoSelecionado = getProdutoSelecionado();
-            if (getSaidaProdutoProdutoObservableList().stream()
-                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue().equals(produtoSelecionado.tblLoteProperty().getValue())
-                            && saidaProdutoProduto.getProduto().idProperty().getValue().intValue() == produtoSelecionado.idProperty().getValue().intValue())
-                    .findFirst().orElse(null) == null) {
-                getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoSelecionado, TipoCodigoCFOP.COMERCIALIZACAO, 1));
+            ProdutoEstoque estoqueEscolhido = getEstoqueSelecionado();
+            SaidaProdutoProduto saida;
+            if ((saida = getSaidaProdutoProdutoObservableList().stream()
+                    .filter(saidaProdutoProduto -> saidaProdutoProduto.loteProperty().getValue().equals(estoqueEscolhido.loteProperty().getValue())
+                            && saidaProdutoProduto.produtoProperty().getValue().idProperty().getValue().intValue()
+                            == estoqueEscolhido.produtoProperty().getValue().idProperty().getValue().intValue())
+                    .findFirst().orElse(null)) == null) {
+                getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(estoqueEscolhido, TipoCodigoCFOP.COMERCIALIZACAO, 1));
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().fireEvent(ServiceComandoTecladoMouse.pressTecla(KeyCode.F8));
-                if (empresaProperty().getValue() != null)
-                    getTmodelSaidaProduto().calculaDescontoCliente();
             } else {
-                for (int i = 0; i < getSaidaProdutoProdutoObservableList().size(); i++) {
-                    SaidaProdutoProduto saida = getSaidaProdutoProdutoObservableList().get(i);
-                    if (saida.loteProperty().getValue().equals(produtoSelecionado.tblLoteProperty().getValue())
-                            && saida.produtoProperty().getValue().idProperty().getValue().intValue()
-                            == produtoSelecionado.idProperty().getValue().intValue()) {
-                        getTvItensNfe().requestFocus();
-                        getTvItensNfe().getSelectionModel().select(i, getTmodelSaidaProduto().getColQtd());
-                    }
-                }
+                getTvItensNfe().requestFocus();
+                getTvItensNfe().getSelectionModel().select(getSaidaProdutoProdutoObservableList().indexOf(saida),
+                        getTmodelSaidaProduto().getColQtd());
             }
-        });
-
-        getTvItensNfe().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() != KeyCode.HELP)
-                return;
-            Produto produtoAdicional = new Produto(getTvItensNfe().getSelectionModel().getSelectedItem().produtoProperty().getValue());
-            getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(produtoAdicional, TipoCodigoCFOP.AMOSTRA, 1));
         });
 
         setEventHandlerSaidaProduto(new EventHandler<KeyEvent>() {
@@ -268,79 +264,21 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             limpaCampos(getPainelViewSaidaProduto());
                             break;
                         case F2:
-//                            getEnumsTasksList().clear();
-//                            getEnumsTasksList().add(EnumsTasks.SALVAR_SAIDA);
-//
-//                            if (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
-//                                    .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0) {
-//                                boolean usarCredDeb = false;
-//                                BigDecimal credDeb = BigDecimal.ZERO;
-//                                if ((credDeb = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2)).compareTo(BigDecimal.ZERO) < 0) {
-//                                    setAlertMensagem(new ServiceAlertMensagem());
-//                                    getAlertMensagem().setCabecalho("Crédito disponível");
-//                                    getAlertMensagem().setContentText(String.format("o cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
-//                                            ServiceMascara.getMoeda((credDeb.multiply(new BigDecimal("-1."))), 2)));
-//                                    getAlertMensagem().setStrIco("");
-//                                    ButtonType btnResult;
-//                                    if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
-//                                        return;
-//                                    usarCredDeb = (btnResult == ButtonType.YES);
-//                                } else if (credDeb.compareTo(BigDecimal.ZERO) > 0) {
-//                                    setAlertMensagem(new ServiceAlertMensagem());
-//                                    getAlertMensagem().setCabecalho("Débito detectado");
-//                                    getAlertMensagem().setContentText(String.format("o cliente tem um dédito de R$ %s\ndeseja acrescentar esse valor no pedido atual?",
-//                                            ServiceMascara.getMoeda((credDeb.multiply(new BigDecimal("-1."))), 2)));
-//                                    getAlertMensagem().setStrIco("");
-//                                    ButtonType btnResult;
-//                                    if ((btnResult = getAlertMensagem().alertYesNoCancel().get()) == ButtonType.CANCEL)
-//                                        return;
-//                                    usarCredDeb = (btnResult == ButtonType.YES);
-//                                } else {
-//                                    credDeb = BigDecimal.ZERO;
-//                                }
-//
-//                                if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
-//                                    if (usarCredDeb) {
-//                                        try {
-//                                            getContasAReceberDAO().transactionBegin();
-//                                            baixaCredito(credDeb);
-//                                            PagamentoModalidade tipBaixa = null;
-//                                            if (credDeb.compareTo(BigDecimal.ZERO) < 0)
-//                                                tipBaixa = PagamentoModalidade.CREDITO;
-//                                            else if (credDeb.compareTo(BigDecimal.ZERO) > 0)
-//                                                tipBaixa = PagamentoModalidade.DEBITO;
-//                                            getContasAReceber().getRecebimentoList().add(addRecebimento(getContasAReceber(), tipBaixa, credDeb));
-//                                            getContasAReceberDAO().transactionCommit();
-//                                        } catch (Exception ex) {
-//                                            getContasAReceberDAO().transactionRollback();
-//                                            ex.printStackTrace();
-//                                        }
-//                                    }
-//
-//                                    new ViewRecebimento().openViewRecebimento(getContasAReceber());
-//
-//                                    if (getSaidaProdutoNfe() != null) {
-//                                        nfeAddCobranca();
-//                                        gerarDanfe();
-//                                    }
-//
-//                                    atualizaTotaisCliente(getContasAReceber());
-//                                    System.out.printf("001OiOiOiOiOiOiOiOi\n");
-//
-//                                    limpaCampos(getPainelViewSaidaProduto());
-//                                    System.out.printf("002OiOiOiOiOiOiOiOi\n");
-//                                }
-//                            } else {
-//                                setAlertMensagem(new ServiceAlertMensagem());
-//                                getAlertMensagem().setCabecalho("Limite excedido");
-//                                getAlertMensagem().setContentText("Cliente não possui limite para finalizar o pedido!");
-//                                getAlertMensagem().setStrIco("");
-//                                getAlertMensagem().alertOk();
-//                            }
-//                            System.out.printf("003OiOiOiOiOiOiOiOi\n");
+                            if (getSaidaProdutoProdutoObservableList().size() > 0 && validarSaida()) {
+                                getEnumsTasksList().clear();
+                                getEnumsTasksList().add(EnumsTasks.SALVAR_ENT_SAIDA);
+                                if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
+                                    limpaCampos(getPainelViewSaidaProduto());
+                                }
+                            } else {
+                                setAlertMensagem(new ServiceAlertMensagem());
+                                getAlertMensagem().setCabecalho("Entrada invalida");
+                                getAlertMensagem().setContentText("Verifique a saida de produtos pois está invalida");
+                                getAlertMensagem().setStrIco("");
+                                getAlertMensagem().alertOk();
+                            }
                             break;
                         case F6:
-                            getCboEmpresa().getEditor().setEditable(true);
                             getCboEmpresa().requestFocus();
                             break;
                         case F7:
@@ -364,7 +302,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             }
         });
 
-
         ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
             if (n == null) return;
             if (n.getText().equals(getNomeTab())) {
@@ -377,72 +314,64 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
 
+        new ServiceAutoCompleteComboBox(Empresa.class, getCboNfeTransporteTransportadora());
+
+        empresaProperty().bind(getCboEmpresa().valueProperty());
+
+        empresaProperty().addListener((ov, o, n) -> {
+            if (n == null)
+                n = new Empresa();
+            getTmodelSaidaProduto().empresaProperty().setValue(n);
+            getTmodelSaidaProduto().prazoProperty().setValue(n.prazoProperty().getValue() == null ? 0 : n.prazoProperty().getValue());
+            exibirEmpresaDetalhe(n);
+            showStatusBar();
+        });
+
         getCboEmpresa().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() != KeyCode.ENTER)
-                return;
-            if (getCboEmpresa().getSelectionModel().getSelectedItem() != null)
+            if (event.getCode() == KeyCode.ENTER && getCboEmpresa().getValue() != null)
                 getTxtPesquisaProduto().requestFocus();
         });
 
-        getCboEmpresa().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-            if (n == null) {
-                if (getCboEmpresa().getItems().size() > 0)
-                    n = getCboEmpresa().getItems().get(0);
-                limpaCampos(getTpnCliente());
-            }
-            getDtpDtSaida().setValue(LocalDate.now());
-            getLblLimite().setText(ServiceMascara.getMoeda(n.limiteProperty().getValue(), 2));
-            getLblLimiteUtilizado().setText(ServiceMascara.getMoeda(n.limiteUtilizadoProperty().getValue(), 2));
-            getLblLimiteDisponivel().setText(ServiceMascara.getMoeda(
-                    n.limiteProperty().getValue().subtract(n.limiteUtilizadoProperty().getValue()), 2));
-            getLblPrazo().setText(n.prazoProperty().getValue().toString());
-            getLabelUltimoPedidoDt().setText("Últ. pedido");
-            if (n.dtUltimoPedidoProperty().getValue() == null) {
-                if (n.dtCadastroProperty().getValue() == null) {
-                    getLblUltimoPedidoDt().setText("");
-                    getLblUltimoPedidoDias().setText("");
-                } else {
-                    getLabelUltimoPedidoDt().setText("Dt. cadastro");
-                    getLblUltimoPedidoDt().setText(n.dtCadastroProperty().getValue().format(DTF_DATA));
-                    getLblUltimoPedidoDias().setText(String.valueOf(DAYS.between(n.dtCadastroProperty().getValue().toLocalDate(), LocalDate.now())));
-                }
-            } else {
-                getLblUltimoPedidoDt().setText(n.dtUltimoPedidoProperty().getValue().format(DTF_DATA));
-                getLblUltimoPedidoDias().setText(String.valueOf(DAYS.between(n.dtUltimoPedidoProperty().getValue(), LocalDate.now())));
-            }
-            getLblUltimoPedidoVlr().setText(ServiceMascara.getMoeda(n.vlrUltimoPedidoProperty().getValue(), 2));
-            getLblQtdPedidos().setText(n.qtdPedidosProperty().getValue().toString());
-            getLblTicketMedioVlr().setText(ServiceMascara.getMoeda(n.vlrTickeMedioProperty().getValue(), 2));
-
-            getCboEndereco().getItems().clear();
-            getCboEndereco().getItems().setAll(n.getEnderecoList());
-            getCboEndereco().getSelectionModel().select(getCboEndereco().getItems().stream()
-                    .filter(endereco1 -> endereco1.getTipo().equals(TipoEndereco.ENTREGA))
-                    .findFirst().orElse(getCboEndereco().getItems().stream().findFirst().orElse(null)));
-
-            getCboTelefone().getItems().clear();
-            getCboTelefone().getItems().setAll(n.getTelefoneList());
-            getCboTelefone().getSelectionModel().select(getCboTelefone().getItems().stream()
-                    .filter(telefone -> telefone.isPrincipal())
-                    .findFirst().orElse(getCboTelefone().getItems().stream().findFirst().orElse(null)));
-        });
-
         getCboEndereco().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-            limpaEndereco();
-            if (n == null)
+            if (n == null) {
+                limpaEndereco();
                 return;
+            }
             getLblLogradoruro().setText(n.logradouroProperty().getValue());
             getLblNumero().setText(n.numeroProperty().getValue());
             getLblBairro().setText(n.bairroProperty().getValue());
             getLblComplemento().setText(n.complementoProperty().getValue());
         });
 
-        getCboEndereco().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() != KeyCode.ENTER)
-                return;
-            getTxtPesquisaProduto().requestFocus();
+        prazoProperty().addListener((ov, o, n) -> {
+            if (n == null)
+                getDtpDtVencimento().setValue(getDtpDtSaida().getValue());
+            else
+                getDtpDtVencimento().setValue(getDtpDtSaida().getValue().plusDays(n.intValue()));
         });
 
+        getTxtPesquisaProduto().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() != KeyCode.ENTER
+                    && getSaidaProdutoProdutoObservableList().size() <= 0) return;
+            getTtvProdutoEstoque().requestFocus();
+            getTtvProdutoEstoque().getSelectionModel().selectFirst();
+        });
+
+        getLblQtdItem().textProperty().bind(getTmodelSaidaProduto().totalQtdItemProperty().asString());
+        getLblQtdTotal().textProperty().bind(getTmodelSaidaProduto().totalQtdProdutoProperty().asString());
+        getLblQtdVolume().textProperty().bind(getTmodelSaidaProduto().totalQtdVolumeProperty().asString());
+        getLblTotalBruto().textProperty().bind(Bindings.createStringBinding(() ->
+                        ServiceMascara.getMoeda(getTmodelSaidaProduto().totalBrutoProperty().getValue(), 2),
+                getTmodelSaidaProduto().totalBrutoProperty()
+        ));
+        getLblTotalDesconto().textProperty().bind(Bindings.createStringBinding(() ->
+                        ServiceMascara.getMoeda(getTmodelSaidaProduto().totalDescontoProperty().getValue(), 2),
+                getTmodelSaidaProduto().totalDescontoProperty()
+        ));
+        getLblTotalLiquido().textProperty().bind(Bindings.createStringBinding(() ->
+                        ServiceMascara.getMoeda(getTmodelSaidaProduto().totalLiquidoProperty().getValue(), 2),
+                getTmodelSaidaProduto().totalLiquidoProperty()
+        ));
     }
 
     /**
@@ -452,7 +381,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private Task newTaskSaidaProduto() {
         try {
             int qtdTasks = getEnumsTasksList().size();
-            final int[] cont = {1};
+            final int[] cont = {0};
             return new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
@@ -473,106 +402,57 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
                             case TABELA_VINCULAR:
                                 getTmodelProduto().setLblRegistrosLocalizados(getLblRegistrosLocalizados());
-                                getTmodelProduto().setTtvProduto(getTtvProduto());
-                                getTmodelProduto().setTxtPesquisa(getTxtPesquisaProduto());
+                                getTmodelProduto().setTtvProdutoEstoque(getTtvProdutoEstoque());
+                                getTmodelProduto().setTxtPesquisaProduto(getTxtPesquisaProduto());
                                 setProdutoFilteredList(getTmodelProduto().getProdutoFilteredList());
                                 getTmodelProduto().escutaLista();
 
-                                getTmodelSaidaProduto().setTvSaidaProdutoProduto(getTvItensNfe());
-                                getTmodelSaidaProduto().setTxtPesquisa(getTxtPesquisaProduto());
-                                getTmodelSaidaProduto().setDtpDtSaida(getDtpDtSaida());
-                                getTmodelSaidaProduto().setDtpDtVencimento(getDtpDtVencimento());
-//                                empresaProperty().setValue(getTmodelSaidaProduto().empresaProperty().getValue());
-                                getTmodelSaidaProduto().setEmpresa(empresaProperty().getValue());
-                                getTmodelSaidaProduto().setSaidaProduto(getSaidaProduto());
+                                getTmodelSaidaProduto().setTvItensNfe(getTvItensNfe());
+                                getTmodelSaidaProduto().setTxtPesquisaProduto(getTxtPesquisaProduto());
+                                prazoProperty().bind(getTmodelSaidaProduto().prazoProperty());
                                 getTmodelSaidaProduto().setSaidaProdutoProdutoObservableList(getSaidaProdutoProdutoObservableList());
-//                                setSaidaProduto(getTmodelSaidaProduto().getSaidaProduto());
-//                                setSaidaProdutoProdutoObservableList(getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList());
+                                getTmodelSaidaProduto().setFichaKardexList(getFichaKardexList());
                                 getTmodelSaidaProduto().escutaLista();
                                 break;
+
                             case COMBOS_PREENCHER:
-                                ServiceCalculaTempo tempo = new ServiceCalculaTempo();
                                 loadListaEmpresas();
-//                                informacoesAdicionais();
-                                //tempo.fim();
 
-                                //tempo.start();
-//                                getCboEmpresa().setItems(getEmpresaObservableList().stream()
-//                                        .filter(clientes -> clientes.isCliente())
-//                                        .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
-
-                                //tempo.start();
-                                getCboEmpresa().getItems().add(0, new Empresa());
-                                //tempo.fim();
-
-                                //tempo.start();
                                 getCboNfeDadosNaturezaOperacao().setItems(
                                         Arrays.stream(NfeDadosNaturezaOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeDadosModelo().setItems(
                                         Arrays.stream(NfeDadosModelo.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeDadosDestinoOperacao().setItems(
                                         Arrays.stream(NfeDadosDestinoOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeDadosIndicadorConsumidorFinal().setItems(
                                         Arrays.stream(NfeDadosIndicadorConsumidorFinal.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeDadosIndicadorPresenca().setItems(
                                         Arrays.stream(NfeDadosIndicadorPresenca.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeImpressaoTpImp().setItems(
                                         Arrays.stream(NfeImpressaoTpImp.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeImpressaoTpEmis().setItems(
                                         Arrays.stream(NfeImpressaoTpEmis.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeImpressaoFinNFe().setItems(
                                         Arrays.stream(NfeImpressaoFinNFe.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeTransporteModFrete().setItems(
                                         Arrays.stream(NfeTransporteModFrete.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
-                                getCboNfeTransporteTransportadora().setItems(
-                                        getEmpresaObservableList().stream()
-                                                .filter(tranportadoras -> tranportadoras.isTransportadora())
-                                                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
-
-                                //tempo.start();
                                 getCboNfeCobrancaDuplicataNumeros().setItems(
                                         Arrays.stream(NfeCobrancaDuplicataNumero.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeCobrancaPagamentoIndicador().setItems(
                                         Arrays.stream(NfeCobrancaDuplicataPagamentoIndicador.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
 
-                                //tempo.start();
                                 getCboNfeCobrancaPagamentoMeio().setItems(
                                         Arrays.stream(NfeCobrancaDuplicataPagamentoMeio.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                                //tempo.fim();
-
                                 break;
 
                             case TABELA_PREENCHER:
@@ -582,15 +462,15 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 break;
 
                             case SALVAR_ENT_SAIDA:
-//                                if (guardarSaidaProduto()) {
-//                                    if (salvarSaidaProduto()) {
+                                if (guardarSaidaProduto()) {
+//                                    if (salvarEntradaProduto()) {
 //                                        getTmodelProduto().atualizarProdutos();
 //                                    } else {
 //                                        Thread.currentThread().interrupt();
 //                                    }
-//                                } else {
-//                                    Thread.currentThread().interrupt();
-//                                }
+                                } else {
+                                    Thread.currentThread().interrupt();
+                                }
                                 break;
                             case NFE_GERAR:
 //                                gerarXmlNFe();
@@ -624,6 +504,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             ex.printStackTrace();
             return null;
         }
+//        return null;
     }
 
 
@@ -635,17 +516,16 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
      * Begin voids
      */
 
-
     private void limpaCampos(TitledPane titledPane) {
         limpaCampos((AnchorPane) titledPane.getContent());
     }
 
     private void limpaCampos(AnchorPane anchorPane) {
-        if (anchorPane == getPainelViewSaidaProduto()) {
-            getCboEmpresa().getSelectionModel().select(0);
+        ServiceCampoPersonalizado.fieldClear(anchorPane);
+        if (anchorPane.equals(getPainelViewSaidaProduto())) {
+            getCboEmpresa().getSelectionModel().select(-1);
             getCboEmpresa().requestFocus();
         }
-        ServiceCampoPersonalizado.fieldClear(anchorPane);
     }
 
     private void limpaEndereco() {
@@ -655,9 +535,24 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         getLblComplemento().setText("");
     }
 
+    private void escutaTitledTab() {
+        getTpnNfe().expandedProperty().addListener((ov, o, n) -> {
+            int diff = (getTpnNfe().getHeight() == 0) ? 85 : (int) getTpnNfe().getHeight() - 23;
+            if (!n) diff = (diff * -1);
+            ajustaTpnItensNota(diff);
+//            getTpnNfe().setText(n ? "Informações de imposto" : "Nf-e sem imposto");
+        });
+    }
+
+    private void ajustaTpnItensNota(int diff) {
+        getTpnItensTotaisDetalhe().setLayoutY(getTpnItensTotaisDetalhe().getLayoutY() + diff);
+        getTpnItensTotaisDetalhe().setPrefHeight(getTpnItensTotaisDetalhe().getPrefHeight() + (diff * -1));
+        getvBoxItensNfeDetalhe().setPrefHeight(getvBoxItensNfeDetalhe().getPrefHeight() + (diff * -1));
+    }
+
     private void showStatusBar() {
         try {
-            if (getSaidaProdutoProdutoObservableList().size() <= 0 || getCboEmpresa().getValue().idProperty().getValue() == 0)
+            if (getSaidaProdutoProdutoObservableList().size() <= 0)
                 ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao().replace("  [F2-Finalizar venda]", ""));
             else
                 ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao());
@@ -667,49 +562,94 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private void loadListaEmpresas() {
-        try {
-            ObservableList<Empresa> empresaObservableList = FXCollections.observableArrayList(
-                    new EmpresaDAO().getAll(Empresa.class, "cliente = '1'", "razao, fantasia"));
-            ObservableList<ContasAReceber> contasAReceberObservableList = FXCollections.observableArrayList(
-                    new ContasAReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC"));
-            ObservableList<ContasAReceber> aReceberClienteObservableList = FXCollections.observableArrayList();
-            empresaObservableList.stream()
-                    .filter(empresa1 -> contasAReceberObservableList.stream()
-                            .filter(contasAReceber -> contasAReceber.saidaProdutoProperty().getValue()
-                                    .clienteProperty().getValue().idProperty().getValue().equals(empresa1.idProperty().getValue())).count() > 0)
-                    .forEach(empresa1 -> {
-                        aReceberClienteObservableList.setAll(contasAReceberObservableList.stream()
-                                .filter(contasAReceber -> contasAReceber.saidaProdutoProperty().getValue()
-                                        .clienteProperty().getValue().idProperty().getValue().equals(empresa1.idProperty().getValue()))
-                                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-                        ContasAReceber ultConta = aReceberClienteObservableList.stream()
-                                .findFirst().get();
-                        empresa1.limiteUtilizadoProperty().setValue(
-                                aReceberClienteObservableList.stream()
-                                        .map(ContasAReceber::getValor)
-                                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                                        .subtract(aReceberClienteObservableList.stream()
-                                                .map(ContasAReceber::getRecebimentoList)
-                                                .map(recebimentos -> recebimentos.stream()
-                                                        .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                                                        .map(Recebimento::getValor)
-                                                        .reduce(BigDecimal.ZERO, BigDecimal::add))
-                                                .reduce(BigDecimal.ZERO, BigDecimal::add))
-                        );
-                        empresa1.dtUltimoPedidoProperty().setValue(ultConta.saidaProdutoProperty().getValue().dtSaidaProperty().getValue());
-                        empresa1.vlrUltimoPedidoProperty().setValue(ultConta.valorProperty().getValue());
-                        empresa1.qtdPedidosProperty().setValue(aReceberClienteObservableList.size());
-                        empresa1.vlrTickeMedioProperty().setValue(
-                                aReceberClienteObservableList.stream()
-                                        .map(ContasAReceber::getValor)
-                                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                                        .divide(new BigDecimal(empresa1.qtdPedidosProperty().getValue()), 2, RoundingMode.HALF_UP)
-                        );
-                    });
-            getCboEmpresa().setItems(empresaObservableList);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        ObservableList<Empresa> empresaObservableList = FXCollections.observableArrayList(
+                new EmpresaDAO().getAll(Empresa.class, null, "razao, fantasia"));
+        empresaObservableList.add(0, new Empresa());
+        ObservableList<ContasAReceber> contasAReceberObservableList =
+                FXCollections.observableArrayList(new ContasAReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC"));
+
+        getCboEmpresa().setItems(empresaObservableList);
+
+        getCboNfeTransporteTransportadora().setItems(
+                empresaObservableList.stream()
+                        .filter(tranportadoras -> tranportadoras.isTransportadora())
+                        .collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+        empresaObservableList.stream()
+                .filter(empresa -> contasAReceberObservableList.stream()
+                        .filter(contasAReceber -> contasAReceber.saidaProdutoProperty().getValue()
+                                .clienteProperty().getValue().idProperty().getValue().equals(empresa.idProperty().getValue())).count() > 0)
+                .forEach(empresa -> {
+                    empresa.limiteUtilizadoProperty().setValue(
+                            contasAReceberObservableList.stream()
+                                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresa.idProperty().getValue())
+                                    .map(ContasAReceber::getValor)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                    .subtract(
+                                            contasAReceberObservableList.stream()
+                                                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() ==
+                                                            empresa.idProperty().getValue())
+                                                    .map(ContasAReceber::getRecebimentoList)
+                                                    .map(recebimentos -> recebimentos.stream()
+                                                            .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                                            .map(Recebimento::getValor)
+                                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                    )
+                    );
+                });
+    }
+
+    private void exibirEmpresaDetalhe(Empresa empresa) {
+        getTmodelSaidaProduto().empresaProperty().setValue(empresa);
+        //getTmodelSaidaProduto().prazoProperty().setValue(empresa.prazoProperty().getValue() == null ? 0 : empresa.prazoProperty().getValue());
+
+        getDtpDtSaida().setValue(LocalDate.now());
+        getDtpDtVencimento().setValue(getDtpDtSaida().getValue().plusDays(prazoProperty().getValue()));
+        getLblLimite().setText(ServiceMascara.getMoeda(empresa.limiteProperty().getValue(), 2));
+        getLblLimiteUtilizado().setText(ServiceMascara.getMoeda(empresa.limiteUtilizadoProperty().getValue(), 2));
+
+        getLblUltimoPedidoDt().setText(empresa.dtUltimoPedidoProperty().getValue() != null
+                ? empresa.dtUltimoPedidoProperty().getValue().format(DTF_DATA)
+                : "");
+
+        getLblUltimoPedidoDias().setText(empresa == null
+                ? ""
+                : (empresa.dtUltimoPedidoProperty().getValue() != null
+                ? String.valueOf(DAYS.between(empresa.dtUltimoPedidoProperty().getValue(), LocalDate.now()))
+                : (empresa.dtCadastroProperty().getValue() == null
+                ? ""
+                : String.valueOf(DAYS.between(empresa.dtCadastroProperty().getValue().toLocalDate(), LocalDate.now())))));
+
+        getLblUltimoPedidoVlr().setText(ServiceMascara.getMoeda(empresa.vlrUltimoPedidoProperty().getValue(), 2));
+        getLblQtdPedidos().setText(empresa.qtdPedidosProperty().getValue().toString());
+        getLblTicketMedioVlr().setText(ServiceMascara.getMoeda(empresa.vlrTickeMedioProperty().getValue(), 2));
+
+        if (empresa.getEnderecoList() != null)
+            getCboEndereco().setItems(empresa.getEnderecoList().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
+        else
+            getCboEndereco().getItems().clear();
+
+        if (empresa.getTelefoneList() != null)
+            getCboTelefone().setItems(empresa.getTelefoneList().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
+        else
+            getCboTelefone().getItems().clear();
+
+        getCboEndereco().getSelectionModel().select(0);
+        getCboTelefone().getSelectionModel().select(0);
+
+        getCboEndereco().getItems().stream()
+                .filter(endereco -> endereco.getTipo().equals(TipoEndereco.ENTREGA))
+                .findFirst().ifPresent(endereco -> getCboEndereco().getSelectionModel().select(endereco));
+
+        showStatusBar();
+    }
+
+    private void guardarSaidaProdutoProduto() {
+        getSaidaProdutoProdutoObservableList().stream()
+                .forEach(saidaProdutoProduto -> {
+                    saidaProdutoProduto.saidaProdutoProperty().setValue(getSaidaProduto());
+                });
     }
 
     /**
@@ -721,20 +661,97 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
      * Begin returns
      */
 
-    private Produto getProdutoSelecionado() {
-        Produto produtoSelecionado;
-        if (getTtvProduto().getSelectionModel().getSelectedItem().getValue().idProperty().getValue() != 0) {
-            produtoSelecionado = new Produto(getTtvProduto().getSelectionModel().getSelectedItem().getValue());
-            produtoSelecionado.setTblEstoque(getTtvProduto().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblEstoque());
-            produtoSelecionado.setTblLote(getTtvProduto().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblLote());
-            produtoSelecionado.setTblValidade(getTtvProduto().getSelectionModel().getSelectedItem().getChildren().get(0).getValue().getTblValidade());
-        } else {
-            produtoSelecionado = new Produto((getTtvProduto().getSelectionModel().getSelectedItem().getParent().getValue()));
-            produtoSelecionado.setTblEstoque(getTtvProduto().getSelectionModel().getSelectedItem().getValue().getTblEstoque());
-            produtoSelecionado.setTblLote(getTtvProduto().getSelectionModel().getSelectedItem().getValue().getTblLote());
-            produtoSelecionado.setTblValidade(getTtvProduto().getSelectionModel().getSelectedItem().getValue().getTblValidade());
+    private ProdutoEstoque getEstoqueSelecionado() {
+        ProdutoEstoque estoqueSelecionado;
+        if (getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue() instanceof ProdutoEstoque)
+            estoqueSelecionado = ((ProdutoEstoque) getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue());
+        else
+            estoqueSelecionado = ((ProdutoEstoque) getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getChildren().get(0).getValue());
+        return estoqueSelecionado;
+    }
+
+    private boolean guardarSaidaProduto() {
+        try {
+            setSaidaProduto(new SaidaProduto());
+
+            getSaidaProduto().setSaidaProdutoProdutoList(getSaidaProdutoProdutoObservableList());
+            getSaidaProduto().setCliente(getCboEmpresa().getSelectionModel().getSelectedItem());
+            getSaidaProduto().setVendedor(UsuarioLogado.usuarioProperty().getValue());
+            getSaidaProduto().setDtSaida(getDtpDtSaida().getValue());
+
+            guardarSaidaProdutoProduto();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
         }
-        return produtoSelecionado;
+        return true;
+    }
+
+    private boolean validarSaida() {
+        return (validarCliente() && validarNFe() && getSaidaProdutoProdutoObservableList().size() > 0);
+    }
+
+    private boolean validarCliente() {
+        if (getDtpDtSaida().getValue() == null) {
+            getDtpDtSaida().requestFocus();
+            return false;
+        }
+        if (getDtpDtVencimento().getValue() == null) {
+            getDtpDtVencimento().requestFocus();
+            return false;
+        }
+        if (getCboEmpresa().getSelectionModel().getSelectedItem() == null) {
+            getCboEmpresa().requestFocus();
+            return false;
+        }
+        if (getCboEndereco().getSelectionModel().getSelectedItem() == null) {
+            getCboEndereco().getSelectionModel().select(0);
+        }
+        return true;
+    }
+
+    private boolean validarNFe() {
+        if (!getTpnNfe().isExpanded())
+            return true;
+        if (getCboNfeDadosNaturezaOperacao().getSelectionModel().getSelectedItem() == null) {
+            getCboNfeDadosNaturezaOperacao().requestFocus();
+            return false;
+        }
+        if (getTxtNfeDadosNumero().getText().trim().replaceAll("\\D", "").length() == 0) {
+            getTxtNfeDadosNumero().requestFocus();
+            return false;
+        }
+        if (getTxtNfeDadosSerie().getText().trim().replaceAll("\\D", "").length() == 0) {
+            getTxtNfeDadosSerie().requestFocus();
+            return false;
+        }
+        if (getCboNfeDadosModelo().getSelectionModel().getSelectedItem() == null) {
+            getCboNfeDadosModelo().requestFocus();
+            return false;
+        }
+        if (getDtpNfeDadosDtEmissao().getValue() == null || getDtpNfeDadosDtEmissao().getValue().compareTo(LocalDate.now()) > 0) {
+            getDtpNfeDadosDtEmissao().requestFocus();
+            return false;
+        }
+        if (getTxtNfeDadosHoraEmissao().getText().trim().replaceAll("\\D", "").length() == 0) {
+            getTxtNfeDadosHoraEmissao().requestFocus();
+            return false;
+        }
+        if (getDtpNfeDadosDtSaida().getValue() == null || getDtpNfeDadosDtSaida().getValue().compareTo(LocalDate.now()) > 0) {
+            getDtpNfeDadosDtSaida().requestFocus();
+            return false;
+        }
+        if (getTxtNfeDadosHoraSaida().getText().trim().replaceAll("\\D", "").length() == 0) {
+            getTxtNfeDadosHoraSaida().requestFocus();
+            return false;
+        }
+        if (getCboNfeDadosDestinoOperacao().getSelectionModel().getSelectedItem() == null) {
+            getCboNfeDadosDestinoOperacao().requestFocus();
+            return false;
+        }
+//        if (getcboin)
+
+        return true;
     }
 
     /**
@@ -1137,12 +1154,12 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.txaNfeInformacoesAdicionais = txaNfeInformacoesAdicionais;
     }
 
-    public TitledPane getTpnProdutos() {
-        return tpnProdutos;
+    public TitledPane getTpnItensTotaisDetalhe() {
+        return tpnItensTotaisDetalhe;
     }
 
-    public void setTpnProdutos(TitledPane tpnProdutos) {
-        this.tpnProdutos = tpnProdutos;
+    public void setTpnItensTotaisDetalhe(TitledPane tpnItensTotaisDetalhe) {
+        this.tpnItensTotaisDetalhe = tpnItensTotaisDetalhe;
     }
 
     public TextField getTxtPesquisaProduto() {
@@ -1153,6 +1170,14 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.txtPesquisaProduto = txtPesquisaProduto;
     }
 
+    public Label getLblStatus() {
+        return lblStatus;
+    }
+
+    public void setLblStatus(Label lblStatus) {
+        this.lblStatus = lblStatus;
+    }
+
     public Label getLblRegistrosLocalizados() {
         return lblRegistrosLocalizados;
     }
@@ -1161,20 +1186,20 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.lblRegistrosLocalizados = lblRegistrosLocalizados;
     }
 
-    public TreeTableView<Produto> getTtvProduto() {
-        return ttvProduto;
+    public TreeTableView<Object> getTtvProdutoEstoque() {
+        return ttvProdutoEstoque;
     }
 
-    public void setTtvProduto(TreeTableView<Produto> ttvProduto) {
-        this.ttvProduto = ttvProduto;
+    public void setTtvProdutoEstoque(TreeTableView<Object> ttvProdutoEstoque) {
+        this.ttvProdutoEstoque = ttvProdutoEstoque;
     }
 
-    public TitledPane getTpnItensPedido() {
-        return tpnItensPedido;
+    public VBox getvBoxItensNfeDetalhe() {
+        return vBoxItensNfeDetalhe;
     }
 
-    public void setTpnItensPedido(TitledPane tpnItensPedido) {
-        this.tpnItensPedido = tpnItensPedido;
+    public void setvBoxItensNfeDetalhe(VBox vBoxItensNfeDetalhe) {
+        this.vBoxItensNfeDetalhe = vBoxItensNfeDetalhe;
     }
 
     public TableView<SaidaProdutoProduto> getTvItensNfe() {
@@ -1193,28 +1218,28 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.vBoxTotalQtdItem = vBoxTotalQtdItem;
     }
 
-    public Label getLblTotalQtdItem() {
-        return lblTotalQtdItem;
+    public Label getLblQtdItem() {
+        return lblQtdItem;
     }
 
-    public void setLblTotalQtdItem(Label lblTotalQtdItem) {
-        this.lblTotalQtdItem = lblTotalQtdItem;
+    public void setLblQtdItem(Label lblQtdItem) {
+        this.lblQtdItem = lblQtdItem;
     }
 
-    public VBox getvBoxTotalQtdProduto() {
-        return vBoxTotalQtdProduto;
+    public VBox getvBoxTotalQtdTotal() {
+        return vBoxTotalQtdTotal;
     }
 
-    public void setvBoxTotalQtdProduto(VBox vBoxTotalQtdProduto) {
-        this.vBoxTotalQtdProduto = vBoxTotalQtdProduto;
+    public void setvBoxTotalQtdTotal(VBox vBoxTotalQtdTotal) {
+        this.vBoxTotalQtdTotal = vBoxTotalQtdTotal;
     }
 
-    public Label getLblTotalQtdProduto() {
-        return lblTotalQtdProduto;
+    public Label getLblQtdTotal() {
+        return lblQtdTotal;
     }
 
-    public void setLblTotalQtdProduto(Label lblTotalQtdProduto) {
-        this.lblTotalQtdProduto = lblTotalQtdProduto;
+    public void setLblQtdTotal(Label lblQtdTotal) {
+        this.lblQtdTotal = lblQtdTotal;
     }
 
     public VBox getvBoxTotalQtdVolume() {
@@ -1225,12 +1250,12 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.vBoxTotalQtdVolume = vBoxTotalQtdVolume;
     }
 
-    public Label getLblTotalQtdVolume() {
-        return lblTotalQtdVolume;
+    public Label getLblQtdVolume() {
+        return lblQtdVolume;
     }
 
-    public void setLblTotalQtdVolume(Label lblTotalQtdVolume) {
-        this.lblTotalQtdVolume = lblTotalQtdVolume;
+    public void setLblQtdVolume(Label lblQtdVolume) {
+        this.lblQtdVolume = lblQtdVolume;
     }
 
     public VBox getvBoxTotalBruto() {
@@ -1389,14 +1414,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.saidaProdutoProdutoObservableList = saidaProdutoProdutoObservableList;
     }
 
-    public ObservableList<Empresa> getEmpresaObservableList() {
-        return empresaObservableList;
-    }
-
-    public void setEmpresaObservableList(ObservableList<Empresa> empresaObservableList) {
-        this.empresaObservableList = empresaObservableList;
-    }
-
     public Empresa getEmpresa() {
         return empresa.get();
     }
@@ -1409,42 +1426,25 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.empresa.set(empresa);
     }
 
-    public List<Endereco> getEnderecoList() {
-        return enderecoList.get();
+    public List<FichaKardex> getFichaKardexList() {
+        return fichaKardexList;
     }
 
-    public ObjectProperty<List<Endereco>> enderecoListProperty() {
-        return enderecoList;
+    public void setFichaKardexList(List<FichaKardex> fichaKardexList) {
+        this.fichaKardexList = fichaKardexList;
     }
 
-    public void setEnderecoList(List<Endereco> enderecoList) {
-        this.enderecoList.set(enderecoList);
+    public int getPrazo() {
+        return prazo.get();
     }
 
-    public Endereco getEndereco() {
-        return endereco.get();
+    public IntegerProperty prazoProperty() {
+        return prazo;
     }
 
-    public ObjectProperty<Endereco> enderecoProperty() {
-        return endereco;
+    public void setPrazo(int prazo) {
+        this.prazo.set(prazo);
     }
-
-    public void setEndereco(Endereco endereco) {
-        this.endereco.set(endereco);
-    }
-
-    public List<Telefone> getTelefoneList() {
-        return telefoneList.get();
-    }
-
-    public ObjectProperty<List<Telefone>> telefoneListProperty() {
-        return telefoneList;
-    }
-
-    public void setTelefoneList(List<Telefone> telefoneList) {
-        this.telefoneList.set(telefoneList);
-    }
-
     /**
      * END Getters e Setters
      */

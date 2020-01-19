@@ -1,7 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.tm;
 
 import br.com.tlmacedo.cafeperfeito.controller.ControllerPrincipal;
-import br.com.tlmacedo.cafeperfeito.model.dao.FichaKardexDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.TipoCodigoCFOP;
 import br.com.tlmacedo.cafeperfeito.model.vo.EntradaProdutoProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.FichaKardex;
@@ -19,6 +18,8 @@ import javafx.scene.input.KeyEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
@@ -29,6 +30,7 @@ public class TmodelEntradaProduto {
     private TableView<EntradaProdutoProduto> tvItensNfe;
     private ObservableList<EntradaProdutoProduto> entradaProdutoProdutoObservableList;
     private TextField txtPesquisaProduto;
+    private List<FichaKardex> fichaKardexList;
 
     private TableColumn<EntradaProdutoProduto, String> colId;
     private TableColumn<EntradaProdutoProduto, String> colProdId;
@@ -202,7 +204,6 @@ public class TmodelEntradaProduto {
                 //, getColEstoque()
         );
 
-
         getTvItensNfe().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         getTvItensNfe().getSelectionModel().setCellSelectionEnabled(true);
         getTvItensNfe().setEditable(true);
@@ -339,160 +340,6 @@ public class TmodelEntradaProduto {
                         .subtract(totalDescontoProperty().getValue()));
     }
 
-//    public void calculaDescontoCliente() {
-//        if (fornecedorProperty().getValue() == null) return;
-//        getEntradaProdutoProdutoObservableList().stream()
-//                .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd))
-//                .forEach(
-//                        (aLong, saidaProdutos) -> {
-//                            EmpresaCondicoes condicoes;
-//                            if ((condicoes = fornecedorProperty().get().getEmpresaCondicoes().stream()
-//                                    .filter(empresaCondicoes -> empresaCondicoes.getProduto().idProperty().getValue() == aLong
-//                                            && empresaCondicoes.validadeProperty().get().compareTo(LocalDate.now()) >= 0)
-//                                    .sorted(Comparator.comparing(EmpresaCondicoes::getValidade))
-//                                    .findFirst().orElse(null)) == null) {
-//                                prazoProperty().setValue(fornecedorProperty().getValue().prazoProperty().getValue());
-//                                saidaProdutos.stream()
-//                                        .filter(saidaProdutoProduto -> saidaProdutoProduto.getTipoSaidaProduto().equals(TipoCodigoCFOP.BONIFICACAO)
-//                                                || saidaProdutoProduto.getTipoSaidaProduto().equals(TipoCodigoCFOP.CONSUMO))
-//                                        .forEach(saidaProdutoProduto -> {
-//                                            saidaProdutoProduto.setVlrDesconto(BigDecimal.ZERO);
-//                                            saidaProdutoProduto.setTipoSaidaProduto(TipoCodigoCFOP.COMERCIALIZACAO);
-//                                        });
-//                            } else {
-//                                Integer fator = saidaProdutos.stream()
-//                                        .filter(saidaProdutoProduto -> saidaProdutoProduto.getTipoSaidaProduto().equals(TipoCodigoCFOP.COMERCIALIZACAO))
-//                                        .collect(Collectors.summingInt(SaidaProdutoProduto::getQtd)) / condicoes.qtdMinimaProperty().getValue();
-//
-//                                if (fator > 0 && condicoes.prazoProperty().getValue() > 0)
-//                                    prazoProperty().setValue(condicoes.prazoProperty().getValue());
-//                                else
-//                                    prazoProperty().setValue(fornecedorProperty().getValue().prazoProperty().getValue());
-//
-//                                if (condicoes.valorProperty().get().compareTo(BigDecimal.ZERO) > 0) {
-//                                    saidaProdutos.stream()
-//                                            .forEach(saidaProdutoProduto -> {
-//                                                saidaProdutoProduto.setVlrVenda(condicoes.valorProperty().get());
-//                                                if (fator == 0)
-//                                                    saidaProdutoProduto.setVlrDesconto(BigDecimal.ZERO);
-//                                                else
-//                                                    saidaProdutoProduto.setVlrDesconto(condicoes.descontoProperty().getValue()
-//                                                            .multiply(BigDecimal.valueOf(saidaProdutoProduto.qtdProperty().getValue())));
-//                                            });
-//                                }
-//
-//
-//                                if (fator > 0 && condicoes.qtdMinimaProperty().getValue() > 0) {
-////                                    if (condicoes.descontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0) {
-////
-////                                    } else
-//                                    if (condicoes.bonificacaoProperty().getValue().compareTo(0) > 0
-//                                            || condicoes.retiradaProperty().getValue().compareTo(0) > 0) {
-//                                        TipoCodigoCFOP tSaidaProduto = null;
-//                                        if (condicoes.bonificacaoProperty().getValue().compareTo(0) > 0) {
-//                                            tSaidaProduto = TipoCodigoCFOP.BONIFICACAO;
-//                                        } else if (condicoes.retiradaProperty().getValue().compareTo(0) > 0) {
-//                                            tSaidaProduto = TipoCodigoCFOP.CONSUMO;
-//                                        }
-//                                        TipoCodigoCFOP finalTSaidaProduto = tSaidaProduto;
-//                                        if (condicoes.bonificacaoProperty().getValue() == condicoes.qtdMinimaProperty().getValue()) {
-//                                            saidaProdutos.stream().forEach(saidaProdutoProduto -> saidaProdutoProduto.setTipoSaidaProduto(TipoCodigoCFOP.BONIFICACAO));
-//                                        } else if (condicoes.retiradaProperty().getValue() == condicoes.qtdMinimaProperty().getValue()) {
-//                                            saidaProdutos.stream().forEach(saidaProdutoProduto -> saidaProdutoProduto.setTipoSaidaProduto(TipoCodigoCFOP.CONSUMO));
-//                                        } else {
-//                                            switch (tSaidaProduto) {
-//                                                case BONIFICACAO:
-//                                                    saidaProdutos.stream()
-//                                                            .filter(saidaProdutoProduto -> saidaProdutoProduto.getTipoSaidaProduto().equals(TipoCodigoCFOP.CONSUMO))
-//                                                            .forEach(saidaProdutoProduto -> getEntradaProdutoProdutoObservableList().remove(saidaProdutoProduto));
-//                                                    break;
-//                                                case CONSUMO:
-//                                                    saidaProdutos.stream()
-//                                                            .filter(saidaProdutoProduto -> saidaProdutoProduto.getTipoSaidaProduto().equals(TipoCodigoCFOP.BONIFICACAO))
-//                                                            .forEach(saidaProdutoProduto -> getEntradaProdutoProdutoObservableList().remove(saidaProdutoProduto));
-//                                                    break;
-//                                            }
-//                                            Integer qtdSaiuBonf = saidaProdutos.stream()
-//                                                    .filter(saidaProdutoProduto -> saidaProdutoProduto.getTipoSaidaProduto().equals(TipoCodigoCFOP.BONIFICACAO)
-//                                                            || saidaProdutoProduto.getTipoSaidaProduto().equals(TipoCodigoCFOP.CONSUMO))
-//                                                    .collect(Collectors.summingInt(SaidaProdutoProduto::getQtd));
-//                                            final Integer[] restoBonif = {fator - qtdSaiuBonf};
-//                                            if (restoBonif[0] <= 0) {
-//                                                saidaProdutos.stream()
-//                                                        .filter(saidaProdutoProduto -> saidaProdutoProduto.getTipoSaidaProduto().equals(finalTSaidaProduto))
-//                                                        .sorted(Comparator.comparing(SaidaProdutoProduto::getDtValidade).reversed())
-//                                                        .forEach(saidaProdutoProduto -> {
-//                                                            if (restoBonif[0] < 0) {
-//                                                                saidaProdutoProduto.qtdProperty().setValue(saidaProdutoProduto.qtdProperty().getValue() + restoBonif[0]);
-//                                                                if (saidaProdutoProduto.qtdProperty().getValue() <= 0) {
-//                                                                    restoBonif[0] = saidaProdutoProduto.qtdProperty().getValue();
-//                                                                    getEntradaProdutoProdutoObservableList().remove(saidaProdutoProduto);
-//                                                                } else {
-//                                                                    restoBonif[0] = 0;
-//                                                                }
-//                                                            }
-//                                                        });
-//                                            } else {
-//                                                new ProdutoDAO().getById(Produto.class, aLong).getProdutoEstoqueList().stream()
-//                                                        .filter(produtoEstoque -> produtoEstoque.qtdProperty().getValue().compareTo(0) > 0)
-//                                                        .sorted(Comparator.comparing(ProdutoEstoque::getValidade)).sorted(Comparator.comparing(ProdutoEstoque::getId))
-//                                                        .collect(Collectors.groupingBy(ProdutoEstoque::getLote,
-//                                                                LinkedHashMap::new,
-//                                                                Collectors.toList()))
-//                                                        .forEach((s, produtoEstoques) -> {
-//                                                            if (restoBonif[0] > 0) {
-//                                                                Integer qtdSaiu = saidaProdutos.stream()
-//                                                                        .filter(saidaProdutoProduto -> saidaProdutoProduto.getIdProd() == produtoEstoques.get(0).getProduto().idProperty().getValue()
-//                                                                                && saidaProdutoProduto.loteProperty().getValue().equals(s))
-//                                                                        .collect(Collectors.summingInt(SaidaProdutoProduto::getQtd));
-//                                                                Integer qtdEstoque = produtoEstoques.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd));
-//                                                                Integer qtdDisponivel = qtdEstoque - qtdSaiu;
-//                                                                if (qtdDisponivel > 0) {
-//                                                                    Integer qtdAdd = 0;
-//                                                                    if (restoBonif[0] - qtdDisponivel >= 0)
-//                                                                        qtdAdd = qtdDisponivel;
-//                                                                    else
-//                                                                        qtdAdd = restoBonif[0];
-//                                                                    restoBonif[0] -= qtdAdd;
-//                                                                    SaidaProdutoProduto sProd;
-//                                                                    if ((sProd = saidaProdutos.stream()
-//                                                                            .filter(saidaProdutoProduto -> saidaProdutoProduto.produtoProperty().getValue().idProperty().getValue() == produtoEstoques.get(0).getProduto().idProperty().getValue()
-//                                                                                    && saidaProdutoProduto.loteProperty().getValue().equals(s) && saidaProdutoProduto.getTipoSaidaProduto().equals(finalTSaidaProduto))
-//                                                                            .findFirst().orElse(null)) == null) {
-//                                                                        Produto prod = null;
-//                                                                        try {
-//                                                                            prod = produtoEstoques.get(0).getProduto().clone();
-//                                                                        } catch (CloneNotSupportedException e) {
-//                                                                            e.printStackTrace();
-//                                                                        }
-//                                                                        prod.idProperty().setValue(produtoEstoques.get(0).getProduto().idProperty().getValue());
-//                                                                        prod.tblEstoqueProperty().setValue(qtdEstoque);
-//                                                                        prod.tblLoteProperty().setValue(s);
-//                                                                        prod.tblValidadeProperty().setValue(produtoEstoques.get(0).validadeProperty().getValue());
-//                                                                        getEntradaProdutoProdutoObservableList().add(new SaidaProdutoProduto(prod, finalTSaidaProduto, qtdAdd));
-//                                                                    } else {
-//                                                                        sProd.qtdProperty().setValue(sProd.qtdProperty().getValue() + qtdAdd);
-//                                                                    }
-//                                                                }
-//                                                            }
-//                                                        });
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                            saidaProdutos.stream().forEach(saidaProdutoProduto -> totalizaLinha(saidaProdutoProduto));
-//                        }
-//                );
-//    }
-
-
-//    public void limpaCampos() {
-//        setProdutoEstoqueDAO(new ProdutoEstoqueDAO());
-//        setFichaKardexDAO(new FichaKardexDAO());
-//        getEntradaProdutoProdutoObservableList().clear();
-//    }
-
     /**
      * END Voids
      */
@@ -501,70 +348,6 @@ public class TmodelEntradaProduto {
      * Begin Returns
      */
 
-//    public boolean updateSaidaProduto() {
-//        try {
-//            getSaidaProdutoDAO().transactionBegin();
-//            setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
-//            getSaidaProdutoDAO().transactionCommit();
-//        } catch (Exception ex) {
-//            getSaidaProdutoDAO().transactionRollback();
-//            ex.printStackTrace();
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//    public boolean updateContasAReceber() {
-//        try {
-//            getContasAReceberDAO().transactionBegin();
-//            setaReceber(getContasAReceberDAO().setTransactionPersist(getaReceber()));
-//            getContasAReceberDAO().transactionCommit();
-//        } catch (Exception ex) {
-//            getContasAReceberDAO().transactionRollback();
-//            ex.printStackTrace();
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//    public ProdutoEstoque updateEstoque(ProdutoEstoque estoque) {
-//        try {
-//            getProdutoEstoqueDAO().transactionBegin();
-//            estoque = getProdutoEstoqueDAO().setTransactionPersist(estoque);
-//            getProdutoEstoqueDAO().transactionCommit();
-//        } catch (Exception ex) {
-//            getProdutoEstoqueDAO().transactionRollback();
-//            ex.printStackTrace();
-//            return null;
-//        }
-//        return estoque;
-//    }
-//
-//    public FichaKardex updateFichaKardex(FichaKardex kardex) {
-//        try {
-//            getFichaKardexDAO().transactionBegin();
-//            kardex = getFichaKardexDAO().setTransactionPersist(kardex);
-//            getFichaKardexDAO().transactionCommit();
-//        } catch (Exception ex) {
-//            getFichaKardexDAO().transactionRollback();
-//            ex.printStackTrace();
-//            return null;
-//        }
-//        return kardex;
-//    }
-    private boolean newFichaKardex(EntradaProdutoProduto entradaProdutoProduto) {
-        FichaKardexDAO fichaKardexDAO = new FichaKardexDAO();
-        try {
-            fichaKardexDAO.transactionBegin();
-            fichaKardexDAO.setTransactionPersist(new FichaKardex(entradaProdutoProduto));
-            fichaKardexDAO.transactionCommit();
-        } catch (Exception ex) {
-            fichaKardexDAO.transactionRollback();
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
-    }
 
     /**
      * END Returns
@@ -574,106 +357,17 @@ public class TmodelEntradaProduto {
      * Begin booleans
      */
 
-//    public boolean guardarSaidaProduto() {
-//        try {
-//            getSaidaProduto().setCliente(empresaProperty().getValue());
-//            getSaidaProduto().setVendedor(UsuarioLogado.getUsuario());
-//            getSaidaProduto().setDtSaida(getDtpDtSaida().getValue());
-//
-//            getSaidaProdutoProdutoObservableList().stream().forEach(saidaProdutoProduto -> {
-//                saidaProdutoProduto.setSaidaProduto(getSaidaProduto());
-//                saidaProdutoProduto.setVlrEntrada(BigDecimal.ZERO);
-//                saidaProdutoProduto.setVlrEntradaBruto(BigDecimal.ZERO);
-//            });
-//
-//            getSaidaProduto().setSaidaProdutoProdutoList(getSaidaProdutoProdutoObservableList());
-//
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//    public boolean salvarSaidaProduto() {
-//        try {
-//            getProdutoEstoqueDAO().transactionBegin();
-//            getFichaKardexDAO().transactionBegin();
-//            if (baixarEstoque()) {
-//                getSaidaProdutoDAO().transactionBegin();
-//                ContasAReceber receber = new ContasAReceber();
-//                getSaidaProduto().setContasAReceber(receber);
-//                receber.dtVencimentoProperty().setValue(getDtpDtVencimento().getValue());
-//                receber.valorProperty().setValue(getSaidaProdutoProdutoObservableList().stream()
-//                        .map(SaidaProdutoProduto::getVlrLiquido)
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add));
-//                receber.setUsuarioCadastro(UsuarioLogado.getUsuario());
-//                receber.setSaidaProduto(getSaidaProduto());
-//
-//                setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
-//
-//                getFichaKardexDAO().transactionCommit();
-//                getProdutoEstoqueDAO().transactionCommit();
-//                getSaidaProdutoDAO().transactionCommit();
-//            } else {
-//                getFichaKardexDAO().transactionRollback();
-//                getProdutoEstoqueDAO().transactionRollback();
-//            }
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//            getFichaKardexDAO().transactionRollback();
-//            getProdutoEstoqueDAO().transactionRollback();
-//            getSaidaProdutoDAO().transactionRollback();
-//            return false;
-//        }
-//        return true;
-//    }
     public boolean incluirEstoque() {
         try {
+            setFichaKardexList(new ArrayList<>());
             getEntradaProdutoProdutoObservableList().stream()
                     .forEach(entradaProdutoProduto -> {
+                        ProdutoEstoque produtoEstoque = new ProdutoEstoque(entradaProdutoProduto);
                         entradaProdutoProduto.produtoProperty().getValue()
-                                .getProdutoEstoqueList().add(new ProdutoEstoque(entradaProdutoProduto));
-                        newFichaKardex(entradaProdutoProduto);
+                                .getProdutoEstoqueList().add(produtoEstoque);
+                        getFichaKardexList().add(new FichaKardex(entradaProdutoProduto.qtdProperty().getValue(),
+                                produtoEstoque, true));
                     });
-//            getEntradaProdutoProdutoObservableList().stream()
-//                    .forEach(entradaProdutoProduto -> {
-//                        Produto produto = entradaProdutoProduto.produtoProperty().getValue();
-//                        ProdutoEstoque newEstoque = new ProdutoEstoque();
-//                        newEstoque.produtoProperty().setValue(entradaProdutoProduto.produtoProperty().getValue());
-//                        newEstoque.qtdProperty().setValue(entradaProdutoProduto.qtdProperty().getValue());
-//                        newEstoque.loteProperty().setValue(entradaProdutoProduto.loteProperty().getValue());
-//                        newEstoque.dtValidadeProperty().setValue(entradaProdutoProduto.dtValidadeProperty().getValue());
-//                        newEstoque.vlrUnitarioProperty().setValue(entradaProdutoProduto.vlrUnitarioProperty().getValue());
-//                        newEstoque.vlrFreteBrutoProperty().setValue(freteBrutoKg
-//                                .multiply(entradaProdutoProduto.produtoProperty().getValue().pesoProperty().getValue())
-//                                .setScale(4, RoundingMode.HALF_UP));
-//                        newEstoque.vlrImpostoNaEntradaProperty().setValue(entradaProdutoProduto.produtoProperty().getValue()
-//                                .precoCompraProperty().getValue().multiply(impEntrada.divide(new BigDecimal("100."))));
-//                        newEstoque.vlrImpostoFreteNaEntradaProperty().setValue(
-//                                produto.pesoProperty().getValue().multiply(impFreteEntrada));
-//                        newEstoque.vlrImpostoDentroFreteProperty().setValue(
-//                                produto.pesoProperty().getValue().multiply(impFrete));
-//                        newEstoque.vlrFreteTaxaProperty().setValue(
-//                                produto.pesoProperty().getValue().multiply(taxaFrete));
-//                        newEstoque.usuarioCadastroProperty().setValue(UsuarioLogado.getUsuario());
-//                        newEstoque.docEntradaProperty().setValue(docEntrada);
-//                        newEstoque.docEntradaChaveNFeProperty().setValue(chaveNFe);
-//                        entradaProdutoProduto.vlrFreteProperty().setValue(
-//                                newEstoque.vlrFreteBrutoProperty().getValue()
-//                                        .add(newEstoque.vlrFreteTaxaProperty().getValue())
-//                                        .add(newEstoque.vlrImpostoDentroFreteProperty().getValue())
-//                        );
-//                        entradaProdutoProduto.vlrImpostoProperty().setValue(
-//                                newEstoque.vlrImpostoNaEntradaProperty().getValue()
-//                                        .add(newEstoque.vlrImpostoFreteNaEntradaProperty().getValue())
-//                        );
-//                        produto.ultFreteProperty().setValue(entradaProdutoProduto.vlrFreteProperty().getValue());
-//                        produto.setUltImpostoSefaz(entradaProdutoProduto.vlrImpostoProperty().getValue());
-//
-//                        produto.getProdutoEstoqueList().add(newEstoque);
-//                        newFichaKardex(entradaProdutoProduto, newEstoque);
-//                    });
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
@@ -689,6 +383,7 @@ public class TmodelEntradaProduto {
     /**
      * Begin Gets and Setters
      */
+
     public TablePosition getTp() {
         return tp;
     }
@@ -955,6 +650,14 @@ public class TmodelEntradaProduto {
 
     public void setTotalLiquido(BigDecimal totalLiquido) {
         this.totalLiquido.set(totalLiquido);
+    }
+
+    public List<FichaKardex> getFichaKardexList() {
+        return fichaKardexList;
+    }
+
+    public void setFichaKardexList(List<FichaKardex> fichaKardexList) {
+        this.fichaKardexList = fichaKardexList;
     }
 
     /**

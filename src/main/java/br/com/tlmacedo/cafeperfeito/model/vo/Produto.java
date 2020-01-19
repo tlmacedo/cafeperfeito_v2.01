@@ -30,8 +30,8 @@ public class Produto implements Serializable, Cloneable {
     private StringProperty codigo = new SimpleStringProperty();
     private StringProperty descricao = new SimpleStringProperty();
     private ObjectProperty<BigDecimal> peso = new SimpleObjectProperty<>();
-    private UndComercialProduto unidadeComercial;
-    private SituacaoProduto situacao;
+    private ObjectProperty<UndComercialProduto> unidadeComercial = new SimpleObjectProperty<>();
+    private ObjectProperty<SituacaoProduto> situacao = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> precoCompra = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> precoVenda = new SimpleObjectProperty<>();
     private IntegerProperty varejo = new SimpleIntegerProperty();
@@ -72,8 +72,8 @@ public class Produto implements Serializable, Cloneable {
         this.codigo = new SimpleStringProperty(prod.codigoProperty().getValue());
         this.descricao = new SimpleStringProperty(prod.descricaoProperty().getValue());
         this.peso = new SimpleObjectProperty<>(prod.pesoProperty().getValue());
-        this.unidadeComercial = prod.getUnidadeComercial();
-        this.situacao = prod.getSituacao();
+        this.unidadeComercial = prod.unidadeComercialProperty();
+        this.situacao = prod.situacaoProperty();
         this.precoCompra = new SimpleObjectProperty<>(prod.precoCompraProperty().getValue());
         this.precoVenda = new SimpleObjectProperty<>(prod.precoVendaProperty().getValue());
         this.varejo = new SimpleIntegerProperty(prod.varejoProperty().getValue());
@@ -173,20 +173,28 @@ public class Produto implements Serializable, Cloneable {
 
     @Enumerated(EnumType.ORDINAL)
     public UndComercialProduto getUnidadeComercial() {
+        return unidadeComercial.get();
+    }
+
+    public ObjectProperty<UndComercialProduto> unidadeComercialProperty() {
         return unidadeComercial;
     }
 
     public void setUnidadeComercial(UndComercialProduto unidadeComercial) {
-        this.unidadeComercial = unidadeComercial;
+        this.unidadeComercial.set(unidadeComercial);
     }
 
     @Enumerated(EnumType.ORDINAL)
     public SituacaoProduto getSituacao() {
+        return situacao.get();
+    }
+
+    public ObjectProperty<SituacaoProduto> situacaoProperty() {
         return situacao;
     }
 
     public void setSituacao(SituacaoProduto situacao) {
-        this.situacao = situacao;
+        this.situacao.set(situacao);
     }
 
     @Column(length = 19, scale = 4, nullable = false)

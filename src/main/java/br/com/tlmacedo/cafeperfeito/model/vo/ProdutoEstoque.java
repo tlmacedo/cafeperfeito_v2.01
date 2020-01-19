@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity(name = "ProdutoEstoque")
 @Table(name = "produto_estoque")
@@ -32,6 +34,22 @@ public class ProdutoEstoque implements Serializable {
     private StringProperty docEntradaChaveNFe = new SimpleStringProperty();
 
     public ProdutoEstoque() {
+    }
+
+    public ProdutoEstoque(List<ProdutoEstoque> estoqueList) {
+        this.id = new SimpleLongProperty(0);
+        this.produto = estoqueList.get(0).produtoProperty();
+        this.qtd = new SimpleIntegerProperty(estoqueList.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
+        this.lote = estoqueList.get(0).loteProperty();
+        this.dtValidade = estoqueList.get(0).dtValidadeProperty();
+        this.vlrUnitario = estoqueList.get(0).vlrUnitarioProperty();
+        this.vlrDesconto = estoqueList.get(0).vlrDescontoProperty();
+        this.vlrFrete = estoqueList.get(0).vlrFreteProperty();
+        this.vlrImposto = estoqueList.get(0).vlrImpostoProperty();
+        this.usuarioCadastro = estoqueList.get(0).usuarioCadastroProperty();
+        this.dtCadastro = estoqueList.get(0).dtCadastroProperty();
+        this.docEntrada = estoqueList.get(0).docEntradaProperty();
+        this.docEntradaChaveNFe = estoqueList.get(0).docEntradaChaveNFeProperty();
     }
 
     public ProdutoEstoque(EntradaProdutoProduto entradaProdutoProduto) {
@@ -72,7 +90,7 @@ public class ProdutoEstoque implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     public Produto getProduto() {
         return produto.get();
     }

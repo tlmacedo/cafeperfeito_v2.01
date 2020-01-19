@@ -31,26 +31,60 @@ public class FichaKardex implements Serializable {
     public FichaKardex() {
     }
 
-    public FichaKardex(EntradaProdutoProduto entradaProdutoProduto) {
-        this.produto = entradaProdutoProduto.produtoProperty();
-        this.documento = entradaProdutoProduto.entradaProdutoProperty().getValue()
-                .entradaNfeProperty().getValue().numeroProperty();
-        this.detalhe = entradaProdutoProduto.loteProperty();
-        this.qtd = entradaProdutoProduto.qtdProperty();
-        this.vlrUnitario = new SimpleObjectProperty<>(((entradaProdutoProduto.vlrBrutoProperty().getValue()
-                .add(entradaProdutoProduto.vlrImpostoProperty().getValue())
-                .add(entradaProdutoProduto.vlrFreteProperty().getValue()))
-                .subtract(entradaProdutoProduto.vlrDescontoProperty().getValue()))
-                .divide(new BigDecimal(qtdProperty().getValue())));
-        this.qtdEntrada = entradaProdutoProduto.qtdProperty();
-        this.vlrEntrada = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue()
-                .multiply(new BigDecimal(qtdProperty().getValue())));
-        this.qtdSaida = new SimpleIntegerProperty(0);
-        this.vlrSaida = new SimpleObjectProperty<>(BigDecimal.ZERO);
-        this.saldo = new SimpleIntegerProperty(entradaProdutoProduto.produtoProperty().getValue()
+    public FichaKardex(Integer qtdMovimento, ProdutoEstoque produtoEstoque, boolean isEntrada) {
+        this.produto = produtoEstoque.produtoProperty();
+        this.documento = produtoEstoque.docEntradaProperty();
+        this.detalhe = produtoEstoque.loteProperty();
+        this.qtd = new SimpleIntegerProperty(qtdMovimento);
+        this.vlrUnitario = new SimpleObjectProperty<>((produtoEstoque.vlrUnitarioProperty().getValue()
+                .add(produtoEstoque.vlrImpostoProperty().getValue())
+                .add(produtoEstoque.vlrFreteProperty().getValue()))
+                .subtract(produtoEstoque.vlrDescontoProperty().getValue()));
+        if (isEntrada) {
+            this.qtdEntrada = qtdProperty();
+            this.vlrEntrada = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue()
+                    .multiply(new BigDecimal(qtdProperty().getValue())));
+            this.qtdSaida = new SimpleIntegerProperty(0);
+            this.vlrSaida = new SimpleObjectProperty<>(BigDecimal.ZERO);
+        } else {
+            this.qtdEntrada = new SimpleIntegerProperty(0);
+            this.vlrEntrada = new SimpleObjectProperty<>(BigDecimal.ZERO);
+            this.qtdSaida = qtdProperty();
+            this.vlrSaida = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue()
+                    .multiply(new BigDecimal(qtdProperty().getValue())));
+        }
+        this.saldo = new SimpleIntegerProperty(produtoEstoque.produtoProperty().getValue()
                 .getProdutoEstoqueList().stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
         this.vlrSaldo = new SimpleObjectProperty<>(
-                entradaProdutoProduto.produtoProperty().getValue()
+                produtoEstoque.produtoProperty().getValue()
+                        .getProdutoEstoqueList().stream().filter(stq -> stq.qtdProperty().getValue() > 0)
+                        .map(stq ->
+                                ((stq.vlrUnitarioProperty().getValue()
+                                        .add(stq.vlrFreteProperty().getValue())
+                                        .add(stq.vlrImpostoProperty().getValue())
+                                        .subtract(stq.vlrDescontoProperty().getValue())))
+                                        .multiply(BigDecimal.valueOf(stq.qtdProperty().getValue())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
+    }
+
+    public FichaKardex(Integer qtdSaida, SaidaProdutoProduto saidaProdutoProduto) {
+        this.produto = saidaProdutoProduto.produtoProperty();
+        this.documento = new SimpleStringProperty(saidaProdutoProduto.saidaProdutoProperty().getValue()
+                .idProperty().toString());
+        this.detalhe = saidaProdutoProduto.loteProperty();
+        this.qtd = saidaProdutoProduto.qtdProperty();
+        this.vlrUnitario = new SimpleObjectProperty<>(((saidaProdutoProduto.vlrBrutoProperty().getValue()
+                .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
+                .divide(new BigDecimal(qtdProperty().getValue()))));
+        this.qtdEntrada = new SimpleIntegerProperty(0);
+        this.vlrEntrada = new SimpleObjectProperty<>(BigDecimal.ZERO);
+        this.qtdSaida = new SimpleIntegerProperty(qtdSaida);
+        this.vlrSaida = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue()
+                .multiply(new BigDecimal(qtdProperty().getValue())));
+        this.saldo = new SimpleIntegerProperty(saidaProdutoProduto.produtoProperty().getValue()
+                .getProdutoEstoqueList().stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
+        this.vlrSaldo = new SimpleObjectProperty<>(
+                saidaProdutoProduto.produtoProperty().getValue()
                         .getProdutoEstoqueList().stream().filter(stq -> stq.qtdProperty().getValue() > 0)
                         .map(stq ->
                                 ((stq.vlrUnitarioProperty().getValue()

@@ -7,6 +7,7 @@ import br.com.tlmacedo.cafeperfeito.model.vo.ProdutoEstoque;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -24,22 +25,22 @@ public class TmodelProduto {
 
     private final TModelTipo tModelTipo;
     private Label lblRegistrosLocalizados;
-    private TextField txtPesquisa;
-    private TreeTableView<Produto> ttvProduto;
+    private TextField txtPesquisaProduto;
+    private TreeTableView<Object> ttvProdutoEstoque;
     private ObservableList<Produto> produtoObservableList = FXCollections.observableArrayList(new ProdutoDAO().getAll(Produto.class, null, "descricao"));
     private FilteredList<Produto> produtoFilteredList = new FilteredList<>(getProdutoObservableList());
 
-    private TreeItem<Produto> produtoTreeItem;
-    private TreeTableColumn<Produto, String> colId;
-    private TreeTableColumn<Produto, String> colCodigo;
-    private TreeTableColumn<Produto, String> colDescricao;
-    private TreeTableColumn<Produto, String> colVarejo;
-    private TreeTableColumn<Produto, String> colUndCom;
-    private TreeTableColumn<Produto, String> colPrecoCompra;
-    private TreeTableColumn<Produto, String> colPrecoVenda;
-    private TreeTableColumn<Produto, Integer> colEstoque;
-    private TreeTableColumn<Produto, String> colLote;
-    private TreeTableColumn<Produto, String> colValidade;
+    private TreeItem<Object> produtoEstoqueTreeItem;
+    private TreeTableColumn<Object, String> colId;
+    private TreeTableColumn<Object, String> colCodigo;
+    private TreeTableColumn<Object, String> colDescricao;
+    private TreeTableColumn<Object, String> colVarejo;
+    private TreeTableColumn<Object, String> colUndCom;
+    private TreeTableColumn<Object, String> colPrecoCompra;
+    private TreeTableColumn<Object, String> colPrecoVenda;
+    private TreeTableColumn<Object, Integer> colEstoque;
+    private TreeTableColumn<Object, String> colLote;
+    private TreeTableColumn<Object, String> colValidade;
 //    private TreeTableColumn<Produto, String> colNFeEntrada;
 
 //    private TreeTableColumn<Produto, String> colEstoqueId;
@@ -58,79 +59,95 @@ public class TmodelProduto {
             setColId(new TreeTableColumn<>("id"));
             getColId().setPrefWidth(48);
             getColId().setStyle("-fx-alignment: center-right;");
-            getColId().setCellValueFactory(param -> {
-                if (param.getValue().getValue().idProperty().get() == 0)
-                    return new SimpleStringProperty("");
-                else
-                    return param.getValue().getValue().idProperty().asString();
+            getColId().setCellValueFactory(cellData -> {
+                if (cellData.getValue().getValue() instanceof Produto)
+                    return ((Produto) cellData.getValue().getValue()).idProperty().asString();
+                return new SimpleStringProperty("");
             });
 
             setColCodigo(new TreeTableColumn<>("código"));
             getColCodigo().setPrefWidth(60);
             getColCodigo().setStyle("-fx-alignment: center-right;");
-            getColCodigo().setCellValueFactory(param -> param.getValue().getValue().codigoProperty());
+            getColCodigo().setCellValueFactory(cellData -> {
+                if (cellData.getValue().getValue() instanceof Produto)
+                    return ((Produto) cellData.getValue().getValue()).codigoProperty();
+                return new SimpleStringProperty("");
+            });
 
             setColDescricao(new TreeTableColumn<>("descrição"));
             getColDescricao().setPrefWidth(350);
-            getColDescricao().setCellValueFactory(param -> param.getValue().getValue().descricaoProperty());
+            getColDescricao().setCellValueFactory(cellData -> {
+                if (cellData.getValue().getValue() instanceof Produto)
+                    return ((Produto) cellData.getValue().getValue()).descricaoProperty();
+                return new SimpleStringProperty("");
+            });
 
             setColVarejo(new TreeTableColumn<>("varejo"));
             getColVarejo().setPrefWidth(50);
             getColVarejo().setStyle("-fx-alignment: center-right;");
-            getColVarejo().setCellValueFactory(param -> {
-                if (param.getValue().getValue().varejoProperty().get() == 0)
-                    return new SimpleStringProperty("");
-                else
-                    return param.getValue().getValue().varejoProperty().asString();
+            getColVarejo().setCellValueFactory(cellData -> {
+                if (cellData.getValue().getValue() instanceof Produto)
+                    return ((Produto) cellData.getValue().getValue()).varejoProperty().asString();
+                return new SimpleStringProperty("");
             });
 
             setColUndCom(new TreeTableColumn<>("und com"));
             getColUndCom().setPrefWidth(70);
-            getColUndCom().setCellValueFactory(param -> {
-                if (param.getValue().getValue().getUnidadeComercial() == null)
-                    return new SimpleStringProperty("");
-                else
-                    return new SimpleStringProperty(param.getValue().getValue().getUnidadeComercial().getDescricao());
+            getColUndCom().setCellValueFactory(cellData -> {
+                if (cellData.getValue().getValue() instanceof Produto)
+                    return ((Produto) cellData.getValue().getValue()).unidadeComercialProperty().asString();
+                return new SimpleStringProperty("");
             });
 
             setColPrecoCompra(new TreeTableColumn<>("preço compra"));
             getColPrecoCompra().setPrefWidth(90);
             getColPrecoCompra().setStyle("-fx-alignment: center-right;");
-            getColPrecoCompra().setCellValueFactory(param -> {
-                if (param.getValue().getValue().precoCompraProperty().getValue() == null)
-                    return new SimpleStringProperty("");
-                else
-                    return new SimpleStringProperty(ServiceMascara.getMoeda(param.getValue().getValue().precoCompraProperty().getValue(), 2));
+            getColPrecoCompra().setCellValueFactory(cellData -> {
+                if (cellData.getValue().getValue() instanceof Produto)
+                    return new SimpleStringProperty(ServiceMascara.getMoeda(((Produto) cellData.getValue().getValue()).precoCompraProperty().getValue(), 2));
+                return new SimpleStringProperty("0,00");
             });
 
             setColPrecoVenda(new TreeTableColumn<>("preço venda"));
             getColPrecoVenda().setPrefWidth(90);
             getColPrecoVenda().setStyle("-fx-alignment: center-right;");
-            getColPrecoVenda().setCellValueFactory(param -> {
-                if (param.getValue().getValue().precoVendaProperty().getValue() == null)
-                    return new SimpleStringProperty("");
-                else
-                    return new SimpleStringProperty(ServiceMascara.getMoeda(param.getValue().getValue().precoVendaProperty().getValue(), 2));
+            getColPrecoVenda().setCellValueFactory(cellData -> {
+                if (cellData.getValue().getValue() instanceof Produto)
+                    return new SimpleStringProperty(ServiceMascara.getMoeda(((Produto) cellData.getValue().getValue()).precoVendaProperty().getValue(), 2));
+                return new SimpleStringProperty("");
             });
 
             setColEstoque(new TreeTableColumn<>("estoque"));
             getColEstoque().setPrefWidth(65);
             getColEstoque().setStyle("-fx-alignment: center-right;");
-            getColEstoque().setCellValueFactory(param -> param.getValue().getValue().tblEstoqueProperty().asObject());
+            getColEstoque().setCellValueFactory(cellData -> {
+                if (cellData.getValue().getValue() instanceof Produto)
+                    return ((Produto) cellData.getValue().getValue()).tblEstoqueProperty().asObject();
+                if (cellData.getValue().getValue() instanceof ProdutoEstoque)
+                    return ((ProdutoEstoque) cellData.getValue().getValue()).qtdProperty().asObject();
+                return new SimpleObjectProperty<>(0);
+            });
 
             setColLote(new TreeTableColumn<>("lote"));
             getColLote().setPrefWidth(105);
             getColLote().setStyle("-fx-alignment: center;");
-            getColLote().setCellValueFactory(param -> param.getValue().getValue().tblLoteProperty());
+            getColLote().setCellValueFactory(cellData -> {
+                if (cellData.getValue().getValue() instanceof Produto)
+                    return ((Produto) cellData.getValue().getValue()).tblLoteProperty();
+                if (cellData.getValue().getValue() instanceof ProdutoEstoque)
+                    return ((ProdutoEstoque) cellData.getValue().getValue()).loteProperty();
+                return new SimpleStringProperty("");
+            });
 
             setColValidade(new TreeTableColumn<>("validade"));
             getColValidade().setPrefWidth(105);
             getColValidade().setStyle("-fx-alignment: center-right;");
-            getColValidade().setCellValueFactory(param -> {
-                if (param.getValue().getValue().tblValidadeProperty().getValue() == null)
-                    return new SimpleStringProperty("");
-                else
-                    return new SimpleStringProperty(param.getValue().getValue().tblValidadeProperty().get().format(DTF_DATA));
+            getColValidade().setCellValueFactory(cellData -> {
+//                if (cellData.getValue().getValue() instanceof Produto)
+//                    return new SimpleStringProperty(((Produto) cellData.getValue().getValue()).tblValidadeProperty().getValue().format(DTF_DATA));
+                if (cellData.getValue().getValue() instanceof ProdutoEstoque)
+                    return new SimpleStringProperty(((ProdutoEstoque) cellData.getValue().getValue()).dtValidadeProperty().getValue().format(DTF_DATA));
+                return new SimpleStringProperty("");
             });
 
 //            setColNFeEntrada(new TreeTableColumn<>("doc. ent."));
@@ -143,84 +160,81 @@ public class TmodelProduto {
 //            getColEstoqueId().setStyle("-fx-alignment: center-right;");
 //            getColEstoqueId().setCellValueFactory(param -> param.getValue().getValue().tblEstoque_idProperty().asString());
 
-        } catch (
-                Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
     }
 
     public void preencheTabela() {
-        setProdutoTreeItem(new TreeItem<>());
-        getProdutoFilteredList().forEach(
-                produtoTreeItem -> {
-                    final int[] estq = {0};
-                    TreeItem<Produto> prodTree = new TreeItem<>(produtoTreeItem);
-                    getProdutoTreeItem().getChildren().add(prodTree);
-                    if (gettModelTipo().equals(TModelTipo.PROD_VENDA))
-                        produtoTreeItem.getProdutoEstoqueList().stream()
-                                .filter(produtoEstoque -> produtoEstoque.qtdProperty().getValue().compareTo(0) > 0)
-                                .sorted(Comparator.comparing(ProdutoEstoque::getDtValidade))
-                                .collect(Collectors.groupingBy(ProdutoEstoque::getLote,
-                                        LinkedHashMap::new,
-                                        Collectors.toList()))
-                                .forEach((s, produtoEstoques) -> {
-                                    ProdutoEstoque estoque = new ProdutoEstoque();
-                                    estoque.qtdProperty().setValue(produtoEstoques.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd)));
-                                    estoque.loteProperty().setValue(s);
-                                    estoque.dtValidadeProperty().setValue(produtoEstoques.stream().findFirst().orElse(null).dtValidadeProperty().getValue());
-                                    estq[0] += estoque.qtdProperty().getValue();
+        try {
+            setProdutoEstoqueTreeItem(new TreeItem<>());
+            getProdutoFilteredList().stream()
+                    .forEach(produto -> {
+                                final int[] estq = {0};
+                                TreeItem<Object> paiItem = new TreeItem(produto);
+                                getProdutoEstoqueTreeItem().getChildren().add(paiItem);
+                                if (gettModelTipo().equals(TModelTipo.PROD_VENDA)) {
+                                    produto.getProdutoEstoqueList().stream()
+                                            .filter(produtoEstoque -> produtoEstoque.qtdProperty().getValue().compareTo(0) > 0)
+                                            .sorted(Comparator.comparing(ProdutoEstoque::getDtValidade))
+                                            .collect(Collectors.groupingBy(ProdutoEstoque::getLote,
+                                                    LinkedHashMap::new,
+                                                    Collectors.toList()))
+                                            .forEach((s, produtoEstoques) -> {
+                                                paiItem.getChildren().add(new TreeItem<>(new ProdutoEstoque(produtoEstoques)));
+                                                estq[0] += produtoEstoques.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd));
+                                            });
+                                } else {
+                                    estq[0] = produto.getProdutoEstoqueList().stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd));
+                                }
 
-                                    prodTree.getChildren().add(new TreeItem<>(new Produto(estoque)));
-                                });
-                    else
-                        estq[0] = produtoTreeItem.getProdutoEstoqueList().stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd));
+                                ((Produto) paiItem.getValue()).tblEstoqueProperty().setValue(estq[0]);
+                            }
+                    );
 
-                    prodTree.getValue().setTblEstoque(estq[0]);
-                }
-        );
+            System.out.printf("");
+            getTtvProdutoEstoque().getColumns().setAll(
+                    getColId(), getColCodigo(), getColDescricao(), getColVarejo(), getColUndCom(), getColPrecoCompra(),
+                    getColPrecoVenda(), getColEstoque(), getColLote(), getColValidade()
+            );
+            System.out.printf("");
+
+            if (gettModelTipo().equals(TModelTipo.PROD_VENDA)) {
+                getTtvProdutoEstoque().getColumns().remove(getColPrecoCompra());
+            } else {
+                getTtvProdutoEstoque().getColumns().remove(getColLote());
+                getTtvProdutoEstoque().getColumns().remove(getColValidade());
+            }
+
+            getTtvProdutoEstoque().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
 
-        getTtvProduto().getColumns().setAll(
-                getColId(), getColCodigo(), getColDescricao(), getColVarejo(), getColUndCom(), getColPrecoCompra(),
-                getColPrecoVenda(), getColEstoque(), getColLote(), getColValidade()//, getColNFeEntrada()
-                //, getColEstoqueId()
-        );
-
-        if (gettModelTipo().equals(TModelTipo.PROD_VENDA)) {
-            getTtvProduto().getColumns().remove(getColPrecoCompra());
-        } else {
-            getTtvProduto().getColumns().remove(getColLote());
-            getTtvProduto().getColumns().remove(getColValidade());
+            getTtvProdutoEstoque().setRoot(getProdutoEstoqueTreeItem());
+            getTtvProdutoEstoque().setShowRoot(false);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-
-        getTtvProduto().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
-
-        getTtvProduto().setRoot(getProdutoTreeItem());
-        getTtvProduto().setShowRoot(false);
     }
 
     public void escutaLista() {
-        getTtvProduto().setRowFactory(produtoTreeTableView -> {
-            TreeTableRow<Produto> row = new TreeTableRow<>() {
+        try {
+            System.out.printf("");
+            getTtvProdutoEstoque().setRowFactory(objectTreeTableView -> new TreeTableRow<>() {
                 @Override
-                protected void updateItem(Produto item, boolean empty) {
+                protected void updateItem(Object item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (empty) {
-                        getStyleClass().remove("produto-estoque");
-                    } else if (item.getDescricao() == null) {
-                        if (!getStyleClass().contains("produto-estoque"))
+                    getStyleClass().removeAll(getStyleClass().stream().filter(s -> s.contains("produto-")).collect(Collectors.toList()));
+                    if (!empty)
+                        if (item instanceof ProdutoEstoque)
                             getStyleClass().add("produto-estoque");
-                    } else {
-                        getStyleClass().remove("produto-estoque");
-                    }
                 }
-            };
-            return row;
-        });
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-        getTxtPesquisa().textProperty().addListener((ov, o, n) -> {
+        getTxtPesquisaProduto().textProperty().addListener((ov, o, n) -> {
             String strFind = n.toLowerCase().trim();
             getProdutoFilteredList().setPredicate(produto -> {
                 if (produto.idProperty().toString().contains(strFind))
@@ -244,7 +258,7 @@ public class TmodelProduto {
         getProdutoFilteredList().addListener((ListChangeListener<? super Produto>) change -> {
             Platform.runLater(() -> {
                 preencheTabela();
-                getTtvProduto().refresh();
+                getTtvProdutoEstoque().refresh();
             });
         });
 
@@ -255,7 +269,7 @@ public class TmodelProduto {
 
     public void atualizarProdutos() {
         getProdutoObservableList().setAll(new ProdutoDAO().getAll(Produto.class, null, "descricao"));
-        getTtvProduto().refresh();
+        getTtvProdutoEstoque().refresh();
     }
 
     /**
@@ -278,20 +292,20 @@ public class TmodelProduto {
         this.lblRegistrosLocalizados = lblRegistrosLocalizados;
     }
 
-    public TextField getTxtPesquisa() {
-        return txtPesquisa;
+    public TextField getTxtPesquisaProduto() {
+        return txtPesquisaProduto;
     }
 
-    public void setTxtPesquisa(TextField txtPesquisa) {
-        this.txtPesquisa = txtPesquisa;
+    public void setTxtPesquisaProduto(TextField txtPesquisaProduto) {
+        this.txtPesquisaProduto = txtPesquisaProduto;
     }
 
-    public TreeTableView<Produto> getTtvProduto() {
-        return ttvProduto;
+    public TreeTableView<Object> getTtvProdutoEstoque() {
+        return ttvProdutoEstoque;
     }
 
-    public void setTtvProduto(TreeTableView<Produto> ttvProduto) {
-        this.ttvProduto = ttvProduto;
+    public void setTtvProdutoEstoque(TreeTableView<Object> ttvProdutoEstoque) {
+        this.ttvProdutoEstoque = ttvProdutoEstoque;
     }
 
     public ObservableList<Produto> getProdutoObservableList() {
@@ -310,95 +324,95 @@ public class TmodelProduto {
         this.produtoFilteredList = produtoFilteredList;
     }
 
-    public TreeItem<Produto> getProdutoTreeItem() {
-        return produtoTreeItem;
+    public TreeItem<Object> getProdutoEstoqueTreeItem() {
+        return produtoEstoqueTreeItem;
     }
 
-    public void setProdutoTreeItem(TreeItem<Produto> produtoTreeItem) {
-        this.produtoTreeItem = produtoTreeItem;
+    public void setProdutoEstoqueTreeItem(TreeItem<Object> produtoEstoqueTreeItem) {
+        this.produtoEstoqueTreeItem = produtoEstoqueTreeItem;
     }
 
-    public TreeTableColumn<Produto, String> getColId() {
+    public TreeTableColumn<Object, String> getColId() {
         return colId;
     }
 
-    public void setColId(TreeTableColumn<Produto, String> colId) {
+    public void setColId(TreeTableColumn<Object, String> colId) {
         this.colId = colId;
     }
 
-    public TreeTableColumn<Produto, String> getColCodigo() {
+    public TreeTableColumn<Object, String> getColCodigo() {
         return colCodigo;
     }
 
-    public void setColCodigo(TreeTableColumn<Produto, String> colCodigo) {
+    public void setColCodigo(TreeTableColumn<Object, String> colCodigo) {
         this.colCodigo = colCodigo;
     }
 
-    public TreeTableColumn<Produto, String> getColDescricao() {
+    public TreeTableColumn<Object, String> getColDescricao() {
         return colDescricao;
     }
 
-    public void setColDescricao(TreeTableColumn<Produto, String> colDescricao) {
+    public void setColDescricao(TreeTableColumn<Object, String> colDescricao) {
         this.colDescricao = colDescricao;
     }
 
-    public TreeTableColumn<Produto, String> getColVarejo() {
+    public TreeTableColumn<Object, String> getColVarejo() {
         return colVarejo;
     }
 
-    public void setColVarejo(TreeTableColumn<Produto, String> colVarejo) {
+    public void setColVarejo(TreeTableColumn<Object, String> colVarejo) {
         this.colVarejo = colVarejo;
     }
 
-    public TreeTableColumn<Produto, String> getColUndCom() {
+    public TreeTableColumn<Object, String> getColUndCom() {
         return colUndCom;
     }
 
-    public void setColUndCom(TreeTableColumn<Produto, String> colUndCom) {
+    public void setColUndCom(TreeTableColumn<Object, String> colUndCom) {
         this.colUndCom = colUndCom;
     }
 
-    public TreeTableColumn<Produto, String> getColPrecoCompra() {
+    public TreeTableColumn<Object, String> getColPrecoCompra() {
         return colPrecoCompra;
     }
 
-    public void setColPrecoCompra(TreeTableColumn<Produto, String> colPrecoCompra) {
+    public void setColPrecoCompra(TreeTableColumn<Object, String> colPrecoCompra) {
         this.colPrecoCompra = colPrecoCompra;
     }
 
-    public TreeTableColumn<Produto, String> getColPrecoVenda() {
+    public TreeTableColumn<Object, String> getColPrecoVenda() {
         return colPrecoVenda;
     }
 
-    public void setColPrecoVenda(TreeTableColumn<Produto, String> colPrecoVenda) {
+    public void setColPrecoVenda(TreeTableColumn<Object, String> colPrecoVenda) {
         this.colPrecoVenda = colPrecoVenda;
     }
 
-    public TreeTableColumn<Produto, Integer> getColEstoque() {
+    public TreeTableColumn<Object, Integer> getColEstoque() {
         return colEstoque;
     }
 
-    public void setColEstoque(TreeTableColumn<Produto, Integer> colEstoque) {
+    public void setColEstoque(TreeTableColumn<Object, Integer> colEstoque) {
         this.colEstoque = colEstoque;
     }
 
-    public TreeTableColumn<Produto, String> getColLote() {
+    public TreeTableColumn<Object, String> getColLote() {
         return colLote;
     }
 
-    public void setColLote(TreeTableColumn<Produto, String> colLote) {
+    public void setColLote(TreeTableColumn<Object, String> colLote) {
         this.colLote = colLote;
     }
 
-    public TreeTableColumn<Produto, String> getColValidade() {
+    public TreeTableColumn<Object, String> getColValidade() {
         return colValidade;
     }
 
-    public void setColValidade(TreeTableColumn<Produto, String> colValidade) {
+    public void setColValidade(TreeTableColumn<Object, String> colValidade) {
         this.colValidade = colValidade;
     }
 
-    /**
-     * END Gets and Setters
-     */
+/**
+ * END Gets and Setters
+ */
 }
