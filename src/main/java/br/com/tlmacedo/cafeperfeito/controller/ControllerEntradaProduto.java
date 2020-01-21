@@ -1083,38 +1083,10 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     private boolean salvarEntradaProduto() {
         boolean retorno;
         try {
+            setFichaKardexList(new ArrayList<>());
+            getTmodelEntradaProduto().setFichaKardexList(getFichaKardexList());
             setEntradaProdutoDAO(new EntradaProdutoDAO());
             getEntradaProdutoDAO().transactionBegin();
-
-
-//            retorno = getTmodelEntradaProduto().incluirEstoque(
-//                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrBruto().getText(), 2)
-//                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
-//                                    4, RoundingMode.HALF_UP),
-//
-//
-//                    (ServiceMascara.getBigDecimalFromTextField(getTxtNfeFiscalVlrNFe().getText(), 2)
-//                            .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 2)) == 0)
-//                            ? ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrPercentual().getText(), 4)
-//                            : (ServiceMascara.getBigDecimalFromTextField(getLblNfeFiscalVlrTotal().getText(), 4)
-//                            .multiply(new BigDecimal("100.")))
-//                            .divide(ServiceMascara.getBigDecimalFromTextField(getLblTotalBruto().getText(), 4),
-//                                    4, RoundingMode.HALF_UP),
-//
-//                    ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2)
-//                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
-//                                    4, RoundingMode.HALF_UP),
-//
-//                    ServiceMascara.getBigDecimalFromTextField(getLblCteFiscalVlrTotal().getText(), 2)
-//                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
-//                                    4, RoundingMode.HALF_UP),
-//
-//                    ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrTaxa().getText(), 2)
-//                            .add(ServiceMascara.getBigDecimalFromTextField(getTxtCteVlrColeta().getText(), 2))
-//                            .divide(ServiceMascara.getBigDecimalFromTextField(getTxtCtePesoBruto().getText(), 2),
-//                                    4, RoundingMode.HALF_UP),
-//                    getTxtNfeNumero().getText().replaceAll("\\D", ""),
-//                    getTxtNfeChave().getText().replaceAll("\\D", ""));
             retorno = getTmodelEntradaProduto().incluirEstoque();
             setEntradaProduto(getEntradaProdutoDAO().setTransactionPersist(getEntradaProduto()));
             getEntradaProdutoDAO().transactionCommit();

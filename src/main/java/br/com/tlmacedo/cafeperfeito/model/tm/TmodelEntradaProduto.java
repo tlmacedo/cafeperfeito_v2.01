@@ -18,7 +18,6 @@ import javafx.scene.input.KeyEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -359,7 +358,6 @@ public class TmodelEntradaProduto {
 
     public boolean incluirEstoque() {
         try {
-            setFichaKardexList(new ArrayList<>());
             getEntradaProdutoProdutoObservableList().stream()
                     .forEach(entradaProdutoProduto -> {
                         ProdutoEstoque produtoEstoque = new ProdutoEstoque(entradaProdutoProduto);

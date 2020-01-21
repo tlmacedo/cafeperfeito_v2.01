@@ -3,6 +3,7 @@ package br.com.tlmacedo.cafeperfeito.controller;
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.ContasAReceberDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
+import br.com.tlmacedo.cafeperfeito.model.dao.FichaKardexDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
@@ -19,6 +20,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
@@ -264,7 +266,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             limpaCampos(getPainelViewSaidaProduto());
                             break;
                         case F2:
-                            if (getSaidaProdutoProdutoObservableList().size() > 0 && validarSaida()) {
+                            if (validarSaida()) {
                                 getEnumsTasksList().clear();
                                 getEnumsTasksList().add(EnumsTasks.SALVAR_ENT_SAIDA);
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
@@ -310,6 +312,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             } else {
                 ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
             }
+        });
+
+        getSaidaProdutoProdutoObservableList().addListener((ListChangeListener<? super SaidaProdutoProduto>) c -> {
+            showStatusBar();
         });
 
         new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
@@ -407,11 +413,12 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 setProdutoFilteredList(getTmodelProduto().getProdutoFilteredList());
                                 getTmodelProduto().escutaLista();
 
+                                setFichaKardexList(new ArrayList<>());
+                                getTmodelSaidaProduto().setFichaKardexList(getFichaKardexList());
                                 getTmodelSaidaProduto().setTvItensNfe(getTvItensNfe());
                                 getTmodelSaidaProduto().setTxtPesquisaProduto(getTxtPesquisaProduto());
-                                prazoProperty().bind(getTmodelSaidaProduto().prazoProperty());
                                 getTmodelSaidaProduto().setSaidaProdutoProdutoObservableList(getSaidaProdutoProdutoObservableList());
-                                getTmodelSaidaProduto().setFichaKardexList(getFichaKardexList());
+                                prazoProperty().bind(getTmodelSaidaProduto().prazoProperty());
                                 getTmodelSaidaProduto().escutaLista();
                                 break;
 
@@ -463,11 +470,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
                             case SALVAR_ENT_SAIDA:
                                 if (guardarSaidaProduto()) {
-//                                    if (salvarEntradaProduto()) {
-//                                        getTmodelProduto().atualizarProdutos();
-//                                    } else {
-//                                        Thread.currentThread().interrupt();
-//                                    }
+                                    if (salvarSaidaProduto()) {
+                                        getTmodelProduto().atualizarProdutos();
+                                    } else {
+                                        Thread.currentThread().interrupt();
+                                    }
                                 } else {
                                     Thread.currentThread().interrupt();
                                 }
@@ -688,7 +695,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private boolean validarSaida() {
-        return (validarCliente() && validarNFe() && getSaidaProdutoProdutoObservableList().size() > 0);
+        return (validarCliente() && validarNFe()
+                && getSaidaProdutoProdutoObservableList().size() > 0);
     }
 
     private boolean validarCliente() {
@@ -749,10 +757,43 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             getCboNfeDadosDestinoOperacao().requestFocus();
             return false;
         }
-//        if (getcboin)
-
         return true;
     }
+
+    private boolean salvarSaidaProduto() {
+        boolean retorno;
+        try {
+            setSaidaProdutoDAO(new SaidaProdutoDAO());
+            getSaidaProdutoDAO().transactionBegin();
+            retorno = getTmodelSaidaProduto().baixarEstoque();
+            setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
+            getSaidaProdutoDAO().transactionCommit();
+            salvarFichaKardexList();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            getSaidaProdutoDAO().transactionRollback();
+            retorno = false;
+        }
+        return retorno;
+    }
+
+    private boolean salvarFichaKardexList() {
+        FichaKardexDAO fichaKardexDAO = new FichaKardexDAO();
+        try {
+            fichaKardexDAO.transactionBegin();
+            for (FichaKardex ficha : getFichaKardexList()) {
+                ficha.setDocumento(getSaidaProduto().idProperty().getValue().toString());
+                fichaKardexDAO.setTransactionPersist(ficha);
+            }
+            fichaKardexDAO.transactionCommit();
+        } catch (Exception ex) {
+            fichaKardexDAO.transactionRollback();
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * END returns

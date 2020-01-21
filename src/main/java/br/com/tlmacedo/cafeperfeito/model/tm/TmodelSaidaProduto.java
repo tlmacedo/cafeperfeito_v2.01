@@ -17,7 +17,6 @@ import javafx.scene.input.KeyEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -126,20 +125,14 @@ public class TmodelSaidaProduto {
                 newValue = 1;
             Integer oldValue = Integer.valueOf(editEvent.getOldValue());
             editEvent.getRowValue().setQtd(validEstoque(newValue, oldValue));
-//            System.out.printf("\ncodigoCFOP: [%s]\n", editEvent.getRowValue().codigoCFOPProperty().getValue());
-//            System.out.printf("new: [%02d]\told: [%02d]\t ==>: [%03d]\n",
-//                    newValue,
-//                    oldValue,
-//                    newValue - oldValue);
+
             if (editEvent.getRowValue().codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.COMERCIALIZACAO)) {
                 calculaDescontoCliente();
-//                System.out.printf("calculando desconto");
             } else {
-                if (newValue > oldValue) {
+                if (newValue > oldValue)
                     calculaDescontoCliente();
-//                    System.out.printf("calculando desconto");
-                }
             }
+
             getTvItensNfe().getSelectionModel().selectNext();
             totalizaLinha(editEvent.getRowValue());
         });
@@ -456,46 +449,48 @@ public class TmodelSaidaProduto {
 
 
     public boolean baixarEstoque() {
+        ProdutoEstoqueDAO produtoEstoqueDAO = new ProdutoEstoqueDAO();
         try {
-            setFichaKardexList(new ArrayList<>());
+            produtoEstoqueDAO.transactionBegin();
+            List<ProdutoEstoque> produtoEstoqueList = produtoEstoqueDAO.getAll(ProdutoEstoque.class,
+                    String.format("qtd > 0"), "dtValidade, id");
             getSaidaProdutoProdutoObservableList().stream()
-                    .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd)).sorted(Comparator.comparing(SaidaProdutoProduto::getDtValidade))
+                    .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd))
                     .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd, LinkedHashMap::new, Collectors.toList()))
                     .forEach((aLong, saidaProdutoProdutos) -> {
                         saidaProdutoProdutos.stream()
                                 .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote, LinkedHashMap::new, Collectors.toList()))
                                 .forEach((s, saidaProdutoProdutos1) -> {
                                     final Integer[] saldoSaida = {saidaProdutoProdutos1.stream().collect(Collectors.summingInt(SaidaProdutoProduto::getQtd)), 0};
-                                    //List<ProdutoEstoque> produtoEstoqueList = getProdutoEstoqueDAO().getAll(ProdutoEstoque.class, String.format("produto_id=%s", aLong.toString()), "validade");
-                                    saidaProdutoProdutos1.stream()
-                                            .map(SaidaProdutoProduto::getProduto)
-                                            .map(Produto::getProdutoEstoqueList)
-                                            .filter(produtoEstoques -> produtoEstoques.stream().filter(produtoEstoque -> produtoEstoque.loteProperty().getValue().equals(s)
-                                                    && produtoEstoque.qtdProperty().getValue() > 0).count() > 0)
-                                            .forEach(produtoEstoques -> {
-                                                produtoEstoques.stream()
-                                                        .forEach(produtoEstoque -> {
-                                                            try {
-                                                                if (saldoSaida[0] > 0) {
-                                                                    produtoEstoque.qtdProperty().setValue(produtoEstoque.qtdProperty().getValue() - saldoSaida[0]);
-                                                                    if (produtoEstoque.qtdProperty().getValue() < 0) {
-                                                                        getFichaKardexList().add(new FichaKardex(saldoSaida[0] + produtoEstoque.qtdProperty().getValue(),
-                                                                                produtoEstoque, false));
-                                                                        saldoSaida[0] = produtoEstoque.qtdProperty().getValue() * (-1);
-                                                                        produtoEstoque.qtdProperty().setValue(0);
-                                                                    } else {
-                                                                        getFichaKardexList().add(new FichaKardex(saldoSaida[0], produtoEstoque, false));
-                                                                    }
-                                                                }
-                                                            } catch (Exception ex) {
-                                                                ex.printStackTrace();
-                                                            }
-                                                        });
+                                    produtoEstoqueList.stream()
+                                            .filter(produtoEstoque -> produtoEstoque.produtoProperty().getValue().idProperty().getValue().equals(aLong)
+                                                    && produtoEstoque.loteProperty().getValue().equals(s))
+                                            .forEach(produtoEstoque -> {
+                                                try {
+                                                    if (saldoSaida[0].compareTo(0) > 0) {
+                                                        produtoEstoque.qtdProperty().setValue(produtoEstoque.qtdProperty().getValue() - saldoSaida[0]);
+                                                        if (produtoEstoque.qtdProperty().getValue().compareTo(0) < 0) {
+                                                            getFichaKardexList().add(new FichaKardex(produtoEstoque.qtdProperty().getValue() - saldoSaida[0],
+                                                                    produtoEstoque, false));
+                                                            saldoSaida[0] = produtoEstoque.qtdProperty().getValue() * (-1);
+                                                            produtoEstoque.qtdProperty().setValue(0);
+                                                        } else {
+                                                            getFichaKardexList().add(new FichaKardex(saldoSaida[0],
+                                                                    produtoEstoque, false));
+                                                            saldoSaida[0] = 0;
+                                                        }
+                                                        produtoEstoqueDAO.setTransactionPersist(produtoEstoque);
+                                                    }
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
+                                                }
                                             });
                                 });
                     });
+            produtoEstoqueDAO.transactionCommit();
         } catch (Exception ex) {
             ex.printStackTrace();
+            produtoEstoqueDAO.transactionRollback();
             return false;
         }
         return true;
