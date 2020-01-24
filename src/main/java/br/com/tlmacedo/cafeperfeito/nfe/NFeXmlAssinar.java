@@ -4,6 +4,7 @@ import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
 import br.com.tlmacedo.nfe.service.NFeAssinarXml;
 import com.google.gson.internal.Pair;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -11,7 +12,7 @@ import java.security.UnrecoverableEntryException;
 
 public class NFeXmlAssinar {
 
-    private static ObjectProperty<LoadCertificadoA3> loadCertificadoA3;
+    private static ObjectProperty<LoadCertificadoA3> loadCertificadoA3 = new SimpleObjectProperty<>();
 
     public static Pair<String, LoadCertificadoA3> getXmlAssinado(String xmlNfe) throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException {
 
@@ -27,6 +28,12 @@ public class NFeXmlAssinar {
         return gerarPair(new NFeAssinarXml(NFeXml.getXml(saidaProduto), loadCertificadoA3Property().getValue().getCertificates()).getXmlAssinadoNFe());
     }
 
+    public static String getXmlAssinado(String xmlNfe, LoadCertificadoA3 loadCertificadoA3) throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException {
+        setLoadCertificadoA3(loadCertificadoA3);
+
+        return new NFeAssinarXml(xmlNfe, loadCertificadoA3Property().getValue().getCertificates()).getXmlAssinadoNFe();
+    }
+
     public static Pair<String, LoadCertificadoA3> getXmlAssinado(SaidaProduto saidaProduto) throws Exception {
 
         loadCertificado();
@@ -37,6 +44,7 @@ public class NFeXmlAssinar {
     private static void loadCertificado() {
         if (loadCertificadoA3Property().getValue() == null)
             loadCertificadoA3Property().setValue(new LoadCertificadoA3());
+//        loadCertificadoA3Property().setValue(new LoadCertificadoA3());
 
         while (loadCertificadoA3Property().getValue().load())
             loadCertificadoA3Property().getValue().load();

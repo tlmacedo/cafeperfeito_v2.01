@@ -141,6 +141,14 @@ public class TmodelEntradaProduto {
         getColVlrUnitario().setCellValueFactory(param -> new SimpleStringProperty(
                 ServiceMascara.getMoeda(param.getValue().vlrUnitarioProperty().get(), 2)
         ));
+        getColVlrUnitario().setCellFactory(param -> new SetCellFactoryTableCell_EdtitingCell<EntradaProdutoProduto, String>(
+                ServiceMascara.getNumeroMask(12, 2)
+        ));
+        getColVlrUnitario().setOnEditCommit(editEvent -> {
+            editEvent.getRowValue().setVlrUnitario(ServiceMascara.getBigDecimalFromTextField(editEvent.getNewValue(), 2));
+            getTvItensNfe().getSelectionModel().selectNext();
+            totalizaLinha(editEvent.getRowValue());
+        });
 
         setColVlrBruto(new TableColumn<>("vlr bruto"));
         getColVlrBruto().setPrefWidth(90);

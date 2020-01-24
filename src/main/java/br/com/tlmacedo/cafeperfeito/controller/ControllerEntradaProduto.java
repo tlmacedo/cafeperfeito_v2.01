@@ -322,8 +322,7 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
         new ServiceAutoCompleteComboBox(FiscalTributosSefazAm.class, getCboCteFiscalTributo());
 
         getTxtPesquisaProduto().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() != KeyCode.ENTER
-                    && getEntradaProdutoProdutoObservableList().size() <= 0) return;
+            if (event.getCode() != KeyCode.ENTER) return;
             getTtvProdutoEstoque().requestFocus();
             getTtvProdutoEstoque().getSelectionModel().selectFirst();
         });
@@ -910,24 +909,26 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     }
 
     private boolean validarNfeFiscal() {
-        if (getTpnNfeDetalheFiscal().isExpanded()) {
-            if (getTxtNfeFiscalControle().getText().length() == 0) {
-                getTxtNfeFiscalControle().requestFocus();
-                return false;
-            }
-            if (getTxtNfeFiscalOrigem().getText().length() == 0) {
-                getTxtNfeFiscalOrigem().requestFocus();
-                return false;
-            }
-            if (getCboNfeFiscalTributo().getValue() == null) {
-                getCboNfeFiscalTributo().requestFocus();
-                return false;
-            }
+        if (!getTpnNfeDetalheFiscal().isExpanded())
+            return true;
+        if (getTxtNfeFiscalControle().getText().length() == 0) {
+            getTxtNfeFiscalControle().requestFocus();
+            return false;
+        }
+        if (getTxtNfeFiscalOrigem().getText().length() == 0) {
+            getTxtNfeFiscalOrigem().requestFocus();
+            return false;
+        }
+        if (getCboNfeFiscalTributo().getValue() == null) {
+            getCboNfeFiscalTributo().requestFocus();
+            return false;
         }
         return true;
     }
 
     private boolean validarCteDetalhe() {
+        if (!getTpnCteDetalhe().isExpanded())
+            return true;
         if (getTxtCteChave().getText().length() < 44) {
             getTxtCteChave().requestFocus();
             return false;
@@ -988,19 +989,19 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
     }
 
     private boolean validarCteFiscal() {
-        if (getTpnCteDetalheFiscal().isExpanded()) {
-            if (getTxtCteFiscalControle().getText().length() == 0) {
-                getTxtCteFiscalControle().requestFocus();
-                return false;
-            }
-            if (getTxtCteFiscalOrigem().getText().length() == 0) {
-                getTxtCteFiscalOrigem().requestFocus();
-                return false;
-            }
-            if (getCboCteFiscalTributo().getValue() == null) {
-                getCboCteFiscalTributo().requestFocus();
-                return false;
-            }
+        if (!getTpnCteDetalheFiscal().isExpanded())
+            return true;
+        if (getTxtCteFiscalControle().getText().length() == 0) {
+            getTxtCteFiscalControle().requestFocus();
+            return false;
+        }
+        if (getTxtCteFiscalOrigem().getText().length() == 0) {
+            getTxtCteFiscalOrigem().requestFocus();
+            return false;
+        }
+        if (getCboCteFiscalTributo().getValue() == null) {
+            getCboCteFiscalTributo().requestFocus();
+            return false;
         }
         return true;
     }

@@ -55,31 +55,13 @@ public class SaidaProdutoProduto implements Serializable {
         this.vlrUnitario = produtoEstoque.produtoProperty().getValue().precoVendaProperty();
         this.vlrBruto = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue()
                 .multiply(new BigDecimal(qtdProperty().getValue())));
+        this.vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
+        if (!codigoCFOP.equals(TipoCodigoCFOP.COMERCIALIZACAO))
+            this.vlrDesconto = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue().multiply(new BigDecimal(qtdProperty().getValue())));
         this.vlrLiquido = new SimpleObjectProperty<>(vlrBrutoProperty().getValue().subtract(vlrDescontoProperty().getValue()));
         this.estoque = produtoEstoque.qtdProperty();
         this.varejo = produtoEstoque.produtoProperty().getValue().varejoProperty();
-        this.volume = new SimpleIntegerProperty(1);
-    }
-
-    public SaidaProdutoProduto(Produto produto, TipoCodigoCFOP codigoCFOP, Integer qtd) {
-        this.produto = new SimpleObjectProperty<>(produto);
-        this.codigo = getProduto().codigoProperty();
-        this.descricao = getProduto().descricaoProperty();
-        this.codigoCFOP = new SimpleObjectProperty<>(codigoCFOP);
-        this.lote = new SimpleStringProperty("");
-        this.dtValidade = new SimpleObjectProperty<>(LocalDate.now());
-        this.qtd = new SimpleIntegerProperty(qtd == null ? 1 : qtd);
-
-        this.vlrUnitario = getProduto().precoCompraProperty();
-        this.vlrBruto = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
-        this.vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
-        if (!codigoCFOP.equals(TipoCodigoCFOP.COMERCIALIZACAO)) {
-            this.vlrDesconto = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
-        }
-        this.vlrLiquido = new SimpleObjectProperty<>(vlrBrutoProperty().getValue().subtract(vlrDescontoProperty().getValue()));
-        this.estoque = getProduto().tblEstoqueProperty();
-        this.varejo = getProduto().varejoProperty();
-        this.volume = new SimpleIntegerProperty(1);
+        this.volume = new SimpleIntegerProperty(Double.valueOf(qtdProperty().doubleValue() / produtoProperty().getValue().varejoProperty().doubleValue()).intValue() + 1);
     }
 
     @Id

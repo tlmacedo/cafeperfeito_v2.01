@@ -18,8 +18,8 @@ import java.util.Map;
 
 public class ServiceRelatorio extends JFrame {
     public void gerar(RelatorioTipo tipo, File pathXml) throws JRException {
-
-        JRDataSource ds = new JRXmlDataSource(pathXml);
+        JRDataSource ds = new JRXmlDataSource(pathXml, "/nfeProc/NFe/infNFe/det");
+//        JRXmlDataSource xml = new JRXmlDataSource(pathXml, "/NFe/infNFe/det");
 
         InputStream relJasper = getClass().getResourceAsStream(tipo.getDescricao());
 
@@ -27,6 +27,7 @@ public class ServiceRelatorio extends JFrame {
 
         try {
             impressao = JasperFillManager.fillReport(relJasper, new HashMap<>(), ds);
+//            impressao = JasperFillManager.fillReport(relJasper, new HashMap<>(), xml);
             JasperViewer viewer = new JasperViewer(impressao, false);
             viewer.setVisible(true);
         } catch (Exception ex) {

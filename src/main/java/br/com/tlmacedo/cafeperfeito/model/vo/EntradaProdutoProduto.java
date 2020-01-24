@@ -54,7 +54,7 @@ public class EntradaProdutoProduto implements Serializable {
         this.dtValidade = new SimpleObjectProperty<>(LocalDate.now());
         this.qtd = new SimpleIntegerProperty(1);
 
-        this.vlrUnitario = getProduto().precoCompraProperty();
+        this.vlrUnitario = new SimpleObjectProperty<>(getProduto().precoCompraProperty().getValue());
         this.vlrBruto = new SimpleObjectProperty<>(vlrUnitarioProperty().getValue().multiply(BigDecimal.valueOf(qtdProperty().getValue())));
         this.vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO.setScale(2));
 //        if (!codigoCFOP.equals(TipoCodigoCFOP.COMERCIALIZACAO)) {
@@ -82,6 +82,7 @@ public class EntradaProdutoProduto implements Serializable {
         this.id.set(id);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public EntradaProduto getEntradaProduto() {
         return entradaProduto.get();
@@ -253,6 +254,7 @@ public class EntradaProdutoProduto implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public BigDecimal getVlrLiquido() {
         return vlrLiquido.get();
     }
@@ -266,6 +268,7 @@ public class EntradaProdutoProduto implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public int getEstoque() {
         return estoque.get();
     }
@@ -279,6 +282,7 @@ public class EntradaProdutoProduto implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public int getVarejo() {
         return varejo.get();
     }
@@ -292,6 +296,7 @@ public class EntradaProdutoProduto implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public int getVolume() {
         return volume.get();
     }
@@ -314,7 +319,7 @@ public class EntradaProdutoProduto implements Serializable {
     public String toString() {
         return "EntradaProdutoProduto{" +
                 "id=" + id +
-                ", entradaProduto=" + entradaProduto +
+//                ", entradaProduto=" + entradaProduto +
                 ", produto=" + produto +
                 ", codigo=" + codigo +
                 ", descricao=" + descricao +
@@ -325,9 +330,10 @@ public class EntradaProdutoProduto implements Serializable {
                 ", vlrUnitario=" + vlrUnitario +
                 ", vlrBruto=" + vlrBruto +
                 ", vlrDesconto=" + vlrDesconto +
+                ", vlrFrete=" + vlrFrete +
                 ", vlrImposto=" + vlrImposto +
                 ", vlrLiquido=" + vlrLiquido +
-                ", estoque=" + estoque +
+//                ", estoque=" + estoque +
                 ", varejo=" + varejo +
                 ", volume=" + volume +
                 '}';

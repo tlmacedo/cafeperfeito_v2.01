@@ -1,12 +1,15 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
+import javafx.scene.control.ButtonType;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +36,8 @@ public class ProdutoEstoque implements Serializable {
     private StringProperty docEntrada = new SimpleStringProperty();
     private StringProperty docEntradaChaveNFe = new SimpleStringProperty();
 
+    private ServiceAlertMensagem alertMensagem;
+
     public ProdutoEstoque() {
     }
 
@@ -58,6 +63,20 @@ public class ProdutoEstoque implements Serializable {
         this.lote = entradaProdutoProduto.loteProperty();
         this.dtValidade = entradaProdutoProduto.dtValidadeProperty();
         this.vlrUnitario = entradaProdutoProduto.vlrUnitarioProperty();
+        if (produtoProperty().getValue().precoCompraProperty().getValue().compareTo(vlrUnitarioProperty().getValue()) < 0) {
+            calculaNovoPrecoVenda();
+        } else if (produtoProperty().getValue().precoCompraProperty().getValue().compareTo(vlrUnitarioProperty().getValue()) > 0) {
+            setAlertMensagem(new ServiceAlertMensagem());
+            getAlertMensagem().setCabecalho("Preço diferente");
+            getAlertMensagem().setContentText("Preço de compra está menor que o do cadastro;\ndeseja abaixar o preço de venda para manter a mesma margem?");
+            ButtonType retorno = getAlertMensagem().alertYesNoCancel().get();
+            if (retorno == ButtonType.YES) {
+                calculaNovoPrecoVenda();
+            } else if (retorno == ButtonType.NO) {
+                produtoProperty().getValue().precoCompraProperty().setValue(vlrUnitarioProperty().getValue());
+            }
+        }
+
         this.vlrDesconto = new SimpleObjectProperty<>(entradaProdutoProduto.vlrDescontoProperty().getValue()
                 .divide(new BigDecimal(getQtd())));
         this.vlrFrete = new SimpleObjectProperty<>(entradaProdutoProduto.vlrFreteProperty().getValue()
@@ -73,6 +92,14 @@ public class ProdutoEstoque implements Serializable {
                 .ultFreteProperty().setValue(vlrFreteProperty().getValue());
         entradaProdutoProduto.produtoProperty().getValue()
                 .ultImpostoSefazProperty().setValue(vlrImpostoProperty().getValue());
+    }
+
+    private void calculaNovoPrecoVenda() {
+        BigDecimal margem = produtoProperty().getValue().precoVendaProperty().getValue()
+                .divide(produtoProperty().getValue().precoCompraProperty().getValue(), 4, RoundingMode.HALF_UP);
+        produtoProperty().getValue().precoCompraProperty().setValue(vlrUnitarioProperty().getValue());
+        produtoProperty().getValue().precoVendaProperty().setValue(vlrUnitarioProperty().getValue()
+                .multiply(margem).setScale(4, RoundingMode.HALF_UP));
     }
 
     @Id
@@ -244,6 +271,15 @@ public class ProdutoEstoque implements Serializable {
 
     public void setDocEntradaChaveNFe(String docEntradaChaveNFe) {
         this.docEntradaChaveNFe.set(docEntradaChaveNFe);
+    }
+
+    @Transient
+    public ServiceAlertMensagem getAlertMensagem() {
+        return alertMensagem;
+    }
+
+    public void setAlertMensagem(ServiceAlertMensagem alertMensagem) {
+        this.alertMensagem = alertMensagem;
     }
 
     @Override

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sistema>
     <myLocale>pt_br</myLocale>
-    <timeOut>30</timeOut>
+    <timeOut>600</timeOut>
     <versao>2.01</versao>
     <sis>
         <connect_DB>
@@ -82,7 +82,7 @@
         <cPais>1058</cPais>
         <nPais>BRASIL</nPais>
         <CRT>3</CRT>
-        <infAdic>TOTAL R$ %s%s DADOS BANCARIOS PARA TRANSFERENCIA BANCO %s AG: %s C/C: %s</infAdic>
+        <infAdic>TOTAL R$ %s*t*%s*n*DADOS BANCARIOS PARA TRANSFERENCIA*n*BANCO %s AG: %s C/C: %s</infAdic>
         <infRespTec>
             <cnpj>08009246000136</cnpj>
             <xContato>THIAGO LEIROS MACEDO</xContato>

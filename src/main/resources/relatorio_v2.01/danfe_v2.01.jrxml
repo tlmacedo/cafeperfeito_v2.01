@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.9.0.final using JasperReports Library version 6.9.0-cb8f9004be492ccc537180b49c026951f4220bf3  -->
+<!-- Created with Jaspersoft Studio version 6.11.0.final using JasperReports Library version 6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
@@ -9,8 +9,7 @@
     <property name="ireport.zoom" value="1.5"/>
     <property name="ireport.x" value="0"/>
     <property name="ireport.y" value="0"/>
-    <property name="com.jaspersoft.studio.data.defaultdataadapter"
-              value="src/main/resources/relatorio/dtAdaptSIDTMDanfe.xml"/>
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="dtAdapter_v2.01.xml"/>
     <queryString language="xPath">
         <![CDATA[/nfeProc/NFe/infNFe/det]]>
     </queryString>
@@ -219,37 +218,37 @@
         <fieldDescription><![CDATA[prod/indTot]]></fieldDescription>
     </field>
     <field name="prodICMSorig" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/ICMS/descendant::orig]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/ICMS/descendant::orig]]></fieldDescription>
     </field>
     <field name="prodICMSvBC" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/ICMS/descendant::vBC]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/ICMS/descendant::vBC]]></fieldDescription>
     </field>
     <field name="prodICMSpICMS" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/ICMS/descendant::pICMS]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/ICMS/descendant::pICMS]]></fieldDescription>
     </field>
     <field name="prodICMSvICMS" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/ICMS/descendant::vICMS]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/ICMS/descendant::vICMS]]></fieldDescription>
     </field>
     <field name="prodICMSvBCST" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/ICMS/descendant::vBCST]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/ICMS/descendant::vBCST]]></fieldDescription>
     </field>
     <field name="prodICMSvICMSST" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/ICMS/descendant::vICMSST]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/ICMS/descendant::vICMSST]]></fieldDescription>
     </field>
     <field name="prodICMSCST" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/ICMS/descendant::CST]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/ICMS/descendant::CST]]></fieldDescription>
     </field>
     <field name="prodIPIpIPI" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/IPI/descendant::pIPI]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/IPI/descendant::pIPI]]></fieldDescription>
     </field>
     <field name="prodIPIvIPI" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/IPI/descendant::vIPI]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/IPI/descendant::vIPI]]></fieldDescription>
     </field>
     <field name="prodPISCST" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/PIS/descendant::CST]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/PIS/descendant::CST]]></fieldDescription>
     </field>
     <field name="prodCOFINSCST" class="java.lang.String">
-        <fieldDescription><![CDATA[imposto/COFINS/descendant::CST]]></fieldDescription>
+        <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/det/imposto/COFINS/descendant::CST]]></fieldDescription>
     </field>
     <field name="totICMSvBC" class="java.lang.String">
         <fieldDescription><![CDATA[/nfeProc/NFe/infNFe/total/ICMSTot/vBC]]></fieldDescription>
@@ -389,6 +388,10 @@
     <field name="protNFedigVal" class="java.lang.String">
         <fieldDescription><![CDATA[/nfeProc/protNFe/infProt/digVal]]></fieldDescription>
     </field>
+    <field name="cProd" class="java.lang.String">
+        <property name="net.sf.jasperreports.xpath.field.expression" value="child::text()"/>
+        <fieldDescription><![CDATA[child::text()]]></fieldDescription>
+    </field>
     <title>
         <band height="72" splitType="Stretch">
             <rectangle>
@@ -503,7 +506,7 @@
             <image scaleImage="RetainShape">
                 <reportElement stretchType="RelativeToBandHeight" x="4" y="4" width="51" height="51"
                                uuid="90c1af69-9cfa-4228-a24e-a9a3bb811757"/>
-                <imageExpression><![CDATA["/Users/thiagomacedo/Desktop/Logo Cafe Perfeito.png"]]></imageExpression>
+                <imageExpression><![CDATA["/Users/thiagomacedo/Desktop/LogoCafePerfeito.png"]]></imageExpression>
             </image>
             <textField>
                 <reportElement x="59" y="5" width="162" height="50" uuid="e95f12ae-ab80-4bea-8d26-60855f157884"/>
@@ -2153,7 +2156,7 @@ $F{transpVolpesoL}]]></textFieldExpression>
     </columnHeader>
     <detail>
         <band height="13" splitType="Stretch">
-            <textField isStretchWithOverflow="true">
+            <textField textAdjust="StretchHeight">
                 <reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="29" height="13"
                                uuid="89017837-4896-4a8a-bd79-ffdaf458970f"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2161,12 +2164,12 @@ $F{transpVolpesoL}]]></textFieldExpression>
                     <bottomPen lineWidth="0.25" lineStyle="Dotted"/>
                     <rightPen lineWidth="0.5"/>
                 </box>
-                <textElement verticalAlignment="Top">
+                <textElement textAlignment="Right" verticalAlignment="Top">
                     <font fontName="Times New Roman" size="7"/>
                 </textElement>
                 <textFieldExpression><![CDATA[$F{prodcProd}]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true">
+            <textField textAdjust="StretchHeight">
                 <reportElement stretchType="RelativeToBandHeight" x="29" y="0" width="153" height="13"
                                uuid="9efeac30-c49e-42c8-8dc7-f75a729d7c8e"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2180,7 +2183,7 @@ $F{transpVolpesoL}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[$F{prodxProd}]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true">
+            <textField textAdjust="StretchHeight">
                 <reportElement stretchType="RelativeToBandHeight" x="182" y="0" width="34" height="13"
                                uuid="f9f00bb5-0055-4146-8380-8f20d7e4e780"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2193,7 +2196,7 @@ $F{transpVolpesoL}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[$F{prodNCM}]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true">
+            <textField textAdjust="StretchHeight">
                 <reportElement stretchType="RelativeToBandHeight" x="216" y="0" width="17" height="13"
                                uuid="2617f62b-78f9-4207-beda-ce0816fff4a6"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2209,7 +2212,7 @@ $F{transpVolpesoL}]]></textFieldExpression>
 :
 $F{prodICMSCST}]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true">
+            <textField textAdjust="StretchHeight">
                 <reportElement stretchType="RelativeToBandHeight" x="233" y="0" width="21" height="13"
                                uuid="358bc33f-0ec3-4d89-82bf-fb9d7776c0f7"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2222,7 +2225,7 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[$F{prodCFOP}]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true">
+            <textField textAdjust="StretchHeight">
                 <reportElement stretchType="RelativeToBandHeight" x="254" y="0" width="22" height="13"
                                uuid="5dae0dc9-9e89-4e96-b001-a1c7a73ceb35"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2235,7 +2238,7 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[$F{produCom}]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.0000">
+            <textField textAdjust="StretchHeight" pattern="#,##0.00">
                 <reportElement stretchType="RelativeToBandHeight" x="306" y="0" width="39" height="13"
                                uuid="68cabe3b-67f5-4248-ab46-6aadc7eb9710"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2248,7 +2251,7 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[Double.parseDouble($F{prodvUnCom})]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.0000">
+            <textField textAdjust="StretchHeight" pattern="#,##0.0000">
                 <reportElement stretchType="RelativeToBandHeight" x="276" y="0" width="30" height="13"
                                uuid="2ccb25b4-a4ec-48ed-873f-625e2e9a9fb4"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2261,7 +2264,7 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[Double.parseDouble($F{prodqCom})]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.00">
+            <textField textAdjust="StretchHeight" pattern="#,##0.00">
                 <reportElement stretchType="RelativeToBandHeight" x="345" y="0" width="36" height="13"
                                uuid="4b8ee125-e2ce-4197-b0ea-2a45f29587fb"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2274,7 +2277,7 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[Double.parseDouble($F{prodvProd})]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement stretchType="RelativeToBandHeight" x="381" y="0" width="36" height="13"
                                uuid="26d768b3-38cb-4515-8eac-06288fba181a"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2287,7 +2290,7 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[Double.parseDouble($F{prodICMSvBC})]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement stretchType="RelativeToBandHeight" x="417" y="0" width="36" height="13"
                                uuid="195966ca-cdb1-464d-bca3-5dbe95a49a58"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2300,7 +2303,7 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[Double.parseDouble($F{prodICMSvICMS})]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement stretchType="RelativeToBandHeight" x="453" y="0" width="35" height="13"
                                uuid="344fa90f-6461-4465-ac06-61f72fdc9e01"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2313,7 +2316,7 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[Double.parseDouble($F{prodIPIvIPI})]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement stretchType="RelativeToBandHeight" x="488" y="0" width="21" height="13"
                                uuid="ab3d7f9b-15ca-473f-bbc6-f8237e71fc26"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2326,7 +2329,7 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <textFieldExpression><![CDATA[Double.parseDouble($F{prodICMSpICMS})]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+            <textField textAdjust="StretchHeight" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement stretchType="RelativeToBandHeight" x="509" y="0" width="21" height="13"
                                uuid="5b46f93c-37f7-4224-82c5-5416e220af03"/>
                 <box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
@@ -2430,14 +2433,15 @@ $F{prodICMSCST}]]></textFieldExpression>
                 </textElement>
                 <text><![CDATA[INFORMAÇÕES COMPLEMENTARES]]></text>
             </staticText>
-            <textField isStretchWithOverflow="true">
+            <textField textAdjust="ScaleFont">
                 <reportElement stretchType="RelativeToBandHeight" x="0" y="50" width="254" height="83"
                                uuid="222acb10-9efd-48ef-94fb-5224a91728a1"/>
                 <box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="4"/>
-                <textElement textAlignment="Justified">
+                <textElement textAlignment="Left">
                     <font fontName="Times New Roman" size="7"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$F{infAdicinfCpl}]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA[$F{infAdicinfCpl}.replace("*t*", "\t").replace("*T*", "\t").replace("*n*", "\n").replace("*N*", "\n")]]></textFieldExpression>
             </textField>
             <rectangle radius="3">
                 <reportElement x="255" y="43" width="275" height="90" uuid="18eb1909-a7e6-402c-be75-2d15ebe44095"/>

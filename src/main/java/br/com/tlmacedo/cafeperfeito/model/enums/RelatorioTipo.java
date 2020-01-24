@@ -9,8 +9,8 @@ import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONF
 
 public enum RelatorioTipo {
 
-    RECIBO(0, String.format("/relatorio/recibo_v%s.jasper", TCONFIG.getVersao())),
-    NFE(1, String.format("/relatorio/danfe_v%s.jasper", TCONFIG.getVersao()));
+    RECIBO(0, String.format("/relatorio_v2.01/recibo_v%s.jasper", TCONFIG.getVersao())),
+    NFE(1, String.format("/relatorio_v2.01/danfe_v%s.jasper", TCONFIG.getVersao()));
 
     private int cod;
     private String descricao;

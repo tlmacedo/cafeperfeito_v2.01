@@ -546,7 +546,7 @@ public class Produto implements Serializable, Cloneable {
     @Transient
     @JsonIgnore
     public String getCEAN() {
-        if (produtoCodigoBarraList != null)
+        if (produtoCodigoBarraList.size() > 0)
             return produtoCodigoBarraList.get(0).getCodigoBarra();
         return "";
     }

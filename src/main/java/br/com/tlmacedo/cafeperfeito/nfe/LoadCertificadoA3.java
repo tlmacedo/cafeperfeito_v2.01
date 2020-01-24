@@ -11,7 +11,6 @@ public class LoadCertificadoA3 {
 
     public LoadCertificadoA3() {
         try {
-
             setCertificates(new ServiceLoadCertificates());
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -7,14 +7,12 @@ import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
-import br.com.tlmacedo.cafeperfeito.service.ServiceUtilJSon;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -43,7 +41,7 @@ public class NotaFiscal {
     }
 
     public static void gerarNotaFiscal() throws Exception {
-        ServiceUtilJSon.printJsonFromObject(getSaidaProduto().getContasAReceber(), "NewNotaFiscal002:");
+        setEnviNfeVO(new EnviNfeVO());
 
         getEnviNfeVO().setVersao(TCONFIG.getNfe().getVersao());
         getEnviNfeVO().setIdLote(String.format("%015d", getSaidaProduto().idProperty().getValue()));
@@ -57,8 +55,8 @@ public class NotaFiscal {
 
         infNfeVO.setVersao(TCONFIG.getNfe().getVersao());
 
-        getSaidaProduto().getSaidaProdutoNfeList().stream()
-                .forEach(System.out::println);
+//        getSaidaProduto().getSaidaProdutoNfeList().stream()
+//                .forEach(System.out::println);
 
         setMyNfe(getSaidaProduto().getSaidaProdutoNfeList().stream().filter(saidaProdutoNfe -> !saidaProdutoNfe.isCancelada()).findFirst().orElse(null));
         IdeVO ideVO = newNfeIde();
@@ -204,10 +202,15 @@ public class NotaFiscal {
             infNfeVO.setCobr(cobrVO);
             FatVO fatVO = new FatVO();
             cobrVO.setFat(fatVO);
-            Recebimento rec;
-            if ((rec = getSaidaProduto().getContasAReceber().getRecebimentoList().stream().sorted(Comparator.comparing(Recebimento::getId).reversed())
-                    .findFirst().orElse(null)) != null)
-                fatVO.setnFat(rec.documentoProperty().getValue());
+            if (getSaidaProduto().getContasAReceber() != null) {
+                Recebimento rec;
+
+                if ((rec = getSaidaProduto().getContasAReceber().getRecebimentoList().stream().sorted(Comparator.comparing(Recebimento::getId).reversed())
+                        .findFirst().orElse(null)) != null)
+                    fatVO.setnFat(rec.documentoProperty().getValue());
+            } else {
+                fatVO.setnFat(getSaidaProduto().idProperty().getValue().toString());
+            }
 
             if (fatVO.getnFat().equals(""))
                 fatVO.setnFat(ideVO.getnNF());
@@ -305,13 +308,8 @@ public class NotaFiscal {
         ideVO.setMod(getMyNfe().getModelo().getDescricao());
         ideVO.setSerie(getMyNfe().serieProperty().getValue().toString());
         ideVO.setnNF(getMyNfe().numeroProperty().getValue().toString());
-        if (TCONFIG.getNfe().getTpAmb() == 2) {
-            ideVO.setDhEmi(LocalDateTime.now());
-            ideVO.setDhSaiEnt(LocalDateTime.now());
-        } else {
-            ideVO.setDhEmi(getMyNfe().dtHoraEmissaoProperty().getValue());
-            ideVO.setDhSaiEnt(getMyNfe().dtHoraSaidaProperty().getValue());
-        }
+        ideVO.setDhEmi(getMyNfe().dtHoraEmissaoProperty().getValue());
+        ideVO.setDhSaiEnt(getMyNfe().dtHoraSaidaProperty().getValue());
         ideVO.setTpNF(String.valueOf(TCONFIG.getNfe().getTpNF()));
         ideVO.setIdDest(String.valueOf(getMyNfe().getDestinoOperacao().getCod()));
         ideVO.setcMunFG(String.valueOf(TCONFIG.getInfLoja().getCMunFG()));

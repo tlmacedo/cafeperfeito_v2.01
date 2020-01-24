@@ -1,23 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<nfeProc versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe">
+<enviNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+    <idLote>000000000000110</idLote>
+    <indSinc>0</indSinc>
     <NFe>
-        <infNFe versao="4.00" Id="NFe13191108009246000136550010000005481201911194">
+        <infNFe Id="NFe13200108009246000136550010000008811202001230" versao="4.00">
             <ide>
                 <cUF>13</cUF>
-                <cNF>20191119</cNF>
+                <cNF>20200123</cNF>
                 <natOp>DENTRO DO ESTADO</natOp>
                 <mod>55</mod>
                 <serie>1</serie>
-                <nNF>548</nNF>
-                <dhEmi>2019-11-19T17:10:02-04:00</dhEmi>
-                <dhSaiEnt>2019-11-19T17:10:02-04:00</dhSaiEnt>
+                <nNF>881</nNF>
+                <dhEmi>2020-01-23T08:00:00-04:00</dhEmi>
+                <dhSaiEnt>2020-01-23T08:00:00-04:00</dhSaiEnt>
                 <tpNF>1</tpNF>
                 <idDest>1</idDest>
                 <cMunFG>1302603</cMunFG>
                 <tpImp>1</tpImp>
                 <tpEmis>1</tpEmis>
-                <cDV>4</cDV>
-                <tpAmb>2</tpAmb>
+                <cDV>0</cDV>
+                <tpAmb>1</tpAmb>
                 <finNFe>1</finNFe>
                 <indFinal>1</indFinal>
                 <indPres>3</indPres>
@@ -44,17 +45,16 @@
                 <CRT>3</CRT>
             </emit>
             <dest>
-                <CNPJ>60701190159200</CNPJ>
-                <xNome>ITAU UNIBANCO S.A. (AG 1677)</xNome>
+                <CNPJ>60701190057637</CNPJ>
+                <xNome>ITAU UNIBANCO S.A. (AG 0686)</xNome>
                 <enderDest>
-                    <xLgr>AV COSTA E SILVA</xLgr>
-                    <nro>393</nro>
-                    <xCpl>A</xCpl>
-                    <xBairro>CACHOEIRINHA</xBairro>
+                    <xLgr>AV FLORIANO PEIXOTO</xLgr>
+                    <nro>54</nro>
+                    <xBairro>CENTRO</xBairro>
                     <cMun>1302603</cMun>
                     <xMun>MANAUS</xMun>
                     <UF>AM</UF>
-                    <CEP>69065080</CEP>
+                    <CEP>69005070</CEP>
                     <cPais>1058</cPais>
                     <xPais>BRASIL</xPais>
                     <fone>1155822192</fone>
@@ -71,13 +71,163 @@
                     <CEST>1709602</CEST>
                     <CFOP>5102</CFOP>
                     <uCom>PCT</uCom>
-                    <qCom>2.0000</qCom>
+                    <qCom>4.0000</qCom>
                     <vUnCom>43.0000000000</vUnCom>
-                    <vProd>86.00</vProd>
+                    <vProd>172.00</vProd>
                     <cEANTrib>7898903647025</cEANTrib>
                     <uTrib>PCT</uTrib>
-                    <qTrib>2.0000</qTrib>
+                    <qTrib>4.0000</qTrib>
                     <vUnTrib>43.0000000000</vUnTrib>
+                    <indTot>1</indTot>
+                </prod>
+                <imposto>
+                    <ICMS>
+                        <ICMS60>
+                            <orig>0</orig>
+                            <CST>60</CST>
+                        </ICMS60>
+                    </ICMS>
+                    <PIS>
+                        <PISNT>
+                            <CST>06</CST>
+                        </PISNT>
+                    </PIS>
+                    <COFINS>
+                        <COFINSNT>
+                            <CST>06</CST>
+                        </COFINSNT>
+                    </COFINS>
+                </imposto>
+            </det>
+            <det nItem="2">
+                <prod>
+                    <cProd>906</cProd>
+                    <cEAN>7896224807098</cEAN>
+                    <xProd>CAFE MOIDO KIMIMO 250G</xProd>
+                    <NCM>09012100</NCM>
+                    <CEST>1709600</CEST>
+                    <CFOP>5102</CFOP>
+                    <uCom>PCT</uCom>
+                    <qCom>5.0000</qCom>
+                    <vUnCom>7.8000000000</vUnCom>
+                    <vProd>39.00</vProd>
+                    <cEANTrib>7896224807098</cEANTrib>
+                    <uTrib>PCT</uTrib>
+                    <qTrib>5.0000</qTrib>
+                    <vUnTrib>7.8000000000</vUnTrib>
+                    <indTot>1</indTot>
+                </prod>
+                <imposto>
+                    <ICMS>
+                        <ICMS60>
+                            <orig>0</orig>
+                            <CST>60</CST>
+                        </ICMS60>
+                    </ICMS>
+                    <PIS>
+                        <PISNT>
+                            <CST>06</CST>
+                        </PISNT>
+                    </PIS>
+                    <COFINS>
+                        <COFINSNT>
+                            <CST>06</CST>
+                        </COFINSNT>
+                    </COFINS>
+                </imposto>
+            </det>
+            <det nItem="3">
+                <prod>
+                    <cProd>401</cProd>
+                    <cEAN>7898215152347</cEAN>
+                    <xProd>LEITE EM PO INTEGRAL PIRACANJUBA 400G</xProd>
+                    <NCM>04022110</NCM>
+                    <CEST>1701200</CEST>
+                    <CFOP>5102</CFOP>
+                    <uCom>PCT</uCom>
+                    <qCom>5.0000</qCom>
+                    <vUnCom>13.5500000000</vUnCom>
+                    <vProd>67.75</vProd>
+                    <cEANTrib>7898215152347</cEANTrib>
+                    <uTrib>PCT</uTrib>
+                    <qTrib>5.0000</qTrib>
+                    <vUnTrib>13.5500000000</vUnTrib>
+                    <indTot>1</indTot>
+                </prod>
+                <imposto>
+                    <ICMS>
+                        <ICMS60>
+                            <orig>0</orig>
+                            <CST>60</CST>
+                        </ICMS60>
+                    </ICMS>
+                    <PIS>
+                        <PISNT>
+                            <CST>06</CST>
+                        </PISNT>
+                    </PIS>
+                    <COFINS>
+                        <COFINSNT>
+                            <CST>06</CST>
+                        </COFINSNT>
+                    </COFINS>
+                </imposto>
+            </det>
+            <det nItem="4">
+                <prod>
+                    <cProd>4801</cProd>
+                    <cEAN>7891021001885
+                    </cEAN>
+                    <xProd>FILTRO DE PAPEL MELITTA 102 C/ 30 UND</xProd>
+                    <NCM>48232099</NCM>
+                    <CEST>1400100</CEST>
+                    <CFOP>5102</CFOP>
+                    <uCom>CX</uCom>
+                    <qCom>3.0000</qCom>
+                    <vUnCom>7.3300000000</vUnCom>
+                    <vProd>21.99</vProd>
+                    <cEANTrib>7891021001885
+                    </cEANTrib>
+                    <uTrib>CX</uTrib>
+                    <qTrib>3.0000</qTrib>
+                    <vUnTrib>7.3300000000</vUnTrib>
+                    <indTot>1</indTot>
+                </prod>
+                <imposto>
+                    <ICMS>
+                        <ICMS60>
+                            <orig>0</orig>
+                            <CST>60</CST>
+                        </ICMS60>
+                    </ICMS>
+                    <PIS>
+                        <PISNT>
+                            <CST>06</CST>
+                        </PISNT>
+                    </PIS>
+                    <COFINS>
+                        <COFINSNT>
+                            <CST>06</CST>
+                        </COFINSNT>
+                    </COFINS>
+                </imposto>
+            </det>
+            <det nItem="5">
+                <prod>
+                    <cProd>3910</cProd>
+                    <cEAN>7898287990014</cEAN>
+                    <xProd>COPO DESCARTAVEL BRANCO MARATA 050 ML C/100 UND</xProd>
+                    <NCM>39241000</NCM>
+                    <CEST>1100900</CEST>
+                    <CFOP>5102</CFOP>
+                    <uCom>PCT</uCom>
+                    <qCom>2.0000</qCom>
+                    <vUnCom>5.9000000000</vUnCom>
+                    <vProd>11.80</vProd>
+                    <cEANTrib>7898287990014</cEANTrib>
+                    <uTrib>PCT</uTrib>
+                    <qTrib>2.0000</qTrib>
+                    <vUnTrib>5.9000000000</vUnTrib>
                     <indTot>1</indTot>
                 </prod>
                 <imposto>
@@ -112,7 +262,7 @@
                     <vST>0.00</vST>
                     <vFCPST>0.00</vFCPST>
                     <vFCPSTRet>0.00</vFCPSTRet>
-                    <vProd>86.00</vProd>
+                    <vProd>312.54</vProd>
                     <vFrete>0.00</vFrete>
                     <vSeg>0.00</vSeg>
                     <vDesc>0.00</vDesc>
@@ -122,7 +272,7 @@
                     <vPIS>0.00</vPIS>
                     <vCOFINS>0.00</vCOFINS>
                     <vOutro>0.00</vOutro>
-                    <vNF>86.00</vNF>
+                    <vNF>312.54</vNF>
                     <vTotTrib>0.00</vTotTrib>
                 </ICMSTot>
             </total>
@@ -131,27 +281,22 @@
             </transp>
             <cobr>
                 <fat>
-                    <nFat>191119003-02</nFat>
-                    <vOrig>86.00</vOrig>
+                    <nFat>110</nFat>
+                    <vOrig>312.54</vOrig>
                     <vDesc>0.00</vDesc>
-                    <vLiq>86.00</vLiq>
+                    <vLiq>312.54</vLiq>
                 </fat>
-                <dup>
-                    <nDup>001</nDup>
-                    <dVenc>2019-11-19</dVenc>
-                    <vDup>86.00</vDup>
-                </dup>
             </cobr>
             <pag>
                 <detPag>
                     <indPag>1</indPag>
                     <tPag>99</tPag>
-                    <vPag>86.00</vPag>
+                    <vPag>312.54</vPag>
                 </detPag>
             </pag>
             <infAdic>
-                <infCpl>TOTAL R$ 86,00 DT. VENC.: 19/11/2019 DADOS BANCARIOS PARA TRANSFERENCIA BANCO ITAU AG: 1677 C/C:
-                    35.456-3
+                <infCpl>TOTAL R$ 312,54*T*DT. VENC.: 23/01/2020*N*DADOS BANCARIOS PARA TRANSFERENCIA*N*BANCO ITAU AG:
+                    1677 C/C: 35.456-3
                 </infCpl>
             </infAdic>
             <infRespTec>
@@ -165,37 +310,60 @@
             <SignedInfo>
                 <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
                 <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-                <Reference URI="#NFe13191108009246000136550010000005481201911194">
+                <Reference URI="#NFe13200108009246000136550010000008811202001230">
                     <Transforms>
                         <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
                         <Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
                     </Transforms>
                     <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-                    <DigestValue>L+ca38LFHwd28JA17REJBxKyWSU=</DigestValue>
+                    <DigestValue>8DUB1Hl56Xg34rN3OKNzmdR1RLc=</DigestValue>
                 </Reference>
             </SignedInfo>
-            <SignatureValue>
-                X09bfIXa1oc5mH6IdyTEjUKAZftnUVHkxdjzO8PZkHWkANnvnzZZB7mHpQEl2jZyFUPfEGjwoljIUDBwhm9vVDzvPhwoYkDy13czkKOfoffWGNmR2VxhmNuBK+pgmHNIbzmxHxiOu+t9LnzzOF2GMRJsyteZSrN0XlecJ3kjMZLT9A7gOmcfnNWHnSwM5DB2RTXA3JI6v/XknGSZM6aWQmVFD8jZxwqPW2D8diSFiGQtLTiODhOZsPBI7NxDD1fv1xBuHCIEhZoGGGLAzfVmmG3Zt3dIx8kNIqtGI8U3g85hNbGPN8IMmPOalMWEnw8N5wY0xgSQ6+g8DQ279+CZMQ==
+            <SignatureValue>fw6iwXr7QDs1VmPuRXFhzw1/8K8Y7TddL0OUMV/zPGAcbt77gRR1PtZ7QzLP+UxqOsR6R2O14ps5&#13;
+                LvS1tON2333Hcak2dbK/cdUWRXf3CvqAa3yetMLSp0VSpVhEjXJ9p161O8ci//sZgQN41/3v7C0v&#13;
+                9JxvfDPjlYanacHvnubyT3mAdwrix4QpS/fLv/MbmcdaC+dJLNdZal38Uhfp+BzT18vcU7SnIvc+&#13;
+                daUEgJneE1b3MeC/Qetzz/ISu/4ej5v691Jr+VM40MtKQdyohB4KX1qrIPEbEBTQCNv3+P+r3zei&#13;
+                CO/uMQ2MNzwynruFXubE+r7AkUd0tKIvmw3c1w==
             </SignatureValue>
             <KeyInfo>
                 <X509Data>
-                    <X509Certificate>
-                        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
+                    <X509Certificate>MIIHiTCCBXGgAwIBAgIICoQvm0mPGV0wDQYJKoZIhvcNAQELBQAwdTELMAkGA1UEBhMCQlIxEzAR&#13;
+                        BgNVBAoMCklDUC1CcmFzaWwxNjA0BgNVBAsMLVNlY3JldGFyaWEgZGEgUmVjZWl0YSBGZWRlcmFs&#13;
+                        IGRvIEJyYXNpbCAtIFJGQjEZMBcGA1UEAwwQQUMgU0VSQVNBIFJGQiB2NTAeFw0xNzA0MTQwMTAw&#13;
+                        MDBaFw0yMDA0MTMwMTAwMDBaMIHIMQswCQYDVQQGEwJCUjELMAkGA1UECAwCQU0xDzANBgNVBAcM&#13;
+                        Bk1BTkFVUzETMBEGA1UECgwKSUNQLUJyYXNpbDE2MDQGA1UECwwtU2VjcmV0YXJpYSBkYSBSZWNl&#13;
+                        aXRhIEZlZGVyYWwgZG8gQnJhc2lsIC0gUkZCMRYwFAYDVQQLDA1SRkIgZS1DTlBKIEEzMRIwEAYD&#13;
+                        VQQLDAlBUiBTRVJBU0ExIjAgBgNVBAMMGVQgTCBNQUNFRE86MDgwMDkyNDYwMDAxMzYwggEiMA0G&#13;
+                        CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQD0Lj55e3PzyEojttL19OSmUpNRzv319K3YMTQ0qmx7&#13;
+                        1XxiDeG32TtP4y6yVp/YCN55oVZtmiRUWXzCbE4o93EkZxA7+CV/5Rb+tecroCoe5NilD1xcBxGz&#13;
+                        nfPonSKjCGS9XJF640qYNx13M+xL96Fn1q0WrKnjzxOcIBKZgMmLYk7CI8yyIaiI7ObbU6eYMfBw&#13;
+                        E9Iv6JdYM1UPkAWDr7WE4pjr2SwYp/udPrKrk6jPVmnMJMi9AdTkZAMysw0dn8/bSjKBB2XpPQn4&#13;
+                        LkX24kOGswP2sKIRBuqAScJbjex5sPpRRBtt8b8UaHdoihL4RZp0oNPWFBT9pMMSMejy5bApAgMB&#13;
+                        AAGjggLHMIICwzCBmQYIKwYBBQUHAQEEgYwwgYkwSAYIKwYBBQUHMAKGPGh0dHA6Ly93d3cuY2Vy&#13;
+                        dGlmaWNhZG9kaWdpdGFsLmNvbS5ici9jYWRlaWFzL3NlcmFzYXJmYnY1LnA3YjA9BggrBgEFBQcw&#13;
+                        AYYxaHR0cDovL29jc3AuY2VydGlmaWNhZG9kaWdpdGFsLmNvbS5ici9zZXJhc2FyZmJ2NTAJBgNV&#13;
+                        HRMEAjAAMB8GA1UdIwQYMBaAFOzxQVFXqOY66V6zoCL5CIq1OoePMHEGA1UdIARqMGgwZgYGYEwB&#13;
+                        AgMKMFwwWgYIKwYBBQUHAgEWTmh0dHA6Ly9wdWJsaWNhY2FvLmNlcnRpZmljYWRvZGlnaXRhbC5j&#13;
+                        b20uYnIvcmVwb3NpdG9yaW8vZHBjL2RlY2xhcmFjYW8tcmZiLnBkZjCBnQYDVR0fBIGVMIGSMEqg&#13;
+                        SKBGhkRodHRwOi8vd3d3LmNlcnRpZmljYWRvZGlnaXRhbC5jb20uYnIvcmVwb3NpdG9yaW8vbGNy&#13;
+                        L3NlcmFzYXJmYnY1LmNybDBEoEKgQIY+aHR0cDovL2xjci5jZXJ0aWZpY2Fkb3MuY29tLmJyL3Jl&#13;
+                        cG9zaXRvcmlvL2xjci9zZXJhc2FyZmJ2NS5jcmwwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQG&#13;
+                        CCsGAQUFBwMCBggrBgEFBQcDBDCBtgYDVR0RBIGuMIGrgRVUTC5NQUNFRE9ASE9UTUFJTC5DT02g&#13;
+                        HwYFYEwBAwKgFhMUVEhJQUdPIExFSVJPUyBNQUNFRE+gGQYFYEwBAwOgEBMOMDgwMDkyNDYwMDAx&#13;
+                        MzagPQYFYEwBAwSgNBMyMDIwNDE5ODE1MjMwOTU1MDIzMDAwMDAwMDAwMDAwMDAwMDAwMzc1NzI4&#13;
+                        MzE0U1NQU1CgFwYFYEwBAwegDhMMMDAwMDAwMDAwMDAwMA0GCSqGSIb3DQEBCwUAA4ICAQBdFa5n&#13;
+                        DROMbFFOvDv5cnOtJRonzQq93wECt8yBTXc8x83aV3hLqUgGOU52b8Ps2dMTIUn6MV5Un60DPA1k&#13;
+                        ZUvNTtjxb0mY27h3gB6gsexo1f7HuS2MgiBb0YeSrvSxNGBeqkGAQMuJDZ7vS33VmKzbse9v2Y+f&#13;
+                        I87xhnC71olrGxdl1y7+C6tgrijoxUztLpgISGFXlWbxKrdydp1Tj1RO6X6NvP46J0JxNAJkw2nC&#13;
+                        y5tn3+efnzQIQwqkaB7ZHNTPsE3+rvX0VwhI5xJQqjo2maA90O+V9yoaSb4vPeikoxlfcXBskerH&#13;
+                        XDLWdw5UVfUMw1R4LgzCgfR43/GBLDDy5Khet4joziAO709Fi2vYI3HWqDW6CeyvU2hGWaueZHIp&#13;
+                        N4o2YO8BH225AMjvVkLH3ivlVwJXrOFrbbtNAh83WgalaoqsygogLuFkZYwl2SmPrIDtsIAupI1V&#13;
+                        TZmTGN5tyHEmHrUEhtjJB6+MNYQjqHK7bnqNX+n2xYc9PdOKNgxkPic3fUKdEydgj9mN7W0KSXUB&#13;
+                        c8z2abE3dHd4KBxDVKuz5hgXLH6aV24BXJ7fatLl58jjsOD0R+7EJUk9UioMYnTZ9RoaVdYX099p&#13;
+                        AnY60wZ3QWoOJq8t+ZxXtHAgDZl1qFlMdycD+jFoTQKGOwBgUfUrD6OwuLCUyjgmauE66Q==
                     </X509Certificate>
                 </X509Data>
             </KeyInfo>
         </Signature>
     </NFe>
-    <protNFe versao="4.00">
-        <infProt>
-            <tpAmb>2</tpAmb>
-            <verAplic>AM4.00</verAplic>
-            <chNFe>13191108009246000136550010000005481201911194</chNFe>
-            <dhRecbto>2019-11-19T17:10:07-04:00</dhRecbto>
-            <nProt>113190007607248</nProt>
-            <digVal>L+ca38LFHwd28JA17REJBxKyWSU=</digVal>
-            <cStat>100</cStat>
-            <xMotivo>Autorizado o uso da NF-e</xMotivo>
-        </infProt>
-    </protNFe>
-</nfeProc>
+</enviNFe>

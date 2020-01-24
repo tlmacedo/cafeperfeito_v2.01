@@ -97,6 +97,9 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
                             ? String.format(" order by %s", orderBy) : ""
             );
             select = getConexao().getEntityManager().createQuery(sql);
+//            if (orderBy != null)
+//                if (orderBy.contains("LIMIT 1"))
+//                    return new ArrayList<>(select.getFirstResult());
             return select.getResultList();
         } catch (Exception ex) {
             ex.printStackTrace();

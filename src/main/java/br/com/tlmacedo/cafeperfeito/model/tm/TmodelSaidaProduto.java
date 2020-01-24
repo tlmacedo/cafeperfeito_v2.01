@@ -265,7 +265,7 @@ public class TmodelSaidaProduto {
                 break;
             case COMERCIALIZACAO:
                 saidaProdutoProduto.vlrBrutoProperty().setValue(saidaProdutoProduto.vlrUnitarioProperty().getValue()
-                        .multiply(BigDecimal.valueOf(saidaProdutoProduto.qtdProperty().getValue())).setScale(2));
+                        .multiply(BigDecimal.valueOf(saidaProdutoProduto.qtdProperty().getValue())).setScale(2, RoundingMode.HALF_UP));
                 if (saidaProdutoProduto.vlrDescontoProperty().getValue()
                         .compareTo(saidaProdutoProduto.vlrBrutoProperty().getValue().multiply(TCONFIG.getInfLoja().getDescMax())) > 0) {
                     saidaProdutoProduto.vlrDescontoProperty()
@@ -344,7 +344,11 @@ public class TmodelSaidaProduto {
                                         ? TipoCodigoCFOP.BONIFICACAO
                                         : ((condicoes.retiradaProperty().getValue() > 0)
                                         ? TipoCodigoCFOP.CONSUMO
-                                        : null);
+                                        : TipoCodigoCFOP.COMERCIALIZACAO);
+//                                System.out.printf("codigoCFOP(01): %s\n", codigoCFOP);
+//                                if (codigoCFOP == null)
+//                                    codigoCFOP = TipoCodigoCFOP.COMERCIALIZACAO;
+//                                System.out.printf("codigoCFOP(02): %s\n", codigoCFOP);
                                 switch (codigoCFOP) {
                                     case BONIFICACAO:
                                         saidaProdutosId.stream()
