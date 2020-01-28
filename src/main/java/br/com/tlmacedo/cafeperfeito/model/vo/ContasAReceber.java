@@ -29,11 +29,11 @@ public class ContasAReceber implements Serializable {
 
     private List<Recebimento> recebimentoList = new ArrayList<>();
 
-    private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlr = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrCredDeb = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> valorPago = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> valorSaldo = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrPago = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlrSaldo = new SimpleObjectProperty<>();
 
     public ContasAReceber() {
     }
@@ -53,7 +53,7 @@ public class ContasAReceber implements Serializable {
     }
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne//(fetch = FetchType.LAZY)
     public SaidaProduto getSaidaProduto() {
         return saidaProduto.get();
     }
@@ -107,6 +107,7 @@ public class ContasAReceber implements Serializable {
     }
 
     @CreationTimestamp
+    @Column(nullable = false)
     public LocalDateTime getDtCadastro() {
         return dtCadastro.get();
     }
@@ -119,8 +120,7 @@ public class ContasAReceber implements Serializable {
         this.dtCadastro.set(dtCadastro);
     }
 
-
-    @OneToMany(mappedBy = "aReceber", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "contasAReceber", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Recebimento> getRecebimentoList() {
         return recebimentoList;
     }
@@ -129,19 +129,21 @@ public class ContasAReceber implements Serializable {
         this.recebimentoList = recebimentoList;
     }
 
+    @JsonIgnore
     @Transient
-    public BigDecimal getVlrBruto() {
-        return vlrBruto.get();
+    public BigDecimal getVlr() {
+        return vlr.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrBrutoProperty() {
-        return vlrBruto;
+    public ObjectProperty<BigDecimal> vlrProperty() {
+        return vlr;
     }
 
-    public void setVlrBruto(BigDecimal vlrBruto) {
-        this.vlrBruto.set(vlrBruto);
+    public void setVlr(BigDecimal vlr) {
+        this.vlr.set(vlr);
     }
 
+    @JsonIgnore
     @Transient
     public BigDecimal getVlrCredDeb() {
         return vlrCredDeb.get();
@@ -155,6 +157,7 @@ public class ContasAReceber implements Serializable {
         this.vlrCredDeb.set(vlrCredDeb);
     }
 
+    @JsonIgnore
     @Transient
     public BigDecimal getVlrLiquido() {
         return vlrLiquido.get();
@@ -168,31 +171,34 @@ public class ContasAReceber implements Serializable {
         this.vlrLiquido.set(vlrLiquido);
     }
 
+    @JsonIgnore
     @Transient
-    public BigDecimal getValorPago() {
-        return valorPago.get();
+    public BigDecimal getVlrPago() {
+        return vlrPago.get();
     }
 
-    public ObjectProperty<BigDecimal> valorPagoProperty() {
-        return valorPago;
+    public ObjectProperty<BigDecimal> vlrPagoProperty() {
+        return vlrPago;
     }
 
-    public void setValorPago(BigDecimal valorPago) {
-        this.valorPago.set(valorPago);
+    public void setVlrPago(BigDecimal vlrPago) {
+        this.vlrPago.set(vlrPago);
     }
 
+    @JsonIgnore
     @Transient
-    public BigDecimal getValorSaldo() {
-        return valorSaldo.get();
+    public BigDecimal getVlrSaldo() {
+        return vlrSaldo.get();
     }
 
-    public ObjectProperty<BigDecimal> valorSaldoProperty() {
-        return valorSaldo;
+    public ObjectProperty<BigDecimal> vlrSaldoProperty() {
+        return vlrSaldo;
     }
 
-    public void setValorSaldo(BigDecimal valorSaldo) {
-        this.valorSaldo.set(valorSaldo);
+    public void setVlrSaldo(BigDecimal vlrSaldo) {
+        this.vlrSaldo.set(vlrSaldo);
     }
+
 
     @Override
     public String toString() {
@@ -203,11 +209,12 @@ public class ContasAReceber implements Serializable {
                 ", valor=" + valor +
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
-                ", vlrBruto=" + vlrBruto +
+                ", recebimentoList=" + recebimentoList +
+                ", vlr=" + vlr +
                 ", vlrCredDeb=" + vlrCredDeb +
                 ", vlrLiquido=" + vlrLiquido +
-                ", valorPago=" + valorPago +
-                ", valorSaldo=" + valorSaldo +
+                ", vlrPago=" + vlrPago +
+                ", vlrSaldo=" + vlrSaldo +
                 '}';
     }
 }

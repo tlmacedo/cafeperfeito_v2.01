@@ -35,7 +35,7 @@
         <class>br.com.tlmacedo.cafeperfeito.model.vo.Produto</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.ProdutoCodigoBarra</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.ProdutoEstoque</class>
-        <class>br.com.tlmacedo.cafeperfeito.model.vo.Recebimento</class>
+        <!--        <class>br.com.tlmacedo.cafeperfeito.model.vo.Recebimento</class>-->
         <class>br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe</class>
         <class>br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoProduto</class>
@@ -48,6 +48,8 @@
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
             <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
             <property name="hibernate.connection.url" value="jdbc:mysql://127.0.0.1:3306/cafeperfeito_v2.01"/>
+            <!--            <property name="hibernate.connection.url" value="jdbc:mysql://127.0.0.1:3306/cafeperfeito_v2.00"/>-->
+            <!--            <property name="hibernate.connection.url" value="jdbc:mysql://127.0.0.1:3306/cafeperfeito_v1.05"/>-->
             <property name="hibernate.connection.username" value="root"/>
             <property name="hibernate.connection.password" value="Tlm$487901"/>
 

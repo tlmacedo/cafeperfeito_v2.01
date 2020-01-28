@@ -280,7 +280,7 @@ public class TmodelEntradaProduto {
                 break;
             case COMERCIALIZACAO:
                 entradaProdutoProduto.vlrBrutoProperty().setValue(entradaProdutoProduto.vlrUnitarioProperty().getValue()
-                        .multiply(BigDecimal.valueOf(entradaProdutoProduto.qtdProperty().getValue())).setScale(2));
+                        .multiply(BigDecimal.valueOf(entradaProdutoProduto.qtdProperty().getValue())).setScale(2, RoundingMode.HALF_UP));
                 if (entradaProdutoProduto.vlrDescontoProperty().getValue()
                         .compareTo(entradaProdutoProduto.vlrBrutoProperty().getValue().multiply(new BigDecimal("0.15"))) > 0) {
                     entradaProdutoProduto.vlrDescontoProperty()

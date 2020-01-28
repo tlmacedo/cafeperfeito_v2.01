@@ -257,7 +257,7 @@ public class SaidaProdutoNfe implements Serializable {
         transportadorProperty().set(transportador);
     }
 
-    @Column(length = 60, nullable = false)
+    @Column(length = 10, nullable = false)
     public String getCobrancaNumero() {
         return cobrancaNumero.get();
     }
@@ -352,8 +352,7 @@ public class SaidaProdutoNfe implements Serializable {
         this.xmlProtNfe.set(xmlProtNfe);
     }
 
-    @Transient
-    @JsonIgnore
+    @Enumerated(EnumType.ORDINAL)
     public NfeImpressaoTpImp getImpressaoTpImp() {
         return impressaoTpImp.get();
     }
@@ -366,8 +365,7 @@ public class SaidaProdutoNfe implements Serializable {
         this.impressaoTpImp.set(impressaoTpImp);
     }
 
-    @Transient
-    @JsonIgnore
+    @Enumerated(EnumType.ORDINAL)
     public NfeImpressaoTpEmis getImpressaoTpEmis() {
         return impressaoTpEmis.get();
     }
@@ -380,8 +378,7 @@ public class SaidaProdutoNfe implements Serializable {
         this.impressaoTpEmis.set(impressaoTpEmis);
     }
 
-    @Transient
-    @JsonIgnore
+    @Enumerated(EnumType.ORDINAL)
     public NfeImpressaoFinNFe getImpressaoFinNFe() {
         return impressaoFinNFe.get();
     }

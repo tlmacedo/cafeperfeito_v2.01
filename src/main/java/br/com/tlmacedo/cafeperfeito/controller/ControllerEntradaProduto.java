@@ -8,6 +8,7 @@ import br.com.tlmacedo.cafeperfeito.model.tm.TmodelProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
+import br.com.tlmacedo.cafeperfeito.service.format.ServiceFormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewEntradaProduto;
 import br.inf.portalfiscal.xsd.cte.procCTe.CteProc;
 import br.inf.portalfiscal.xsd.cte.procCTe.TCTe;
@@ -289,7 +290,8 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                             getTpnCteDetalhe().setExpanded(!getTpnCteDetalhe().isExpanded());
                             break;
                         case F11:
-                            getTpnCteDetalheFiscal().setExpanded(!getTpnCteDetalheFiscal().isExpanded());
+                            if (getTpnCteDetalhe().isExpanded())
+                                getTpnCteDetalheFiscal().setExpanded(!getTpnCteDetalheFiscal().isExpanded());
                             break;
                         case F12:
                             fechar();
@@ -477,6 +479,17 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                 getTmodelEntradaProduto().totalLiquidoProperty()
         ));
 
+        getDtpNfeEmissao().focusedProperty().addListener((ov, o, n) -> {
+            ServiceFormatDataPicker.formatDataPicker(getDtpNfeEmissao(), n);
+        });
+
+        getDtpNfeEntrada().focusedProperty().addListener((ov, o, n) -> {
+            ServiceFormatDataPicker.formatDataPicker(getDtpNfeEntrada(), n);
+        });
+
+        getDtpCteEmissao().focusedProperty().addListener((ov, o, n) -> {
+            ServiceFormatDataPicker.formatDataPicker(getDtpCteEmissao(), n);
+        });
 
     }
 

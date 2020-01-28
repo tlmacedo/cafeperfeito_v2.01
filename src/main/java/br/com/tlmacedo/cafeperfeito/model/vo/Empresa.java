@@ -82,6 +82,7 @@ public class Empresa implements Serializable {
         this.id.set(id);
     }
 
+    @JsonIgnore
     @Column(length = 1, nullable = false)
     public boolean isLoja() {
         return loja.get();
@@ -95,6 +96,7 @@ public class Empresa implements Serializable {
         this.loja.set(loja);
     }
 
+    @JsonIgnore
     @Column(length = 1, nullable = false)
     public boolean isPessoaJuridica() {
         return pessoaJuridica.get();
@@ -108,6 +110,7 @@ public class Empresa implements Serializable {
         this.pessoaJuridica.set(pessoaJuridica);
     }
 
+    @JsonIgnore
     @Enumerated(EnumType.ORDINAL)
     public SituacaoCadastroEmpresa getSituacao() {
         return situacao;
@@ -117,6 +120,7 @@ public class Empresa implements Serializable {
         this.situacao = situacao;
     }
 
+    @JsonIgnore
     @Column(length = 14, nullable = false)
     public String getCnpj() {
         return cnpj.get();
@@ -130,6 +134,7 @@ public class Empresa implements Serializable {
         this.cnpj.set(cnpj);
     }
 
+    @JsonIgnore
     @Column(length = 14)
     public String getIe() {
         return ie.get();
@@ -169,6 +174,7 @@ public class Empresa implements Serializable {
         this.fantasia.set(fantasia);
     }
 
+    @JsonIgnore
     @Column(length = 1, nullable = false)
     public boolean isCliente() {
         return cliente.get();
@@ -182,6 +188,7 @@ public class Empresa implements Serializable {
         this.cliente.set(cliente);
     }
 
+    @JsonIgnore
     @Column(length = 1, nullable = false)
     public boolean isFornecedor() {
         return fornecedor.get();
@@ -195,6 +202,7 @@ public class Empresa implements Serializable {
         this.fornecedor.set(fornecedor);
     }
 
+    @JsonIgnore
     @Column(length = 1, nullable = false)
     public boolean isTransportadora() {
         return transportadora.get();
@@ -222,6 +230,7 @@ public class Empresa implements Serializable {
         this.usuarioCadastro.set(usuarioCadastro);
     }
 
+    @JsonIgnore
     @CreationTimestamp
     @Column(nullable = false)
     public LocalDateTime getDtCadastro() {
@@ -250,6 +259,7 @@ public class Empresa implements Serializable {
         this.usuarioAtualizacao.set(usuarioAtualizacao);
     }
 
+    @JsonIgnore
     @UpdateTimestamp
     public LocalDateTime getDtAtualizacao() {
         return dtAtualizacao.get();
@@ -263,6 +273,7 @@ public class Empresa implements Serializable {
         this.dtAtualizacao.set(dtAtualizacao);
     }
 
+    @JsonIgnore
     @Column(length = 1500)
     public String getObservacoes() {
         return observacoes.get();
@@ -276,6 +287,7 @@ public class Empresa implements Serializable {
         this.observacoes.set(observacoes);
     }
 
+    @JsonIgnore
     @Column(length = 19, scale = 4, nullable = false)
     public BigDecimal getLimite() {
         return limite.get();
@@ -289,6 +301,7 @@ public class Empresa implements Serializable {
         this.limite.set(limite);
     }
 
+    @JsonIgnore
     @Column(length = 3, nullable = false)
     public int getPrazo() {
         return prazo.get();
@@ -302,6 +315,7 @@ public class Empresa implements Serializable {
         this.prazo.set(prazo);
     }
 
+    @JsonIgnore
     @Column(length = 1, nullable = false)
     public boolean isPrazoDiaUtil() {
         return prazoDiaUtil.get();
@@ -315,6 +329,7 @@ public class Empresa implements Serializable {
         this.prazoDiaUtil.set(prazoDiaUtil);
     }
 
+    @JsonIgnore
     @Column(length = 9)
     public String getiSuframa() {
         return iSuframa.get();
@@ -328,6 +343,7 @@ public class Empresa implements Serializable {
         this.iSuframa.set(iSuframa);
     }
 
+    @JsonIgnore
     @Column(length = 15)
     public String getiMunicpipal() {
         return iMunicpipal.get();
@@ -382,6 +398,7 @@ public class Empresa implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public String getRazaoFantasia() {
         return String.format("%s (%s)",
                 razaoProperty().getValue(),
@@ -390,6 +407,7 @@ public class Empresa implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public BigDecimal getLimiteUtilizado() {
         return limiteUtilizado.get();
     }
@@ -403,6 +421,7 @@ public class Empresa implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public LocalDate getDtUltimoPedido() {
         return dtUltimoPedido.get();
     }
@@ -416,6 +435,7 @@ public class Empresa implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public BigDecimal getVlrUltimoPedido() {
         return vlrUltimoPedido.get();
     }
@@ -429,6 +449,7 @@ public class Empresa implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public int getQtdPedidos() {
         return qtdPedidos.get();
     }
@@ -442,6 +463,7 @@ public class Empresa implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public BigDecimal getVlrTickeMedio() {
         return vlrTickeMedio.get();
     }

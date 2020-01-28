@@ -1,6 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.NfeCteModelo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 
 import javax.persistence.*;
@@ -40,6 +41,7 @@ public class EntradaNfe implements Serializable {
         this.id.set(id);
     }
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     public EntradaProduto getEntradaProduto() {
         return entradaProduto.get();
@@ -105,7 +107,7 @@ public class EntradaNfe implements Serializable {
         this.modelo.set(modelo);
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     public Empresa getFornecedor() {
         return fornecedor.get();
     }
@@ -142,7 +144,7 @@ public class EntradaNfe implements Serializable {
         this.dtEntrada.set(dtEntrada);
     }
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     public EntradaFiscal getEntradaFiscal() {
         return entradaFiscal.get();
     }

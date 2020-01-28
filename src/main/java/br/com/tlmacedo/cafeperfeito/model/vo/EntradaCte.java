@@ -2,6 +2,7 @@ package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.CteTomadorServico;
 import br.com.tlmacedo.cafeperfeito.model.enums.NfeCteModelo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 
 import javax.persistence.*;
@@ -50,6 +51,7 @@ public class EntradaCte implements Serializable {
         this.id.set(id);
     }
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     public EntradaProduto getEntradaProduto() {
         return entradaProduto.get();
@@ -140,7 +142,7 @@ public class EntradaCte implements Serializable {
         this.dtEmissao.set(dtEmissao);
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne//(fetch = FetchType.LAZY)
     public Empresa getTransportadora() {
         return transportadora.get();
     }
@@ -153,7 +155,7 @@ public class EntradaCte implements Serializable {
         this.transportadora.set(transportadora);
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne//(fetch = FetchType.LAZY)
     public FiscalFreteSituacaoTributaria getSituacaoTributaria() {
         return situacaoTributaria.get();
     }
@@ -257,7 +259,7 @@ public class EntradaCte implements Serializable {
         this.vlrImpostoFrete.set(vlrImpostoFrete);
     }
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     public EntradaFiscal getEntradaFiscal() {
         return entradaFiscal.get();
     }

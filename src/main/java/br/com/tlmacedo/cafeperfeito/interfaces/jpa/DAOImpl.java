@@ -3,6 +3,7 @@ package br.com.tlmacedo.cafeperfeito.interfaces.jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.List;
@@ -97,9 +98,6 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
                             ? String.format(" order by %s", orderBy) : ""
             );
             select = getConexao().getEntityManager().createQuery(sql);
-//            if (orderBy != null)
-//                if (orderBy.contains("LIMIT 1"))
-//                    return new ArrayList<>(select.getFirstResult());
             return select.getResultList();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -115,7 +113,8 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
                     classe.getSimpleName(), campo);
             return (T) getConexao().getEntityManager().createQuery(sql).setMaxResults(1).getSingleResult();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            if (!(ex instanceof NoResultException))
+                ex.printStackTrace();
             return null;
         }
     }

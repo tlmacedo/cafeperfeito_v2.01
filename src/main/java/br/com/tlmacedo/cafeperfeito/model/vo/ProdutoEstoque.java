@@ -3,7 +3,6 @@ package br.com.tlmacedo.cafeperfeito.model.vo;
 import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
-import javafx.scene.control.ButtonType;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -63,26 +62,26 @@ public class ProdutoEstoque implements Serializable {
         this.lote = entradaProdutoProduto.loteProperty();
         this.dtValidade = entradaProdutoProduto.dtValidadeProperty();
         this.vlrUnitario = entradaProdutoProduto.vlrUnitarioProperty();
-        if (produtoProperty().getValue().precoCompraProperty().getValue().compareTo(vlrUnitarioProperty().getValue()) < 0) {
+        if (produtoProperty().getValue().precoCompraProperty().getValue().compareTo(vlrUnitarioProperty().getValue()) != 0) //{
             calculaNovoPrecoVenda();
-        } else if (produtoProperty().getValue().precoCompraProperty().getValue().compareTo(vlrUnitarioProperty().getValue()) > 0) {
-            setAlertMensagem(new ServiceAlertMensagem());
-            getAlertMensagem().setCabecalho("Preço diferente");
-            getAlertMensagem().setContentText("Preço de compra está menor que o do cadastro;\ndeseja abaixar o preço de venda para manter a mesma margem?");
-            ButtonType retorno = getAlertMensagem().alertYesNoCancel().get();
-            if (retorno == ButtonType.YES) {
-                calculaNovoPrecoVenda();
-            } else if (retorno == ButtonType.NO) {
-                produtoProperty().getValue().precoCompraProperty().setValue(vlrUnitarioProperty().getValue());
-            }
-        }
+//        } else if (produtoProperty().getValue().precoCompraProperty().getValue().compareTo(vlrUnitarioProperty().getValue()) > 0) {
+//            setAlertMensagem(new ServiceAlertMensagem());
+//            getAlertMensagem().setCabecalho("Preço diferente");
+//            getAlertMensagem().setContentText("Preço de compra está menor que o do cadastro;\ndeseja abaixar o preço de venda para manter a mesma margem?");
+//            ButtonType retorno = getAlertMensagem().alertYesNoCancel().get();
+//            if (retorno == ButtonType.YES) {
+//                calculaNovoPrecoVenda();
+//            } else if (retorno == ButtonType.NO) {
+//                produtoProperty().getValue().precoCompraProperty().setValue(vlrUnitarioProperty().getValue());
+//            }
+//        }
 
         this.vlrDesconto = new SimpleObjectProperty<>(entradaProdutoProduto.vlrDescontoProperty().getValue()
-                .divide(new BigDecimal(getQtd())));
+                .divide(new BigDecimal(getQtd()), RoundingMode.HALF_UP));
         this.vlrFrete = new SimpleObjectProperty<>(entradaProdutoProduto.vlrFreteProperty().getValue()
-                .divide(new BigDecimal(getQtd())));
+                .divide(new BigDecimal(getQtd()), RoundingMode.HALF_UP));
         this.vlrImposto = new SimpleObjectProperty<>(entradaProdutoProduto.vlrImpostoProperty().getValue()
-                .divide(new BigDecimal(getQtd())));
+                .divide(new BigDecimal(getQtd()), RoundingMode.HALF_UP));
         this.usuarioCadastro = UsuarioLogado.usuarioProperty();
         this.docEntrada = entradaProdutoProduto.entradaProdutoProperty().getValue()
                 .getEntradaNfe().numeroProperty();

@@ -1,6 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.controller;
 
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
+import br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert;
 import br.com.tlmacedo.cafeperfeito.model.dao.RecebimentoDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.EnumsTasks;
 import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoModalidade;
@@ -12,8 +13,8 @@ import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.Initializable;
@@ -33,11 +34,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.CHAR_KEY_SHIFT_CTRL_N;
-import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.CODE_KEY_SHIFT_CTRL_N;
-
 public class ControllerRecebimento implements Initializable, ModeloCafePerfeito {
-
 
     public AnchorPane painelViewRecebimento;
     public TitledPane tpnRecebimento;
@@ -51,40 +48,25 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     public Button btnOK;
     public Button btnCancel;
 
-    private Stage recebimentoStage;
-    private String nomeController = "recebimento";
+    private Stage stageRecebimento = ViewRecebimento.getStage();
     private List<EnumsTasks> enumsTasksList = new ArrayList<>();
+
+    private String nomeController = "recebimento";
     private ServiceAlertMensagem alertMensagem;
 
-    private ContasAReceber aReceber;
-    private Recebimento recebimento;
-    private RecebimentoDAO recebimentoDAO = new RecebimentoDAO();
+    private ObjectProperty<Recebimento> recebimento = new SimpleObjectProperty<>();
+    private ObjectProperty<Object> object = ViewRecebimento.objectProperty();
 
-    private BooleanProperty deshabilita = new SimpleBooleanProperty(true);
-
-    public ControllerRecebimento() {
-        setRecebimento(ViewRecebimento.getRecebimento());
-        if (getRecebimento() == null) {
-            setaReceber(ViewRecebimento.getaReceber());
-            getEnumsTasksList().add(EnumsTasks.ADD_RECEBIMENTO);
-        } else {
-            setRecebimento(ViewRecebimento.getRecebimento());
-            setaReceber(ViewRecebimento.getaReceber());
-            getEnumsTasksList().add(EnumsTasks.UPDATE_RECEBIMENTO);
-            setDeshabilita(false);
-        }
-    }
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public void initialize(URL location, ResourceBundle resources) {
         try {
             criarObjetos();
             preencherObjetos();
-            fatorarObjetos();
             escutarTecla();
+            fatorarObjetos();
             fieldsFormat();
             Platform.runLater(() -> {
-                setRecebimentoStage(ViewRecebimento.getStage());
                 getCboPagamentoModalidade().requestFocus();
             });
         } catch (Exception ex) {
@@ -100,54 +82,53 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     @Override
     public void fechar() {
         getEnumsTasksList().clear();
-        getRecebimentoStage().close();
+        getStageRecebimento().close();
     }
 
     @Override
     public void criarObjetos() throws Exception {
-
+        getEnumsTasksList().add(EnumsTasks.TABELA_CRIAR);
     }
 
     @Override
     public void preencherObjetos() throws Exception {
-        getCboPagamentoModalidade().setItems(Arrays.stream(PagamentoModalidade.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-        getCboSituacao().setItems(
-                Arrays.stream(PagamentoSituacao.values())
-                        .filter(pagamentoSituacao -> pagamentoSituacao.getCod() != 2)
-                        .collect(Collectors.toCollection(FXCollections::observableArrayList)));
+        getCboPagamentoModalidade().setItems(
+                Arrays.stream(PagamentoModalidade.values()).collect(Collectors.toCollection(FXCollections::observableArrayList))
+        );
 
-        if (getRecebimento() == null) {
+        getCboSituacao().setItems(
+                Arrays.stream(PagamentoSituacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList))
+        );
+
+        if (objectProperty().getValue() instanceof ContasAReceber) {
             getBtnPrintOK().setDefaultButton(true);
             getBtnOK().setDefaultButton(false);
 
-            setRecebimento(new Recebimento());
-            getRecebimento().setaReceber(getaReceber());
-            getRecebimento().setPagamentoModalidade(PagamentoModalidade.DINHEIRO);
-            getRecebimento().setPagamentoSituacao(PagamentoSituacao.PENDENTE);
-            getRecebimento().valorProperty().setValue(getaReceber().valorProperty().getValue()
-                    .subtract(getaReceber().getRecebimentoList().stream()
-                            .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)));
-            if (ViewRecebimento.getCredito() != null)
-                getRecebimento().valorProperty().setValue(
-                        getRecebimento().valorProperty().getValue().add(ViewRecebimento.getCredito()));
-            getRecebimento().dtPagamentoProperty().setValue(getaReceber().dtVencimentoProperty().getValue());
+            recebimentoProperty().setValue(new Recebimento(((ContasAReceber) objectProperty().getValue())));
+
+            recebimentoProperty().getValue().valorProperty().setValue(
+                    recebimentoProperty().getValue().valorProperty().getValue()
+                            .add(ViewRecebimento.credDebProperty().getValue())
+            );
+
+            recebimentoProperty().getValue().contasAReceberProperty().setValue((ContasAReceber) objectProperty().getValue());
+
+            ((ContasAReceber) objectProperty().getValue()).getRecebimentoList().add(recebimentoProperty().getValue());
         } else {
+            recebimentoProperty().setValue(((Recebimento) objectProperty().getValue()));
             getBtnPrintOK().setDefaultButton(false);
             getBtnOK().setDefaultButton(true);
         }
-        getTxtDocumento().setText(getRecebimento().documentoProperty().getValue());
-        getCboPagamentoModalidade().getSelectionModel().select(getRecebimento().getPagamentoModalidade());
-        getCboSituacao().getSelectionModel().select(getRecebimento().getPagamentoSituacao());
 
-//        if (getSaldo().compareTo(BigDecimal.ZERO) < 0)
-//            getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue().add(getSaldo()), 2));
-//        else
-        getTxtValor().setText(ServiceMascara.getMoeda(getRecebimento().valorProperty().getValue(), 2));
+        getTxtDocumento().setText(recebimentoProperty().getValue().documentoProperty().getValue());
+        getCboPagamentoModalidade().setValue(recebimentoProperty().getValue().pagamentoModalidadeProperty().getValue());
+        getCboSituacao().setValue(recebimentoProperty().getValue().pagamentoSituacaoProperty().getValue());
+        getTxtValor().setText(ServiceMascara.getMoeda(recebimentoProperty().getValue().valorProperty().getValue(), 2));
 
-        getDtpDtPagamento().setValue(getRecebimento().dtPagamentoProperty().getValue() != null
-                ? getRecebimento().dtPagamentoProperty().getValue()
-                : LocalDate.now());
-
+        getDtpDtPagamento().setValue(recebimentoProperty().getValue().dtPagamentoProperty().getValue() != null
+                ? recebimentoProperty().getValue().dtPagamentoProperty().getValue()
+                : LocalDate.now()
+        );
     }
 
     @Override
@@ -158,34 +139,30 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     @Override
     public void escutarTecla() throws Exception {
 
-        getPainelViewRecebimento().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (CODE_KEY_SHIFT_CTRL_N.match(keyEvent) || CHAR_KEY_SHIFT_CTRL_N.match(keyEvent)) {
+        getPainelViewRecebimento().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (Regex_Convert.CODE_KEY_SHIFT_CTRL_N.match(event) || Regex_Convert.CHAR_KEY_SHIFT_CTRL_N.match(event))
                 getNewDocumento();
-            }
         });
 
-        deshabilitaProperty().bind(Bindings.createBooleanBinding(() -> {
-                    if (getRecebimento() != null)
-                        getCboSituacao().getSelectionModel().select(getRecebimento().getPagamentoSituacao());
-                    if (getCboPagamentoModalidade().getValue().equals(PagamentoModalidade.AMOSTRA)
-                            || getCboPagamentoModalidade().getValue().equals(PagamentoModalidade.BONIFICACAO)
-                            || getCboPagamentoModalidade().getValue().equals(PagamentoModalidade.RETIRADA)) {
-                        getCboSituacao().getSelectionModel().select(PagamentoSituacao.QUITADO);
-                        return false;
-                    }
+        getBtnCancel().setOnAction(event -> fechar());
 
-                    return (
-                            ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2).compareTo(BigDecimal.ZERO) <= 0
-                                    && getDtpDtPagamento().getValue().compareTo(LocalDate.now().minusDays(7)) < 0
-                    );
-                }, getCboPagamentoModalidade().valueProperty(), getDtpDtPagamento().valueProperty(), getTxtValor().textProperty()
-        ));
+        getBtnOK().disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            if (recebimentoProperty().getValue() != null)
+                getCboSituacao().setValue(recebimentoProperty().getValue().pagamentoSituacaoProperty().getValue());
+            if (getCboPagamentoModalidade().getSelectionModel().getSelectedItem().equals(PagamentoModalidade.AMOSTRA)
+                    || getCboPagamentoModalidade().getSelectionModel().getSelectedItem().equals(PagamentoModalidade.BONIFICACAO)
+                    || getCboPagamentoModalidade().getSelectionModel().getSelectedItem().equals(PagamentoModalidade.RETIRADA)) {
+                getCboSituacao().setValue(PagamentoSituacao.QUITADO);
+                return false;
+            }
+            return (
+                    ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2)
+                            .compareTo(BigDecimal.ZERO) <= 0
+                            && getDtpDtPagamento().getValue().compareTo(LocalDate.now().minusDays(7)) < 0
+            );
+        }, getCboPagamentoModalidade().valueProperty(), getDtpDtPagamento().valueProperty(), getTxtValor().textProperty()));
 
-        getBtnCancel().setOnAction(actionEvent -> fechar());
-
-        getBtnOK().disableProperty().bind(deshabilitaProperty());
-
-        getBtnOK().setOnAction(actionEvent -> {
+        getBtnOK().setOnAction(event -> {
             try {
                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskRecebimento(), "recebimento"))
                     fechar();
@@ -196,89 +173,92 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             }
         });
 
-        getBtnPrintOK().setOnAction(actionEvent -> {
-            try {
-                getEnumsTasksList().add(EnumsTasks.RELATORIO_IMPRIME_RECIBO);
-                if (new ServiceSegundoPlano().executaListaTarefas(newTaskRecebimento(), "imprimir recibo"))
-                    fechar();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
-
-        getImgNewDocumento().addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> getNewDocumento());
-
-
+        getImgNewDocumento().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> getNewDocumento());
     }
+
 
     /**
      * Begin Booleans
      */
 
-    private boolean salvarRecebimento() {
+    private Task newTaskRecebimento() {
         try {
-            getRecebimentoDAO().transactionBegin();
-//            if (getaReceber() != null)
-            getRecebimento().setaReceber(getaReceber());
-            if (getaReceber().getRecebimentoList().stream().filter(recebimento1 -> recebimento1.idProperty().getValue().equals(getRecebimento().idProperty().getValue()))
-                    .count() == 0)
-                getaReceber().getRecebimentoList().add(getRecebimento());
-            getRecebimento().setPagamentoSituacao(getCboSituacao().getValue());
-            getRecebimento().documentoProperty().setValue(getTxtDocumento().getText());
-            if (getRecebimento().documentoProperty().getValue() == null)
-                getRecebimento().documentoProperty().setValue("");
-            getRecebimento().setPagamentoModalidade(getCboPagamentoModalidade().getValue());
-            getRecebimento().valorProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2));
-            getRecebimento().setUsuarioPagamento(null);
-            getRecebimento().setDtPagamento(null);
-            if (getRecebimento().getPagamentoSituacao().equals(PagamentoSituacao.QUITADO)) {
-                getRecebimento().setUsuarioPagamento(UsuarioLogado.getUsuario());
-                getRecebimento().dtPagamentoProperty().setValue(getDtpDtPagamento().getValue());
-            }
-            getRecebimento().setUsuarioCadastro(UsuarioLogado.getUsuario());
-            setRecebimento(getRecebimentoDAO().setTransactionPersist(getRecebimento()));
-            getRecebimentoDAO().transactionCommit();
+            int qtdTasks = getEnumsTasksList().size();
+            final int[] cont = {0};
+            return new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    updateMessage("Loading...");
+                    for (EnumsTasks tasks : getEnumsTasksList()) {
+                        updateProgress(cont[0]++, qtdTasks);
+                        Thread.sleep(200);
+                        updateMessage(String.format("%s%s", tasks.getDescricao(),
+                                tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
+                        switch (tasks) {
+                            case ADD_RECEBIMENTO:
+                            case UPDATE_RECEBIMENTO:
+                                if (guardarRecebimento()) {
+                                    if (!salvarRecebimento())
+                                        Thread.currentThread().interrupt();
+                                } else {
+                                    Thread.currentThread().interrupt();
+                                }
+                                break;
+                            case RELATORIO_IMPRIME_RECIBO:
+                                break;
+                        }
+                    }
+                    updateMessage("tarefa concluída!!!");
+                    updateProgress(qtdTasks, qtdTasks);
+                    return null;
+                }
+            };
         } catch (Exception ex) {
-            getRecebimentoDAO().transactionRollback();
+            ex.printStackTrace();
+            return null;
+        }
+//        return null;
+    }
+
+    private boolean guardarRecebimento() {
+        try {
+            recebimentoProperty().getValue().pagamentoSituacaoProperty().setValue(getCboSituacao().getValue());
+            recebimentoProperty().getValue().documentoProperty().setValue(
+                    getTxtDocumento().getText() == null
+                            ? "" : getTxtDocumento().getText().trim());
+            recebimentoProperty().getValue().pagamentoModalidadeProperty().setValue(getCboPagamentoModalidade().getValue());
+            recebimentoProperty().getValue().valorProperty().setValue(
+                    ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2)
+            );
+            recebimentoProperty().getValue().usuarioPagamentoProperty().setValue(null);
+            recebimentoProperty().getValue().dtPagamentoProperty().setValue(null);
+            if (recebimentoProperty().getValue().pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO)) {
+                recebimentoProperty().getValue().usuarioPagamentoProperty().setValue(UsuarioLogado.getUsuario());
+                recebimentoProperty().getValue().dtPagamentoProperty().setValue(getDtpDtPagamento().getValue());
+            }
+            if (objectProperty().getValue() instanceof ContasAReceber)
+                recebimentoProperty().getValue().usuarioCadastroProperty().setValue(UsuarioLogado.getUsuario());
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
         return true;
     }
 
-    private Task newTaskRecebimento() {
-        int qtdTasks = getEnumsTasksList().size();
-        final int[] cont = {1};
-        return new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                updateMessage("Loading...");
-                for (EnumsTasks tasks : getEnumsTasksList()) {
-                    updateProgress(cont[0]++, qtdTasks);
-                    Thread.sleep(200);
-                    updateMessage(String.format("%s%s", tasks.getDescricao(),
-                            tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
-                    switch (tasks) {
-                        case ADD_RECEBIMENTO:
-                        case UPDATE_RECEBIMENTO:
-                            if (!salvarRecebimento()) {
-                                Thread.currentThread().interrupt();
-                            }
-                            break;
-                        case RELATORIO_IMPRIME_RECIBO:
-                            if (!salvarRecebimento())
-                                Thread.currentThread().interrupt();
-                            new ServiceRecibo().imprimeRecibo(getRecebimento());
-                            break;
-                    }
-                }
-                updateMessage("tarefa concluída!!!");
-                updateProgress(qtdTasks, qtdTasks);
-                return null;
-            }
-        };
+    private boolean salvarRecebimento() {
+        RecebimentoDAO recebimentoDAO = new RecebimentoDAO();
+        try {
+            recebimentoDAO.transactionBegin();
+            recebimentoProperty().setValue(
+                    recebimentoDAO.setTransactionPersist(recebimentoProperty().getValue()));
+            recebimentoDAO.transactionCommit();
+        } catch (Exception ex) {
+            recebimentoDAO.transactionRollback();
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
     }
-
 
     /**
      * END Booleans
@@ -290,14 +270,18 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
      */
 
     private void getNewDocumento() {
-        getTxtDocumento().setText(ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class, getaReceber().dtCadastroProperty().getValue().toLocalDate()));
+        getTxtDocumento().setText(ServiceValidarDado
+                .gerarCodigoCafePerfeito(Recebimento.class,
+                        recebimentoProperty().getValue().contasAReceberProperty().getValue().dtCadastroProperty().getValue().toLocalDate())
+        );
     }
 
     /**
      * END Voids
      */
+
     /**
-     * Begin Getters e Setters
+     * Begin Getters and Setters
      */
 
     public AnchorPane getPainelViewRecebimento() {
@@ -307,7 +291,6 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
     public void setPainelViewRecebimento(AnchorPane painelViewRecebimento) {
         this.painelViewRecebimento = painelViewRecebimento;
     }
-
 
     public TitledPane getTpnRecebimento() {
         return tpnRecebimento;
@@ -323,6 +306,14 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
     public void setCboPagamentoModalidade(ComboBox<PagamentoModalidade> cboPagamentoModalidade) {
         this.cboPagamentoModalidade = cboPagamentoModalidade;
+    }
+
+    public ImageView getImgNewDocumento() {
+        return imgNewDocumento;
+    }
+
+    public void setImgNewDocumento(ImageView imgNewDocumento) {
+        this.imgNewDocumento = imgNewDocumento;
     }
 
     public TextField getTxtDocumento() {
@@ -381,56 +372,12 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
         this.btnCancel = btnCancel;
     }
 
-    public Stage getRecebimentoStage() {
-        return recebimentoStage;
+    public Stage getStageRecebimento() {
+        return stageRecebimento;
     }
 
-    public void setRecebimentoStage(Stage recebimentoStage) {
-        this.recebimentoStage = recebimentoStage;
-    }
-
-    public ServiceAlertMensagem getAlertMensagem() {
-        return alertMensagem;
-    }
-
-    public void setAlertMensagem(ServiceAlertMensagem alertMensagem) {
-        this.alertMensagem = alertMensagem;
-    }
-
-    public ContasAReceber getaReceber() {
-        return aReceber;
-    }
-
-    public void setaReceber(ContasAReceber aReceber) {
-        this.aReceber = aReceber;
-    }
-
-    public Recebimento getRecebimento() {
-        return recebimento;
-    }
-
-    public void setRecebimento(Recebimento recebimento) {
-        this.recebimento = recebimento;
-    }
-
-    public RecebimentoDAO getRecebimentoDAO() {
-        return recebimentoDAO;
-    }
-
-    public void setRecebimentoDAO(RecebimentoDAO recebimentoDAO) {
-        this.recebimentoDAO = recebimentoDAO;
-    }
-
-    public boolean isDeshabilita() {
-        return deshabilita.get();
-    }
-
-    public BooleanProperty deshabilitaProperty() {
-        return deshabilita;
-    }
-
-    public void setDeshabilita(boolean deshabilita) {
-        this.deshabilita.set(deshabilita);
+    public void setStageRecebimento(Stage stageRecebimento) {
+        this.stageRecebimento = stageRecebimento;
     }
 
     public List<EnumsTasks> getEnumsTasksList() {
@@ -449,16 +396,39 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
         this.nomeController = nomeController;
     }
 
-    public ImageView getImgNewDocumento() {
-        return imgNewDocumento;
+    public ServiceAlertMensagem getAlertMensagem() {
+        return alertMensagem;
     }
 
-    public void setImgNewDocumento(ImageView imgNewDocumento) {
-        this.imgNewDocumento = imgNewDocumento;
+    public void setAlertMensagem(ServiceAlertMensagem alertMensagem) {
+        this.alertMensagem = alertMensagem;
     }
 
-/**
- * END Getters e Setters
- */
+    public Recebimento getRecebimento() {
+        return recebimento.get();
+    }
 
+    public ObjectProperty<Recebimento> recebimentoProperty() {
+        return recebimento;
+    }
+
+    public void setRecebimento(Recebimento recebimento) {
+        this.recebimento.set(recebimento);
+    }
+
+    public Object getObject() {
+        return object.get();
+    }
+
+    public ObjectProperty<Object> objectProperty() {
+        return object;
+    }
+
+    public void setObject(Object object) {
+        this.object.set(object);
+    }
+
+    /**
+     * END Getters and Setters
+     */
 }

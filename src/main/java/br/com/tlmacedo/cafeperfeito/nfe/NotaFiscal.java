@@ -1,12 +1,10 @@
 package br.com.tlmacedo.cafeperfeito.nfe;
 
-import br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
-import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
@@ -14,7 +12,6 @@ import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
@@ -202,15 +199,15 @@ public class NotaFiscal {
             infNfeVO.setCobr(cobrVO);
             FatVO fatVO = new FatVO();
             cobrVO.setFat(fatVO);
-            if (getSaidaProduto().getContasAReceber() != null) {
-                Recebimento rec;
-
-                if ((rec = getSaidaProduto().getContasAReceber().getRecebimentoList().stream().sorted(Comparator.comparing(Recebimento::getId).reversed())
-                        .findFirst().orElse(null)) != null)
-                    fatVO.setnFat(rec.documentoProperty().getValue());
-            } else {
-                fatVO.setnFat(getSaidaProduto().idProperty().getValue().toString());
-            }
+//            if (getSaidaProduto().getContasAReceber() != null) {
+//                Recebimento rec;
+//
+//                if ((rec = getSaidaProduto().getContasAReceber().getRecebimentoList().stream().sorted(Comparator.comparing(Recebimento::getId).reversed())
+//                        .findFirst().orElse(null)) != null)
+//                    fatVO.setnFat(rec.documentoProperty().getValue());
+//            } else {
+            fatVO.setnFat(getSaidaProduto().idProperty().getValue().toString());
+//            }
 
             if (fatVO.getnFat().equals(""))
                 fatVO.setnFat(ideVO.getnNF());
@@ -218,13 +215,13 @@ public class NotaFiscal {
             fatVO.setvOrig(icmsTotVO.getvProd());
             fatVO.setvDesc(icmsTotVO.getvDesc());
             fatVO.setvLiq(icmsTotVO.getvNF());
-            if (getSaidaProduto().getContasAReceber() != null) {
-                DupVO dupVO = new DupVO();
-                cobrVO.getDupVOList().add(dupVO);
-                dupVO.setnDup("001");
-                dupVO.setdVenc(getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue());
-                dupVO.setvDup(fatVO.getvLiq());
-            }
+//            if (getSaidaProduto().getContasAReceber() != null) {
+//                DupVO dupVO = new DupVO();
+//                cobrVO.getDupVOList().add(dupVO);
+//                dupVO.setnDup("001");
+//                dupVO.setdVenc(getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue());
+//                dupVO.setvDup(fatVO.getvLiq());
+//            }
         }
         PagVO pagVO = new PagVO();
         infNfeVO.setPag(pagVO);
@@ -276,17 +273,17 @@ public class NotaFiscal {
             getMyNfe().setPagamentoIndicador(NfeCobrancaDuplicataPagamentoIndicador.PRAZO);
             getMyNfe().setPagamentoMeio(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
             getMyNfe().dtHoraEmissaoProperty().setValue(getSaidaProduto().getDtCadastro());
-            getMyNfe().setInformacaoAdicional(String.format(TCONFIG.getNfe().getInfAdic(),
-                    ServiceMascara.getMoeda(getSaidaProduto().getSaidaProdutoProdutoList().stream().map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
-                            .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
-                            .reduce(BigDecimal.ZERO, BigDecimal::add), 2),
-                    (getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue() != null)
-                            ? String.format(" dt. Venc.: %s",
-                            getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue().format(Regex_Convert.DTF_DATA))
-                            : "",
-                    TCONFIG.getInfLoja().getBanco(),
-                    TCONFIG.getInfLoja().getAgencia(), TCONFIG.getInfLoja().getContaCorrente())
-                    .toUpperCase());
+//            getMyNfe().setInformacaoAdicional(String.format(TCONFIG.getNfe().getInfAdic(),
+//                    ServiceMascara.getMoeda(getSaidaProduto().getSaidaProdutoProdutoList().stream().map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
+//                            .subtract(saidaProdutoProduto.vlrDescontoProperty().getValue()))
+//                            .reduce(BigDecimal.ZERO, BigDecimal::add), 2),
+//                    (getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue() != null)
+//                            ? String.format(" dt. Venc.: %s",
+//                            getSaidaProduto().getContasAReceber().dtVencimentoProperty().getValue().format(Regex_Convert.DTF_DATA))
+//                            : "",
+//                    TCONFIG.getInfLoja().getBanco(),
+//                    TCONFIG.getInfLoja().getAgencia(), TCONFIG.getInfLoja().getContaCorrente())
+//                    .toUpperCase());
             getMyNfe().setXmlAssinatura(null);
             getMyNfe().setXmlProtNfe(null);
             if (getSaidaProduto().getDtSaida().compareTo(getSaidaProduto().getDtCadastro().toLocalDate()) <= 0) {

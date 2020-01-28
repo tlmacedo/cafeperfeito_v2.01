@@ -27,8 +27,8 @@ public class SaidaProdutoProduto implements Serializable {
     private ObjectProperty<BigDecimal> vlrEntrada = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> vlrEntradaBruto = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> vlrUnitario = new SimpleObjectProperty<>(BigDecimal.ZERO);
-    private ObjectProperty<BigDecimal> vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> vlrDesconto = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
     private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private IntegerProperty estoque = new SimpleIntegerProperty();

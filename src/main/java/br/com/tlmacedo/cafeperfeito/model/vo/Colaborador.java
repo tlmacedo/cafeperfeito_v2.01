@@ -123,7 +123,7 @@ public class Colaborador implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Empresa getLojaAtivo() {
         return lojaAtivoProperty().get();
     }
@@ -157,19 +157,5 @@ public class Colaborador implements Serializable {
         this.imagemBack = imagemBack;
     }
 
-    @Override
-    public String toString() {
-        return "Colaborador{" +
-                "id=" + id +
-                ", nome=" + nome +
-                ", apelido=" + apelido +
-                ", ctps=" + ctps +
-                ", dtAdmisao=" + dtAdmisao +
-                ", salario=" + salario +
-                ", situacao=" + situacao +
-                ", lojaAtivo=" + lojaAtivo +
-                ", imagem=" + imagem +
-                ", imagemBack=" + imagemBack +
-                '}';
-    }
+
 }

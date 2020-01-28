@@ -48,8 +48,7 @@ public class SaidaProduto implements Serializable {
         this.id.set(id);
     }
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne//(fetch = FetchType.LAZY)
     public Empresa getCliente() {
         return cliente.get();
     }
@@ -76,7 +75,7 @@ public class SaidaProduto implements Serializable {
         this.vendedor.set(vendedor);
     }
 
-    @JsonIgnore
+    //@JsonIgnore
     @CreationTimestamp
     public LocalDateTime getDtCadastro() {
         return dtCadastro.get();
@@ -90,7 +89,7 @@ public class SaidaProduto implements Serializable {
         this.dtCadastro.set(dtCadastro);
     }
 
-    @JsonIgnore
+    //@JsonIgnore
     @Column(nullable = false)
     public LocalDate getDtSaida() {
         return dtSaida.get();
@@ -105,15 +104,6 @@ public class SaidaProduto implements Serializable {
     }
 
     @OneToMany(mappedBy = "saidaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<SaidaProdutoProduto> getSaidaProdutoProdutoList() {
-        return saidaProdutoProdutoList;
-    }
-
-    public void setSaidaProdutoProdutoList(List<SaidaProdutoProduto> saidaProdutoProdutoList) {
-        this.saidaProdutoProdutoList = saidaProdutoProdutoList;
-    }
-
-    @OneToMany(mappedBy = "saidaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<SaidaProdutoNfe> getSaidaProdutoNfeList() {
         return saidaProdutoNfeList;
     }
@@ -122,7 +112,16 @@ public class SaidaProduto implements Serializable {
         this.saidaProdutoNfeList = saidaProdutoNfeList;
     }
 
-    @OneToOne(mappedBy = "saidaProduto")
+    @OneToMany(mappedBy = "saidaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<SaidaProdutoProduto> getSaidaProdutoProdutoList() {
+        return saidaProdutoProdutoList;
+    }
+
+    public void setSaidaProdutoProdutoList(List<SaidaProdutoProduto> saidaProdutoProdutoList) {
+        this.saidaProdutoProdutoList = saidaProdutoProdutoList;
+    }
+
+    @OneToOne(mappedBy = "saidaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
     public ContasAReceber getContasAReceber() {
         return contasAReceber.get();
     }
@@ -135,12 +134,17 @@ public class SaidaProduto implements Serializable {
         this.contasAReceber.set(contasAReceber);
     }
 
-    //    public List<SaidaProdutoProduto> getSaidaProdutoProdutoList() {
-//        return saidaProdutoProdutoList;
+    //    @OneToOne(mappedBy = "saidaProduto")
+//    public ContasAReceber getContasAReceber() {
+//        return contasAReceber.get();
 //    }
 //
-//    public void setSaidaProdutoProdutoList(List<SaidaProdutoProduto> saidaProdutoProdutoList) {
-//        this.saidaProdutoProdutoList = saidaProdutoProdutoList;
+//    public ObjectProperty<ContasAReceber> contasAReceberProperty() {
+//        return contasAReceber;
+//    }
+//
+//    public void setContasAReceber(ContasAReceber contasAReceber) {
+//        this.contasAReceber.set(contasAReceber);
 //    }
 
 
@@ -148,11 +152,13 @@ public class SaidaProduto implements Serializable {
     public String toString() {
         return "SaidaProduto{" +
                 "id=" + id +
-//                ", cliente=" + cliente +
-//                ", vendedor=" + vendedor +
-//                ", dtCadastro=" + dtCadastro +
-//                ", dtSaida=" + dtSaida +
+                ", cliente=" + cliente +
+                ", vendedor=" + vendedor +
+                ", dtCadastro=" + dtCadastro +
+                ", dtSaida=" + dtSaida +
                 ", saidaProdutoProdutoList=" + saidaProdutoProdutoList +
+                ", saidaProdutoNfeList=" + saidaProdutoNfeList +
+                ", contasAReceber=" + contasAReceber +
                 '}';
     }
 }

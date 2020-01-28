@@ -1,10 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoEntrada;
-import br.com.tlmacedo.cafeperfeito.service.serialize_deserialize.EntradaProdutoDeserializer;
-import br.com.tlmacedo.cafeperfeito.service.serialize_deserialize.EntradaProdutoSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -26,8 +23,8 @@ import java.util.List;
 
 @Entity(name = "EntradaProduto")
 @Table(name = "entrada_produto")
-@JsonSerialize(using = EntradaProdutoSerializer.class)
-@JsonDeserialize(using = EntradaProdutoDeserializer.class)
+//@JsonSerialize(using = EntradaProdutoSerializer.class)
+//@JsonDeserialize(using = EntradaProdutoDeserializer.class)
 public class EntradaProduto implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -74,7 +71,7 @@ public class EntradaProduto implements Serializable {
         this.situacao.set(situacao);
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne
     public Empresa getLoja() {
         return loja.get();
     }
@@ -87,6 +84,7 @@ public class EntradaProduto implements Serializable {
         this.loja.set(loja);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro.get();
@@ -113,7 +111,7 @@ public class EntradaProduto implements Serializable {
         this.dtCadastro.set(dtCadastro);
     }
 
-    @OneToOne(mappedBy = "entradaProduto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "entradaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
     public EntradaNfe getEntradaNfe() {
         return entradaNfe.get();
     }
@@ -126,7 +124,7 @@ public class EntradaProduto implements Serializable {
         this.entradaNfe.set(entradaNfe);
     }
 
-    @OneToOne(mappedBy = "entradaProduto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "entradaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
     public EntradaCte getEntradaCte() {
         return entradaCte.get();
     }
@@ -139,7 +137,7 @@ public class EntradaProduto implements Serializable {
         this.entradaCte.set(entradaCte);
     }
 
-    @OneToMany(mappedBy = "entradaProduto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "entradaProduto", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<EntradaProdutoProduto> getEntradaProdutoProdutoList() {
         return entradaProdutoProdutoList;
     }
@@ -147,6 +145,19 @@ public class EntradaProduto implements Serializable {
     public void setEntradaProdutoProdutoList(List<EntradaProdutoProduto> entradaProdutoProdutoList) {
         this.entradaProdutoProdutoList = entradaProdutoProdutoList;
     }
+
+//    @Override
+//    public String toString() {
+//        return "EntradaProduto{" +
+//                "id=" + id +
+//                ", situacao=" + situacao +
+//                ", loja=" + loja +
+//                ", usuarioCadastro=" + usuarioCadastro +
+//                ", dtCadastro=" + dtCadastro +
+//                ", entradaProdutoProdutoList=" + entradaProdutoProdutoList +
+//                '}';
+//    }
+
 
     @Override
     public String toString() {
@@ -156,6 +167,8 @@ public class EntradaProduto implements Serializable {
                 ", loja=" + loja +
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
+                ", entradaNfe=" + entradaNfe +
+                ", entradaCte=" + entradaCte +
                 ", entradaProdutoProdutoList=" + entradaProdutoProdutoList +
                 '}';
     }

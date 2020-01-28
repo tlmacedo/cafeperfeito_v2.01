@@ -18,10 +18,10 @@ public class Recebimento implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private ObjectProperty<ContasAReceber> aReceber = new SimpleObjectProperty<>();
-    private PagamentoSituacao pagamentoSituacao;
+    private ObjectProperty<ContasAReceber> contasAReceber = new SimpleObjectProperty<>();
+    private ObjectProperty<PagamentoSituacao> pagamentoSituacao = new SimpleObjectProperty<>();
     private StringProperty documento = new SimpleStringProperty();
-    private PagamentoModalidade pagamentoModalidade;
+    private ObjectProperty<PagamentoModalidade> pagamentoModalidade = new SimpleObjectProperty<>();
     private ObjectProperty<BigDecimal> valor = new SimpleObjectProperty<>();
 
     private ObjectProperty<Usuario> usuarioPagamento = new SimpleObjectProperty<>();
@@ -33,6 +33,20 @@ public class Recebimento implements Serializable {
     private ObjectProperty<Empresa> emissorRecibo = new SimpleObjectProperty<>();
 
     public Recebimento() {
+    }
+
+    public Recebimento(ContasAReceber contasAReceber) {
+        this.contasAReceber = new SimpleObjectProperty<>(contasAReceber);
+        this.pagamentoSituacao = new SimpleObjectProperty<>(PagamentoSituacao.PENDENTE);
+        this.documento = new SimpleStringProperty("");
+        this.pagamentoModalidade = new SimpleObjectProperty<>(PagamentoModalidade.DINHEIRO);
+        this.valor = new SimpleObjectProperty<>(
+                contasAReceber.valorProperty().getValue()
+                        .subtract(contasAReceber.getRecebimentoList().stream()
+                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add))
+        );
+        this.usuarioPagamento = new SimpleObjectProperty<>(UsuarioLogado.getUsuario());
+        this.dtPagamento = new SimpleObjectProperty<>(contasAReceber.dtVencimentoProperty().getValue());
     }
 
     @Id
@@ -51,25 +65,29 @@ public class Recebimento implements Serializable {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    public ContasAReceber getaReceber() {
-        return aReceber.get();
+    public ContasAReceber getContasAReceber() {
+        return contasAReceber.get();
     }
 
-    public ObjectProperty<ContasAReceber> aReceberProperty() {
-        return aReceber;
+    public ObjectProperty<ContasAReceber> contasAReceberProperty() {
+        return contasAReceber;
     }
 
-    public void setaReceber(ContasAReceber aReceber) {
-        this.aReceber.set(aReceber);
+    public void setContasAReceber(ContasAReceber contasAReceber) {
+        this.contasAReceber.set(contasAReceber);
     }
 
     @Enumerated(EnumType.ORDINAL)
     public PagamentoSituacao getPagamentoSituacao() {
+        return pagamentoSituacao.get();
+    }
+
+    public ObjectProperty<PagamentoSituacao> pagamentoSituacaoProperty() {
         return pagamentoSituacao;
     }
 
     public void setPagamentoSituacao(PagamentoSituacao pagamentoSituacao) {
-        this.pagamentoSituacao = pagamentoSituacao;
+        this.pagamentoSituacao.set(pagamentoSituacao);
     }
 
     @Column(length = 18, nullable = false)
@@ -87,11 +105,15 @@ public class Recebimento implements Serializable {
 
     @Enumerated(EnumType.ORDINAL)
     public PagamentoModalidade getPagamentoModalidade() {
+        return pagamentoModalidade.get();
+    }
+
+    public ObjectProperty<PagamentoModalidade> pagamentoModalidadeProperty() {
         return pagamentoModalidade;
     }
 
     public void setPagamentoModalidade(PagamentoModalidade pagamentoModalidade) {
-        this.pagamentoModalidade = pagamentoModalidade;
+        this.pagamentoModalidade.set(pagamentoModalidade);
     }
 
     @Column(length = 19, scale = 4, nullable = false)
@@ -161,6 +183,7 @@ public class Recebimento implements Serializable {
     }
 
     @Transient
+    @JsonIgnore
     public Empresa getEmissorRecibo() {
         return emissorRecibo.get();
     }
@@ -177,7 +200,7 @@ public class Recebimento implements Serializable {
     public String toString() {
         return "Recebimento{" +
                 "id=" + id +
-                ", aReceber=" + aReceber +
+                ", contasAReceber=" + contasAReceber +
                 ", pagamentoSituacao=" + pagamentoSituacao +
                 ", documento=" + documento +
                 ", pagamentoModalidade=" + pagamentoModalidade +

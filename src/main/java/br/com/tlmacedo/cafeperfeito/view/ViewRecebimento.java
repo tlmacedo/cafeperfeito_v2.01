@@ -1,8 +1,8 @@
 package br.com.tlmacedo.cafeperfeito.view;
 
-import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
-import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.service.ServiceOpenView;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,26 +19,21 @@ import static javafx.stage.StageStyle.UNDECORATED;
 public class ViewRecebimento {
 
     private static Stage stage;
-    private static ContasAReceber aReceber;
-    private static Recebimento recebimento;
-    private static BigDecimal credito;
+    private static ObjectProperty<Object> object = new SimpleObjectProperty<>();
+    private static ObjectProperty<BigDecimal> credDeb = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
-    public void openViewRecebimento(Recebimento recebimento) {
-        setRecebimento(recebimento);
-        setaReceber(recebimento.aReceberProperty().getValue());
+    public ViewRecebimento() {
+    }
+
+    public void openViewRecebimento(Object object) {
+        objectProperty().setValue(object);
         openViewRecebimento();
     }
 
-    public void openViewRecebimento(ContasAReceber aReceber, BigDecimal credito) {
-        setCredito(credito);
-        openViewRecebimento(aReceber);
-    }
-
-    public void openViewRecebimento(ContasAReceber aReceber) {
-        setaReceber(aReceber);
-        setRecebimento(null);
-        openViewRecebimento();
-    }
+//    public void openViewRecebimento(Object object, BigDecimal credDeb){
+//        credDebProperty().setValue(credDeb);
+//        openViewRecebimento(object);
+//    }
 
     public void openViewRecebimento() {
         setStage(new Stage());
@@ -55,8 +50,8 @@ public class ViewRecebimento {
         getStage().setResizable(false);
         getStage().setScene(scene);
         getStage().initStyle(UNDECORATED);
-        getStage().setTitle(TCONFIG.getFxml().getRecebimento().getTitulo());
-        getStage().getIcons().setAll(new Image(getClass().getResource(TCONFIG.getFxml().getRecebimento().getIcone()).toString()));
+        getStage().setTitle(TCONFIG.getFxml().getLogin().getTitulo());
+        getStage().getIcons().setAll(new Image(getClass().getResource(TCONFIG.getFxml().getLogin().getIcone()).toString()));
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().setAll(getClass().getResource(TCONFIG.getPersonalizacao().getStyleSheets()).toString());
 
@@ -71,27 +66,27 @@ public class ViewRecebimento {
         ViewRecebimento.stage = stage;
     }
 
-    public static ContasAReceber getaReceber() {
-        return aReceber;
+    public static Object getObject() {
+        return object.get();
     }
 
-    public static void setaReceber(ContasAReceber aReceber) {
-        ViewRecebimento.aReceber = aReceber;
+    public static ObjectProperty<Object> objectProperty() {
+        return object;
     }
 
-    public static Recebimento getRecebimento() {
-        return recebimento;
+    public static void setObject(Object object) {
+        ViewRecebimento.object.set(object);
     }
 
-    public static void setRecebimento(Recebimento recebimento) {
-        ViewRecebimento.recebimento = recebimento;
+    public static BigDecimal getCredDeb() {
+        return credDeb.get();
     }
 
-    public static BigDecimal getCredito() {
-        return credito;
+    public static ObjectProperty<BigDecimal> credDebProperty() {
+        return credDeb;
     }
 
-    public static void setCredito(BigDecimal credito) {
-        ViewRecebimento.credito = credito;
+    public static void setCredDeb(BigDecimal credDeb) {
+        ViewRecebimento.credDeb.set(credDeb);
     }
 }

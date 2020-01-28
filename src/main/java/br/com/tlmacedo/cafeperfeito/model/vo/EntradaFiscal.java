@@ -64,10 +64,11 @@ public class EntradaFiscal implements Serializable {
         this.origem.set(origem);
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    public FiscalTributosSefazAm getTributosSefazAm() {
-        return tributosSefazAm.get();
-    }
+//    @JsonIgnore
+@ManyToOne//(fetch = FetchType.LAZY)
+public FiscalTributosSefazAm getTributosSefazAm() {
+    return tributosSefazAm.get();
+}
 
     public ObjectProperty<FiscalTributosSefazAm> tributosSefazAmProperty() {
         return tributosSefazAm;

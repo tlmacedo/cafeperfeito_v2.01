@@ -12,6 +12,8 @@ import br.com.tlmacedo.cafeperfeito.nfe.NFeXmlAssinar;
 import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
+import br.com.tlmacedo.cafeperfeito.service.format.ServiceFormatDataPicker;
+import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import br.com.tlmacedo.cafeperfeito.view.ViewSaidaProduto;
 import br.com.tlmacedo.nfe.service.*;
 import br.inf.portalfiscal.xsd.nfe.consReciNFe.TConsReciNFe;
@@ -296,6 +298,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 getEnumsTasksList().add(EnumsTasks.SALVAR_ENT_SAIDA);
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
 
+                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto(), "saidaProduto");
+                                    new ViewRecebimento().openViewRecebimento(getSaidaProduto().contasAReceberProperty().getValue());
+
                                     if (getSaidaProduto().getSaidaProdutoNfeList().size() > 0)
                                         gerarDanfe();
 
@@ -437,6 +442,22 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             if (n == null)
                 n = "";
             getTxaNfeInformacoesAdicionais().setText(n);
+        });
+
+        getDtpDtSaida().focusedProperty().addListener((ov, o, n) -> {
+            ServiceFormatDataPicker.formatDataPicker(getDtpDtSaida(), n);
+        });
+
+        getDtpDtVencimento().focusedProperty().addListener((ov, o, n) -> {
+            ServiceFormatDataPicker.formatDataPicker(getDtpDtVencimento(), n);
+        });
+
+        getDtpNfeDadosDtSaida().focusedProperty().addListener((ov, o, n) -> {
+            ServiceFormatDataPicker.formatDataPicker(getDtpNfeDadosDtSaida(), n);
+        });
+
+        getDtpNfeDadosDtEmissao().focusedProperty().addListener((ov, o, n) -> {
+            ServiceFormatDataPicker.formatDataPicker(getDtpNfeDadosDtEmissao(), n);
         });
 
         //getCboNfeTransporteModFrete().disableProperty().bind(getCboNfeTransporteModFrete().selectionModelProperty().isEqualTo(NfeTransporteModFrete.REMETENTE));
@@ -675,9 +696,16 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     )
                     );
                 });
-//        SaidaProdutoNfe lastSaida = new SaidaProdutoNfeDAO().getLast(SaidaProdutoNfe.class, "numero");
-//        ServiceUtilJSon.printJsonFromObject(lastSaida, "ultimaSaida");
-        nfeLastNumberProperty().setValue(new SaidaProdutoNfeDAO().getLast(SaidaProdutoNfe.class, "numero").numeroProperty().getValue());
+
+        Integer nLast = 0;
+        try {
+            nLast = new SaidaProdutoNfeDAO().getLast(SaidaProdutoNfe.class, "numero").numeroProperty().getValue();
+        } catch (Exception ex) {
+            if (!(ex instanceof NullPointerException))
+                ex.printStackTrace();
+            nLast = 0;
+        }
+        nfeLastNumberProperty().setValue(nLast);
     }
 
     private void exibirEmpresaDetalhe(Empresa empresa) {
@@ -850,6 +878,16 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     }
 
+    private void salvarContasAReceber() {
+        ContasAReceber contasAReceber = new ContasAReceber();
+        contasAReceber.saidaProdutoProperty().setValue(getSaidaProduto());
+        getSaidaProduto().contasAReceberProperty().setValue(contasAReceber);
+
+        contasAReceber.dtVencimentoProperty().setValue(getDtpDtVencimento().getValue());
+        contasAReceber.valorProperty().setValue(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2));
+        contasAReceber.usuarioCadastroProperty().setValue(UsuarioLogado.getUsuario());
+    }
+
     /**
      * END voids
      */
@@ -980,20 +1018,21 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private boolean salvarSaidaProduto() {
-        boolean retorno;
         try {
             setSaidaProdutoDAO(new SaidaProdutoDAO());
             getSaidaProdutoDAO().transactionBegin();
-            retorno = getTmodelSaidaProduto().baixarEstoque();
+            if (!getTmodelSaidaProduto().baixarEstoque()) return false;
+            salvarContasAReceber();
             saidaProdutoProperty().setValue(getSaidaProdutoDAO().setTransactionPersist(saidaProdutoProperty().getValue()));
             getSaidaProdutoDAO().transactionCommit();
             salvarFichaKardexList();
+
         } catch (Exception ex) {
             ex.printStackTrace();
             getSaidaProdutoDAO().transactionRollback();
-            retorno = false;
+            return false;
         }
-        return retorno;
+        return true;
     }
 
     private boolean salvarFichaKardexList() {
