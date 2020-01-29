@@ -114,10 +114,12 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             recebimentoProperty().getValue().contasAReceberProperty().setValue((ContasAReceber) objectProperty().getValue());
 
             ((ContasAReceber) objectProperty().getValue()).getRecebimentoList().add(recebimentoProperty().getValue());
+            getEnumsTasksList().add(EnumsTasks.ADD_RECEBIMENTO);
         } else {
             recebimentoProperty().setValue(((Recebimento) objectProperty().getValue()));
             getBtnPrintOK().setDefaultButton(false);
             getBtnOK().setDefaultButton(true);
+            getEnumsTasksList().add(EnumsTasks.UPDATE_RECEBIMENTO);
         }
 
         getTxtDocumento().setText(recebimentoProperty().getValue().documentoProperty().getValue());
@@ -217,7 +219,6 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             ex.printStackTrace();
             return null;
         }
-//        return null;
     }
 
     private boolean guardarRecebimento() {

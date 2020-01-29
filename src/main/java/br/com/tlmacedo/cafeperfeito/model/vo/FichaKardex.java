@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -113,6 +114,7 @@ public class FichaKardex implements Serializable {
         this.id.set(id);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Produto getProduto() {
         return produto.get();

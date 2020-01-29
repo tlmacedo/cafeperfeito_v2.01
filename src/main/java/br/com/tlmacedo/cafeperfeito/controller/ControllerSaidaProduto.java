@@ -298,7 +298,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 getEnumsTasksList().add(EnumsTasks.SALVAR_ENT_SAIDA);
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
 
-                                    ServiceUtilJSon.printJsonFromObject(getSaidaProduto(), "saidaProduto");
                                     new ViewRecebimento().openViewRecebimento(getSaidaProduto().contasAReceberProperty().getValue());
 
                                     if (getSaidaProduto().getSaidaProdutoNfeList().size() > 0)
@@ -623,6 +622,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             getCboEmpresa().getSelectionModel().select(-1);
             getCboEmpresa().requestFocus();
             getTpnNfe().setExpanded(false);
+            getSaidaProdutoProdutoObservableList();
+            getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList().clear();
         }
     }
 
@@ -754,9 +755,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private void guardarSaidaProdutoProduto() {
+//        saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().clear();
         getSaidaProdutoProdutoObservableList().stream()
                 .forEach(saidaProdutoProduto -> {
                     saidaProdutoProduto.saidaProdutoProperty().setValue(getSaidaProduto());
+//                    saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().add(saidaProdutoProduto);
                 });
     }
 
@@ -1023,7 +1026,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             getSaidaProdutoDAO().transactionBegin();
             if (!getTmodelSaidaProduto().baixarEstoque()) return false;
             salvarContasAReceber();
+            ServiceUtilJSon.printJsonFromObject(saidaProdutoProperty().getValue(), "saidaProduto001");
             saidaProdutoProperty().setValue(getSaidaProdutoDAO().setTransactionPersist(saidaProdutoProperty().getValue()));
+            ServiceUtilJSon.printJsonFromObject(saidaProdutoProperty().getValue(), "saidaProduto002");
             getSaidaProdutoDAO().transactionCommit();
             salvarFichaKardexList();
 

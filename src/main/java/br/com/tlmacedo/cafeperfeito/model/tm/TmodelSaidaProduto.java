@@ -273,6 +273,8 @@ public class TmodelSaidaProduto {
                 }
                 break;
         }
+        saidaProdutoProduto.vlrEntradaBrutoProperty().setValue(saidaProdutoProduto.vlrEntradaProperty().getValue().multiply(new BigDecimal(saidaProdutoProduto.qtdProperty().getValue())));
+
         Double vol = saidaProdutoProduto.qtdProperty().getValue().doubleValue() / saidaProdutoProduto.produtoProperty().getValue().varejoProperty().getValue().doubleValue();
         saidaProdutoProduto.volumeProperty().setValue(((vol - vol.intValue()) > 0) ? vol.intValue() + 1. : vol.intValue());
 
@@ -331,7 +333,10 @@ public class TmodelSaidaProduto {
                                             saidaProdId.vlrDescontoProperty().setValue(BigDecimal.ZERO);
                                     });
 
-                        if (fator > 0) {
+                        if (fator > 0
+                                && condicoes.qtdMinimaProperty().getValue() > 0
+                                && (condicoes.bonificacaoProperty().getValue().compareTo(0) > 0
+                                || condicoes.retiradaProperty().getValue().compareTo(0) > 0)) {
                             prazoProperty().setValue(condicoes.prazoProperty().getValue());
                             if (condicoes.bonificacaoProperty().getValue() == condicoes.qtdMinimaProperty().getValue()) {
                                 saidaProdutosId.stream()

@@ -29,11 +29,11 @@ public class ContasAReceber implements Serializable {
 
     private List<Recebimento> recebimentoList = new ArrayList<>();
 
-    private ObjectProperty<BigDecimal> vlr = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrCredDeb = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrPago = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrSaldo = new SimpleObjectProperty<>();
+    private ObjectProperty<BigDecimal> vlr = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> vlrCredDeb = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> vlrPago = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> vlrSaldo = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
     public ContasAReceber() {
     }

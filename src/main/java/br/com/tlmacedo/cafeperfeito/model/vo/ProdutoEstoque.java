@@ -219,6 +219,7 @@ public class ProdutoEstoque implements Serializable {
         this.vlrImposto.set(vlrImposto);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro.get();
