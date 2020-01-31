@@ -57,7 +57,7 @@ public class Empresa implements Serializable {
     private ObjectProperty<LocalDate> dtUltimoPedido = new SimpleObjectProperty<>(null);
     private ObjectProperty<BigDecimal> vlrUltimoPedido = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private IntegerProperty qtdPedidos = new SimpleIntegerProperty(0);
-    private ObjectProperty<BigDecimal> vlrTickeMedio = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> vlrTotalPedidos = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
     public Empresa() {
     }
@@ -464,16 +464,16 @@ public class Empresa implements Serializable {
 
     @Transient
     @JsonIgnore
-    public BigDecimal getVlrTickeMedio() {
-        return vlrTickeMedio.get();
+    public BigDecimal getVlrTotalPedidos() {
+        return vlrTotalPedidos.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrTickeMedioProperty() {
-        return vlrTickeMedio;
+    public ObjectProperty<BigDecimal> vlrTotalPedidosProperty() {
+        return vlrTotalPedidos;
     }
 
-    public void setVlrTickeMedio(BigDecimal vlrTickeMedio) {
-        this.vlrTickeMedio.set(vlrTickeMedio);
+    public void setVlrTotalPedidos(BigDecimal vlrTotalPedidos) {
+        this.vlrTotalPedidos.set(vlrTotalPedidos);
     }
 
     @Transient

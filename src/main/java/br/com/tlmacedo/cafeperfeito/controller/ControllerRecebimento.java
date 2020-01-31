@@ -100,9 +100,17 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                 Arrays.stream(PagamentoSituacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList))
         );
 
+        getTxtDocumento().textProperty().addListener((ov, o, n) -> {
+            if (n.trim().length() > 0) {
+                getBtnOK().setDefaultButton(false);
+                getBtnPrintOK().setDefaultButton(true);
+            } else {
+                getBtnPrintOK().setDefaultButton(false);
+                getBtnOK().setDefaultButton(true);
+            }
+        });
+
         if (objectProperty().getValue() instanceof ContasAReceber) {
-            getBtnPrintOK().setDefaultButton(true);
-            getBtnOK().setDefaultButton(false);
 
             recebimentoProperty().setValue(new Recebimento(((ContasAReceber) objectProperty().getValue())));
 
@@ -115,15 +123,22 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
             ((ContasAReceber) objectProperty().getValue()).getRecebimentoList().add(recebimentoProperty().getValue());
             getEnumsTasksList().add(EnumsTasks.ADD_RECEBIMENTO);
+
         } else {
             recebimentoProperty().setValue(((Recebimento) objectProperty().getValue()));
-            getBtnPrintOK().setDefaultButton(false);
-            getBtnOK().setDefaultButton(true);
+
             getEnumsTasksList().add(EnumsTasks.UPDATE_RECEBIMENTO);
         }
 
         getTxtDocumento().setText(recebimentoProperty().getValue().documentoProperty().getValue());
-        getCboPagamentoModalidade().setValue(recebimentoProperty().getValue().pagamentoModalidadeProperty().getValue());
+        getCboPagamentoModalidade().getItems().stream()
+                .filter(pagamentoModalidade -> pagamentoModalidade
+                        .equals(recebimentoProperty().getValue().pagamentoModalidadeProperty().getValue()))
+                .findFirst().ifPresent(pagamentoModalidade -> {
+            getCboPagamentoModalidade().setValue(pagamentoModalidade);
+            getCboPagamentoModalidade().getSelectionModel().select(pagamentoModalidade);
+        });
+//        getCboPagamentoModalidade().setValue(recebimentoProperty().getValue().pagamentoModalidadeProperty().getValue());
         getCboSituacao().setValue(recebimentoProperty().getValue().pagamentoSituacaoProperty().getValue());
         getTxtValor().setText(ServiceMascara.getMoeda(recebimentoProperty().getValue().valorProperty().getValue(), 2));
 
@@ -148,6 +163,17 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
         getBtnCancel().setOnAction(event -> fechar());
 
+        getBtnOK().setOnAction(event -> {
+            try {
+                if (new ServiceSegundoPlano().executaListaTarefas(newTaskRecebimento(), "recebimento"))
+                    fechar();
+                else
+                    getCboPagamentoModalidade().requestFocus();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
         getBtnOK().disableProperty().bind(Bindings.createBooleanBinding(() -> {
             if (recebimentoProperty().getValue() != null)
                 getCboSituacao().setValue(recebimentoProperty().getValue().pagamentoSituacaoProperty().getValue());
@@ -164,12 +190,11 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             );
         }, getCboPagamentoModalidade().valueProperty(), getDtpDtPagamento().valueProperty(), getTxtValor().textProperty()));
 
-        getBtnOK().setOnAction(event -> {
+        getBtnPrintOK().setOnAction(event -> {
             try {
-                if (new ServiceSegundoPlano().executaListaTarefas(newTaskRecebimento(), "recebimento"))
-                    fechar();
-                else
-                    getCboPagamentoModalidade().requestFocus();
+                getEnumsTasksList().add(EnumsTasks.RELATORIO_IMPRIME_RECIBO);
+                if (new ServiceSegundoPlano().executaListaTarefas(newTaskRecebimento(), "imprimir recibo")) ;
+                fechar();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -223,11 +248,11 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
 
     private boolean guardarRecebimento() {
         try {
-            recebimentoProperty().getValue().pagamentoSituacaoProperty().setValue(getCboSituacao().getValue());
+            recebimentoProperty().getValue().pagamentoSituacaoProperty().setValue(getCboSituacao().getSelectionModel().getSelectedItem());
             recebimentoProperty().getValue().documentoProperty().setValue(
                     getTxtDocumento().getText() == null
                             ? "" : getTxtDocumento().getText().trim());
-            recebimentoProperty().getValue().pagamentoModalidadeProperty().setValue(getCboPagamentoModalidade().getValue());
+            recebimentoProperty().getValue().pagamentoModalidadeProperty().setValue(getCboPagamentoModalidade().getSelectionModel().getSelectedItem());
             recebimentoProperty().getValue().valorProperty().setValue(
                     ServiceMascara.getBigDecimalFromTextField(getTxtValor().getText(), 2)
             );

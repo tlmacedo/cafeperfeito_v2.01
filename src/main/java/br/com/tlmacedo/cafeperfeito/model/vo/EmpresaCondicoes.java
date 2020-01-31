@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 
 import javax.persistence.*;
@@ -40,6 +41,7 @@ public class EmpresaCondicoes implements Serializable {
         this.id.set(id);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Empresa getEmpresa() {
         return empresa.get();
@@ -53,6 +55,7 @@ public class EmpresaCondicoes implements Serializable {
         this.empresa.set(empresa);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Produto getProduto() {
         return produto.get();

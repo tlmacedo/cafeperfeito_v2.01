@@ -130,7 +130,7 @@ public class Recebimento implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     public Usuario getUsuarioPagamento() {
         return usuarioPagamento.get();
     }
@@ -156,7 +156,7 @@ public class Recebimento implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro.get();
     }

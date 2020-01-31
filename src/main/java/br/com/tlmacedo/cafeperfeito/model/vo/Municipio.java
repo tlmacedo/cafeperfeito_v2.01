@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 
 import javax.persistence.*;
@@ -88,6 +89,7 @@ public class Municipio implements Serializable {
         this.ddd.set(ddd);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Uf getUf() {
         return uf.get();

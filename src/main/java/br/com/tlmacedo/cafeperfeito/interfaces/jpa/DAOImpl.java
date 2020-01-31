@@ -1,8 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.interfaces.jpa;
 
 
-import br.com.tlmacedo.cafeperfeito.service.ServiceUtilJSon;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
@@ -40,9 +38,7 @@ public class DAOImpl<T, I extends Serializable> implements DAO<T, I> {
     @Override
     public T setTransactionPersist(T entity) throws Exception {
         try {
-            ServiceUtilJSon.printJsonFromObject(entity, String.format("%s001", entity.getClass().getSimpleName()));
             T saved = getConexao().getEntityManager().merge(entity);
-            ServiceUtilJSon.printJsonFromObject(saved, String.format("%s002", saved.getClass().getSimpleName()));
             return saved;
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -96,7 +96,7 @@ public class TmodelSaidaProduto {
                 new SimpleObjectProperty<>(param.getValue().getCodigoCFOP()));
         getColCFOP().setCellFactory(param -> new SetCellFactoryTableCell_ComboBox<>(TipoCodigoCFOP.getList()));
         getColCFOP().setOnEditCommit(editEvent -> {
-            editEvent.getRowValue().setCodigoCFOP(editEvent.getNewValue());
+            editEvent.getRowValue().codigoCFOPProperty().setValue(editEvent.getNewValue());
             getTvItensNfe().getSelectionModel().selectNext();
             totalizaLinha(editEvent.getRowValue());
         });
@@ -124,7 +124,7 @@ public class TmodelSaidaProduto {
             if (newValue.compareTo(0) == 0)
                 newValue = 1;
             Integer oldValue = Integer.valueOf(editEvent.getOldValue());
-            editEvent.getRowValue().setQtd(validEstoque(newValue, oldValue));
+            editEvent.getRowValue().qtdProperty().setValue(validEstoque(newValue, oldValue));
 
             if (editEvent.getRowValue().codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.COMERCIALIZACAO)) {
                 calculaDescontoCliente();
@@ -143,26 +143,34 @@ public class TmodelSaidaProduto {
         getColVlrUnitario().setCellValueFactory(param -> new SimpleStringProperty(
                 ServiceMascara.getMoeda(param.getValue().vlrUnitarioProperty().getValue(), 2)
         ));
+        getColVlrUnitario().setCellFactory(param -> new SetCellFactoryTableCell_EdtitingCell<SaidaProdutoProduto, String>(
+                ServiceMascara.getNumeroMask(12, 2)
+        ));
+        getColVlrUnitario().setOnEditCommit(editEvent -> {
+            editEvent.getRowValue().vlrUnitarioProperty().setValue(ServiceMascara.getBigDecimalFromTextField(editEvent.getNewValue(), 2));
+            getTxtPesquisaProduto().requestFocus();
+            totalizaLinha(editEvent.getRowValue());
+        });
 
         setColVlrBruto(new TableColumn<>("vlr bruto"));
         getColVlrBruto().setPrefWidth(90);
         getColVlrBruto().setStyle("-fx-alignment: center-right;");
         getColVlrBruto().setCellValueFactory(param ->
                 new SimpleStringProperty(
-                        ServiceMascara.getMoeda(param.getValue().vlrBrutoProperty().get(), 2)
+                        ServiceMascara.getMoeda(param.getValue().vlrBrutoProperty().getValue(), 2)
                 ));
 
         setColVlrDesconto(new TableColumn<>("desc R$"));
         getColVlrDesconto().setPrefWidth(90);
         getColVlrDesconto().setStyle("-fx-alignment: center-right;");
         getColVlrDesconto().setCellValueFactory(param -> new SimpleStringProperty(
-                ServiceMascara.getMoeda(param.getValue().vlrDescontoProperty().get(), 2)
+                ServiceMascara.getMoeda(param.getValue().vlrDescontoProperty().getValue(), 2)
         ));
         getColVlrDesconto().setCellFactory(param -> new SetCellFactoryTableCell_EdtitingCell<SaidaProdutoProduto, String>(
                 ServiceMascara.getNumeroMask(12, 2)
         ));
         getColVlrDesconto().setOnEditCommit(editEvent -> {
-            editEvent.getRowValue().setVlrDesconto(ServiceMascara.getBigDecimalFromTextField(editEvent.getNewValue(), 2));
+            editEvent.getRowValue().vlrDescontoProperty().setValue(ServiceMascara.getBigDecimalFromTextField(editEvent.getNewValue(), 2));
             getTxtPesquisaProduto().requestFocus();
             totalizaLinha(editEvent.getRowValue());
         });
@@ -171,7 +179,7 @@ public class TmodelSaidaProduto {
         getColVlrLiquido().setPrefWidth(90);
         getColVlrLiquido().setStyle("-fx-alignment: center-right;");
         getColVlrLiquido().setCellValueFactory(param -> new SimpleStringProperty(
-                ServiceMascara.getMoeda(param.getValue().vlrLiquidoProperty().get(), 2)
+                ServiceMascara.getMoeda(param.getValue().vlrLiquidoProperty().getValue(), 2)
         ));
 
         setColEstoque(new TableColumn<>("estoque"));
@@ -236,8 +244,14 @@ public class TmodelSaidaProduto {
                 totalizaTabela();
             });
 
-            empresaProperty().addListener(observable -> {
+            empresaProperty().addListener((ov, o, n) -> {
+                prazoProperty().setValue(0);
+                if (n != null)
+                    prazoProperty().setValue(empresaProperty().getValue().prazoProperty().getValue());
                 calculaDescontoCliente();
+            });
+
+            empresaProperty().addListener(observable -> {
 //                getSaidaProdutoProdutoObservableList().stream()
 //                        .forEach(saidaProdId -> {
 //                            saidaProdId.vlrDescontoProperty().setValue(BigDecimal.ZERO);
@@ -460,6 +474,7 @@ public class TmodelSaidaProduto {
     public boolean baixarEstoque() {
         ProdutoEstoqueDAO produtoEstoqueDAO = new ProdutoEstoqueDAO();
         try {
+            getFichaKardexList().clear();
             produtoEstoqueDAO.transactionBegin();
             List<ProdutoEstoque> produtoEstoqueList = produtoEstoqueDAO.getAll(ProdutoEstoque.class,
                     String.format("qtd > 0"), "dtValidade, id");

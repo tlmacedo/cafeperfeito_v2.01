@@ -29,7 +29,7 @@ public class ContasAReceber implements Serializable {
 
     private List<Recebimento> recebimentoList = new ArrayList<>();
 
-    private ObjectProperty<BigDecimal> vlr = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private ObjectProperty<BigDecimal> vlrOriginalSaida = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> vlrCredDeb = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> vlrPago = new SimpleObjectProperty<>(BigDecimal.ZERO);
@@ -93,7 +93,7 @@ public class ContasAReceber implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     public Usuario getUsuarioCadastro() {
         return usuarioCadastro.get();
     }
@@ -131,16 +131,16 @@ public class ContasAReceber implements Serializable {
 
     @JsonIgnore
     @Transient
-    public BigDecimal getVlr() {
-        return vlr.get();
+    public BigDecimal getVlrOriginalSaida() {
+        return vlrOriginalSaida.get();
     }
 
-    public ObjectProperty<BigDecimal> vlrProperty() {
-        return vlr;
+    public ObjectProperty<BigDecimal> vlrOriginalSaidaProperty() {
+        return vlrOriginalSaida;
     }
 
-    public void setVlr(BigDecimal vlr) {
-        this.vlr.set(vlr);
+    public void setVlrOriginalSaida(BigDecimal vlrOriginalSaida) {
+        this.vlrOriginalSaida.set(vlrOriginalSaida);
     }
 
     @JsonIgnore
@@ -210,7 +210,7 @@ public class ContasAReceber implements Serializable {
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
                 ", recebimentoList=" + recebimentoList +
-                ", vlr=" + vlr +
+                ", vlr=" + vlrOriginalSaida +
                 ", vlrCredDeb=" + vlrCredDeb +
                 ", vlrLiquido=" + vlrLiquido +
                 ", vlrPago=" + vlrPago +

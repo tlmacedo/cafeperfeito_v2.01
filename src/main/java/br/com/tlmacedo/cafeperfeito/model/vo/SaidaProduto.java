@@ -62,7 +62,7 @@ public class SaidaProduto implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne//(fetch = FetchType.LAZY)
     public Usuario getVendedor() {
         return vendedor.get();
     }
