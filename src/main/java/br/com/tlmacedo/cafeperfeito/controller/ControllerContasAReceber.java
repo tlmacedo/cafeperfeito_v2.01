@@ -6,7 +6,7 @@ import br.com.tlmacedo.cafeperfeito.model.enums.EnumsTasks;
 import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
 import br.com.tlmacedo.cafeperfeito.model.enums.StatusBarContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.enums.TModelTipo;
-import br.com.tlmacedo.cafeperfeito.model.tm.TmodelPedido_Recibo_NFe;
+import br.com.tlmacedo.cafeperfeito.model.tm.TmodelContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
@@ -92,7 +92,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     private EventHandler eventHandlerContasAReceber;
     private ServiceAlertMensagem alertMensagem;
 
-    private TmodelPedido_Recibo_NFe tmodelaReceber;
+    private TmodelContasAReceber tmodelaReceber;
     private ObjectProperty<ContasAReceber> aReceber = new SimpleObjectProperty<>();
     private ObjectProperty<Recebimento> recebimento = new SimpleObjectProperty<>();
     private ObservableList<ContasAReceber> aReceberObservableList;
@@ -417,7 +417,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                 tasks.getDescricao().endsWith(" de ") ? getNomeController() : ""));
                         switch (tasks) {
                             case TABELA_CRIAR:
-                                setTmodelaReceber(new TmodelPedido_Recibo_NFe(TModelTipo.PEDIDO_RECIBO));
+                                setTmodelaReceber(new TmodelContasAReceber(TModelTipo.PEDIDO_RECIBO));
                                 getTmodelaReceber().criarTabela();
 //
 //                            setTmodelSaidaProduto(new TmodelSaidaProduto());
@@ -858,11 +858,11 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         this.alertMensagem = alertMensagem;
     }
 
-    public TmodelPedido_Recibo_NFe getTmodelaReceber() {
+    public TmodelContasAReceber getTmodelaReceber() {
         return tmodelaReceber;
     }
 
-    public void setTmodelaReceber(TmodelPedido_Recibo_NFe tmodelaReceber) {
+    public void setTmodelaReceber(TmodelContasAReceber tmodelaReceber) {
         this.tmodelaReceber = tmodelaReceber;
     }
 

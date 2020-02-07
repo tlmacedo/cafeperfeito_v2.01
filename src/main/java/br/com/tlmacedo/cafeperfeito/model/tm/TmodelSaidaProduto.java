@@ -207,6 +207,7 @@ public class TmodelSaidaProduto {
     public void escutaLista() {
         try {
             getTvItensNfe().getFocusModel().focusedCellProperty().addListener((ov, o, n) -> setTp(n));
+
             getTvItensNfe().addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
                 if (getTvItensNfe().getEditingCell() == null && keyEvent.getCode() == KeyCode.ENTER) {
                     getTvItensNfe().getSelectionModel().selectNext();
@@ -218,8 +219,6 @@ public class TmodelSaidaProduto {
                     if (getTvItensNfe().getEditingCell() != null)
                         getTvItensNfe().getSelectionModel().selectNext();
                 }
-
-
                 if (keyEvent.getCode() == KeyCode.DELETE)
                     if (getTvItensNfe().getEditingCell() == null)
                         getSaidaProdutoProdutoObservableList().remove(getTvItensNfe().getSelectionModel().getSelectedItem());
@@ -250,15 +249,6 @@ public class TmodelSaidaProduto {
                     prazoProperty().setValue(empresaProperty().getValue().prazoProperty().getValue());
                 calculaDescontoCliente();
             });
-
-            empresaProperty().addListener(observable -> {
-//                getSaidaProdutoProdutoObservableList().stream()
-//                        .forEach(saidaProdId -> {
-//                            saidaProdId.vlrDescontoProperty().setValue(BigDecimal.ZERO);
-//                            saidaProdId.codigoCFOPProperty().setValue(TipoCodigoCFOP.COMERCIALIZACAO);
-//                        });
-            });
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }

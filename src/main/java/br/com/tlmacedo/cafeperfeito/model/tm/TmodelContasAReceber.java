@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 
-public class TmodelPedido_Recibo_NFe {
+public class TmodelContasAReceber {
 
     private TablePosition tp;
     private final TModelTipo tModelTipo;
@@ -91,7 +91,7 @@ public class TmodelPedido_Recibo_NFe {
     private ObjectProperty<BigDecimal> percLucroLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> totalLucroLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
-    public TmodelPedido_Recibo_NFe(TModelTipo tModelTipo) {
+    public TmodelContasAReceber(TModelTipo tModelTipo) {
         this.tModelTipo = tModelTipo;
         if (tModelTipo.equals(TModelTipo.PEDIDO_RECIBO)) {
             setaReceberDAO(new ContasAReceberDAO());
@@ -646,7 +646,8 @@ public class TmodelPedido_Recibo_NFe {
                     .reduce(BigDecimal.ZERO, BigDecimal::add));
 
             if (getTotalLucroBruto().compareTo(BigDecimal.ZERO) > 0)
-                setPercLucroBruto(getTotalLucroBruto().multiply(new BigDecimal("100.")).divide(getTotalContas()).setScale(4, RoundingMode.HALF_UP));
+                setPercLucroBruto(getTotalLucroBruto().multiply(new BigDecimal("100."))
+                        .divide(getTotalContas(), 4, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP));
             else
                 setPercLucroBruto(BigDecimal.ZERO);
 

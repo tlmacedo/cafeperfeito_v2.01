@@ -224,14 +224,15 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
                         switch (tasks) {
                             case ADD_RECEBIMENTO:
                             case UPDATE_RECEBIMENTO:
+                            case RELATORIO_IMPRIME_RECIBO:
                                 if (guardarRecebimento()) {
                                     if (!salvarRecebimento())
                                         Thread.currentThread().interrupt();
                                 } else {
                                     Thread.currentThread().interrupt();
                                 }
-                                break;
-                            case RELATORIO_IMPRIME_RECIBO:
+                                if (tasks.getDescricao().equals(EnumsTasks.RELATORIO_IMPRIME_RECIBO.getDescricao()))
+                                    new ServiceRecibo().imprimeRecibo(recebimentoProperty().getValue());
                                 break;
                         }
                     }

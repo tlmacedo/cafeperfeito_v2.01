@@ -155,6 +155,10 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private ObjectProperty<SaidaProduto> saidaProduto = new SimpleObjectProperty<>();
     private SaidaProdutoDAO saidaProdutoDAO;
     private ObservableList<SaidaProdutoProduto> saidaProdutoProdutoObservableList = FXCollections.observableArrayList();
+    private ObservableList<ContasAReceber> contasAReceberObservableList =
+            FXCollections.observableArrayList(new ContasAReceberDAO()
+                    .getAll(ContasAReceber.class, null, "dtCadastro DESC"));
+    private ContasAReceberDAO contasAReceberDAO;
 
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
     private IntegerProperty prazo = new SimpleIntegerProperty(0);
@@ -297,7 +301,31 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             if (validarSaida()) {
                                 getEnumsTasksList().clear();
                                 getEnumsTasksList().add(EnumsTasks.SALVAR_ENT_SAIDA);
+                                BigDecimal vlrCredDeb = utilizacaoDeCreditoDebito();
+                                System.out.printf("vlrCredDeb: %s\n", vlrCredDeb);
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
+                                    if (vlrCredDeb.compareTo(BigDecimal.ZERO) != 0) {
+                                        try {
+                                            setContasAReceberDAO(new ContasAReceberDAO());
+                                            baixarCreditoDebito(vlrCredDeb);
+                                            getContasAReceberDAO().transactionBegin();
+                                            PagamentoModalidade modRecebimento = null;
+                                            if (vlrCredDeb.compareTo(BigDecimal.ZERO) < 0)
+                                                modRecebimento = PagamentoModalidade.CREDITO;
+                                            else
+                                                modRecebimento = PagamentoModalidade.DEBITO;
+                                            getSaidaProduto().contasAReceberProperty().getValue().getRecebimentoList()
+                                                    .add(addRecebimento(getSaidaProduto().contasAReceberProperty().getValue(),
+                                                            modRecebimento, vlrCredDeb));
+                                            getSaidaProduto().contasAReceberProperty().setValue(
+                                                    getContasAReceberDAO().setTransactionPersist(getSaidaProduto().contasAReceberProperty().getValue())
+                                            );
+                                            getContasAReceberDAO().transactionCommit();
+                                        } catch (Exception ex) {
+                                            getContasAReceberDAO().transactionRollback();
+                                            ex.printStackTrace();
+                                        }
+                                    }
 
                                     new ViewRecebimento().openViewRecebimento(getSaidaProduto().contasAReceberProperty().getValue());
 
@@ -310,7 +338,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 }
                             } else {
                                 setAlertMensagem(new ServiceAlertMensagem());
-                                getAlertMensagem().setCabecalho("Entrada invalida");
+                                getAlertMensagem().setCabecalho("Saida invalida");
                                 getAlertMensagem().setContentText("Verifique a saida de produtos pois está invalida");
                                 getAlertMensagem().setStrIco("");
                                 getAlertMensagem().alertOk();
@@ -676,8 +704,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         empTemp.setRazao("");
         empTemp.setFantasia("");
         empresaObservableList.add(0, empTemp);
-        ObservableList<ContasAReceber> contasAReceberObservableList =
-                FXCollections.observableArrayList(new ContasAReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC"));
 
         getCboEmpresa().setItems(empresaObservableList);
 
@@ -688,13 +714,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
         final BigDecimal[] vlrTotalUtilizado = {BigDecimal.ZERO};
         empresaObservableList.stream()
-                .filter(empresa -> contasAReceberObservableList.stream()
+                .filter(empresa -> getContasAReceberObservableList().stream()
                         .filter(contasAReceber -> contasAReceber.saidaProdutoProperty().getValue()
                                 .clienteProperty().getValue().idProperty().getValue().equals(empresa.idProperty().getValue())).count() > 0)
                 .forEach(empresa -> {
 //                    System.out.printf("emresa: [%s]", empresa.getRazaoFantasia());
                     vlrTotalUtilizado[0] = BigDecimal.ZERO;
-                    contasAReceberObservableList.stream()
+                    getContasAReceberObservableList().stream()
                             .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresa.idProperty().getValue())
                             .sorted(Comparator.comparing(ContasAReceber::getDtCadastro).reversed())
                             .forEach(aReceber -> {
@@ -942,6 +968,61 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         contasAReceber.usuarioCadastroProperty().setValue(UsuarioLogado.getUsuario());
     }
 
+    private void baixarCreditoDebito(BigDecimal vlrCredDeb) throws Exception {
+        final BigDecimal[] valorCredDeb = {vlrCredDeb};
+        getContasAReceberDAO().transactionBegin();
+        try {
+            final boolean[] alterou = {false};
+            getContasAReceberObservableList().stream()
+                    .sorted(Comparator.comparing(ContasAReceber::getDtCadastro))
+                    .filter(contasAReceber -> contasAReceber.getSaidaProduto().getCliente().idProperty().getValue() == empresaProperty().getValue().idProperty().getValue()
+                            && contasAReceber.getRecebimentoList().stream()
+                            .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                            .map(Recebimento::getValor)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add).compareTo(contasAReceber.valorProperty().getValue()) != 0)
+                    .forEach(contasAReceber -> {
+                        if (valorCredDeb[0].compareTo(BigDecimal.ZERO) < 0) {
+                            valorCredDeb[0] = valorCredDeb[0].multiply(new BigDecimal("-1"));
+                            BigDecimal saldoConta = contasAReceber.valorProperty().getValue().subtract(contasAReceber.getRecebimentoList().stream()
+                                    .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                    .map(Recebimento::getValor)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+                            if (valorCredDeb[0].compareTo(saldoConta) < 0)
+                                saldoConta = valorCredDeb[0];
+                            System.out.printf("baixarCreditoDebito: [R$%s]\n", saldoConta);
+                            contasAReceber.getRecebimentoList().add(addRecebimento(contasAReceber,
+                                    PagamentoModalidade.BAIXA_CREDITO, saldoConta));
+                            try {
+                                contasAReceber = getContasAReceberDAO().setTransactionPersist(contasAReceber);
+                                alterou[0] = true;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            valorCredDeb[0] = valorCredDeb[0].add(saldoConta);
+                        } else if (valorCredDeb[0].compareTo(BigDecimal.ZERO) > 0) {
+                            BigDecimal saldoConta = contasAReceber.valorProperty().getValue().subtract(contasAReceber.getRecebimentoList().stream()
+                                    .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                    .map(Recebimento::getValor)
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+                            contasAReceber.getRecebimentoList().add(addRecebimento(contasAReceber,
+                                    PagamentoModalidade.BAIXA_DEBITO, saldoConta));
+                            try {
+                                contasAReceber = getContasAReceberDAO().setTransactionPersist(contasAReceber);
+                                alterou[0] = true;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            valorCredDeb[0] = valorCredDeb[0].subtract(saldoConta);
+                        }
+                    });
+            if (alterou[0])
+                getContasAReceberDAO().transactionCommit();
+        } catch (Exception ex) {
+            getContasAReceberDAO().transactionRollback();
+            ex.printStackTrace();
+        }
+    }
+
     /**
      * END voids
      */
@@ -1005,9 +1086,50 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         return true;
     }
 
+    private Recebimento addRecebimento(ContasAReceber contasAReceber, PagamentoModalidade pagamentoModalidade, BigDecimal vlr) {
+        Recebimento recebimento = new Recebimento();
+        recebimento.contasAReceberProperty().setValue(contasAReceber);
+        if (pagamentoModalidade.getDescricao().toLowerCase().contains("baixa"))
+            recebimento.pagamentoSituacaoProperty().setValue(PagamentoSituacao.QUITADO);
+        else
+            recebimento.pagamentoSituacaoProperty().setValue(PagamentoSituacao.PENDENTE);
+        recebimento.pagamentoModalidadeProperty().setValue(pagamentoModalidade);
+        recebimento.valorProperty().setValue(vlr);
+
+        recebimento.setUsuarioPagamento(UsuarioLogado.getUsuario());
+        recebimento.dtPagamentoProperty().setValue(LocalDate.now());
+        recebimento.setUsuarioCadastro(UsuarioLogado.getUsuario());
+
+        String codDocRecebimento =
+                ServiceValidarDado.gerarCodigoCafePerfeito(Recebimento.class, getDtpDtSaida().getValue());
+
+
+        switch (pagamentoModalidade) {
+            case CREDITO:
+                recebimento.valorProperty().setValue(vlr.multiply(new BigDecimal("-1.0")));
+            case BAIXA_CREDITO:
+                recebimento.setPagamentoSituacao(PagamentoSituacao.QUITADO);
+                recebimento.documentoProperty().setValue(String.format("UC%s", codDocRecebimento));
+                break;
+
+            case DEBITO:
+                recebimento.valorProperty().setValue(vlr.multiply(new BigDecimal("-1.0")));
+            case BAIXA_DEBITO:
+                recebimento.documentoProperty().setValue(String.format("UD%s", codDocRecebimento));
+            default:
+                recebimento.documentoProperty().setValue(codDocRecebimento);
+                break;
+        }
+
+        return recebimento;
+    }
+
     private boolean validarSaida() {
-        return (validarCliente() && validarNFe()
-                && getSaidaProdutoProdutoObservableList().size() > 0);
+        return ((validarCliente() && validarNFe()
+                && getSaidaProdutoProdutoObservableList().size() > 0)
+                && (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
+                .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0)
+        );
     }
 
     private boolean validarCliente() {
@@ -1149,6 +1271,27 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 );
         }
         return retorno;
+    }
+
+    private BigDecimal utilizacaoDeCreditoDebito() {
+        BigDecimal vlrCredDeb = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2);
+
+        if (vlrCredDeb.compareTo(BigDecimal.ZERO) < 0) {
+            setAlertMensagem(new ServiceAlertMensagem());
+            getAlertMensagem().setCabecalho("Crédito disponível");
+            getAlertMensagem().setContentText(String.format("o cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
+                    ServiceMascara.getMoeda((vlrCredDeb.multiply(new BigDecimal("-1."))), 2)));
+            getAlertMensagem().setStrIco("");
+        } else if (vlrCredDeb.compareTo(BigDecimal.ZERO) > 0) {
+            setAlertMensagem(new ServiceAlertMensagem());
+            getAlertMensagem().setCabecalho("Débito detectado");
+            getAlertMensagem().setContentText(String.format("o cliente tem um dédito de R$ %s\ndeseja acrescentar esse valor no pedido atual?",
+                    ServiceMascara.getMoeda((vlrCredDeb.multiply(new BigDecimal("-1."))), 2)));
+            getAlertMensagem().setStrIco("");
+        }
+        if (getAlertMensagem().alertYesNoCancel().get() == ButtonType.CANCEL)
+            return BigDecimal.ZERO;
+        return vlrCredDeb;
     }
 
 
@@ -1978,6 +2121,22 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setLoadCertificadoA3(LoadCertificadoA3 loadCertificadoA3) {
         this.loadCertificadoA3.set(loadCertificadoA3);
+    }
+
+    public ObservableList<ContasAReceber> getContasAReceberObservableList() {
+        return contasAReceberObservableList;
+    }
+
+    public void setContasAReceberObservableList(ObservableList<ContasAReceber> contasAReceberObservableList) {
+        this.contasAReceberObservableList = contasAReceberObservableList;
+    }
+
+    public ContasAReceberDAO getContasAReceberDAO() {
+        return contasAReceberDAO;
+    }
+
+    public void setContasAReceberDAO(ContasAReceberDAO contasAReceberDAO) {
+        this.contasAReceberDAO = contasAReceberDAO;
     }
 
     /**
