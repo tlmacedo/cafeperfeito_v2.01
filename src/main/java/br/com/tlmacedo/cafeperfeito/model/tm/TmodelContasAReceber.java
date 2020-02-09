@@ -1,17 +1,14 @@
 package br.com.tlmacedo.cafeperfeito.model.tm;
 
 import br.com.tlmacedo.cafeperfeito.model.dao.ContasAReceberDAO;
-import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoModalidade;
 import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
-import br.com.tlmacedo.cafeperfeito.model.enums.TModelTipo;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -27,23 +24,17 @@ import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 public class TmodelContasAReceber {
 
     private TablePosition tp;
-    private final TModelTipo tModelTipo;
-    private DatePicker dtpData1;
-    private DatePicker dtpData2;
-    private CheckBox chkDtVenda;
-    private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
     private TextField txtPesquisa;
-    private ObjectProperty<PagamentoSituacao> pagamentoSituacao = new SimpleObjectProperty<>();
-    //    private ComboBox cboPagamentoSituacao;
     private Label lblRegistrosLocalizados;
-    private TreeTableView<Object> ttvPedido;
-    private ContasAReceberDAO aReceberDAO;
-    private ObservableList<ContasAReceber> aReceberObservableList;
-    private FilteredList<ContasAReceber> aReceberFilteredList;
-    private SaidaProdutoDAO saidaProdutoDAO;
-    private ObservableList<SaidaProduto> saidaProdutoObservableList;
-    private FilteredList<SaidaProduto> saidaProdutoFilteredList;
-
+    private TreeTableView<Object> ttvContasAReceber;
+    private FilteredList<ContasAReceber> contasAReceberFilteredList = new FilteredList<>(
+            FXCollections.observableArrayList(new ContasAReceberDAO().getAll(ContasAReceber.class, "", null))
+    );
+    private ObjectProperty<DatePicker> dtpData1 = new SimpleObjectProperty<>();
+    private ObjectProperty<DatePicker> dtpData2 = new SimpleObjectProperty<>();
+    private ObjectProperty<CheckBox> chkDtVenda = new SimpleObjectProperty<>();
+    private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
+    private ObjectProperty<PagamentoSituacao> pagamentoSituacao = new SimpleObjectProperty<>();
 
     private TreeItem<Object> pedidoTreeItem;
     private TreeTableColumn<Object, Long> colId;
@@ -91,22 +82,13 @@ public class TmodelContasAReceber {
     private ObjectProperty<BigDecimal> percLucroLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
     private ObjectProperty<BigDecimal> totalLucroLiquido = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
-    public TmodelContasAReceber(TModelTipo tModelTipo) {
-        this.tModelTipo = tModelTipo;
-        if (tModelTipo.equals(TModelTipo.PEDIDO_RECIBO)) {
-            setaReceberDAO(new ContasAReceberDAO());
-            setaReceberObservableList(FXCollections.observableArrayList(getaReceberDAO().getAll(ContasAReceber.class, null, "dtCadastro DESC")));
-            setaReceberFilteredList(new FilteredList<>(getaReceberObservableList()));
-        } else if (tModelTipo.equals(TModelTipo.PEDIDO_NFE)) {
-            setSaidaProdutoDAO(new SaidaProdutoDAO());
-            setSaidaProdutoObservableList(FXCollections.observableArrayList(getSaidaProdutoDAO().getAll(SaidaProduto.class, null, "dtCadastro DESC")));
-            setSaidaProdutoFilteredList(new FilteredList<>(getSaidaProdutoObservableList()));
-        }
+    public TmodelContasAReceber() {
     }
 
     /**
      * Begin voids
      */
+
 
 
     public void criarTabela() {
@@ -118,17 +100,11 @@ public class TmodelContasAReceber {
                 return ((ContasAReceber) cellData.getValue().getValue()).idProperty().asObject();
             } else if (cellData.getValue().getValue() instanceof Recebimento) {
                 return ((Recebimento) cellData.getValue().getValue()).idProperty().asObject();
-            } else if (cellData.getValue().getValue() instanceof SaidaProduto) {
-                return ((SaidaProduto) cellData.getValue().getValue()).idProperty().asObject();
-            } else if (cellData.getValue().getValue() instanceof SaidaProdutoNfe) {
-                return ((SaidaProdutoNfe) cellData.getValue().getValue()).idProperty().asObject();
             }
             return new SimpleObjectProperty<>(null);
         });
 
-        setColCliente_Documento(new TreeTableColumn(String.format("cliente / %s",
-                gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)
-                        ? "documento pag" : "n NFe")));
+        setColCliente_Documento(new TreeTableColumn("cliente / documento pag"));
         getColCliente_Documento().setPrefWidth(280);
         getColCliente_Documento().setCellFactory(cellFactory -> new TreeTableCell<>() {
             @Override
@@ -146,10 +122,6 @@ public class TmodelContasAReceber {
                 return new SimpleStringProperty(((ContasAReceber) cellData.getValue().getValue()).getSaidaProduto().getCliente().getRazaoFantasia());
             } else if (cellData.getValue().getValue() instanceof Recebimento) {
                 return ((Recebimento) cellData.getValue().getValue()).documentoProperty();
-            } else if (cellData.getValue().getValue() instanceof SaidaProduto) {
-                return new SimpleStringProperty(((SaidaProduto) cellData.getValue().getValue()).clienteProperty().getValue().getRazaoFantasia());
-            } else if (cellData.getValue().getValue() instanceof SaidaProdutoNfe) {
-                return ((SaidaProdutoNfe) cellData.getValue().getValue()).numeroProperty().asString();
             }
             return new SimpleStringProperty("");
         });
@@ -158,11 +130,8 @@ public class TmodelContasAReceber {
         getColDtVenda().setPrefWidth(75);
         getColDtVenda().setStyle("-fx-alignment: center-right;");
         getColDtVenda().setCellValueFactory(cellData -> {
-            if (cellData.getValue().getValue() instanceof ContasAReceber) {
+            if (cellData.getValue().getValue() instanceof ContasAReceber)
                 return new SimpleObjectProperty<>(((ContasAReceber) cellData.getValue().getValue()).dtCadastroProperty().getValue().toLocalDate());
-            } else if (cellData.getValue().getValue() instanceof SaidaProduto) {
-                return new SimpleObjectProperty<>(((SaidaProduto) cellData.getValue().getValue()).dtCadastroProperty().getValue().toLocalDate());
-            }
             return new SimpleObjectProperty<>();
         });
         getColDtVenda().setCellFactory(cellFactory -> new TreeTableCell<>() {
@@ -178,31 +147,23 @@ public class TmodelContasAReceber {
             }
         });
 
-        setColModalidade(new TreeTableColumn(String.format("/ %s",
-                gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)
-                        ? "mod pag" : "NFe2")));
+        setColModalidade(new TreeTableColumn("/ mod pag"));
         getColModalidade().setPrefWidth(70);
         getColModalidade().setCellValueFactory(cellData -> {
-            if (cellData.getValue().getValue() instanceof Recebimento) {
+            if (cellData.getValue().getValue() instanceof Recebimento)
                 return new SimpleStringProperty(((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao());
-            }
             return new SimpleStringProperty("");
         });
 
-        setColSituacao(new TreeTableColumn(String.format("/ %s",
-                gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)
-                        ? "situação" : "NFe3")));
+        setColSituacao(new TreeTableColumn("/ situação"));
         getColSituacao().setPrefWidth(75);
         getColSituacao().setCellValueFactory(cellData -> {
-            if (cellData.getValue().getValue() instanceof Recebimento) {
+            if (cellData.getValue().getValue() instanceof Recebimento)
                 return new SimpleStringProperty(((Recebimento) cellData.getValue().getValue()).getPagamentoSituacao().getDescricao());
-            }
             return new SimpleStringProperty("");
         });
 
-        setColDtVencimento_DtPagamento(new TreeTableColumn(String.format("dt. venc / %s",
-                gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)
-                        ? "dt. pag" : "NFe4")));
+        setColDtVencimento_DtPagamento(new TreeTableColumn("dt. venc / dt. pag"));
         getColDtVencimento_DtPagamento().setPrefWidth(90);
         getColDtVencimento_DtPagamento().setStyle("-fx-alignment: center-right;");
         getColDtVencimento_DtPagamento().setCellValueFactory(cellData -> {
@@ -328,68 +289,46 @@ public class TmodelContasAReceber {
     public void preencherTabela() {
         try {
             setPedidoTreeItem(new TreeItem());
-            if (gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)) {
-                getaReceberFilteredList().stream()
-//                    .filter(aReceber -> aReceber.getSaidaProduto().getCliente().idProperty().getValue() == 64)
-                        .forEach(aReceber -> {
-//                            final BigDecimal[] vlrCredDeb = {BigDecimal.ZERO};
-//                            final BigDecimal[] vlrPago = {BigDecimal.ZERO};
-//                            final BigDecimal[] vlrSaldo = {aReceber.valorProperty().getValue()};
-                            TreeItem<Object> paiItem = new TreeItem(aReceber);
-                            getPedidoTreeItem().getChildren().add(paiItem);
-                            aReceber.getRecebimentoList().stream()
-                                    .forEach(recebimento -> {
-                                        TreeItem<Object> filhoItem = new TreeItem(recebimento);
-                                        paiItem.getChildren().add(filhoItem);
-                                    });
-                            ((ContasAReceber) paiItem.getValue()).valorProperty().setValue(aReceber.valorProperty().getValue());
+            getContasAReceberFilteredList().stream()
+                    .forEach(aReceber -> {
+                        TreeItem<Object> paiItem = new TreeItem(aReceber);
+                        getPedidoTreeItem().getChildren().add(paiItem);
+                        aReceber.getRecebimentoList().stream()
+                                .forEach(recebimento -> {
+                                    TreeItem<Object> filhoItem = new TreeItem(recebimento);
+                                    paiItem.getChildren().add(filhoItem);
+                                });
+                        ((ContasAReceber) paiItem.getValue()).valorProperty().setValue(aReceber.valorProperty().getValue());
 
-                            ((ContasAReceber) paiItem.getValue()).vlrCredDebProperty().setValue(aReceber.getRecebimentoList().stream()
-                                    .filter(recebimento -> recebimento.getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
-                                            || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO)
-                                            || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
-                                            || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO))
-                                    .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        ((ContasAReceber) paiItem.getValue()).vlrCredDebProperty().setValue(aReceber.getRecebimentoList().stream()
+                                .filter(recebimento -> recebimento.getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
+                                        || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO)
+                                        || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
+                                        || recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO))
+                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add));
 
-                            ((ContasAReceber) paiItem.getValue()).vlrLiquidoProperty().setValue(((ContasAReceber) paiItem.getValue()).valorProperty().getValue()
-                                    .subtract(((ContasAReceber) paiItem.getValue()).vlrCredDebProperty().getValue()));
+                        ((ContasAReceber) paiItem.getValue()).vlrLiquidoProperty().setValue(((ContasAReceber) paiItem.getValue()).valorProperty().getValue()
+                                .subtract(((ContasAReceber) paiItem.getValue()).vlrCredDebProperty().getValue()));
 
-                            ((ContasAReceber) paiItem.getValue()).valorProperty().setValue(aReceber.getRecebimentoList().stream()
-                                    .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO)
-                                            && (!recebimento.getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
-                                            && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO)
-                                            && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
-                                            && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO)))
-                                    .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        ((ContasAReceber) paiItem.getValue()).valorProperty().setValue(aReceber.getRecebimentoList().stream()
+                                .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO)
+                                        && (!recebimento.getPagamentoModalidade().equals(PagamentoModalidade.DEBITO)
+                                        && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_DEBITO)
+                                        && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.CREDITO)
+                                        && !recebimento.getPagamentoModalidade().equals(PagamentoModalidade.BAIXA_CREDITO)))
+                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add));
 
-                            ((ContasAReceber) paiItem.getValue()).vlrSaldoProperty().setValue(((ContasAReceber) paiItem.getValue()).vlrLiquidoProperty().getValue()
-                                    .subtract(((ContasAReceber) paiItem.getValue()).vlrPagoProperty().getValue()));
-                        });
+                        ((ContasAReceber) paiItem.getValue()).vlrSaldoProperty().setValue(((ContasAReceber) paiItem.getValue()).vlrLiquidoProperty().getValue()
+                                .subtract(((ContasAReceber) paiItem.getValue()).vlrPagoProperty().getValue()));
+                    });
 
-                getTtvPedido().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda(),
-                        getColModalidade(), getColSituacao(), getColDtVencimento_DtPagamento(), getColVlrBruto(),
-                        getColVlrCredDeb(), getColVlrLiquido(), getColValorPago(), getColValorSaldo());
+            getTtvContasAReceber().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda(),
+                    getColModalidade(), getColSituacao(), getColDtVencimento_DtPagamento(), getColVlrBruto(),
+                    getColVlrCredDeb(), getColVlrLiquido(), getColValorPago(), getColValorSaldo());
 
-            } else if (gettModelTipo().equals(TModelTipo.PEDIDO_NFE)) {
-                getSaidaProdutoObservableList().stream()
-                        .forEach(saidaProduto -> {
-//                            final BigDecimal[] vlrNFe = {BigDecimal.ZERO};
-//                            final BigDecimal[] vlrNFeNull = {saidaProduto.getSaidaProdutoProdutoList()};
-                            TreeItem<Object> paiItem = new TreeItem<>(saidaProduto);
-                            getPedidoTreeItem().getChildren().add(paiItem);
-                            saidaProduto.getSaidaProdutoNfeList().stream()
-                                    .forEach(saidaProdutoNfe -> {
-                                        TreeItem<Object> filhoItem = new TreeItem<>(saidaProdutoNfe);
-                                        paiItem.getChildren().add(filhoItem);
-                                    });
-                        });
-                getTtvPedido().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda(),
-                        getColModalidade(), getColSituacao(), getColDtVencimento_DtPagamento(), getColVlrBruto(),
-                        getColVlrCredDeb(), getColVlrLiquido(), getColValorPago(), getColValorSaldo());
-            }
-            getTtvPedido().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-            getTtvPedido().setRoot(getPedidoTreeItem());
-            getTtvPedido().setShowRoot(false);
+            getTtvContasAReceber().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+            getTtvContasAReceber().setRoot(getPedidoTreeItem());
+            getTtvContasAReceber().setShowRoot(false);
             totalizaTabela();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -397,266 +336,195 @@ public class TmodelContasAReceber {
     }
 
     public void escutaLista() {
-        if (gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)) {
-            getTtvPedido().setRowFactory(objectTreeTableView -> new TreeTableRow<>() {
-                @Override
-                protected void updateItem(Object item, boolean empty) {
-                    super.updateItem(item, empty);
-                    getStyleClass().removeAll(getStyleClass().stream().filter(s -> s.contains("recebimento-")).collect(Collectors.toList()));
-                    if (!empty) {
-                        String stilo = "";
-                        if (item instanceof ContasAReceber) {
-                            PagamentoModalidade modalidade = null;
-                            BigDecimal vlrPg = BigDecimal.ZERO;
-                            try {
-                                if (LocalDate.now().compareTo(((ContasAReceber) item).dtVencimentoProperty().getValue()) <= 0) {
-                                    stilo = "recebimento-pendente";
-                                } else {
-                                    stilo = "recebimento-vencido";
-                                }
-                                modalidade = ((ContasAReceber) item).getRecebimentoList().stream().sorted(Comparator.comparing(Recebimento::getValor).reversed())
-                                        .findFirst().orElse(null).getPagamentoModalidade();
-                                vlrPg = ((ContasAReceber) item).getRecebimentoList().stream()
-                                        .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                                        .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
-                                if (vlrPg.compareTo(((ContasAReceber) item).valorProperty().getValue()) >= 0) {
-                                    stilo = "recebimento-pago";
-                                }
-                            } catch (Exception ex) {
-
-                            }
-                            if (modalidade != null && (modalidade.equals(PagamentoModalidade.RETIRADA)
-                                    || modalidade.equals(PagamentoModalidade.BONIFICACAO)
-                                    || modalidade.equals(PagamentoModalidade.AMOSTRA))) {
-                                stilo = "recebimento-retirada";
+        getTtvContasAReceber().setRowFactory(objectTreeTableView -> new TreeTableRow<>() {
+            @Override
+            protected void updateItem(Object item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll(getStyleClass().stream().filter(s -> s.contains("recebimento-")).collect(Collectors.toList()));
+                if (!empty) {
+                    String stilo = "";
+                    if (item instanceof ContasAReceber) {
+                        PagamentoModalidade modalidade = null;
+                        BigDecimal vlrPg = BigDecimal.ZERO;
+                        try {
+                            if (LocalDate.now().compareTo(((ContasAReceber) item).dtVencimentoProperty().getValue()) <= 0) {
+                                stilo = "recebimento-pendente";
                             } else {
+                                stilo = "recebimento-vencido";
                             }
-                        } else if (item instanceof Recebimento) {
-                            stilo = "recebimento-recebimento";
+                            modalidade = ((ContasAReceber) item).getRecebimentoList().stream().sorted(Comparator.comparing(Recebimento::getValor).reversed())
+                                    .findFirst().orElse(null).getPagamentoModalidade();
+                            vlrPg = ((ContasAReceber) item).getRecebimentoList().stream()
+                                    .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                    .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
+                            if (vlrPg.compareTo(((ContasAReceber) item).valorProperty().getValue()) >= 0) {
+                                stilo = "recebimento-pago";
+                            }
+                        } catch (Exception ex) {
+
                         }
-                        if (!stilo.equals(""))
-                            getStyleClass().add(stilo);
+                        if (modalidade != null && (modalidade.equals(PagamentoModalidade.RETIRADA)
+                                || modalidade.equals(PagamentoModalidade.BONIFICACAO)
+                                || modalidade.equals(PagamentoModalidade.AMOSTRA))) {
+                            stilo = "recebimento-retirada";
+                        } else {
+                        }
+                    } else if (item instanceof Recebimento) {
+                        stilo = "recebimento-recebimento";
                     }
+                    if (!stilo.equals(""))
+                        getStyleClass().add(stilo);
                 }
-            });
+            }
+        });
 
-            getaReceberFilteredList().addListener((ListChangeListener<? super ContasAReceber>) change -> {
-                preencherTabela();
-            });
+        getContasAReceberFilteredList().addListener((ListChangeListener<? super ContasAReceber>) change -> {
+            preencherTabela();
+        });
 
-            getLblRegistrosLocalizados().textProperty().bind(Bindings.createIntegerBinding(() ->
-                    getaReceberFilteredList().size(), getaReceberFilteredList().predicateProperty()).asString());
+        getLblRegistrosLocalizados().textProperty().bind(Bindings.createIntegerBinding(() ->
+                getContasAReceberFilteredList().size(), getContasAReceberFilteredList().predicateProperty()).asString());
 
-            empresaProperty().addListener(observable -> aplicaFiltro());
-            getTxtPesquisa().textProperty().addListener(observable -> aplicaFiltro());
-            pagamentoSituacaoProperty().addListener(observable -> aplicaFiltro());
-            getDtpData1().valueProperty().addListener(observable -> aplicaFiltro());
-            getDtpData2().valueProperty().addListener(observable -> aplicaFiltro());
-            getChkDtVenda().selectedProperty().addListener(observable -> aplicaFiltro());
-        } else if (gettModelTipo().equals(TModelTipo.PEDIDO_NFE)) {
-
-        }
+//        empresaProperty().addListener(observable -> aplicaFiltro());
+//        getTxtPesquisa().textProperty().addListener(observable -> aplicaFiltro());
+//        pagamentoSituacaoProperty().addListener(observable -> aplicaFiltro());
+//        getDtpData1().valueProperty().addListener(observable -> aplicaFiltro());
+//        getDtpData2().valueProperty().addListener(observable -> aplicaFiltro());
+//        getChkDtVenda().selectedProperty().addListener(observable -> aplicaFiltro());
     }
 
     private void aplicaFiltro() {
         try {
-            if (gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)) {
-                getaReceberFilteredList().setPredicate(aReceber -> {
-                    if (getDtpData1().getValue() == null || getDtpData2().getValue() == null)
-                        return true;
-                    if (getChkDtVenda().isSelected()) {
-                        if (aReceber.dtCadastroProperty().getValue().toLocalDate().isBefore(getDtpData1().getValue())
-                                || aReceber.dtCadastroProperty().getValue().toLocalDate().isAfter(getDtpData2().getValue()))
-                            return false;
-                    } else {
-                        if (aReceber.dtVencimentoProperty().getValue().isBefore(getDtpData1().getValue())
-                                || aReceber.dtVencimentoProperty().getValue().isAfter(getDtpData2().getValue()))
-                            return false;
-                    }
-                    if (empresaProperty().getValue() != null) {
-                        if (empresaProperty().getValue().idProperty().getValue() != 0)
-                            if (aReceber.getSaidaProduto().getCliente().idProperty().getValue() != empresaProperty().getValue().idProperty().getValue()) {
-                                return false;
-                            }
-                    }
-
-                    if (pagamentoSituacaoProperty().getValue() != null) {
-                        switch (pagamentoSituacaoProperty().getValue()) {
-                            case PENDENTE:
-                                if (aReceber.valorProperty().getValue()
-                                        .compareTo(aReceber.getRecebimentoList().stream()
-                                                .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) <= 0)
-                                    return false;
-                                break;
-                            case CANCELADO:
-                                if (aReceber.getRecebimentoList().stream()
-                                        .filter(recebimento -> recebimento.getPagamentoSituacao()
-                                                .equals(PagamentoSituacao.CANCELADO)).count() == 0)
-                                    return false;
-                                break;
-                            case QUITADO:
-                                if (aReceber.valorProperty().getValue()
-                                        .compareTo(aReceber.getRecebimentoList().stream()
-                                                .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) > 0)
-                                    return false;
-                                break;
-                        }
-                    }
-
-                    if (aReceber.getRecebimentoList().stream()
-                            .filter(recebimento -> recebimento.documentoProperty().getValue().toLowerCase()
-                                    .contains(getTxtPesquisa().getText().toLowerCase())).count() == 0)
-                        return false;
-
+            getContasAReceberFilteredList().setPredicate(contasAReceber -> {
+                if (getDtpData1().getValue() == null || getDtpData2().getValue() == null)
                     return true;
-                });
-            } else if (gettModelTipo().equals(TModelTipo.PEDIDO_NFE)) {
-                getSaidaProdutoFilteredList().setPredicate(saidaProduto -> {
-                    if (getDtpData1().getValue() == null || getDtpData2().getValue() == null)
-                        return true;
-                    if (getChkDtVenda().isSelected()) {
-                        if (saidaProduto.dtCadastroProperty().getValue().toLocalDate().isBefore(getDtpData1().getValue())
-                                || saidaProduto.dtCadastroProperty().getValue().toLocalDate().isAfter(getDtpData2().getValue()))
+                if (chkDtVendaProperty().getValue().isSelected()) {
+                    if (contasAReceber.dtCadastroProperty().getValue().toLocalDate().isBefore(getDtpData1().getValue())
+                            || contasAReceber.dtCadastroProperty().getValue().toLocalDate().isAfter(getDtpData2().getValue()))
+                        return false;
+                } else {
+                    if (contasAReceber.dtVencimentoProperty().getValue().isBefore(getDtpData1().getValue())
+                            || contasAReceber.dtVencimentoProperty().getValue().isAfter(getDtpData2().getValue()))
+                        return false;
+                }
+                if (empresaProperty().getValue() != null) {
+                    if (empresaProperty().getValue().idProperty().getValue() != 0)
+                        if (contasAReceber.getSaidaProduto().getCliente().idProperty().getValue() != empresaProperty().getValue().idProperty().getValue()) {
                             return false;
-                    } else {
-                        if (saidaProduto.dtSaidaProperty().getValue().isBefore(getDtpData1().getValue())
-                                || saidaProduto.dtSaidaProperty().getValue().isAfter(getDtpData2().getValue()))
-                            return false;
-                    }
-                    if (empresaProperty().getValue() != null) {
-                        if (empresaProperty().getValue().idProperty().getValue() != 0)
-                            if (saidaProduto.clienteProperty().getValue().idProperty().getValue() != empresaProperty().getValue().idProperty().getValue()) {
-                                return false;
-                            }
-                    }
-
-                    if (pagamentoSituacaoProperty().getValue() != null) {
-                        switch (pagamentoSituacaoProperty().getValue()) {
-                            case PENDENTE:
-                                if (saidaProduto.getSaidaProdutoProdutoList().stream()
-                                        .map(SaidaProdutoProduto::getVlrLiquido).reduce(BigDecimal.ZERO, BigDecimal::add)
-                                        .compareTo(saidaProduto.contasAReceberProperty().getValue().getRecebimentoList().stream()
-                                                .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) <= 0)
-                                    return false;
-                                break;
-                            case CANCELADO:
-                                if (saidaProduto.contasAReceberProperty().getValue().getRecebimentoList().stream()
-                                        .filter(recebimento -> recebimento.getPagamentoSituacao()
-                                                .equals(PagamentoSituacao.CANCELADO)).count() == 0)
-                                    return false;
-                                break;
-                            case QUITADO:
-                                if (saidaProduto.getSaidaProdutoProdutoList().stream()
-                                        .map(SaidaProdutoProduto::getVlrLiquido).reduce(BigDecimal.ZERO, BigDecimal::add)
-                                        .compareTo(saidaProduto.contasAReceberProperty().getValue().getRecebimentoList().stream()
-                                                .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
-                                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) > 0)
-                                    return false;
-                                break;
                         }
+                }
+
+                if (pagamentoSituacaoProperty().getValue() != null) {
+                    switch (pagamentoSituacaoProperty().getValue()) {
+                        case PENDENTE:
+                            if (contasAReceber.valorProperty().getValue()
+                                    .compareTo(contasAReceber.getRecebimentoList().stream()
+                                            .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                            .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) <= 0)
+                                return false;
+                            break;
+                        case CANCELADO:
+                            if (contasAReceber.getRecebimentoList().stream()
+                                    .filter(recebimento -> recebimento.getPagamentoSituacao()
+                                            .equals(PagamentoSituacao.CANCELADO)).count() == 0)
+                                return false;
+                            break;
+                        case QUITADO:
+                            if (contasAReceber.valorProperty().getValue()
+                                    .compareTo(contasAReceber.getRecebimentoList().stream()
+                                            .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
+                                            .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) > 0)
+                                return false;
+                            break;
                     }
+                }
 
-                    if (!saidaProduto.idProperty().getValue().toString().contains(getTxtPesquisa().getText().toLowerCase()))
-                        return false;
-
-                    if (saidaProduto.getSaidaProdutoNfeList().stream()
-                            .filter(saidaProdutoNfe -> saidaProdutoNfe.chaveProperty().getValue().toLowerCase()
-                                    .contains(getTxtPesquisa().getText().toLowerCase())
-                                    || saidaProdutoNfe.numeroProperty().getValue().toString()
-                                    .contains(getTxtPesquisa().getText().toLowerCase())).count() == 0)
-                        return false;
-                    if (saidaProduto.getContasAReceber().getRecebimentoList().stream()
-                            .filter(recebimento -> recebimento.documentoProperty().getValue().toLowerCase()
-                                    .contains(getTxtPesquisa().getText().toLowerCase())).count() == 0)
-                        return false;
-
-                    return true;
-                });
-            }
+                if (contasAReceber.getRecebimentoList().stream()
+                        .filter(recebimento -> recebimento.documentoProperty().getValue().toLowerCase()
+                                .contains(getTxtPesquisa().getText().toLowerCase())).count() == 0)
+                    return false;
+                return true;
+            });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     public void totalizaTabela() {
-        if (gettModelTipo().equals(TModelTipo.PEDIDO_RECIBO)) {
-            setQtdClientes(
-                    getaReceberFilteredList().stream()
-                            .map(ContasAReceber::getSaidaProduto)
-                            .map(SaidaProduto::getCliente)
-                            .collect(Collectors.groupingBy(Empresa::getId))
-                            .size()
-            );
+        setQtdClientes(
+                getContasAReceberFilteredList().stream()
+                        .map(ContasAReceber::getSaidaProduto)
+                        .map(SaidaProduto::getCliente)
+                        .collect(Collectors.groupingBy(Empresa::getId))
+                        .size()
+        );
 
-            setQtdContas((int) getaReceberFilteredList().size());
+        setQtdContas(getContasAReceberFilteredList().size());
 
-            setTotalContas(
-                    getaReceberFilteredList().stream()
-                            .map(ContasAReceber::getValor)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-                            .subtract(getaReceberFilteredList().stream()
-                                    .map(ContasAReceber::getVlrCredDeb)
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add))
-            );
+        setTotalContas(
+                getContasAReceberFilteredList().stream()
+                        .map(ContasAReceber::getValor)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .subtract(getContasAReceberFilteredList().stream()
+                                .map(ContasAReceber::getVlrCredDeb)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add))
+        );
 
-            setQtdContasRetiradas(
-                    (int) getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) == 0)
-                            .count()
-            );
+        setQtdContasRetiradas(
+                (int) getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) == 0)
+                        .count()
+        );
 
-            setTotalContasRetiradas(
-                    getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) == 0)
-                            .map(ContasAReceber::getValor)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            );
+        setTotalContasRetiradas(
+                getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) == 0)
+                        .map(ContasAReceber::getValor)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
-            setQtdContasDescontos(
-                    (int) getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-                                    && aReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
-                                    .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add)
-                                    .compareTo(BigDecimal.ZERO) > 0)
-                            .count()
-            );
+        setQtdContasDescontos(
+                (int) getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
+                                .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add)
+                                .compareTo(BigDecimal.ZERO) > 0)
+                        .count()
+        );
 
-            setTotalContasDescontos(
-                    getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-                                    && aReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
-                                    .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add)
-                                    .compareTo(BigDecimal.ZERO) > 0)
-                            .map(ContasAReceber::getSaidaProduto).map(SaidaProduto::getSaidaProdutoProdutoList)
-                            .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream().map(SaidaProdutoProduto::getVlrDesconto)
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add))
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            );
+        setTotalContasDescontos(
+                getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
+                                .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add)
+                                .compareTo(BigDecimal.ZERO) > 0)
+                        .map(ContasAReceber::getSaidaProduto).map(SaidaProduto::getSaidaProdutoProdutoList)
+                        .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream().map(SaidaProdutoProduto::getVlrDesconto)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
-            setTotalLucroBruto(getaReceberFilteredList().stream()
-                    .map(ContasAReceber::getSaidaProduto)
-                    .map(SaidaProduto::getSaidaProdutoProdutoList)
-                    .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
-                            .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
-                                    .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()))
-                            .reduce(BigDecimal.ZERO, BigDecimal::add))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+        setTotalLucroBruto(getContasAReceberFilteredList().stream()
+                .map(ContasAReceber::getSaidaProduto)
+                .map(SaidaProduto::getSaidaProdutoProdutoList)
+                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
+                        .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
+                                .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
 
-            if (getTotalLucroBruto().compareTo(BigDecimal.ZERO) > 0)
-                setPercLucroBruto(getTotalLucroBruto().multiply(new BigDecimal("100."))
-                        .divide(getTotalContas(), 4, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP));
-            else
-                setPercLucroBruto(BigDecimal.ZERO);
+        if (getTotalLucroBruto().compareTo(BigDecimal.ZERO) > 0)
+            setPercLucroBruto(getTotalLucroBruto().multiply(new BigDecimal("100."))
+                    .divide(getTotalContas(), 4, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP));
+        else
+            setPercLucroBruto(BigDecimal.ZERO);
 
-            setTotalLucroLiquido(getTotalLucroBruto().subtract(getTotalContasDescontos().add(getTotalContasRetiradas())));
+        setTotalLucroLiquido(getTotalLucroBruto().subtract(getTotalContasDescontos().add(getTotalContasRetiradas())));
 
-            if (getTotalLucroLiquido().compareTo(BigDecimal.ZERO) > 0)
-                setPercLucroLiquido(getTotalLucroLiquido().multiply(new BigDecimal("100.")).divide(getTotalContas()).setScale(4, RoundingMode.HALF_UP));
-            else
-                setPercLucroLiquido(BigDecimal.ZERO);
+        if (getTotalLucroLiquido().compareTo(BigDecimal.ZERO) > 0)
+            setPercLucroLiquido(getTotalLucroLiquido().multiply(new BigDecimal("100.")).divide(getTotalContas()).setScale(4, RoundingMode.HALF_UP));
+        else
+            setPercLucroLiquido(BigDecimal.ZERO);
 
 //        BigDecimal valDesconto = getaReceberFilteredList().stream()
 //                .map(ContasAReceber::getSaidaProduto)
@@ -686,76 +554,76 @@ public class TmodelContasAReceber {
 ////                BigDecimal.TEN.setScale(4)
 //        );
 
-            setQtdContasAReceber(
-                    (int) getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-                            .count()
-            );
+        setQtdContasAReceber(
+                (int) getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+                        .count()
+        );
 
-            setTotalContasAReceber(
-                    getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-                            .map(ContasAReceber::getValor)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            );
+        setTotalContasAReceber(
+                getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+                        .map(ContasAReceber::getValor)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
-            setQtdContasVencidas(
-                    (int) getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) != 0
-                                    && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
-                            .count()
-            );
+        setQtdContasVencidas(
+                (int) getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) != 0
+                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
+                        .count()
+        );
 
-            setTotalContasVencidas(
-                    getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) != 0
-                                    && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
-                            .map(ContasAReceber::getVlrSaldo)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            );
+        setTotalContasVencidas(
+                getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) != 0
+                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
+                        .map(ContasAReceber::getVlrSaldo)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
-            setQtdContasPendentes(
-                    (int) getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-                                    && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) >= 0)
-                            .count()
-            );
+        setQtdContasPendentes(
+                (int) getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) >= 0)
+                        .count()
+        );
 
-            setTotalContasPendentes(
-                    getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-                                    && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) >= 0)
-                            .map(ContasAReceber::getVlrSaldo)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            );
+        setTotalContasPendentes(
+                getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) >= 0)
+                        .map(ContasAReceber::getVlrSaldo)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
-            setQtdContasPagas(
-                    (int) getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-                                    && aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) <= 0)
-                            .count()
-            );
+        setQtdContasPagas(
+                (int) getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) <= 0)
+                        .count()
+        );
 
-            setTotalContasPagas(
-                    getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-                                    && aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) <= 0)
-                            .map(ContasAReceber::getVlrPago)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            );
+        setTotalContasPagas(
+                getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) <= 0)
+                        .map(ContasAReceber::getVlrPago)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
-            setQtdContasSaldoClientes(
-                    (int) getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
-                            .count()
-            );
+        setQtdContasSaldoClientes(
+                (int) getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
+                        .count()
+        );
 
-            setTotalContasSaldoClientes(
-                    getaReceberFilteredList().stream()
-                            .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
-                            .map(ContasAReceber::getVlrSaldo)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            );
+        setTotalContasSaldoClientes(
+                getContasAReceberFilteredList().stream()
+                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
+                        .map(ContasAReceber::getVlrSaldo)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
 //        setPercLucroLiquido(
 //                BigDecimal.ONE.setScale(4)
@@ -772,9 +640,6 @@ public class TmodelContasAReceber {
 //        setTotalContasConfirmacao(
 //                getTotalContasVencidas().add(getTotalContasPendentes()).add(getTotalContasPagas()).add(getTotalContasSaldoClientes())
 //        );
-        } else if (gettModelTipo().equals(TModelTipo.PEDIDO_NFE)) {
-
-        }
     }
 
     /**
@@ -794,32 +659,72 @@ public class TmodelContasAReceber {
         this.tp = tp;
     }
 
-    public TModelTipo gettModelTipo() {
-        return tModelTipo;
+    public TextField getTxtPesquisa() {
+        return txtPesquisa;
+    }
+
+    public void setTxtPesquisa(TextField txtPesquisa) {
+        this.txtPesquisa = txtPesquisa;
+    }
+
+    public Label getLblRegistrosLocalizados() {
+        return lblRegistrosLocalizados;
+    }
+
+    public void setLblRegistrosLocalizados(Label lblRegistrosLocalizados) {
+        this.lblRegistrosLocalizados = lblRegistrosLocalizados;
+    }
+
+    public TreeTableView<Object> getTtvContasAReceber() {
+        return ttvContasAReceber;
+    }
+
+    public void setTtvContasAReceber(TreeTableView<Object> ttvContasAReceber) {
+        this.ttvContasAReceber = ttvContasAReceber;
+    }
+
+    public FilteredList<ContasAReceber> getContasAReceberFilteredList() {
+        return contasAReceberFilteredList;
+    }
+
+    public void setContasAReceberFilteredList(FilteredList<ContasAReceber> contasAReceberFilteredList) {
+        this.contasAReceberFilteredList = contasAReceberFilteredList;
     }
 
     public DatePicker getDtpData1() {
+        return dtpData1.get();
+    }
+
+    public ObjectProperty<DatePicker> dtpData1Property() {
         return dtpData1;
     }
 
     public void setDtpData1(DatePicker dtpData1) {
-        this.dtpData1 = dtpData1;
+        this.dtpData1.set(dtpData1);
     }
 
     public DatePicker getDtpData2() {
+        return dtpData2.get();
+    }
+
+    public ObjectProperty<DatePicker> dtpData2Property() {
         return dtpData2;
     }
 
     public void setDtpData2(DatePicker dtpData2) {
-        this.dtpData2 = dtpData2;
+        this.dtpData2.set(dtpData2);
     }
 
     public CheckBox getChkDtVenda() {
+        return chkDtVenda.get();
+    }
+
+    public ObjectProperty<CheckBox> chkDtVendaProperty() {
         return chkDtVenda;
     }
 
     public void setChkDtVenda(CheckBox chkDtVenda) {
-        this.chkDtVenda = chkDtVenda;
+        this.chkDtVenda.set(chkDtVenda);
     }
 
     public Empresa getEmpresa() {
@@ -834,14 +739,6 @@ public class TmodelContasAReceber {
         this.empresa.set(empresa);
     }
 
-    public TextField getTxtPesquisa() {
-        return txtPesquisa;
-    }
-
-    public void setTxtPesquisa(TextField txtPesquisa) {
-        this.txtPesquisa = txtPesquisa;
-    }
-
     public PagamentoSituacao getPagamentoSituacao() {
         return pagamentoSituacao.get();
     }
@@ -852,70 +749,6 @@ public class TmodelContasAReceber {
 
     public void setPagamentoSituacao(PagamentoSituacao pagamentoSituacao) {
         this.pagamentoSituacao.set(pagamentoSituacao);
-    }
-
-    public Label getLblRegistrosLocalizados() {
-        return lblRegistrosLocalizados;
-    }
-
-    public void setLblRegistrosLocalizados(Label lblRegistrosLocalizados) {
-        this.lblRegistrosLocalizados = lblRegistrosLocalizados;
-    }
-
-    public TreeTableView<Object> getTtvPedido() {
-        return ttvPedido;
-    }
-
-    public void setTtvPedido(TreeTableView<Object> ttvPedido) {
-        this.ttvPedido = ttvPedido;
-    }
-
-    public ContasAReceberDAO getaReceberDAO() {
-        return aReceberDAO;
-    }
-
-    public void setaReceberDAO(ContasAReceberDAO aReceberDAO) {
-        this.aReceberDAO = aReceberDAO;
-    }
-
-    public ObservableList<ContasAReceber> getaReceberObservableList() {
-        return aReceberObservableList;
-    }
-
-    public void setaReceberObservableList(ObservableList<ContasAReceber> aReceberObservableList) {
-        this.aReceberObservableList = aReceberObservableList;
-    }
-
-    public FilteredList<ContasAReceber> getaReceberFilteredList() {
-        return aReceberFilteredList;
-    }
-
-    public void setaReceberFilteredList(FilteredList<ContasAReceber> aReceberFilteredList) {
-        this.aReceberFilteredList = aReceberFilteredList;
-    }
-
-    public SaidaProdutoDAO getSaidaProdutoDAO() {
-        return saidaProdutoDAO;
-    }
-
-    public void setSaidaProdutoDAO(SaidaProdutoDAO saidaProdutoDAO) {
-        this.saidaProdutoDAO = saidaProdutoDAO;
-    }
-
-    public ObservableList<SaidaProduto> getSaidaProdutoObservableList() {
-        return saidaProdutoObservableList;
-    }
-
-    public void setSaidaProdutoObservableList(ObservableList<SaidaProduto> saidaProdutoObservableList) {
-        this.saidaProdutoObservableList = saidaProdutoObservableList;
-    }
-
-    public FilteredList<SaidaProduto> getSaidaProdutoFilteredList() {
-        return saidaProdutoFilteredList;
-    }
-
-    public void setSaidaProdutoFilteredList(FilteredList<SaidaProduto> saidaProdutoFilteredList) {
-        this.saidaProdutoFilteredList = saidaProdutoFilteredList;
     }
 
     public TreeItem<Object> getPedidoTreeItem() {
@@ -1274,7 +1107,7 @@ public class TmodelContasAReceber {
         this.totalLucroLiquido.set(totalLucroLiquido);
     }
 
-    /**
+/**
      * END Getters e Setters
      */
 }

@@ -176,6 +176,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private StringProperty xmlNFeRetAutorizacao = new SimpleStringProperty();
     private StringProperty xmlNFeProc = new SimpleStringProperty();
 
+    private ServiceAutoCompleteComboBox comboEmpresa;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
@@ -302,7 +304,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 getEnumsTasksList().clear();
                                 getEnumsTasksList().add(EnumsTasks.SALVAR_ENT_SAIDA);
                                 BigDecimal vlrCredDeb = utilizacaoDeCreditoDebito();
-                                System.out.printf("vlrCredDeb: %s\n", vlrCredDeb);
                                 if (new ServiceSegundoPlano().executaListaTarefas(newTaskSaidaProduto(), String.format("Salvando %s!", getNomeTab()))) {
                                     if (vlrCredDeb.compareTo(BigDecimal.ZERO) != 0) {
                                         try {
@@ -346,10 +347,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             break;
                         case F6:
                             getCboEmpresa().requestFocus();
-                            if (getCboEmpresa().isFocused()) {
-                                getCboEmpresa().setValue(null);
-                                getCboEmpresa().getEditor().setText("");
-                            }
+                            //getCboEmpresa().setValue(null);
                             break;
                         case F7:
                             getTxtPesquisaProduto().requestFocus();
@@ -388,19 +386,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             showStatusBar();
         });
 
-        new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
+        comboEmpresa = new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
 
         new ServiceAutoCompleteComboBox(Empresa.class, getCboNfeTransporteTransportadora());
 
         empresaProperty().bind(Bindings.createObjectBinding(() -> {
-            if (getCboEmpresa().getValue() == null)
+            if (getCboEmpresa().getSelectionModel().getSelectedItem() == null)
                 return new Empresa();
-            return getCboEmpresa().getValue();
+            return getCboEmpresa().getSelectionModel().getSelectedItem();
         }, getCboEmpresa().valueProperty()));
 
         empresaProperty().addListener((ov, o, n) -> {
-//            if (n == null)
-//                n = new Empresa();
             exibirEmpresaDetalhe();
             showStatusBar();
         });
@@ -655,9 +651,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private void limpaCampos(AnchorPane anchorPane) {
         ServiceCampoPersonalizado.fieldClear(anchorPane);
         if (anchorPane.equals(getPainelViewSaidaProduto())) {
-            getCboEmpresa().getSelectionModel().select(-1);
-            getCboEmpresa().setValue(null);
+            comboEmpresa.clearCombo();
             getCboEmpresa().requestFocus();
+//            ServiceComandoTecladoMouse.pressTecla(KeyCode.BACK_SPACE);
+//            getCboEmpresa().getEditor().setText("");
+//            getCboEmpresa().getSelectionModel().select(-1);
             getTpnNfe().setExpanded(false);
             getSaidaProdutoProdutoObservableList();
             getTmodelSaidaProduto().getSaidaProdutoProdutoObservableList().clear();
@@ -783,7 +781,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private void exibirEmpresaDetalhe() {
+        //limpaCampos(getTpnCliente());
         getTmodelSaidaProduto().empresaProperty().setValue(empresaProperty().getValue());
+        showStatusBar();
+
+        //if (empresaProperty().getValue() == null) return;
 
         getDtpDtSaida().setValue(LocalDate.now());
         getLblPrazo().setText(prazoProperty().getValue().toString());
@@ -832,7 +834,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 .filter(endereco -> endereco.getTipo().equals(TipoEndereco.ENTREGA))
                 .findFirst().ifPresent(endereco -> getCboEndereco().getSelectionModel().select(endereco));
 
-        showStatusBar();
     }
 
     private void guardarSaidaProdutoProduto() {
@@ -989,7 +990,6 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     .reduce(BigDecimal.ZERO, BigDecimal::add));
                             if (valorCredDeb[0].compareTo(saldoConta) < 0)
                                 saldoConta = valorCredDeb[0];
-                            System.out.printf("baixarCreditoDebito: [R$%s]\n", saldoConta);
                             contasAReceber.getRecebimentoList().add(addRecebimento(contasAReceber,
                                     PagamentoModalidade.BAIXA_CREDITO, saldoConta));
                             try {
@@ -1141,7 +1141,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
             getDtpDtVencimento().requestFocus();
             return false;
         }
-        if (getCboEmpresa().getSelectionModel().getSelectedItem() == null) {
+        if (getCboEmpresa().getSelectionModel().getSelectedItem() == null
+                && getCboEmpresa().getValue() == null) {
             getCboEmpresa().requestFocus();
             return false;
         }

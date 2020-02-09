@@ -48,7 +48,8 @@ public class SaidaProduto implements Serializable {
         this.id.set(id);
     }
 
-    @ManyToOne//(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     public Empresa getCliente() {
         return cliente.get();
     }
@@ -62,7 +63,8 @@ public class SaidaProduto implements Serializable {
     }
 
     @JsonIgnore
-    @ManyToOne//(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     public Usuario getVendedor() {
         return vendedor.get();
     }
@@ -75,7 +77,6 @@ public class SaidaProduto implements Serializable {
         this.vendedor.set(vendedor);
     }
 
-    //@JsonIgnore
     @CreationTimestamp
     public LocalDateTime getDtCadastro() {
         return dtCadastro.get();
@@ -89,7 +90,6 @@ public class SaidaProduto implements Serializable {
         this.dtCadastro.set(dtCadastro);
     }
 
-    //@JsonIgnore
     @Column(nullable = false)
     public LocalDate getDtSaida() {
         return dtSaida.get();
