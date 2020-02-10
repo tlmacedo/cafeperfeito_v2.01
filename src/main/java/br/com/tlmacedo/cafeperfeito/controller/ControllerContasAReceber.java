@@ -13,9 +13,11 @@ import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
 import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
 import br.com.tlmacedo.cafeperfeito.service.ServiceSegundoPlano;
+import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewContasAReceber;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -24,6 +26,7 @@ import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
@@ -83,6 +86,8 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     private TmodelContasAReceber tmodelContasAReceber;
     private ObjectProperty<ContasAReceber> contasAReceber = new SimpleObjectProperty<>();
     private ContasAReceberDAO contasAReceberDAO;
+    private ObjectProperty<Object> objectSelect = new SimpleObjectProperty<>();
+    private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
 
     private FilteredList<ContasAReceber> contasAReceberFilteredList;
 
@@ -202,128 +207,51 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
             }
         });
 
-//        ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-//            if (n == null) return;
-//            if (n.getText().equals(getNomeTab())) {
-//                ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().addEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
-//                showStatusBar();
-//            } else {
-//                ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerSaidaProduto());
-//            }
-//        });
-//
-//        getSaidaProdutoProdutoObservableList().addListener((ListChangeListener<? super SaidaProdutoProduto>) c -> {
-//            showStatusBar();
-//        });
-//
-//        new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
-//
-//        new ServiceAutoCompleteComboBox(Empresa.class, getCboNfeTransporteTransportadora());
-//
-//        empresaProperty().bind(Bindings.createObjectBinding(() -> {
-//            if (getCboEmpresa().getValue() == null)
-//                return new Empresa();
-//            return getCboEmpresa().getValue();
-//        }, getCboEmpresa().valueProperty()));
-//
-//        empresaProperty().addListener((ov, o, n) -> {
-////            if (n == null)
-////                n = new Empresa();
-//            exibirEmpresaDetalhe();
-//            showStatusBar();
-//        });
-//
-//        getCboEmpresa().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-//            if (event.getCode() == KeyCode.ENTER && getCboEmpresa().getValue() != null)
-//                getTxtPesquisaProduto().requestFocus();
-//        });
-//
-//        getCboEndereco().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-//            if (n == null) {
-//                limpaEndereco();
-//                return;
-//            }
-//            getLblLogradoruro().setText(n.logradouroProperty().getValue());
-//            getLblNumero().setText(n.numeroProperty().getValue());
-//            getLblBairro().setText(n.bairroProperty().getValue());
-//            getLblComplemento().setText(n.complementoProperty().getValue());
-//        });
-//
-//        prazoProperty().addListener((ov, o, n) -> {
-//            if (n == null)
-//                getDtpDtVencimento().setValue(getDtpDtSaida().getValue());
-//            else
-//                getDtpDtVencimento().setValue(getDtpDtSaida().getValue().plusDays(n.intValue()));
-//            getLblPrazo().setText(n.toString());
-//        });
-//
-//        getTxtPesquisaProduto().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-//            if (event.getCode() != KeyCode.ENTER) return;
-//            getTtvProdutoEstoque().requestFocus();
-//            getTtvProdutoEstoque().getSelectionModel().selectFirst();
-//        });
-//
-//        getLblQtdItem().textProperty().bind(getTmodelSaidaProduto().totalQtdItemProperty().asString());
-//        getLblQtdTotal().textProperty().bind(getTmodelSaidaProduto().totalQtdProdutoProperty().asString());
-//        getLblQtdVolume().textProperty().bind(getTmodelSaidaProduto().totalQtdVolumeProperty().asString());
-//        getLblTotalBruto().textProperty().bind(Bindings.createStringBinding(() ->
-//                        ServiceMascara.getMoeda(getTmodelSaidaProduto().totalBrutoProperty().getValue(), 2),
-//                getTmodelSaidaProduto().totalBrutoProperty()
-//        ));
-//        getLblTotalDesconto().textProperty().bind(Bindings.createStringBinding(() ->
-//                        ServiceMascara.getMoeda(getTmodelSaidaProduto().totalDescontoProperty().getValue(), 2),
-//                getTmodelSaidaProduto().totalDescontoProperty()
-//        ));
-//        getLblTotalLiquido().textProperty().bind(Bindings.createStringBinding(() ->
-//                        ServiceMascara.getMoeda(getTmodelSaidaProduto().totalLiquidoProperty().getValue(), 2),
-//                getTmodelSaidaProduto().totalLiquidoProperty()
-//        ));
-//
-//        getTpnNfe().expandedProperty().addListener((ov, o, n) -> {
-//            if (n) {
-//                getTxtNfeDadosNumero().setText(String.valueOf(nfeLastNumberProperty().getValue() + 1));
-//                getTxtNfeDadosSerie().setText(String.valueOf(TCONFIG.getNfe().getNFeSerie()));
-//                getCboNfeDadosNaturezaOperacao().requestFocus();
-//            } else {
-//                limpaCampos(getTpnNfe());
-//                getTxtPesquisaProduto().requestFocus();
-//            }
-//        });
-//
-//        getCboNfeTransporteTransportadora().disableProperty().bind(getCboNfeTransporteModFrete().valueProperty().isEqualTo(NfeTransporteModFrete.REMETENTE));
-//
-//        getCboNfeTransporteTransportadora().disableProperty().addListener((ov, o, n) -> {
-//            if (n)
-//                getCboNfeTransporteTransportadora().getSelectionModel().select(-1);
-//        });
-//
-//        informacoesAdicionasNFeProperty().bind(
-//                Bindings.createStringBinding(() -> refreshNFeInfAdicionas(),
-//                        getLblTotalLiquido().textProperty(), getDtpDtVencimento().valueProperty()));
-//
-//        informacoesAdicionasNFeProperty().addListener((ov, o, n) -> {
-//            if (n == null)
-//                n = "";
-//            getTxaNfeInformacoesAdicionais().setText(n);
-//        });
-//
-//        getDtpDtSaida().focusedProperty().addListener((ov, o, n) -> {
-//            ServiceFormatDataPicker.formatDataPicker(getDtpDtSaida(), n);
-//        });
-//
-//        getDtpDtVencimento().focusedProperty().addListener((ov, o, n) -> {
-//            ServiceFormatDataPicker.formatDataPicker(getDtpDtVencimento(), n);
-//        });
-//
-//        getDtpNfeDadosDtSaida().focusedProperty().addListener((ov, o, n) -> {
-//            ServiceFormatDataPicker.formatDataPicker(getDtpNfeDadosDtSaida(), n);
-//        });
-//
-//        getDtpNfeDadosDtEmissao().focusedProperty().addListener((ov, o, n) -> {
-//            ServiceFormatDataPicker.formatDataPicker(getDtpNfeDadosDtEmissao(), n);
-//        });
-//
-//        //getCboNfeTransporteModFrete().disableProperty().bind(getCboNfeTransporteModFrete().selectionModelProperty().isEqualTo(NfeTransporteModFrete.REMETENTE));
+        ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
+            if (n == null) return;
+            if (n.getText().equals(getNomeTab())) {
+                ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().addEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerContasAReceber());
+                showStatusBar();
+            } else {
+                ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().removeEventHandler(KeyEvent.KEY_PRESSED, getEventHandlerContasAReceber());
+            }
+        });
+
+        getTtvContasAReceber().getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
+            objectSelectProperty().setValue(n);
+            String stb = statusBarProperty().getValue().getDescricao();
+            try {
+                if (objectSelectProperty().getValue() instanceof ContasAReceber) {
+                    if (((ContasAReceber) objectSelectProperty().getValue()).getRecebimentoList().size() == 0) {
+                        stb = stb.replace("  [Ctrl+P-Imprimir recibo]  [F4-Editar recebimento]  ", "");
+                    } else {
+                        if (((ContasAReceber) objectSelectProperty().getValue()).getRecebimentoList().stream().map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)
+                                .compareTo(((ContasAReceber) objectSelectProperty().getValue()).valorProperty().getValue()) >= 0)
+                            stb = stb.replace("[Insert-Novo recebimento]  ", "");
+                    }
+                } else if (objectSelectProperty().getValue() instanceof Recebimento) {
+                    stb = stb.replace("[Insert-Novo recebimento]  ", "");
+                }
+            } catch (Exception ex) {
+                stb = statusBarProperty().getValue().getDescricao();
+            }
+            ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(stb);
+        });
+
+        new ServiceAutoCompleteComboBox(Empresa.class, getCboEmpresa());
+
+        empresaProperty().bind(Bindings.createObjectBinding(() -> {
+            if (getCboEmpresa().getSelectionModel().getSelectedItem() == null)
+                return new Empresa();
+            return getCboEmpresa().getSelectionModel().getSelectedItem();
+        }, getCboEmpresa().valueProperty()));
+
+        getCboEmpresa().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER && getCboEmpresa().getValue() != null)
+                getTxtPesquisa().requestFocus();
+        });
+
+
     }
 
     /**
@@ -360,8 +288,6 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                 getTmodelContasAReceber().empresaProperty().bind(getCboEmpresa().valueProperty());
                                 getTmodelContasAReceber().pagamentoSituacaoProperty().bind(getCboPagamentoSituacao().valueProperty());
                                 getTmodelContasAReceber().escutaLista();
-//                                getDtpData1().setValue(LocalDate.of(LocalDate.now().getYear(), 1, 1));
-//                                getDtpData2().setValue(LocalDate.now().plusMonths(2).withDayOfMonth(1).minusDays(1));
                                 break;
 
                             case COMBOS_PREENCHER:
@@ -429,33 +355,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
 
     private void showStatusBar() {
-//        try {
-//            if (getTtvContasAReceber().get.size() <= 0 || getCboEmpresa().getValue().idProperty().getValue() == 0)
-//                ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao().replace("  [F2-Finalizar venda]", ""));
-//            else
-//                ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao());
-//        } catch (Exception ex) {
-//            ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao());
-//        }
-
-        String stb = "";
-        try {
-            stb = statusBarProperty().getValue().getDescricao();
-            if (contasAReceberProperty().getValue() == null) {
-                stb = stb.replace("[Insert-Novo recebimento]  [Ctrl+P-Imprimir recibo]  [F4-Editar recebimento]  ", "");
-            } else {
-                if (contasAReceberProperty().getValue().getRecebimentoList().size() <= 0) {
-                    stb = stb.replace("[Ctrl+P-Imprimir recibo]  [F4-Editar recebimento]  ", "");
-                } else {
-                    if (contasAReceberProperty().getValue().valorProperty().getValue()
-                            .compareTo(contasAReceberProperty().getValue().getRecebimentoList().stream()
-                                    .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)) <= 0)
-                        stb = stb.replace("[Insert-Novo recebimento]  ", "");
-                }
-            }
-        } catch (Exception ex) {
-            //stb = statusBarProperty().getValue().getDescricao();
-        }
+        String stb = statusBarProperty().getValue().getDescricao();
         ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(stb);
     }
 
@@ -817,6 +717,30 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
     public void setContasAReceberFilteredList(FilteredList<ContasAReceber> contasAReceberFilteredList) {
         this.contasAReceberFilteredList = contasAReceberFilteredList;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa.get();
+    }
+
+    public ObjectProperty<Empresa> empresaProperty() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa.set(empresa);
+    }
+
+    public Object getObjectSelect() {
+        return objectSelect.get();
+    }
+
+    public ObjectProperty<Object> objectSelectProperty() {
+        return objectSelect;
+    }
+
+    public void setObjectSelect(Object objectSelect) {
+        this.objectSelect.set(objectSelect);
     }
 
     /**
