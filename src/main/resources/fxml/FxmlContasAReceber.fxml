@@ -46,7 +46,7 @@
                             </children>
                         </VBox>
                         <CheckBox fx:id="chkDtVenda" layoutX="205.0" layoutY="23.0" mnemonicParsing="false"
-                                  selected="false" text="Dt. venda">
+                                  selected="true" text="Dt. venda">
                             <tooltip>
                                 <Tooltip text="filtrar por data de venda ou data de vencimento."/>
                             </tooltip>

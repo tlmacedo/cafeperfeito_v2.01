@@ -278,8 +278,8 @@ public class TmodelContasAReceber {
             setPedidoTreeItem(new TreeItem());
             getContasAReceberFilteredList().stream()
                     .forEach(contasAReceber -> {
-                        BigDecimal vlrCredDeb = BigDecimal.ZERO;
-                        BigDecimal vlrPago = BigDecimal.ZERO;
+                        final BigDecimal[] vlrCredDeb = {BigDecimal.ZERO};
+                        final BigDecimal[] vlrPago = {BigDecimal.ZERO};
 
                         TreeItem<Object> paiItem = new TreeItem(contasAReceber);
                         getPedidoTreeItem().getChildren().add(paiItem);
@@ -288,31 +288,24 @@ public class TmodelContasAReceber {
                                     TreeItem<Object> filhoItem = new TreeItem(recebimento);
                                     paiItem.getChildren().add(filhoItem);
                                     if (recebimento.getPagamentoModalidade().getDescricao().toLowerCase().contains("credito")
-                                            || recebimento.getPagamentoModalidade().getDescricao().toLowerCase().contains("debito"))
-                                        vlrCredDeb.add(recebimento.valorProperty().getValue());
-                                    if (recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO))
-                                        vlrPago.add(recebimento.valorProperty().getValue());
+                                            || recebimento.getPagamentoModalidade().getDescricao().toLowerCase().contains("debito")) {
+                                        vlrCredDeb[0] = vlrCredDeb[0].add(recebimento.valorProperty().getValue());
+                                    } else {
+                                        if (recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO))
+                                            vlrPago[0] = vlrPago[0].add(recebimento.valorProperty().getValue());
+                                    }
                                 });
 
-                        BigDecimal vlrLiquido = contasAReceber.valorProperty().getValue().subtract(vlrCredDeb);
+                        BigDecimal vlrLiquido = contasAReceber.valorProperty().getValue().subtract(vlrCredDeb[0]);
 
-                        contasAReceber.vlrCredDebProperty().setValue(vlrCredDeb);
+                        contasAReceber.vlrCredDebProperty().setValue(vlrCredDeb[0]);
 
                         contasAReceber.vlrLiquidoProperty().setValue(vlrLiquido);
 
-                        contasAReceber.vlrPagoProperty().setValue(vlrPago);
+                        contasAReceber.vlrPagoProperty().setValue(vlrPago[0]);
 
-                        contasAReceber.vlrSaldoProperty().setValue(vlrLiquido.subtract(vlrPago));
+                        contasAReceber.vlrSaldoProperty().setValue(vlrLiquido.subtract(vlrPago[0]));
 
-                        try {
-                            System.out.printf("%s\n", contasAReceber.toString());
-                            if (contasAReceber.getRecebimentoList().size() > 0)
-                                for (Recebimento rec : contasAReceber.getRecebimentoList())
-                                    System.out.printf("\t%s\n", rec);
-
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
                     });
 
 
