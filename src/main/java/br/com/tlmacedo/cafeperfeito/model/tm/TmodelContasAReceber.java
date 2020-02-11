@@ -230,11 +230,11 @@ public class TmodelContasAReceber {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
                 return new SimpleStringProperty(
                         ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrLiquidoProperty().getValue(), 2));
-            } else if (cellData.getValue().getValue() instanceof Recebimento) {
-                if (!(((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("credito")
-                        || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("debito")))
-                    return new SimpleStringProperty(
-                            ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
+//            } else if (cellData.getValue().getValue() instanceof Recebimento) {
+//                if (!(((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("credito")
+//                        || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("debito")))
+//                    return new SimpleStringProperty(
+//                            ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
             }
             return new SimpleStringProperty("");
         });
@@ -245,11 +245,7 @@ public class TmodelContasAReceber {
         getColValorPago().setCellValueFactory(cellData -> {
             if (cellData.getValue().getValue() instanceof ContasAReceber) {
                 return new SimpleStringProperty(
-                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).getRecebimentoList().stream()
-                                .filter(recebimento ->
-                                        (!(((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("credito")
-                                                || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("debito"))))
-                                .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add), 2));
+                        ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrPagoProperty().getValue(), 2));
             } else if (cellData.getValue().getValue() instanceof Recebimento) {
                 if ((!(((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("credito")
                         || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("debito"))))
@@ -298,15 +294,27 @@ public class TmodelContasAReceber {
                                         vlrPago.add(recebimento.valorProperty().getValue());
                                 });
 
-
-                        ((ContasAReceber) paiItem.getValue()).vlrCredDebProperty().setValue(vlrCredDeb);
-
                         BigDecimal vlrLiquido = contasAReceber.valorProperty().getValue().subtract(vlrCredDeb);
 
-                        ((ContasAReceber) paiItem.getValue()).vlrLiquidoProperty().setValue(vlrLiquido);
+                        contasAReceber.vlrCredDebProperty().setValue(vlrCredDeb);
 
-                        ((ContasAReceber) paiItem.getValue()).vlrSaldoProperty().setValue(vlrLiquido.subtract(vlrPago));
+                        contasAReceber.vlrLiquidoProperty().setValue(vlrLiquido);
+
+                        contasAReceber.vlrPagoProperty().setValue(vlrPago);
+
+                        contasAReceber.vlrSaldoProperty().setValue(vlrLiquido.subtract(vlrPago));
+
+                        try {
+                            System.out.printf("%s\n", contasAReceber.toString());
+                            if (contasAReceber.getRecebimentoList().size() > 0)
+                                for (Recebimento rec : contasAReceber.getRecebimentoList())
+                                    System.out.printf("\t%s\n", rec);
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     });
+
 
             getTtvContasAReceber().getColumns().setAll(getColId(), getColCliente_Documento(), getColDtVenda(),
                     getColModalidade(), getColSituacao(), getColDtVencimento_DtPagamento(), getColVlrBruto(),

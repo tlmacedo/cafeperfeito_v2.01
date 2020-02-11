@@ -210,7 +210,7 @@ public class ContasAReceber implements Serializable {
                 ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
                 ", recebimentoList=" + recebimentoList +
-                ", vlr=" + vlrOriginalSaida +
+                ", vlrOriginalSaida=" + vlrOriginalSaida +
                 ", vlrCredDeb=" + vlrCredDeb +
                 ", vlrLiquido=" + vlrLiquido +
                 ", vlrPago=" + vlrPago +

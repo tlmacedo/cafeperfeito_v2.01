@@ -200,7 +200,7 @@ public class Recebimento implements Serializable {
     public String toString() {
         return "Recebimento{" +
                 "id=" + id +
-                ", contasAReceber=" + contasAReceber +
+//                ", contasAReceber=" + contasAReceber +
                 ", pagamentoSituacao=" + pagamentoSituacao +
                 ", documento=" + documento +
                 ", pagamentoModalidade=" + pagamentoModalidade +
