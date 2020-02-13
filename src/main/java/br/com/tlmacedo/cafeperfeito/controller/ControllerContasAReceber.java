@@ -278,11 +278,25 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         getLblTotQtdDescontos().textProperty().bind(Bindings.createStringBinding(() ->
                         String.format("Desc / Bonif: [%d]", getTmodelContasAReceber().qtdContasDescontosProperty().getValue()),
                 getTmodelContasAReceber().qtdContasDescontosProperty()));
-
-
         getLblTotalDescontos().textProperty().bind(Bindings.createStringBinding(() ->
-                        String.format("R$$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasDescontosProperty().getValue(), 2)),
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasDescontosProperty().getValue(), 2)),
                 getTmodelContasAReceber().totalContasDescontosProperty()));
+
+
+        getLblTotQtdLucroBruto().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Lucro bruto: [%s%%]", ServiceMascara.getMoeda(getTmodelContasAReceber().percLucroBrutoProperty().getValue(), 4)),
+                getTmodelContasAReceber().percLucroBrutoProperty()));
+        getLblTotalLucroBruto().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalLucroBrutoProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalLucroBrutoProperty()));
+
+
+        getLblTotQtdContasAReceber().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas a receber: [%d]", getTmodelContasAReceber().qtdContasAReceberProperty().getValue()),
+                getTmodelContasAReceber().qtdContasAReceberProperty()));
+        getLblTotalContasAReceber().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasAReceberProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalContasAReceberProperty()));
 
 
     }

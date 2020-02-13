@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
@@ -424,52 +425,82 @@ public class TmodelContasAReceber {
         );
         totalContasProperty().setValue(
                 getContasAReceberFilteredList().stream()
-                        .map(ContasAReceber::getValor)
+                        .map(ContasAReceber::getSaidaProduto)
+                        .map(SaidaProduto::getSaidaProdutoProdutoList)
+                        .flatMap(Collection::stream)
+                        .map(SaidaProdutoProduto::getVlrBruto)
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
 
 
         qtdContasRetiradasProperty().setValue(
                 getContasAReceberFilteredList().stream()
-                        .filter(contasAReceber -> contasAReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
-                                .filter(saidaProdutoProduto -> saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO))
-                                .count() > 0)
+                        .map(ContasAReceber::getSaidaProduto)
+                        .map(SaidaProduto::getSaidaProdutoProdutoList)
+                        .flatMap(Collection::stream)
+                        .filter(saidaProdutoProduto -> saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO))
                         .count()
         );
         totalContasRetiradasProperty().setValue(
                 getContasAReceberFilteredList().stream()
-                        .filter(contasAReceber -> contasAReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
-                                .filter(saidaProdutoProduto -> saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO))
-                                .count() > 0)
                         .map(ContasAReceber::getSaidaProduto)
                         .map(SaidaProduto::getSaidaProdutoProdutoList)
-                        .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
-                                .filter(saidaProdutoProduto -> saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO))
-                                .map(SaidaProdutoProduto::getVlrBruto).reduce(BigDecimal.ZERO, BigDecimal::add))
+                        .flatMap(Collection::stream)
+                        .filter(saidaProdutoProduto -> saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO))
+                        .map(SaidaProdutoProduto::getVlrBruto)
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
 
 
         qtdContasDescontosProperty().setValue(
                 getContasAReceberFilteredList().stream()
-                        .filter(contasAReceber -> contasAReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
-                                .filter(saidaProdutoProduto -> !saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO)
-                                        && saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-                                .count() > 0)
+                        .map(ContasAReceber::getSaidaProduto)
+                        .map(SaidaProduto::getSaidaProdutoProdutoList)
+                        .flatMap(Collection::stream)
+                        .filter(saidaProdutoProduto -> !saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO)
+                                && saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
                         .count()
         );
         totalContasDescontosProperty().setValue(
                 getContasAReceberFilteredList().stream()
-                        .filter(contasAReceber -> contasAReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
-                                .filter(saidaProdutoProduto -> !saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO)
-                                        && saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-                                .count() > 0)
                         .map(ContasAReceber::getSaidaProduto)
                         .map(SaidaProduto::getSaidaProdutoProdutoList)
-                        .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
-                                .filter(saidaProdutoProduto -> !saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO)
-                                        && saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-                                .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add))
+                        .flatMap(Collection::stream)
+                        .filter(saidaProdutoProduto -> !saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO)
+                                && saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+                        .map(SaidaProdutoProduto::getVlrDesconto)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+
+        totalLucroBrutoProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .map(ContasAReceber::getSaidaProduto)
+                        .map(SaidaProduto::getSaidaProdutoProdutoList)
+                        .flatMap(Collection::stream)
+                        .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
+                                .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+        try {
+            percLucroBrutoProperty().setValue(
+                    totalLucroBrutoProperty().getValue().scaleByPowerOfTen(2)
+                            .divide(totalContasProperty().getValue(), 4, RoundingMode.HALF_UP)
+            );
+        } catch (Exception ex) {
+            if (ex instanceof ArithmeticException)
+                percLucroBrutoProperty().setValue(BigDecimal.ZERO);
+        }
+
+
+        qtdContasAReceberProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .filter(contasAReceber -> contasAReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+                        .count()
+        );
+        totalContasAReceberProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .map(ContasAReceber::getValor)
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
 
