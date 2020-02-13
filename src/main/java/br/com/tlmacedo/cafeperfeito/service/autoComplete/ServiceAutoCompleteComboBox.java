@@ -33,8 +33,12 @@ public class ServiceAutoCompleteComboBox<T> {
                 Platform.runLater(() -> getComboBox().getEditor().selectAll());
             } else {
                 getComboBox().setEditable(false);
-                if (getObservableList().contains(getComboBox().getSelectionModel().getSelectedItem()))
-                    getComboBox().setValue(getComboBox().getSelectionModel().getSelectedItem());
+                try {
+                    if (getObservableList().contains(getComboBox().getSelectionModel().getSelectedItem()))
+                        getComboBox().setValue(getComboBox().getSelectionModel().getSelectedItem());
+                } catch (Exception ex) {
+                    getComboBox().setValue(null);
+                }
             }
         });
         getComboBox().setOnKeyPressed(t -> getComboBox().hide());

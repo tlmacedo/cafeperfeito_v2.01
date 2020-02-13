@@ -4,6 +4,7 @@ import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.ContasAReceberDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.EnumsTasks;
+import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoModalidade;
 import br.com.tlmacedo.cafeperfeito.model.enums.PagamentoSituacao;
 import br.com.tlmacedo.cafeperfeito.model.enums.StatusBarContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.tm.TmodelContasAReceber;
@@ -12,6 +13,7 @@ import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
 import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
+import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import br.com.tlmacedo.cafeperfeito.service.ServiceSegundoPlano;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
@@ -49,6 +51,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     public ComboBox<Empresa> cboEmpresa;
     public TextField txtPesquisa;
     public ComboBox<PagamentoSituacao> cboPagamentoSituacao;
+    public ComboBox<PagamentoModalidade> cboPagamentoModalidade;
     public Label lblRegistrosLocalizados;
     public TreeTableView<Object> ttvContasAReceber;
     public Label lblTotQtdClientes;
@@ -252,6 +255,36 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         });
 
 
+        getLblTotalQtdClientes().textProperty().bind(
+                getTmodelContasAReceber().qtdClientesProperty().asString()
+        );
+
+        getLblTotQtdContas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas: [%d]", getTmodelContasAReceber().qtdContasProperty().getValue()),
+                getTmodelContasAReceber().qtdContasProperty()));
+        getLblTotalContas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalContasProperty()));
+
+
+        getLblTotQtdRetiradas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Retiradas: [%d]", getTmodelContasAReceber().qtdContasRetiradasProperty().getValue()),
+                getTmodelContasAReceber().qtdContasRetiradasProperty()));
+        getLblTotalRetiradas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasRetiradasProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalContasRetiradasProperty()));
+
+
+        getLblTotQtdDescontos().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Desc / Bonif: [%d]", getTmodelContasAReceber().qtdContasDescontosProperty().getValue()),
+                getTmodelContasAReceber().qtdContasDescontosProperty()));
+
+
+        getLblTotalDescontos().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasDescontosProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalContasDescontosProperty()));
+
+
     }
 
     /**
@@ -278,15 +311,16 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                 break;
 
                             case TABELA_VINCULAR:
-                                getTmodelContasAReceber().setDtpData1(getDtpData1());
-                                getTmodelContasAReceber().setDtpData2(getDtpData2());
-                                getTmodelContasAReceber().setChkDtVenda(getChkDtVenda());
-                                getTmodelContasAReceber().setTxtPesquisa(getTxtPesquisa());
-                                getTmodelContasAReceber().setLblRegistrosLocalizados(getLblRegistrosLocalizados());
+                                getTmodelContasAReceber().dtpData1Property().bind(getDtpData1().valueProperty());
+                                getTmodelContasAReceber().dtpData2Property().bind(getDtpData2().valueProperty());
+                                getTmodelContasAReceber().chkDtVendaProperty().bind(getChkDtVenda().selectedProperty());
+                                getTmodelContasAReceber().txtPesquisaProperty().bind(getTxtPesquisa().textProperty());
+                                getTmodelContasAReceber().empresaProperty().bind(getCboEmpresa().valueProperty());
+                                getTmodelContasAReceber().pagamentoSituacaoProperty().bind(getCboPagamentoSituacao().getSelectionModel().selectedItemProperty());
+                                getTmodelContasAReceber().pagamentoModalidadeProperty().bind(getCboPagamentoModalidade().getSelectionModel().selectedItemProperty());
+                                getLblRegistrosLocalizados().textProperty().bind(getTmodelContasAReceber().lblRegistrosLocalizadosProperty().asString());
                                 getTmodelContasAReceber().setTtvContasAReceber(getTtvContasAReceber());
                                 setContasAReceberFilteredList(getTmodelContasAReceber().getContasAReceberFilteredList());
-                                getTmodelContasAReceber().empresaProperty().bind(getCboEmpresa().valueProperty());
-                                getTmodelContasAReceber().pagamentoSituacaoProperty().bind(getCboPagamentoSituacao().valueProperty());
                                 getTmodelContasAReceber().escutaLista();
                                 break;
 
@@ -300,6 +334,9 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
                                 getCboPagamentoSituacao().setItems(Arrays.stream(PagamentoSituacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
                                 getCboPagamentoSituacao().getItems().add(0, null);
+
+                                getCboPagamentoModalidade().setItems(Arrays.stream(PagamentoModalidade.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                getCboPagamentoModalidade().getItems().add(0, null);
                                 break;
 
                             case TABELA_PREENCHER:
@@ -429,6 +466,14 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
     public void setCboPagamentoSituacao(ComboBox<PagamentoSituacao> cboPagamentoSituacao) {
         this.cboPagamentoSituacao = cboPagamentoSituacao;
+    }
+
+    public ComboBox<PagamentoModalidade> getCboPagamentoModalidade() {
+        return cboPagamentoModalidade;
+    }
+
+    public void setCboPagamentoModalidade(ComboBox<PagamentoModalidade> cboPagamentoModalidade) {
+        this.cboPagamentoModalidade = cboPagamentoModalidade;
     }
 
     public Label getLblRegistrosLocalizados() {
@@ -711,12 +756,16 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         this.contasAReceberDAO = contasAReceberDAO;
     }
 
-    public FilteredList<ContasAReceber> getContasAReceberFilteredList() {
-        return contasAReceberFilteredList;
+    public Object getObjectSelect() {
+        return objectSelect.get();
     }
 
-    public void setContasAReceberFilteredList(FilteredList<ContasAReceber> contasAReceberFilteredList) {
-        this.contasAReceberFilteredList = contasAReceberFilteredList;
+    public ObjectProperty<Object> objectSelectProperty() {
+        return objectSelect;
+    }
+
+    public void setObjectSelect(Object objectSelect) {
+        this.objectSelect.set(objectSelect);
     }
 
     public Empresa getEmpresa() {
@@ -731,16 +780,12 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
         this.empresa.set(empresa);
     }
 
-    public Object getObjectSelect() {
-        return objectSelect.get();
+    public FilteredList<ContasAReceber> getContasAReceberFilteredList() {
+        return contasAReceberFilteredList;
     }
 
-    public ObjectProperty<Object> objectSelectProperty() {
-        return objectSelect;
-    }
-
-    public void setObjectSelect(Object objectSelect) {
-        this.objectSelect.set(objectSelect);
+    public void setContasAReceberFilteredList(FilteredList<ContasAReceber> contasAReceberFilteredList) {
+        this.contasAReceberFilteredList = contasAReceberFilteredList;
     }
 
     /**
