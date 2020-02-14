@@ -299,6 +299,22 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                 getTmodelContasAReceber().totalContasAReceberProperty()));
 
 
+        getLblTotQtdContasVencidas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas Vencidas: [%d]", getTmodelContasAReceber().qtdContasVencidasProperty().getValue()),
+                getTmodelContasAReceber().qtdContasVencidasProperty()));
+        getLblTotalContasVencidas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasVencidasProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalContasVencidasProperty()));
+
+
+        getLblTotQtdContasPendentes().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas a receber: [%d]", getTmodelContasAReceber().qtdContasPendentesProperty().getValue()),
+                getTmodelContasAReceber().qtdContasPendentesProperty()));
+        getLblTotalContasPendentes().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasPendentesProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalContasPendentesProperty()));
+
+
     }
 
     /**

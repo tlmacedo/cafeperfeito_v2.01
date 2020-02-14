@@ -505,6 +505,43 @@ public class TmodelContasAReceber {
         );
 
 
+        qtdContasVencidasProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .filter(contasAReceber -> contasAReceber.dtVencimentoProperty().getValue().isBefore(LocalDate.now()))
+                        .map(ContasAReceber::getRecebimentoList)
+                        .flatMap(Collection::stream)
+                        .filter(recebimento -> recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.PENDENTE))
+                        .count()
+        );
+        totalContasVencidasProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .filter(contasAReceber -> contasAReceber.dtVencimentoProperty().getValue().isBefore(LocalDate.now()))
+                        .map(ContasAReceber::getRecebimentoList)
+                        .flatMap(Collection::stream)
+                        .filter(recebimento -> recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.PENDENTE))
+                        .map(Recebimento::getValor)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+
+        qtdContasPendentesProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .filter(contasAReceber -> contasAReceber.dtVencimentoProperty().getValue().isAfter(LocalDate.now()))
+                        .map(ContasAReceber::getRecebimentoList)
+                        .flatMap(Collection::stream)
+                        .filter(recebimento -> recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.PENDENTE))
+                        .count()
+        );
+        totalContasPendentesProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .filter(contasAReceber -> contasAReceber.dtVencimentoProperty().getValue().isAfter(LocalDate.now()))
+                        .map(ContasAReceber::getRecebimentoList)
+                        .flatMap(Collection::stream)
+                        .filter(recebimento -> recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.PENDENTE))
+                        .map(Recebimento::getValor)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
 //        totalContasRetiradasProperty().setValue(
 //                getContasAReceberFilteredList().stream()
 //                        .filter(contasAReceber -> contasAReceber.getRecebimentoList().stream()
