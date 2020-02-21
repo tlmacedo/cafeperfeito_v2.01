@@ -813,7 +813,7 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
         if (cteProc.getCTe().getInfCte().getInfCTeNorm().getInfDoc().getInfNFe() != null)
             for (TCTe.InfCte.InfCTeNorm.InfDoc.InfNFe infNFe : cteProc.getCTe().getInfCte().getInfCTeNorm().getInfDoc().getInfNFe()) {
                 File fileTmp;
-                if ((fileTmp = ServiceFileFinder.finder(file.getParent(), infNFe.getChave())).exists())
+                if ((fileTmp = ServiceFileFinder.finder(file.getParent(), infNFe.getChave(), "xml")).exists())
                     addXmlNfe(fileTmp);
             }
     }

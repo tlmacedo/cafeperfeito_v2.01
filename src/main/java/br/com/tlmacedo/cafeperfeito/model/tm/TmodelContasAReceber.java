@@ -223,11 +223,11 @@ public class TmodelContasAReceber {
                 return new SimpleStringProperty(
                         ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).getVlrCredDeb()
                                 .setScale(2, RoundingMode.HALF_UP), 2));
-            if (cellData.getValue().getValue() instanceof Recebimento
-                    && (((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("credito")
-                    || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("debito")))
-                return new SimpleStringProperty(
-                        ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
+            if (cellData.getValue().getValue() instanceof Recebimento)
+                if (((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("crédito")
+                        || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("débito"))
+                    return new SimpleStringProperty(
+                            ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
             return new SimpleStringProperty("");
         });
 
@@ -238,6 +238,10 @@ public class TmodelContasAReceber {
             if (cellData.getValue().getValue() instanceof ContasAReceber)
                 return new SimpleStringProperty(
                         ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrLiquidoProperty().getValue(), 2));
+            if (cellData.getValue().getValue() instanceof Recebimento)
+                if (!((Recebimento) cellData.getValue().getValue()).pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO))
+                    return new SimpleStringProperty(
+                            ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
             return new SimpleStringProperty("");
         });
 
@@ -248,11 +252,12 @@ public class TmodelContasAReceber {
             if (cellData.getValue().getValue() instanceof ContasAReceber)
                 return new SimpleStringProperty(
                         ServiceMascara.getMoeda(((ContasAReceber) cellData.getValue().getValue()).vlrPagoProperty().getValue(), 2));
-            if (cellData.getValue().getValue() instanceof Recebimento
-                    && !(((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("credito")
-                    || ((Recebimento) cellData.getValue().getValue()).getPagamentoModalidade().getDescricao().toLowerCase().contains("debito")))
-                return new SimpleStringProperty(
-                        ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
+            if (cellData.getValue().getValue() instanceof Recebimento)
+                if (((Recebimento) cellData.getValue().getValue()).pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO))
+                    if (!(((Recebimento) cellData.getValue().getValue()).pagamentoModalidadeProperty().getValue().getDescricao().toLowerCase().contains("crédito")
+                            || ((Recebimento) cellData.getValue().getValue()).pagamentoModalidadeProperty().getValue().getDescricao().toLowerCase().contains("débito")))
+                        return new SimpleStringProperty(
+                                ServiceMascara.getMoeda(((Recebimento) cellData.getValue().getValue()).valorProperty().getValue(), 2));
             return new SimpleStringProperty("");
         });
 
@@ -283,8 +288,8 @@ public class TmodelContasAReceber {
                                 .forEach(recebimento -> {
                                     TreeItem<Object> filhoItem = new TreeItem(recebimento);
                                     paiItem.getChildren().add(filhoItem);
-                                    if (recebimento.getPagamentoModalidade().getDescricao().toLowerCase().contains("credito")
-                                            || recebimento.getPagamentoModalidade().getDescricao().toLowerCase().contains("debito")) {
+                                    if (recebimento.getPagamentoModalidade().getDescricao().toLowerCase().contains("crédito")
+                                            || recebimento.getPagamentoModalidade().getDescricao().toLowerCase().contains("débito")) {
                                         vlrCredDeb[0] = vlrCredDeb[0].add(recebimento.valorProperty().getValue());
                                     } else {
                                         if (recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO))
@@ -507,10 +512,13 @@ public class TmodelContasAReceber {
 
         qtdContasVencidasProperty().setValue(
                 getContasAReceberFilteredList().stream()
-                        .filter(contasAReceber -> contasAReceber.dtVencimentoProperty().getValue().isBefore(LocalDate.now()))
-                        .map(ContasAReceber::getRecebimentoList)
-                        .flatMap(Collection::stream)
-                        .filter(recebimento -> recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.PENDENTE))
+                        .filter(contasAReceber -> contasAReceber.dtVencimentoProperty().getValue().isBefore(LocalDate.now())
+                                && (contasAReceber.valorProperty().getValue().subtract(
+                                contasAReceber.getRecebimentoList().stream()
+                                        .filter(recebimento -> recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO))
+                                        .map(Recebimento::getValor)
+                                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        )).compareTo(BigDecimal.ZERO) != 0)
                         .count()
         );
         totalContasVencidasProperty().setValue(
@@ -541,6 +549,12 @@ public class TmodelContasAReceber {
                         .map(Recebimento::getValor)
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
+
+
+//        qtdContasPagasProperty().setValue(
+//                getContasAReceberFilteredList().stream()
+//
+//        );
 
 //        totalContasRetiradasProperty().setValue(
 //                getContasAReceberFilteredList().stream()

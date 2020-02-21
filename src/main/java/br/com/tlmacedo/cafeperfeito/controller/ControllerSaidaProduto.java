@@ -1277,21 +1277,23 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     private BigDecimal utilizacaoDeCreditoDebito() {
         BigDecimal vlrCredDeb = ServiceMascara.getBigDecimalFromTextField(getLblLimiteUtilizado().getText(), 2);
 
-        if (vlrCredDeb.compareTo(BigDecimal.ZERO) < 0) {
-            setAlertMensagem(new ServiceAlertMensagem());
-            getAlertMensagem().setCabecalho("Crédito disponível");
-            getAlertMensagem().setContentText(String.format("o cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
-                    ServiceMascara.getMoeda((vlrCredDeb.multiply(new BigDecimal("-1."))), 2)));
-            getAlertMensagem().setStrIco("");
-        } else if (vlrCredDeb.compareTo(BigDecimal.ZERO) > 0) {
-            setAlertMensagem(new ServiceAlertMensagem());
-            getAlertMensagem().setCabecalho("Débito detectado");
-            getAlertMensagem().setContentText(String.format("o cliente tem um dédito de R$ %s\ndeseja acrescentar esse valor no pedido atual?",
-                    ServiceMascara.getMoeda((vlrCredDeb.multiply(new BigDecimal("-1."))), 2)));
-            getAlertMensagem().setStrIco("");
+        if (vlrCredDeb.compareTo(BigDecimal.ZERO) != 0) {
+            if (vlrCredDeb.compareTo(BigDecimal.ZERO) < 0) {
+                setAlertMensagem(new ServiceAlertMensagem());
+                getAlertMensagem().setCabecalho("Crédito disponível");
+                getAlertMensagem().setContentText(String.format("o cliente tem um crédito de R$ %s\ndeseja utilizar esse valor para abater no pedido?",
+                        ServiceMascara.getMoeda((vlrCredDeb.multiply(new BigDecimal("-1."))), 2)));
+                getAlertMensagem().setStrIco("");
+            } else if (vlrCredDeb.compareTo(BigDecimal.ZERO) > 0) {
+                setAlertMensagem(new ServiceAlertMensagem());
+                getAlertMensagem().setCabecalho("Débito detectado");
+                getAlertMensagem().setContentText(String.format("o cliente tem um dédito de R$ %s\ndeseja acrescentar esse valor no pedido atual?",
+                        ServiceMascara.getMoeda((vlrCredDeb.multiply(new BigDecimal("-1."))), 2)));
+                getAlertMensagem().setStrIco("");
+            }
+            if (getAlertMensagem().alertYesNoCancel().get() == ButtonType.CANCEL)
+                return BigDecimal.ZERO;
         }
-        if (getAlertMensagem().alertYesNoCancel().get() == ButtonType.CANCEL)
-            return BigDecimal.ZERO;
         return vlrCredDeb;
     }
 

@@ -34,7 +34,7 @@ public class ServiceAutoCompleteComboBox<T> {
             } else {
                 getComboBox().setEditable(false);
                 try {
-                    if (getObservableList().contains(getComboBox().getSelectionModel().getSelectedItem()))
+//                    if (getObservableList().contains(getComboBox().getSelectionModel().getSelectedItem()))
                         getComboBox().setValue(getComboBox().getSelectionModel().getSelectedItem());
                 } catch (Exception ex) {
                     getComboBox().setValue(null);
