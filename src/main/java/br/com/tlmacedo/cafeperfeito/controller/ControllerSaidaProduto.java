@@ -294,6 +294,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                         return;
                     if (!ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().getSelectedItem().getText().equals(getNomeTab()))
                         return;
+                    if (event.getCode().equals(KeyCode.HELP)
+                            && getTvItensNfe().isFocused()) {
+                        ProdutoEstoque estoqueEscolhido = getEstoqueSelecionado();
+
+                        getSaidaProdutoProdutoObservableList().add(new SaidaProdutoProduto(estoqueEscolhido, TipoCodigoCFOP.BONIFICACAO, 1));
+                        ControllerPrincipal.getCtrlPrincipal().getPainelViewPrincipal().fireEvent(ServiceComandoTecladoMouse.pressTecla(KeyCode.F8));
+                    }
                     if (!ControllerPrincipal.getCtrlPrincipal().teclaDisponivel(event.getCode())) return;
                     switch (event.getCode()) {
                         case F1:
@@ -364,6 +371,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             break;
                         case F12:
                             fechar();
+                            break;
+                        case HELP:
                             break;
                     }
                 } catch (Exception ex) {
@@ -1033,11 +1042,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
      */
 
     private ProdutoEstoque getEstoqueSelecionado() {
-        ProdutoEstoque estoqueSelecionado;
-        if (getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue() instanceof ProdutoEstoque)
-            estoqueSelecionado = ((ProdutoEstoque) getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue());
-        else
-            estoqueSelecionado = ((ProdutoEstoque) getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getChildren().get(0).getValue());
+        ProdutoEstoque estoqueSelecionado = null;
+        if (getTtvProdutoEstoque().isFocused()) {
+            if (getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue() instanceof ProdutoEstoque)
+                estoqueSelecionado = ((ProdutoEstoque) getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getValue());
+            else
+                estoqueSelecionado = ((ProdutoEstoque) getTtvProdutoEstoque().getSelectionModel().getSelectedItem().getChildren().get(0).getValue());
+        } else if (getTvItensNfe().isFocused()) {
+            estoqueSelecionado = getTvItensNfe().getSelectionModel().getSelectedItem().produtoProperty().getValue().getProdutoEstoqueList().stream()
+                    .filter(produtoEstoque -> produtoEstoque.loteProperty().getValue().equals(getTvItensNfe().getSelectionModel().getSelectedItem().loteProperty().getValue()))
+                    .findFirst().orElse(null);
+        }
         return estoqueSelecionado;
     }
 
@@ -1125,11 +1140,24 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private boolean validarSaida() {
-        return ((validarCliente() && validarNFe()
+        System.out.printf("validarCliente:\t%s\n", validarCliente());
+        System.out.printf("validarNFe:\t%s\n", validarNFe());
+        System.out.printf("getSaidaProdutoProdutoObservableList.size:\t%s\n", getSaidaProdutoProdutoObservableList().size());
+
+
+        System.out.printf("lblLimiteDisponivel:\tR$ %s\n", ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2));
+        System.out.printf("lblTotalLiquido:\tR$ %s\n", ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2));
+        System.out.printf("result: %s\n",
+                (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
+                        .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0)
+        );
+        boolean result = ((validarCliente() && validarNFe()
                 && getSaidaProdutoProdutoObservableList().size() > 0)
                 && (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
                 .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0)
         );
+        System.out.printf("RESULT:\t%s\n\n", result);
+        return result;
     }
 
     private boolean validarCliente() {
