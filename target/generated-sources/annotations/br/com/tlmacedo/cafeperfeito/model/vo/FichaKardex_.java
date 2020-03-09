@@ -7,7 +7,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2020-02-19T20:51:48")
+@Generated(value="EclipseLink-2.7.0.v20170811-rNA", date="2020-03-06T17:55:07")
 @StaticMetamodel(FichaKardex.class)
 public class FichaKardex_ { 
 
