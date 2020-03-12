@@ -164,6 +164,12 @@
                                 <TreeTableView fx:id="ttvContasAReceber" prefHeight="800.0" prefWidth="1328.0"/>
                             </children>
                         </VBox>
+                        <CheckBox fx:id="chkLucroContaPaga" layoutX="1160.0" layoutY="23.0" mnemonicParsing="false"
+                                  selected="true" text="Lucro contas pagas">
+                            <tooltip>
+                                <Tooltip text="filtrar por data de venda ou data de vencimento."/>
+                            </tooltip>
+                        </CheckBox>
                         <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="45.0" prefWidth="180.0">
                             <children>
                                 <Label fx:id="lblTotQtdClientes" prefWidth="400.0" styleClass="float"
@@ -241,25 +247,6 @@
                         </VBox>
                         <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="305.0" prefWidth="180.0">
                             <children>
-                                <Label fx:id="lblTotQtdLucroBruto" prefWidth="400.0" styleClass="lucro"
-                                       text="Lucro Bruto">
-                                    <VBox.margin>
-                                        <Insets/>
-                                    </VBox.margin>
-                                    <padding>
-                                        <Insets left="5.0"/>
-                                    </padding>
-                                </Label>
-                                <Label fx:id="lblTotalLucroBruto" prefHeight="40.0" prefWidth="400.0"
-                                       styleClass="label-total-valor-lucro">
-                                    <tooltip>
-                                        <Tooltip text="valor total lucro bruto no periodo."/>
-                                    </tooltip>
-                                </Label>
-                            </children>
-                        </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="370.0" prefWidth="180.0">
-                            <children>
                                 <Label fx:id="lblTotQtdContasAReceber" prefWidth="400.0" styleClass="float"
                                        text="Qtd A Receber">
                                     <VBox.margin>
@@ -277,7 +264,7 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="435.0" prefWidth="180.0">
+                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="370.0" prefWidth="180.0">
                             <children>
                                 <Label fx:id="lblTotQtdContasVencidas" prefWidth="400.0"
                                        styleClass="recebimento-vencido" text="Qtd Vencidas">
@@ -296,7 +283,7 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="500.0" prefWidth="180.0">
+                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="435.0" prefWidth="180.0">
                             <children>
                                 <Label fx:id="lblTotQtdContasPendentes" prefWidth="400.0"
                                        styleClass="recebimento-pendente" text="Qtd Contas Pendentes">
@@ -315,7 +302,7 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="565.0" prefWidth="180.0">
+                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="500.0" prefWidth="180.0">
                             <children>
                                 <Label fx:id="lblTotQtdContasPagas" prefWidth="400.0" styleClass="recebimento-pago"
                                        text="Qtd Contas Pagas">
@@ -334,7 +321,7 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="630.0" prefWidth="180.0">
+                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="565.0" prefWidth="180.0">
                             <children>
                                 <Label fx:id="lblTotQtdContasSaldoClientes" prefWidth="400.0"
                                        styleClass="recebimento-pago" text="Qtd Saldo Clientes">
@@ -349,6 +336,25 @@
                                        styleClass="label-total-valor-recebimento-pago">
                                     <tooltip>
                                         <Tooltip text="valor total de saldo de clientes."/>
+                                    </tooltip>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER_LEFT" layoutX="1160.0" layoutY="630.0" prefWidth="180.0">
+                            <children>
+                                <Label fx:id="lblTotQtdLucroBruto" prefWidth="400.0" styleClass="lucro"
+                                       text="Lucro Bruto">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets left="5.0"/>
+                                    </padding>
+                                </Label>
+                                <Label fx:id="lblTotalLucroBruto" prefHeight="40.0" prefWidth="400.0"
+                                       styleClass="label-total-valor-lucro">
+                                    <tooltip>
+                                        <Tooltip text="valor total lucro bruto no periodo."/>
                                     </tooltip>
                                 </Label>
                             </children>

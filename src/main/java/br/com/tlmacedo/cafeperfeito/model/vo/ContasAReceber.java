@@ -204,12 +204,12 @@ public class ContasAReceber implements Serializable {
     public String toString() {
         return "ContasAReceber{" +
                 "id=" + id +
-                ", saidaProduto=" + saidaProduto +
+//                ", saidaProduto=" + saidaProduto +
                 ", dtVencimento=" + dtVencimento +
                 ", valor=" + valor +
-                ", usuarioCadastro=" + usuarioCadastro +
+//                ", usuarioCadastro=" + usuarioCadastro +
                 ", dtCadastro=" + dtCadastro +
-                ", recebimentoList=" + recebimentoList +
+//                ", recebimentoList=" + recebimentoList +
                 ", vlrOriginalSaida=" + vlrOriginalSaida +
                 ", vlrCredDeb=" + vlrCredDeb +
                 ", vlrLiquido=" + vlrLiquido +

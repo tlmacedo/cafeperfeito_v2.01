@@ -17,8 +17,10 @@ import javafx.scene.control.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
@@ -35,6 +37,7 @@ public class TmodelContasAReceber {
     private ObjectProperty<LocalDate> dtpData1 = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDate> dtpData2 = new SimpleObjectProperty<>();
     private BooleanProperty chkDtVenda = new SimpleBooleanProperty();
+    private BooleanProperty chkLucroContaPaga = new SimpleBooleanProperty();
     private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
     private ObjectProperty<PagamentoSituacao> pagamentoSituacao = new SimpleObjectProperty<>();
     private ObjectProperty<PagamentoModalidade> pagamentoModalidade = new SimpleObjectProperty<>();
@@ -367,6 +370,8 @@ public class TmodelContasAReceber {
             totalizaTabela();
         });
 
+        chkLucroContaPagaProperty().addListener((observable -> totalizaTabela()));
+
         lblRegistrosLocalizadosProperty().bind(Bindings.size(getContasAReceberFilteredList()));
 
         dtpData1Property().addListener(observable -> aplicaFiltro());
@@ -478,26 +483,6 @@ public class TmodelContasAReceber {
         );
 
 
-        totalLucroBrutoProperty().setValue(
-                getContasAReceberFilteredList().stream()
-                        .map(ContasAReceber::getSaidaProduto)
-                        .map(SaidaProduto::getSaidaProdutoProdutoList)
-                        .flatMap(Collection::stream)
-                        .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
-                                .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-        );
-        try {
-            percLucroBrutoProperty().setValue(
-                    totalLucroBrutoProperty().getValue().scaleByPowerOfTen(2)
-                            .divide(totalContasProperty().getValue(), 4, RoundingMode.HALF_UP)
-            );
-        } catch (Exception ex) {
-            if (ex instanceof ArithmeticException)
-                percLucroBrutoProperty().setValue(BigDecimal.ZERO);
-        }
-
-
         qtdContasAReceberProperty().setValue(
                 getContasAReceberFilteredList().stream()
                         .filter(contasAReceber -> contasAReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
@@ -551,172 +536,103 @@ public class TmodelContasAReceber {
         );
 
 
-//        qtdContasPagasProperty().setValue(
-//                getContasAReceberFilteredList().stream()
-//
-//        );
+        qtdContasPagasProperty().setValue(
+                getContasAReceberFilteredList().stream().filter(
+                        contasAReceber -> contasAReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
+                                && contasAReceber.valorProperty().getValue()
+                                .compareTo(contasAReceber.getRecebimentoList().stream()
+                                        .filter(recebimento -> recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO))
+                                        .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add)
+                                )
+                                <= 0).count()
+        );
+        totalContasPagasProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .map(ContasAReceber::getRecebimentoList)
+                        .flatMap(Collection::stream)
+                        .filter(recebimento -> recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO))
+                        .map(Recebimento::getValor)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
 
-//        totalContasRetiradasProperty().setValue(
-//                getContasAReceberFilteredList().stream()
-//                        .filter(contasAReceber -> contasAReceber.getRecebimentoList().stream()
-//                                .filter(recebimento -> recebimento.pagamentoModalidadeProperty().getValue().equals(PagamentoModalidade.RETIRADA))
-//                                .count() > 0)
-//                .distinct()
-//        );
 
-        //        setTotalContas(
-//                getContasAReceberFilteredList().stream()
-//                        .map(ContasAReceber::getValor)
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-//                        .subtract(getContasAReceberFilteredList().stream()
-//                                .map(ContasAReceber::getVlrCredDeb)
-//                                .reduce(BigDecimal.ZERO, BigDecimal::add))
-//        );
-//
-//        setQtdContasRetiradas(
-//                (int) getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) == 0)
-//                        .count()
-//        );
-//
-//        setTotalContasRetiradas(
-//                getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) == 0)
-//                        .map(ContasAReceber::getValor)
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-//        );
-//
-//        setQtdContasDescontos(
-//                (int) getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-//                                && aReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
-//                                .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add)
-//                                .compareTo(BigDecimal.ZERO) > 0)
-//                        .count()
-//        );
-//
-//        setTotalContasDescontos(
-//                getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-//                                && aReceber.saidaProdutoProperty().getValue().getSaidaProdutoProdutoList().stream()
-//                                .map(SaidaProdutoProduto::getVlrDesconto).reduce(BigDecimal.ZERO, BigDecimal::add)
-//                                .compareTo(BigDecimal.ZERO) > 0)
-//                        .map(ContasAReceber::getSaidaProduto).map(SaidaProduto::getSaidaProdutoProdutoList)
-//                        .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream().map(SaidaProdutoProduto::getVlrDesconto)
-//                                .reduce(BigDecimal.ZERO, BigDecimal::add))
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-//        );
-//
-//        setTotalLucroBruto(getContasAReceberFilteredList().stream()
-//                .map(ContasAReceber::getSaidaProduto)
-//                .map(SaidaProduto::getSaidaProdutoProdutoList)
-//                .map(saidaProdutoProdutos -> saidaProdutoProdutos.stream()
-//                        .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
-//                                .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()))
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add))
-//                .reduce(BigDecimal.ZERO, BigDecimal::add));
-//
-//        if (getTotalLucroBruto().compareTo(BigDecimal.ZERO) > 0)
-//            setPercLucroBruto(getTotalLucroBruto().multiply(new BigDecimal("100."))
-//                    .divide(getTotalContas(), 4, RoundingMode.HALF_UP).setScale(4, RoundingMode.HALF_UP));
-//        else
-//            setPercLucroBruto(BigDecimal.ZERO);
-//
-//        setTotalLucroLiquido(getTotalLucroBruto().subtract(getTotalContasDescontos().add(getTotalContasRetiradas())));
-//
-//        System.out.printf("getTotalLucroLiquido: %s\n", getTotalLucroLiquido().toString());
-//        System.out.printf("getTotalContas: %s\n", getTotalContas().toString());
-//        if (getTotalLucroLiquido().compareTo(BigDecimal.ZERO) > 0)
-//            setPercLucroLiquido((getTotalLucroLiquido().scaleByPowerOfTen(2).divide(getTotalContas())).setScale(2, RoundingMode.HALF_UP));
-//        else
-//            setPercLucroLiquido(BigDecimal.ZERO);
-//
-//        setQtdContasAReceber(
-//                (int) getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-//                        .count()
-//        );
-//
-//        setTotalContasAReceber(
-//                getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-//                        .map(ContasAReceber::getValor)
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-//        );
-//
-//        setQtdContasVencidas(
-//                (int) getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) != 0
-//                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
-//                        .count()
-//        );
-//
-//        setTotalContasVencidas(
-//                getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) != 0
-//                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) < 0)
-//                        .map(ContasAReceber::getVlrSaldo)
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-//        );
-//
-//        setQtdContasPendentes(
-//                (int) getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-//                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) >= 0)
-//                        .count()
-//        );
-//
-//        setTotalContasPendentes(
-//                getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-//                                && aReceber.dtVencimentoProperty().getValue().compareTo(LocalDate.now()) >= 0)
-//                        .map(ContasAReceber::getVlrSaldo)
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-//        );
-//
-//        setQtdContasPagas(
-//                (int) getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-//                                && aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) <= 0)
-//                        .count()
-//        );
-//
-//        setTotalContasPagas(
-//                getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.valorProperty().getValue().compareTo(BigDecimal.ZERO) > 0
-//                                && aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) <= 0)
-//                        .map(ContasAReceber::getVlrPago)
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-//        );
-//
-//        setQtdContasSaldoClientes(
-//                (int) getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
-//                        .count()
-//        );
-//
-//        setTotalContasSaldoClientes(
-//                getContasAReceberFilteredList().stream()
-//                        .filter(aReceber -> aReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
-//                        .map(ContasAReceber::getVlrSaldo)
-//                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-//        );
-//
-////        setPercLucroLiquido(
-////                BigDecimal.ONE.setScale(4)
-////        );
-//
-////        setTotalLucroLiquido(
-////                BigDecimal.ONE.setScale(4)
-////        );
-//
-////        setPercLucroLiquido(
-////                getQtdContasVencidas() + getQtdContasPendentes() + getQtdContasPagas()
-////        );
-//
-////        setTotalContasConfirmacao(
-////                getTotalContasVencidas().add(getTotalContasPendentes()).add(getTotalContasPagas()).add(getTotalContasSaldoClientes())
-////        );
+        qtdContasSaldoClientesProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .filter(contasAReceber -> contasAReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
+                        .count()
+        );
+        totalContasSaldoClientesProperty().setValue(
+                getContasAReceberFilteredList().stream()
+                        .filter(contasAReceber -> contasAReceber.vlrSaldoProperty().getValue().compareTo(BigDecimal.ZERO) < 0)
+                        .map(ContasAReceber::getVlrSaldo)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+
+        List<ContasAReceber> contasAReceberList = new ArrayList<>();
+        BigDecimal totalConta, totalDesc, totalReti;
+        if (chkLucroContaPagaProperty().getValue()) {
+            contasAReceberList = getContasAReceberFilteredList().stream()
+                    .filter(contasAReceber -> contasAReceber.getRecebimentoList().stream()
+                            .filter(recebimento -> recebimento.pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO))
+                            .count() > 0).collect(Collectors.toList());
+            totalConta = totalContasPagasProperty().getValue();
+            totalDesc = contasAReceberList.stream()
+                    .map(ContasAReceber::getSaidaProduto)
+                    .map(SaidaProduto::getSaidaProdutoProdutoList)
+                    .flatMap(Collection::stream)
+                    .filter(saidaProdutoProduto -> !saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO)
+                            && saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+                    .map(SaidaProdutoProduto::getVlrDesconto)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            totalReti = contasAReceberList.stream()
+                    .map(ContasAReceber::getSaidaProduto)
+                    .map(SaidaProduto::getSaidaProdutoProdutoList)
+                    .flatMap(Collection::stream)
+                    .filter(saidaProdutoProduto -> saidaProdutoProduto.codigoCFOPProperty().getValue().equals(TipoCodigoCFOP.CONSUMO))
+                    .map(SaidaProdutoProduto::getVlrBruto)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        } else {
+            contasAReceberList = getContasAReceberFilteredList();
+            totalConta = totalContasProperty().getValue();
+            totalDesc = totalContasDescontosProperty().getValue();
+            totalReti = totalContasRetiradasProperty().getValue();
+        }
+
+        totalLucroBrutoProperty().setValue(
+                contasAReceberList.stream()
+                        .map(ContasAReceber::getSaidaProduto)
+                        .map(SaidaProduto::getSaidaProdutoProdutoList)
+                        .flatMap(Collection::stream)
+                        .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
+                                .subtract(saidaProdutoProduto.vlrEntradaBrutoProperty().getValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+        try {
+            percLucroBrutoProperty().setValue(
+                    totalLucroBrutoProperty().getValue().scaleByPowerOfTen(2)
+                            .divide(totalConta, 4, RoundingMode.HALF_UP)
+            );
+        } catch (Exception ex) {
+            if (ex instanceof ArithmeticException)
+                percLucroBrutoProperty().setValue(BigDecimal.ZERO);
+        }
+
+
+        totalLucroLiquidoProperty().setValue(
+                totalLucroBrutoProperty().getValue().subtract(
+                        (totalDesc.add(totalReti))
+                ));
+        try {
+            percLucroLiquidoProperty().setValue(
+                    totalLucroLiquidoProperty().getValue().scaleByPowerOfTen(2)
+                            .divide(totalConta, 4, RoundingMode.HALF_UP)
+            );
+        } catch (Exception ex) {
+            if (ex instanceof ArithmeticException)
+                percLucroLiquidoProperty().setValue(BigDecimal.ZERO);
+        }
+
     }
 
     /**
@@ -1218,6 +1134,18 @@ public class TmodelContasAReceber {
 
     public void setColVlrDescontos(TreeTableColumn<Object, String> colVlrDescontos) {
         this.colVlrDescontos = colVlrDescontos;
+    }
+
+    public boolean isChkLucroContaPaga() {
+        return chkLucroContaPaga.get();
+    }
+
+    public BooleanProperty chkLucroContaPagaProperty() {
+        return chkLucroContaPaga;
+    }
+
+    public void setChkLucroContaPaga(boolean chkLucroContaPaga) {
+        this.chkLucroContaPaga.set(chkLucroContaPaga);
     }
 
     /**

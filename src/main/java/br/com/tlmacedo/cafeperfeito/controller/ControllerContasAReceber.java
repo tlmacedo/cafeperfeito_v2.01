@@ -18,6 +18,7 @@ import br.com.tlmacedo.cafeperfeito.service.ServiceSegundoPlano;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewContasAReceber;
+import br.com.tlmacedo.cafeperfeito.view.ViewRecebimento;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -54,6 +55,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
     public ComboBox<PagamentoModalidade> cboPagamentoModalidade;
     public Label lblRegistrosLocalizados;
     public TreeTableView<Object> ttvContasAReceber;
+    public CheckBox chkLucroContaPaga;
     public Label lblTotQtdClientes;
     public Label lblTotalQtdClientes;
     public Label lblTotQtdContas;
@@ -187,7 +189,16 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                         case F2:
                             break;
                         case F4:
-
+                            Object object;
+                            if ((object = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue()) != null) {
+                                Recebimento recebimento = null;
+                                if (object instanceof ContasAReceber)
+                                    recebimento = ((Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue());
+                                else if (object instanceof Recebimento)
+                                    recebimento = (Recebimento) object;
+                                if (recebimento == null) return;
+                                new ViewRecebimento().openViewRecebimento(recebimento);
+                            }
                             break;
                         case F6:
                             getCboEmpresa().requestFocus();
@@ -276,7 +287,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
 
         getLblTotQtdDescontos().textProperty().bind(Bindings.createStringBinding(() ->
-                        String.format("Desc / Bonif: [%d]", getTmodelContasAReceber().qtdContasDescontosProperty().getValue()),
+                        String.format("Desc / bonif: [%d]", getTmodelContasAReceber().qtdContasDescontosProperty().getValue()),
                 getTmodelContasAReceber().qtdContasDescontosProperty()));
         getLblTotalDescontos().textProperty().bind(Bindings.createStringBinding(() ->
                         String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasDescontosProperty().getValue(), 2)),
@@ -300,7 +311,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
 
         getLblTotQtdContasVencidas().textProperty().bind(Bindings.createStringBinding(() ->
-                        String.format("Contas Vencidas: [%d]", getTmodelContasAReceber().qtdContasVencidasProperty().getValue()),
+                        String.format("Contas vencidas: [%d]", getTmodelContasAReceber().qtdContasVencidasProperty().getValue()),
                 getTmodelContasAReceber().qtdContasVencidasProperty()));
         getLblTotalContasVencidas().textProperty().bind(Bindings.createStringBinding(() ->
                         String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasVencidasProperty().getValue(), 2)),
@@ -314,6 +325,29 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                         String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasPendentesProperty().getValue(), 2)),
                 getTmodelContasAReceber().totalContasPendentesProperty()));
 
+
+        getLblTotQtdContasPagas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Contas pagas: [%d]", getTmodelContasAReceber().qtdContasPagasProperty().getValue()),
+                getTmodelContasAReceber().qtdContasPagasProperty()));
+        getLblTotalContasPagas().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasPagasProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalContasPagasProperty()));
+
+
+        getLblTotQtdContasSaldoClientes().textProperty().bind(Bindings.createStringBinding(() ->
+                String.format("Saldo clientes: [%d]", getTmodelContasAReceber().qtdContasSaldoClientesProperty().getValue(),
+                        getTmodelContasAReceber().qtdContasSaldoClientesProperty())));
+        getLblTotalContasSaldoClientes().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalContasSaldoClientesProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalContasSaldoClientesProperty()));
+
+
+        getLblTotQtdLucroLiquido().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("Lucro líquido: [%s%%]", ServiceMascara.getMoeda(getTmodelContasAReceber().percLucroLiquidoProperty().getValue(), 4)),
+                getTmodelContasAReceber().percLucroLiquidoProperty()));
+        getLblTotalLucroLiquido().textProperty().bind(Bindings.createStringBinding(() ->
+                        String.format("R$ %s", ServiceMascara.getMoeda(getTmodelContasAReceber().totalLucroLiquidoProperty().getValue(), 2)),
+                getTmodelContasAReceber().totalLucroLiquidoProperty()));
 
     }
 
@@ -344,6 +378,7 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                                 getTmodelContasAReceber().dtpData1Property().bind(getDtpData1().valueProperty());
                                 getTmodelContasAReceber().dtpData2Property().bind(getDtpData2().valueProperty());
                                 getTmodelContasAReceber().chkDtVendaProperty().bind(getChkDtVenda().selectedProperty());
+                                getTmodelContasAReceber().chkLucroContaPagaProperty().bind(getChkLucroContaPaga().selectedProperty());
                                 getTmodelContasAReceber().txtPesquisaProperty().bind(getTxtPesquisa().textProperty());
                                 getTmodelContasAReceber().empresaProperty().bind(getCboEmpresa().valueProperty());
                                 getTmodelContasAReceber().pagamentoSituacaoProperty().bind(getCboPagamentoSituacao().getSelectionModel().selectedItemProperty());
@@ -816,6 +851,14 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
     public void setContasAReceberFilteredList(FilteredList<ContasAReceber> contasAReceberFilteredList) {
         this.contasAReceberFilteredList = contasAReceberFilteredList;
+    }
+
+    public CheckBox getChkLucroContaPaga() {
+        return chkLucroContaPaga;
+    }
+
+    public void setChkLucroContaPaga(CheckBox chkLucroContaPaga) {
+        this.chkLucroContaPaga = chkLucroContaPaga;
     }
 
     /**
