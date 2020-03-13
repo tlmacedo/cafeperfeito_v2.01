@@ -11,10 +11,7 @@ import br.com.tlmacedo.cafeperfeito.model.tm.TmodelContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.ContasAReceber;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
-import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
-import br.com.tlmacedo.cafeperfeito.service.ServiceCampoPersonalizado;
-import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
-import br.com.tlmacedo.cafeperfeito.service.ServiceSegundoPlano;
+import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.FormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewContasAReceber;
@@ -182,6 +179,8 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                     if (!ControllerPrincipal.getCtrlPrincipal().getTabPaneViewPrincipal().getSelectionModel().getSelectedItem().getText().equals(getNomeTab()))
                         return;
                     if (!ControllerPrincipal.getCtrlPrincipal().teclaDisponivel(event.getCode())) return;
+                    Object object;
+                    Recebimento recebimento = null;
                     switch (event.getCode()) {
                         case F1:
                             limpaCampos(getPainelViewContasAReceber());
@@ -189,16 +188,15 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                         case F2:
                             break;
                         case F4:
-                            Object object;
-                            if ((object = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue()) != null) {
-                                Recebimento recebimento = null;
-                                if (object instanceof ContasAReceber)
-                                    recebimento = ((Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue());
-                                else if (object instanceof Recebimento)
-                                    recebimento = (Recebimento) object;
-                                if (recebimento == null) return;
-                                new ViewRecebimento().openViewRecebimento(recebimento);
-                            }
+                            if (getTtvContasAReceber().getSelectionModel().getSelectedItem() == null) return;
+                            object = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue();
+                            if (object instanceof ContasAReceber)
+                                recebimento = ((Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue());
+                            else if (object instanceof Recebimento)
+                                recebimento = (Recebimento) object;
+                            if (recebimento == null) return;
+                            new ViewRecebimento().openViewRecebimento(recebimento);
+                            getTmodelContasAReceber().preencherTabela();
                             break;
                         case F6:
                             getCboEmpresa().requestFocus();
@@ -213,6 +211,18 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
                             break;
                         case F12:
                             fechar();
+                            break;
+                        case P:
+                            if (!event.isControlDown() || getTtvContasAReceber().getSelectionModel().getSelectedItem() == null)
+                                return;
+                            object = getTtvContasAReceber().getSelectionModel().getSelectedItem().getValue();
+                            if (object instanceof ContasAReceber)
+                                recebimento = ((Recebimento) getTtvContasAReceber().getSelectionModel().getSelectedItem().getChildren().get(0).getValue());
+                            else if (object instanceof Recebimento)
+                                recebimento = (Recebimento) object;
+                            if (recebimento == null) return;
+
+                            new ServiceRecibo().imprimeRecibo(recebimento);
                             break;
                     }
                 } catch (Exception ex) {

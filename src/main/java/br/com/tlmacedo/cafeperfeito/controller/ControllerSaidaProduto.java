@@ -1140,23 +1140,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     }
 
     private boolean validarSaida() {
-        System.out.printf("validarCliente:\t%s\n", validarCliente());
-        System.out.printf("validarNFe:\t%s\n", validarNFe());
-        System.out.printf("getSaidaProdutoProdutoObservableList.size:\t%s\n", getSaidaProdutoProdutoObservableList().size());
-
-
-        System.out.printf("lblLimiteDisponivel:\tR$ %s\n", ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2));
-        System.out.printf("lblTotalLiquido:\tR$ %s\n", ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2));
-        System.out.printf("result: %s\n",
-                (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
-                        .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0)
-        );
         boolean result = ((validarCliente() && validarNFe()
                 && getSaidaProdutoProdutoObservableList().size() > 0)
                 && (ServiceMascara.getBigDecimalFromTextField(getLblLimiteDisponivel().getText(), 2)
                 .compareTo(ServiceMascara.getBigDecimalFromTextField(getLblTotalLiquido().getText(), 2)) >= 0)
         );
-        System.out.printf("RESULT:\t%s\n\n", result);
         return result;
     }
 

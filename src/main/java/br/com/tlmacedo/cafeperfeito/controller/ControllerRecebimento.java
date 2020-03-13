@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
+
 public class ControllerRecebimento implements Initializable, ModeloCafePerfeito {
 
     public AnchorPane painelViewRecebimento;
@@ -138,13 +140,14 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             getCboPagamentoModalidade().setValue(pagamentoModalidade);
             getCboPagamentoModalidade().getSelectionModel().select(pagamentoModalidade);
         });
-//        getCboPagamentoModalidade().setValue(recebimentoProperty().getValue().pagamentoModalidadeProperty().getValue());
         getCboSituacao().setValue(recebimentoProperty().getValue().pagamentoSituacaoProperty().getValue());
         getTxtValor().setText(ServiceMascara.getMoeda(recebimentoProperty().getValue().valorProperty().getValue(), 2));
 
         getDtpDtPagamento().setValue(recebimentoProperty().getValue().dtPagamentoProperty().getValue() != null
                 ? recebimentoProperty().getValue().dtPagamentoProperty().getValue()
-                : LocalDate.now()
+                : (recebimentoProperty().getValue().contasAReceberProperty().getValue().dtVencimentoProperty().getValue() != null
+                ? recebimentoProperty().getValue().contasAReceberProperty().getValue().dtVencimentoProperty().getValue()
+                : LocalDate.now())
         );
     }
 
@@ -261,7 +264,13 @@ public class ControllerRecebimento implements Initializable, ModeloCafePerfeito 
             recebimentoProperty().getValue().dtPagamentoProperty().setValue(null);
             if (recebimentoProperty().getValue().pagamentoSituacaoProperty().getValue().equals(PagamentoSituacao.QUITADO)) {
                 recebimentoProperty().getValue().usuarioPagamentoProperty().setValue(UsuarioLogado.getUsuario());
-                recebimentoProperty().getValue().dtPagamentoProperty().setValue(getDtpDtPagamento().getValue());
+                try {
+                    recebimentoProperty().getValue().dtPagamentoProperty().setValue(
+                            LocalDate.parse(getDtpDtPagamento().getEditor().getText(), DTF_DATA)
+                    );
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
             if (objectProperty().getValue() instanceof ContasAReceber)
                 recebimentoProperty().getValue().usuarioCadastroProperty().setValue(UsuarioLogado.getUsuario());

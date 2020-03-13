@@ -321,6 +321,7 @@ public class TmodelContasAReceber {
             getTtvContasAReceber().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             getTtvContasAReceber().setRoot(getPedidoTreeItem());
             getTtvContasAReceber().setShowRoot(false);
+            totalizaTabela();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -347,7 +348,8 @@ public class TmodelContasAReceber {
                         vlrPg = ((ContasAReceber) item).getRecebimentoList().stream()
                                 .filter(recebimento -> recebimento.getPagamentoSituacao().equals(PagamentoSituacao.QUITADO))
                                 .map(Recebimento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
-                        if (vlrPg.compareTo(((ContasAReceber) item).valorProperty().getValue()) >= 0) {
+                        if (vlrPg.compareTo(((ContasAReceber) item).valorProperty().getValue()) >= 0
+                                && vlrPg.compareTo(BigDecimal.ZERO) != 0) {
                             stilo = "recebimento-pago";
                         }
                         if (modalidade != null && (modalidade.equals(PagamentoModalidade.RETIRADA)
@@ -367,7 +369,6 @@ public class TmodelContasAReceber {
 
         getContasAReceberFilteredList().addListener((ListChangeListener<? super ContasAReceber>) change -> {
             preencherTabela();
-            totalizaTabela();
         });
 
         chkLucroContaPagaProperty().addListener((observable -> totalizaTabela()));

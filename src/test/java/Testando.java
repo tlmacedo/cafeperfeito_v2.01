@@ -1,7 +1,23 @@
+import java.time.LocalDate;
+
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
+
 public class Testando {
 
     public static void main(String[] args) {
 
+        String date = "14/03/2020", str;
+        LocalDate ldt = null;
+
+        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+
+        //String date = "16/08/2016";
+
+        LocalDate localDate = LocalDate.parse(date, DTF_DATA);
+
+        System.out.println(localDate);
+
+        System.out.println(DTF_DATA.format(localDate));
 //        ObservableList<Empresa> empresaObservableList = FXCollections.observableArrayList(
 //                new EmpresaDAO().getAll(Empresa.class, null, "razao, fantasia"));
 //        empresaObservableList.add(0, new Empresa());
