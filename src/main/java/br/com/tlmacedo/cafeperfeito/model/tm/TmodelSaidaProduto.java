@@ -261,6 +261,7 @@ public class TmodelSaidaProduto {
             case CORTESIA:
             case TESTE:
                 saidaProdutoProduto.qtdProperty().setValue(1);
+            case AVARIA:
             case BONIFICACAO:
             case CONSUMO:
                 saidaProdutoProduto.vlrBrutoProperty().setValue(saidaProdutoProduto.vlrUnitarioProperty().getValue()

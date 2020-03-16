@@ -12,7 +12,8 @@ public enum TipoCodigoCFOP {
     CONSUMO(557, "retirada"),
     CORTESIA(910, "cortesia"),
     AMOSTRA(911, "amostra"),
-    TESTE(912, "teste");
+    TESTE(912, "teste"),
+    AVARIA(927, "avaria");
 
     private int cod;
     private String descricao;

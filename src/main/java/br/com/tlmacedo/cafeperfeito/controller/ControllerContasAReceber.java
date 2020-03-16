@@ -105,7 +105,11 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
             escutarTecla();
             fatorarObjetos();
             fieldsFormat();
-            Platform.runLater(() -> limpaCampos(getPainelViewContasAReceber()));
+            Platform.runLater(() -> {
+                limpaCampos(getPainelViewContasAReceber());
+                getDtpData1().setValue(LocalDate.of(LocalDate.now().getYear(), 1, 1));
+                getDtpData2().setValue(LocalDate.now().plusMonths(1).withDayOfMonth(1));
+            });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -146,7 +150,6 @@ public class ControllerContasAReceber implements Initializable, ModeloCafePerfei
 
     @Override
     public void fatorarObjetos() {
-
         getDtpData2().valueProperty().addListener((ov, o, n) -> {
             if (n == null && getDtpData1().getValue() == null)
                 getDtpData1().setValue(LocalDate.now());
