@@ -122,3 +122,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+src/main/java/br/com/tlmacedo/cafeperfeito/service/format/iReport/
+src/main/resources/style/less/
+target/generated-test-sources/
+target/test-classes/
