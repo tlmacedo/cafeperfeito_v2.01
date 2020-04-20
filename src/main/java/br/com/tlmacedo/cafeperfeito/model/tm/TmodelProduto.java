@@ -174,7 +174,7 @@ public class TmodelProduto {
                                 final int[] estq = {0};
                                 TreeItem<Object> paiItem = new TreeItem(produto);
                                 getProdutoEstoqueTreeItem().getChildren().add(paiItem);
-                                if (gettModelTipo().equals(TModelTipo.PROD_VENDA)) {
+                                if (gettModelTipo().equals(TModelTipo.PROD_VENDA))
                                     produto.getProdutoEstoqueList().stream()
                                             .filter(produtoEstoque -> produtoEstoque.qtdProperty().getValue().compareTo(0) > 0)
                                             .sorted(Comparator.comparing(ProdutoEstoque::getDtValidade))
@@ -185,9 +185,8 @@ public class TmodelProduto {
                                                 paiItem.getChildren().add(new TreeItem<>(new ProdutoEstoque(produtoEstoques)));
                                                 estq[0] += produtoEstoques.stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd));
                                             });
-                                } else {
+                                else
                                     estq[0] = produto.getProdutoEstoqueList().stream().collect(Collectors.summingInt(ProdutoEstoque::getQtd));
-                                }
 
                                 ((Produto) paiItem.getValue()).tblEstoqueProperty().setValue(estq[0]);
                             }

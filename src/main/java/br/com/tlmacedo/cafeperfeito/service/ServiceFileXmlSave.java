@@ -19,18 +19,32 @@ public class ServiceFileXmlSave {
     private static String conteudoXml;
     private static File newFileXml;
 
+    public static boolean saveXml(String pathFile, String xml) throws IOException {
+        setConteudoXml(xml);
+
+        if (!pathFile.contains("/"))
+            pathFile = String.format("%s%s%s.xml",
+                    System.getProperty("user.dir"),
+                    TCONFIG.getPaths().getPathNFeSaveXmlOut().trim(),
+                    pathFile);
+
+        setNewFileXml(new File(pathFile));
+
+        return salvaArquivo();
+    }
+
     public static boolean saveTEnviNFeToFile(TEnviNFe tEnviNFe) throws IOException, JAXBException {
         TNFe tnFe = tEnviNFe.getNFe().get(0);
 
         setConteudoXml(ServiceUtilXml.objectToXml(tnFe));
 
-        setArqXml(new FileWriter(new File(
+        setNewFileXml(new File(
                 String.format("%s%s%s%s.xml",
                         System.getProperty("user.dir"),
                         TCONFIG.getPaths().getPathNFeSaveXmlOut().trim(),
                         tnFe.getInfNFe().getId(),
                         (tnFe.getSignature() != null) ? "-assinada" : "")
-        )));
+        ));
         return salvaArquivo();
     }
 
@@ -38,13 +52,13 @@ public class ServiceFileXmlSave {
 
         setConteudoXml(ServiceUtilXml.objectToXml(tNfeProc));
 
-        String caminhoArquivo = String.format("%s%s%s%s.xml",
-                System.getProperty("user.dir"),
-                TCONFIG.getPaths().getPathNFeSaveXmlOut().trim(),
-                tNfeProc.getNFe().getInfNFe().getId(),
-                (tNfeProc.getProtNFe().getInfProt().getCStat().equals("100")) ? "-proc" : "");
-
-        setNewFileXml(new File(caminhoArquivo));
+        setNewFileXml(new File(
+                String.format("%s%s%s%s.xml",
+                        System.getProperty("user.dir"),
+                        TCONFIG.getPaths().getPathNFeSaveXmlOut().trim(),
+                        tNfeProc.getNFe().getInfNFe().getId(),
+                        (tNfeProc.getProtNFe().getInfProt().getCStat().equals("100")) ? "-proc" : "")
+        ));
 
         if (salvaArquivo()) {
             System.out.printf("caminhoArquivo: [%s]\n", getNewFileXml());
@@ -66,6 +80,7 @@ public class ServiceFileXmlSave {
 
     private static boolean salvaArquivo() {
         try {
+//            if (getArqXml() == null)
             setArqXml(new FileWriter(getNewFileXml()));
             getArqXml().write(getConteudoXml());
             getArqXml().close();

@@ -62,7 +62,6 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito {
 
-
     public AnchorPane painelViewSaidaProduto;
 
     public TitledPane tpnCliente;
@@ -99,6 +98,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     public ComboBox<NfeDadosDestinoOperacao> cboNfeDadosDestinoOperacao;
     public ComboBox<NfeDadosIndicadorConsumidorFinal> cboNfeDadosIndicadorConsumidorFinal;
     public ComboBox<NfeDadosIndicadorPresenca> cboNfeDadosIndicadorPresenca;
+    public CheckBox chkPrintLoteProdutos;
+
 
     public Tab tabNfeImpressao;
     public ComboBox<NfeImpressaoTpImp> cboNfeImpressaoTpImp;
@@ -366,8 +367,13 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                             break;
                         case F9:
                             getTpnNfe().setExpanded(!getTpnNfe().isExpanded());
+                            showStatusBar();
                             if (getTpnNfe().isExpanded())
                                 getTxtNfeDadosNumero().requestFocus();
+                            break;
+                        case F10:
+                            if (getTpnNfe().isExpanded())
+                                getChkPrintLoteProdutos().setSelected(!getChkPrintLoteProdutos().isSelected());
                             break;
                         case F12:
                             fechar();
@@ -604,11 +610,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 break;
                             case NFE_GERAR:
                                 xmlNFe_gerar();
+//                                ServiceFileXmlSave.saveXml("NFe" + getSaidaProduto().getSaidaProdutoNfeList().stream()
+//                                        .sorted(Comparator.comparing(SaidaProdutoNfe::getDtHoraEmissao).reversed())
+//                                        .findFirst().get().getChave(), xmlNFeProperty().getValue());
                                 break;
                             case NFE_ASSINAR:
                                 if (xmlNFeProperty().getValue() == null)
                                     Thread.currentThread().interrupt();
                                 xmlNFe_assinar();
+//                                ServiceFileXmlSave.saveXml("NFe" + getSaidaProduto().getSaidaProdutoNfeList().stream()
+//                                        .sorted(Comparator.comparing(SaidaProdutoNfe::getDtHoraEmissao).reversed())
+//                                        .findFirst().get().getChave() + "-assinado", xmlNFeAssinadoProperty().getValue());
                                 break;
                             case NFE_TRANSMITIR:
                                 if (xmlNFeAssinadoProperty().getValue() == null)
@@ -699,6 +711,8 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao().replace("  [F2-Finalizar venda]", ""));
             else
                 ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao());
+            if (!getTpnNfe().isExpanded())
+                ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao().replace("[F10-Print Lote NFe]  ", ""));
         } catch (Exception ex) {
             ControllerPrincipal.getCtrlPrincipal().getServiceStatusBar().atualizaStatusBar(statusBarProperty().getValue().getDescricao());
         }
@@ -2156,6 +2170,22 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public void setContasAReceberDAO(ContasAReceberDAO contasAReceberDAO) {
         this.contasAReceberDAO = contasAReceberDAO;
+    }
+
+    public CheckBox getChkPrintLoteProdutos() {
+        return chkPrintLoteProdutos;
+    }
+
+    public void setChkPrintLoteProdutos(CheckBox chkPrintLoteProdutos) {
+        this.chkPrintLoteProdutos = chkPrintLoteProdutos;
+    }
+
+    public ServiceAutoCompleteComboBox getComboEmpresa() {
+        return comboEmpresa;
+    }
+
+    public void setComboEmpresa(ServiceAutoCompleteComboBox comboEmpresa) {
+        this.comboEmpresa = comboEmpresa;
     }
 
     /**

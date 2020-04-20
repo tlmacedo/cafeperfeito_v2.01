@@ -556,6 +556,13 @@
                                                         </ComboBox>
                                                     </children>
                                                 </VBox>
+                                                <CheckBox fx:id="chkPrintLoteProdutos" accessibleText="value::false;"
+                                                          layoutX="1065.0" layoutY="22.0" mnemonicParsing="false"
+                                                          selected="true" text="Imprimir Lote dos produtos">
+                                                    <tooltip>
+                                                        <Tooltip text="imprimi na NFe o lote dos produtos."/>
+                                                    </tooltip>
+                                                </CheckBox>
                                             </children>
                                         </AnchorPane>
                                     </content>

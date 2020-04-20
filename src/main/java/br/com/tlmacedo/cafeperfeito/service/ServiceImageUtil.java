@@ -8,13 +8,13 @@ import net.sourceforge.barbecue.BarcodeImageHandler;
 import net.sourceforge.barbecue.output.OutputException;
 
 import javax.imageio.ImageIO;
+import javax.sql.rowset.serial.SerialBlob;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
+import java.sql.Blob;
+import java.sql.SQLException;
 
 public class ServiceImageUtil {
 
@@ -42,6 +42,18 @@ public class ServiceImageUtil {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public static Blob getBlobFromImage(Image image) throws IOException, SQLException {
+        return new SerialBlob(getInputStreamFromImage(image).readAllBytes());
+    }
+
+    public static Blob getBobFromImage(Image image, int width, int height) throws IOException, SQLException {
+        return new SerialBlob(getInputStreamFromImage(getImageResized(image, width, height)).readAllBytes());
+    }
+
+    public static Blob getBobFromImage(File fileImage, int width, int height) throws IOException, SQLException {
+        return new SerialBlob(getInputStreamFromImage(getImageResized(new Image(new FileInputStream(fileImage)), width, height)).readAllBytes());
     }
 
     public static Image getImageFromInputStream(InputStream inputStream) {
