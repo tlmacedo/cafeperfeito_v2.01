@@ -8,13 +8,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
-import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalTime;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATAHORA_HMS;
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_HORA_HMS;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
+
+//import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.StringUtils;
 
 public class ServiceStatusBar {
 

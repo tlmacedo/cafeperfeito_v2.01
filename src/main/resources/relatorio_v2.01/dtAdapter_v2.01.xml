@@ -2,7 +2,9 @@
 <xmlDataAdapter class="net.sf.jasperreports.data.xml.XmlDataAdapterImpl">
     <name>dtAdapter_v2.01.xml</name>
     <dataFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="repositoryDataLocation">
-        <location>/Users/thiagomacedo/Downloads/13200108009246000136550010000008801202001232.xml</location>
+        <location>
+            /Volumes/150GB-Development/cafeperfeito/cafeperfeito_v2.01/src/main/resources/xml/nfe/out/NFe13200408009246000136550010000006031202004208.xml
+        </location>
     </dataFile>
     <useConnection>true</useConnection>
     <namespaceAware>false</namespaceAware>

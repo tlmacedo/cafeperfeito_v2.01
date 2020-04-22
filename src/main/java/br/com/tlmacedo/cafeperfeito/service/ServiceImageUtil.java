@@ -1,11 +1,14 @@
 package br.com.tlmacedo.cafeperfeito.service;
 
+//import com.pnuema.java.barcode.Barcode;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.oned.EAN13Writer;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import net.sourceforge.barbecue.Barcode;
-import net.sourceforge.barbecue.BarcodeFactory;
-import net.sourceforge.barbecue.BarcodeImageHandler;
-import net.sourceforge.barbecue.output.OutputException;
 
 import javax.imageio.ImageIO;
 import javax.sql.rowset.serial.SerialBlob;
@@ -15,6 +18,11 @@ import java.io.*;
 import java.net.URL;
 import java.sql.Blob;
 import java.sql.SQLException;
+
+//import net.sourceforge.barbecue.Barcode;
+//import net.sourceforge.barbecue.BarcodeFactory;
+//import net.sourceforge.barbecue.BarcodeImageHandler;
+//import net.sourceforge.barbecue.output.OutputException;
 
 public class ServiceImageUtil {
 
@@ -68,21 +76,34 @@ public class ServiceImageUtil {
         return null;
     }
 
-    public static Image getImageCodBarrasEAN13(String busca) {
-        Barcode barcode = null;
+    public static BufferedImage generateEAN13BarcodeImage(String barcodeText) throws WriterException {
+        EAN13Writer barcodeWriter = new EAN13Writer();
+        BitMatrix bitMatrix = barcodeWriter.encode(barcodeText, BarcodeFormat.EAN_13, 200, 2);
+
+        return MatrixToImageWriter.toBufferedImage(bitMatrix);
+    }
+
+    public static Image getImageCodBarrasEAN13(String barcodeText) throws WriterException {
         try {
-            barcode = BarcodeFactory.createEAN13(busca.substring(0, 12));
-//            barcode.setBarHeight(2);
-//            barcode.setBarWidth(200);
+            return SwingFXUtils.toFXImage(generateEAN13BarcodeImage(barcodeText), null);
         } catch (Exception ex) {
             ex.printStackTrace();
+            return null;
         }
-        try {
-            return SwingFXUtils.toFXImage(BarcodeImageHandler.getImage(barcode), null);
-        } catch (OutputException e) {
-            e.printStackTrace();
-        }
-        return null;
+//        Barcode barcode = null;
+//        try {
+//            barcode = BarcodeFactory.createEAN13(busca.substring(0, 12));
+////            barcode.setBarHeight(2);
+////            barcode.setBarWidth(200);
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//        try {
+//            return SwingFXUtils.toFXImage(BarcodeImageHandler.getImage(barcode), null);
+//        } catch (OutputException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
     }
 
     public static Image getImageResized(final Image image, int width, int height) {

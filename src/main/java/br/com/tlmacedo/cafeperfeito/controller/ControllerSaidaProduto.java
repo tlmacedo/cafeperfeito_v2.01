@@ -344,6 +344,9 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                     atualizaTotaisCliente();
 
                                     limpaCampos(getPainelViewSaidaProduto());
+                                } else {
+                                    //if (getSaidaProdutoDAO() != null)
+                                    getSaidaProdutoDAO().transactionRollback();
                                 }
                             } else {
                                 setAlertMensagem(new ServiceAlertMensagem());
@@ -610,17 +613,17 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                 break;
                             case NFE_GERAR:
                                 xmlNFe_gerar();
-//                                ServiceFileXmlSave.saveXml("NFe" + getSaidaProduto().getSaidaProdutoNfeList().stream()
-//                                        .sorted(Comparator.comparing(SaidaProdutoNfe::getDtHoraEmissao).reversed())
-//                                        .findFirst().get().getChave(), xmlNFeProperty().getValue());
+                                ServiceFileXmlSave.saveXml("NFe" + getSaidaProduto().getSaidaProdutoNfeList().stream()
+                                        .sorted(Comparator.comparing(SaidaProdutoNfe::getDtHoraEmissao).reversed())
+                                        .findFirst().get().getChave(), xmlNFeProperty().getValue());
                                 break;
                             case NFE_ASSINAR:
                                 if (xmlNFeProperty().getValue() == null)
                                     Thread.currentThread().interrupt();
                                 xmlNFe_assinar();
-//                                ServiceFileXmlSave.saveXml("NFe" + getSaidaProduto().getSaidaProdutoNfeList().stream()
-//                                        .sorted(Comparator.comparing(SaidaProdutoNfe::getDtHoraEmissao).reversed())
-//                                        .findFirst().get().getChave() + "-assinado", xmlNFeAssinadoProperty().getValue());
+                                ServiceFileXmlSave.saveXml("NFe" + getSaidaProduto().getSaidaProdutoNfeList().stream()
+                                        .sorted(Comparator.comparing(SaidaProdutoNfe::getDtHoraEmissao).reversed())
+                                        .findFirst().get().getChave() + "-assinado", xmlNFeAssinadoProperty().getValue());
                                 break;
                             case NFE_TRANSMITIR:
                                 if (xmlNFeAssinadoProperty().getValue() == null)
@@ -903,10 +906,16 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         System.out.printf("xmlNFeAssinado:\n%s\n---------------------**********************\n\n", xmlNFeAssinadoProperty().getValue());
     }
 
-    private void xmlNFe_transmitir() throws XMLStreamException, RemoteException { //throws XMLStreamException, RemoteException {
-        nFev400Property().setValue(new NFev400(TCONFIG.getNfe().getTpAmb()));
-        nFev400Property().getValue().setAutorizacaoNFe(new NFeAutorizacao(xmlNFeAssinadoProperty().getValue()));
-        xmlNFeAutorizacaoProperty().setValue(nFev400Property().getValue().getAutorizacaoNFe().getXmlAutorizacaoNFe());
+    private void xmlNFe_transmitir() {//} throws XMLStreamException, RemoteException {
+        try {
+            nFev400Property().setValue(new NFev400(TCONFIG.getNfe().getTpAmb()));
+            nFev400Property().getValue().setAutorizacaoNFe(new NFeAutorizacao(xmlNFeAssinadoProperty().getValue()));
+            xmlNFeAutorizacaoProperty().setValue(nFev400Property().getValue().getAutorizacaoNFe().getXmlAutorizacaoNFe());
+        } catch (Exception ex) {
+            System.out.printf("\n\n\nTentandoTransmitir(%s):\n[%s]\n\n\n", ex.toString(), ex.getLocalizedMessage());
+//            System.out.printf("TentandoTransmitir:\n[%s]\n", );
+            ex.printStackTrace();
+        }
         System.out.printf("xmlNFeAutorizacao:\n%s\n---------------------**********************\n\n", xmlNFeAutorizacaoProperty().getValue());
         //return (xmlNFeAutorizacaoProperty().getValue() != null);
     }

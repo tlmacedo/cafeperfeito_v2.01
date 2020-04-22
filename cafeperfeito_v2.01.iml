@@ -112,8 +112,7 @@
     <orderEntry type="library" name="Maven: net.sf.jasperreports:jasperreports-fonts:6.11.0" level="project" />
     <orderEntry type="library" name="Maven: net.sf.jasperreports:jasperreports-metadata:6.11.0" level="project" />
     <orderEntry type="library" name="nfe_v400" level="project" />
-        <orderEntry type="library" name="xsdConfigSistema" level="project" />
-        <orderEntry type="library" name="xsdCte_pl300nt2018_002" level="project" />
-
+    <orderEntry type="library" name="xsdConfigSistema" level="project" />
+    <orderEntry type="library" name="xsdCte_pl300nt2018_002" level="project" />
   </component>
 </module>

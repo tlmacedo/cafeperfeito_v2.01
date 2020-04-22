@@ -5,7 +5,7 @@ import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import com.google.common.base.Splitter;
 import javafx.scene.control.TextField;
-import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.text.MaskFormatter;
 import java.math.BigDecimal;

@@ -15,8 +15,8 @@ public class ServiceUtilJSon {
 
     public static Object getObjectFromJson(String json, Class classe) {
         try {
-//            JSONObject jsonObject = new JSONObject(json);
-//            System.out.printf("jsonObject: %s", jsonObject.toString());
+            JSONObject jsonObject = new JSONObject(json);
+            System.out.printf("jsonObject: %s", jsonObject.toString());
             return mapper.readValue(json, classe);
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -2,10 +2,12 @@ package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+//import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.StringUtils;
 
 public class UsuarioLogado implements Serializable {
     private static final long serialVersionUID = 1L;
