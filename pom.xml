@@ -14,7 +14,7 @@
         <maven.version>3.5.3</maven.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputencoding>UTF-8</project.reporting.outputencoding>
-        <jdk.version>13.0.2</jdk.version>
+        <jdk.version>14.0.1</jdk.version>
         <maven.compiler.source>${jdk.version}</maven.compiler.source>
         <maven.compiler.target>${jdk.version}</maven.compiler.target>
     </properties>
