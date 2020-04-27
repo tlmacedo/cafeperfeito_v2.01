@@ -13,7 +13,9 @@ import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
@@ -149,11 +151,44 @@ public class NotaFiscal {
         if (getSaidaProduto().getSaidaProdutoProdutoList().size() > 0) {
             List<DetVO> detVOList = new ArrayList<>();
 
-            for (int i = 0; i < getSaidaProduto().getSaidaProdutoProdutoList().size(); i++) {
+//            List<SaidaProdutoProduto> saidaProdutoProdutoList = new ArrayList<>();
+
+//            if (getMyNfe().impressaoLtProdutoProperty().getValue()) {
+//                saidaProdutoProdutoList = getSaidaProduto().getSaidaProdutoProdutoList();
+//                saidaProdutoProdutoList.stream()
+//                        .forEach(saidaProdutoProduto -> {
+//                            saidaProdutoProduto.produtoProperty().getValue().descricaoProperty().setValue(
+//                                    String.format("%s [%s] val.:%s",
+//                                            saidaProdutoProduto.produtoProperty().getValue().descricaoProperty().getValue(),
+//                                            saidaProdutoProduto.produtoProperty().getValue().getTblLote(),
+//                                            saidaProdutoProduto.produtoProperty().getValue().getTblValidade()
+//                                    )
+//                            );
+//                        });
+//            }else {
+//                saidaProdutoProdutoList = getSaidaProduto().getSaidaProdutoProdutoList().stream()
+//                        .collect(Collectors.groupingBy(SaidaProdutoProduto::getDescricao))
+//            }
+
+            if (getMyNfe().impressaoLtProdutoProperty().getValue())
+                getSaidaProduto().getSaidaProdutoProdutoList().stream()
+                        .forEach(saidaProdutoProduto -> {
+                            saidaProdutoProduto.produtoProperty().getValue().descricaoProperty().setValue(
+                                    String.format("%s  lt[%s] val.:%s",
+                                            saidaProdutoProduto.descricaoProperty().getValue(),
+                                            saidaProdutoProduto.loteProperty().getValue(),
+                                            saidaProdutoProduto.dtValidadeProperty().getValue().format(DTF_DATA))
+                            );
+                        });
+            final int[] nItem = {1};
+//            for (int i = 0; i < getSaidaProduto().getSaidaProdutoProdutoList().size(); i++) {
+            getSaidaProduto().getSaidaProdutoProdutoList().stream()
+                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getDescricao)).forEach((s, saidaProdutoProdutos) -> {
+
                 DetVO detVO = new DetVO();
-                detVO.setnItem(String.valueOf(i + 1));
-                detVO.setProd(newNfeProd(getSaidaProduto().getSaidaProdutoProdutoList().get(i)));
-                detVO.setImposto(newNfeImposto(getSaidaProduto().getSaidaProdutoProdutoList().get(i).getProduto()));
+                detVO.setnItem(String.valueOf(nItem[0]++));
+                detVO.setProd(newNfeProd(saidaProdutoProdutos.get(0)));
+                detVO.setImposto(newNfeImposto(saidaProdutoProdutos.get(0).getProduto()));
 
                 detVOList.add(detVO);
 
@@ -165,7 +200,9 @@ public class NotaFiscal {
                     icmsTotVO.setvSeg(icmsTotVO.getvSeg().add(detVO.getProd().getvSeg()));
                 if (detVO.getProd().getvDesc() != null)
                     icmsTotVO.setvDesc(icmsTotVO.getvDesc().add(detVO.getProd().getvDesc()));
-            }
+            });
+
+//            }
             icmsTotVO.setvNF(icmsTotVO.getvProd().subtract(icmsTotVO.getvDesc()));
 
             infNfeVO.setDetList(detVOList);

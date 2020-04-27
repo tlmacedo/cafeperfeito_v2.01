@@ -30,6 +30,7 @@ public class SaidaProdutoNfe implements Serializable {
     private ObjectProperty<NfeImpressaoTpImp> impressaoTpImp = new SimpleObjectProperty<>();
     private ObjectProperty<NfeImpressaoTpEmis> impressaoTpEmis = new SimpleObjectProperty<>();
     private ObjectProperty<NfeImpressaoFinNFe> impressaoFinNFe = new SimpleObjectProperty<>();
+    private BooleanProperty impressaoLtProduto = new SimpleBooleanProperty(false);
     private ObjectProperty<NfeDadosIndicadorConsumidorFinal> consumidorFinal = new SimpleObjectProperty<>();
     private ObjectProperty<NfeDadosIndicadorPresenca> indicadorPresenca = new SimpleObjectProperty<>();
     private ObjectProperty<NfeTransporteModFrete> modFrete = new SimpleObjectProperty<>();
@@ -391,6 +392,19 @@ public class SaidaProdutoNfe implements Serializable {
         this.impressaoFinNFe.set(impressaoFinNFe);
     }
 
+    @Column(length = 1, nullable = false)
+    public boolean isImpressaoLtProduto() {
+        return impressaoLtProduto.get();
+    }
+
+    public BooleanProperty impressaoLtProdutoProperty() {
+        return impressaoLtProduto;
+    }
+
+    public void setImpressaoLtProduto(boolean impressaoLtProduto) {
+        this.impressaoLtProduto.set(impressaoLtProduto);
+    }
+
     @Override
     public String toString() {
         return "SaidaProdutoNfe{" +
@@ -408,6 +422,7 @@ public class SaidaProdutoNfe implements Serializable {
                 ", impressaoTpImp=" + impressaoTpImp +
                 ", impressaoTpEmis=" + impressaoTpEmis +
                 ", impressaoFinNFe=" + impressaoFinNFe +
+                ", impressaoLtProduto=" + impressaoLtProduto +
                 ", consumidorFinal=" + consumidorFinal +
                 ", indicadorPresenca=" + indicadorPresenca +
                 ", modFrete=" + modFrete +

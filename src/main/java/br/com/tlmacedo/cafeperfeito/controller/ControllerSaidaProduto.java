@@ -1103,6 +1103,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 saidaProdutoNfeProperty().getValue().dtHoraSaidaProperty().setValue(getDtpNfeDadosDtSaida().getValue()
                         .atTime(LocalTime.parse(getTxtNfeDadosHoraSaida().getText())));
                 saidaProdutoNfeProperty().getValue().destinoOperacaoProperty().setValue(getCboNfeDadosDestinoOperacao().getSelectionModel().getSelectedItem());
+                saidaProdutoNfeProperty().getValue().impressaoLtProdutoProperty().setValue(getChkPrintLoteProdutos().isSelected());
                 saidaProdutoNfeProperty().getValue().consumidorFinalProperty().setValue(getCboNfeDadosIndicadorConsumidorFinal().getSelectionModel().getSelectedItem());
                 saidaProdutoNfeProperty().getValue().indicadorPresencaProperty().setValue(getCboNfeDadosIndicadorPresenca().getSelectionModel().getSelectedItem());
                 saidaProdutoNfeProperty().getValue().modFreteProperty().setValue(getCboNfeTransporteModFrete().getSelectionModel().getSelectedItem());
