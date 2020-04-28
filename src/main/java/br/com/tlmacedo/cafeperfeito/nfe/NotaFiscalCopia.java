@@ -19,7 +19,7 @@ import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
-public class NotaFiscal {
+public class NotaFiscalCopia {
 
     private static EnviNfeVO enviNfeVO;
     private static SaidaProduto saidaProduto;
@@ -176,13 +176,13 @@ public class NotaFiscal {
 
                         if (detVO.getProd().getvProd() != null)
                             icmsTotVO.setvProd(icmsTotVO.getvProd().add(detVO.getProd().getvProd()));
-                if (detVO.getProd().getvFrete() != null)
-                    icmsTotVO.setvFrete(icmsTotVO.getvFrete().add(detVO.getProd().getvFrete()));
-                if (detVO.getProd().getvSeg() != null)
-                    icmsTotVO.setvSeg(icmsTotVO.getvSeg().add(detVO.getProd().getvSeg()));
-                if (detVO.getProd().getvDesc() != null)
-                    icmsTotVO.setvDesc(icmsTotVO.getvDesc().add(detVO.getProd().getvDesc()));
-            });
+                        if (detVO.getProd().getvFrete() != null)
+                            icmsTotVO.setvFrete(icmsTotVO.getvFrete().add(detVO.getProd().getvFrete()));
+                        if (detVO.getProd().getvSeg() != null)
+                            icmsTotVO.setvSeg(icmsTotVO.getvSeg().add(detVO.getProd().getvSeg()));
+                        if (detVO.getProd().getvDesc() != null)
+                            icmsTotVO.setvDesc(icmsTotVO.getvDesc().add(detVO.getProd().getvDesc()));
+                    });
 
 //            }
             icmsTotVO.setvNF(icmsTotVO.getvProd().subtract(icmsTotVO.getvDesc()));
@@ -488,7 +488,7 @@ public class NotaFiscal {
     }
 
     public static void setEnviNfeVO(EnviNfeVO enviNfeVO) {
-        NotaFiscal.enviNfeVO = enviNfeVO;
+        NotaFiscalCopia.enviNfeVO = enviNfeVO;
     }
 
     public static SaidaProduto getSaidaProduto() {
@@ -496,7 +496,7 @@ public class NotaFiscal {
     }
 
     public static void setSaidaProduto(SaidaProduto saidaProduto) {
-        NotaFiscal.saidaProduto = saidaProduto;
+        NotaFiscalCopia.saidaProduto = saidaProduto;
     }
 
     public static SaidaProdutoNfe getMyNfe() {
@@ -504,7 +504,7 @@ public class NotaFiscal {
     }
 
     public static void setMyNfe(SaidaProdutoNfe myNfe) {
-        NotaFiscal.myNfe = myNfe;
+        NotaFiscalCopia.myNfe = myNfe;
     }
 
     public static SaidaProdutoDAO getSaidaProdutoDAO() {
@@ -512,7 +512,7 @@ public class NotaFiscal {
     }
 
     public static void setSaidaProdutoDAO(SaidaProdutoDAO saidaProdutoDAO) {
-        NotaFiscal.saidaProdutoDAO = saidaProdutoDAO;
+        NotaFiscalCopia.saidaProdutoDAO = saidaProdutoDAO;
     }
 
     public static TEnviNFe gettEnviNFe() {
@@ -520,7 +520,7 @@ public class NotaFiscal {
     }
 
     public static void settEnviNFe(TEnviNFe tEnviNFe) {
-        NotaFiscal.tEnviNFe = tEnviNFe;
+        NotaFiscalCopia.tEnviNFe = tEnviNFe;
     }
 
     /**

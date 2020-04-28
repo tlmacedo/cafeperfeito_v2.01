@@ -50,6 +50,7 @@ public class SaidaProduto implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
+    @JsonIgnore
     public Empresa getCliente() {
         return cliente.get();
     }
