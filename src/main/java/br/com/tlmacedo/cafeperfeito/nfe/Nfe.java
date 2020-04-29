@@ -5,10 +5,7 @@ import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
-import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
-import br.com.tlmacedo.cafeperfeito.model.vo.Endereco;
-import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
-import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
+import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
@@ -17,8 +14,11 @@ import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
@@ -29,6 +29,7 @@ public class Nfe {
     private SaidaProdutoNfe saidaProdutoNfe;
     private SaidaProdutoDAO saidaProdutoDAO;
     private TEnviNFe tEnviNFe;
+    private boolean imprimirLote = false;
 
     public Nfe(SaidaProduto saidaProduto) {
         setSaidaProduto(saidaProduto);
@@ -184,6 +185,7 @@ public class Nfe {
             else
                 saidaProdutoNfe.consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.NORMAL);
             saidaProdutoNfe.indicadorPresencaProperty().setValue(NfeDadosIndicadorPresenca.TELEATENDIMENTO);
+            saidaProdutoNfe.impressaoLtProdutoProperty().setValue(false);
             salvar = true;
         }
 
@@ -214,6 +216,7 @@ public class Nfe {
         ideVO.setIndPres(String.valueOf(saidaProdutoNfe.indicadorPresencaProperty().getValue().getCod()));
         ideVO.setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));
         ideVO.setVerProc(TCONFIG.getNfe().getVerProc());
+        setImprimirLote(saidaProdutoNfe.impressaoLtProdutoProperty().getValue());
 
         if (salvar) {
             saidaProdutoNfe.chaveProperty().setValue(ServiceValidarDado.gerarChaveNfe(ideVO));
@@ -339,15 +342,123 @@ public class Nfe {
     }
 
     public List<DetVO> new_DetVOList(TotalVO totalVO) {
+        final int[] nItem = {1};
         if (getSaidaProduto().getSaidaProdutoProdutoList().size() > 0) {
             List<DetVO> detVOList = new ArrayList<>();
-
-
+            getSaidaProduto().getSaidaProdutoProdutoList().stream()
+                    .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd))
+                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd))
+                    .forEach((aLong, saidaProdutoProdutos) -> {
+                        if (isImprimirLote())
+                            saidaProdutoProdutos.stream()
+                                    .sorted(Comparator.comparing(SaidaProdutoProduto::getLote))
+                                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote))
+                                    .forEach((s, saidaProdutoProdutos1) -> {
+                                        DetVO detVO = new DetVO();
+                                        detVO.setnItem(String.valueOf(nItem[0]++));
+                                        detVO.setProd(new_ProdVO(saidaProdutoProdutos1.get(0)));
+                                        detVO.getProd().setxProd(
+                                                String.format("%s Lt[%s] val.:%s",
+                                                        detVO.getProd().getxProd().substring(0,
+                                                                (detVO.getProd().getxProd().length() - (20 + s.length()))),
+                                                        s,
+                                                        saidaProdutoProdutos1.get(0).dtValidadeProperty().getValue().format(DTF_DATA)
+                                                )
+                                        );
+                                        for (int i = 1; i < saidaProdutoProdutos1.size(); i++) {
+                                            if (detVO.getProd().getCFOP().substring(1)
+                                                    .equals(saidaProdutoProdutos1.get(i).codigoCFOPProperty().getValue().getCod())) {
+                                                add_ProdVO(detVO.getProd(), saidaProdutoProdutos1.get(i));
+                                            } else {
+                                                detVO = new DetVO();
+                                                detVO.setnItem(String.valueOf(nItem[0]++));
+                                                detVO.setProd(new_ProdVO(saidaProdutoProdutos1.get(i)));
+                                                detVO.getProd().setxProd(
+                                                        String.format("%s Lt[%s] val.:%s",
+                                                                detVO.getProd().getxProd().substring(0,
+                                                                        (detVO.getProd().getxProd().length() - (20 + s.length()))),
+                                                                s,
+                                                                saidaProdutoProdutos1.get(i).dtValidadeProperty().getValue().format(DTF_DATA)
+                                                        )
+                                                );
+                                            }
+                                        }
+                                    });
+                    });
             totalVO.getIcmsTot().setvNF(null);
             return detVOList;
         }
         return null;
     }
+
+    private ProdVO new_ProdVO(SaidaProdutoProduto saidaProdutoProduto) {
+        Produto produto = saidaProdutoProduto.produtoProperty().getValue();
+        ProdVO prodVO = new ProdVO();
+
+        prodVO.setcProd(produto.codigoProperty().getValue());
+        prodVO.setcEAN(produto.getCEAN());
+        prodVO.setxProd(produto.descricaoProperty().getValue());
+        prodVO.setNCM(produto.ncmProperty().getValue());
+        prodVO.setNVE("");
+        prodVO.setCEST(produto.cestProperty().getValue());
+        prodVO.setIndEscala("");
+        prodVO.setCNPJFab("");
+        prodVO.setcBenef("");
+        prodVO.setEXTIPI("");
+        prodVO.setCFOP("5" + saidaProdutoProduto.codigoCFOPProperty().getValue().getCod());
+        prodVO.setuCom(produto.unidadeComercialProperty().getValue().getDescricao());
+        BigDecimal qCom = new BigDecimal(saidaProdutoProduto.qtdProperty().getValue());
+        prodVO.setqCom(qCom);
+        prodVO.setvUnCom(saidaProdutoProduto.vlrUnitarioProperty().getValue());
+        prodVO.setvProd(saidaProdutoProduto.vlrBrutoProperty().getValue());
+        prodVO.setcEANTrib(produto.getCEAN());
+        prodVO.setuTrib(produto.unidadeComercialProperty().getValue().getDescricao());
+        prodVO.setqTrib(qCom);
+        prodVO.setvUnTrib(saidaProdutoProduto.vlrUnitarioProperty().getValue());
+        prodVO.setvFrete(null);
+        prodVO.setvSeg(null);
+        if (saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+            prodVO.setvDesc(saidaProdutoProduto.vlrDescontoProperty().getValue());
+        prodVO.setvOutro(null);
+        prodVO.setIndTot("1");
+
+        return prodVO;
+    }
+
+    private ProdVO add_ProdVO(ProdVO prodVO, SaidaProdutoProduto saidaProdutoProduto) {
+//        Produto produto = saidaProdutoProduto.produtoProperty().getValue();
+//        ProdVO prodVO = new ProdVO();
+
+//        prodVO.setcEAN(produto.getCEAN());
+//        prodVO.setxProd(produto.descricaoProperty().getValue());
+//        prodVO.setNCM(produto.ncmProperty().getValue());
+//        prodVO.setNVE("");
+//        prodVO.setCEST(produto.cestProperty().getValue());
+//        prodVO.setIndEscala("");
+//        prodVO.setCNPJFab("");
+//        prodVO.setcBenef("");
+//        prodVO.setEXTIPI("");
+//        prodVO.setCFOP("5" + saidaProdutoProduto.codigoCFOPProperty().getValue().getCod());
+//        prodVO.setuCom(produto.unidadeComercialProperty().getValue().getDescricao());
+        BigDecimal qCom = new BigDecimal(saidaProdutoProduto.qtdProperty().getValue()).add(prodVO.getqCom());
+        prodVO.setqCom(qCom);
+        prodVO.setvUnCom(saidaProdutoProduto.vlrUnitarioProperty().getValue());
+        prodVO.setvProd(saidaProdutoProduto.vlrBrutoProperty().getValue());
+//        prodVO.setcEANTrib(produto.getCEAN());
+//        prodVO.setuTrib(produto.unidadeComercialProperty().getValue().getDescricao());
+        prodVO.setqTrib(qCom);
+        prodVO.setvUnTrib(saidaProdutoProduto.vlrUnitarioProperty().getValue());
+        prodVO.setvFrete(null);
+        prodVO.setvSeg(null);
+        if (saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+            prodVO.setvDesc(saidaProdutoProduto.vlrDescontoProperty().getValue()
+                    .add(prodVO.getvDesc()));
+        prodVO.setvOutro(null);
+        prodVO.setIndTot("1");
+
+        return prodVO;
+    }
+
 
     public EnviNfeVO getEnviNfeVO() {
         return enviNfeVO;
@@ -387,5 +498,13 @@ public class Nfe {
 
     public void settEnviNFe(TEnviNFe tEnviNFe) {
         this.tEnviNFe = tEnviNFe;
+    }
+
+    public boolean isImprimirLote() {
+        return imprimirLote;
+    }
+
+    public void setImprimirLote(boolean imprimirLote) {
+        this.imprimirLote = imprimirLote;
     }
 }
