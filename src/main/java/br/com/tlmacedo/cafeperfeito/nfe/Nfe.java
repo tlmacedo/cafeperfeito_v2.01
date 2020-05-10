@@ -1,6 +1,5 @@
 package br.com.tlmacedo.cafeperfeito.nfe;
 
-import br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
@@ -11,6 +10,7 @@ import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
+import javafx.util.Pair;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,138 +24,98 @@ import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONF
 
 public class Nfe {
 
-    private EnviNfeVO enviNfeVO;
     private SaidaProduto saidaProduto;
-    private SaidaProdutoNfe saidaProdutoNfe;
-    private SaidaProdutoDAO saidaProdutoDAO;
-    private TEnviNFe tEnviNFe;
-    private boolean imprimirLote = false;
+    private SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
+    private SaidaProdutoNfe myNFe = new SaidaProdutoNfe();
+    private boolean ImprimirLote = false;
+    private int nItem = 1;
+    private DetVO detVO;
+    private TEnviNFe tEnviNFe = new TEnviNFe();
+    private EnviNfeVO enviNfeVO = new EnviNfeVO();
+    private NfeVO nfeVO = new NfeVO();
+    private InfNfeVO infNfeVO = new InfNfeVO();
+    private IdeVO ideVO = new IdeVO();
+    private EmitVO emitVO = new EmitVO();
+    private DestVO destVO = new DestVO();
+    private EntregaVO entregaVO;
+    private List<DetVO> detVOList = new ArrayList<>();
+    private TotalVO totalVO = new TotalVO();
+    private IcmsTotVO icmsTotVO = new IcmsTotVO();
+    private TranspVO transpVO = new TranspVO();
+    private CobrVO cobrVO = new CobrVO();
+    private PagVO pagVO = new PagVO();
+    private InfAdicVO infAdicVO = new InfAdicVO();
+    private InfRespTecVO infRespTecVO = new InfRespTecVO();
 
     public Nfe(SaidaProduto saidaProduto) {
         setSaidaProduto(saidaProduto);
-        setSaidaProdutoDAO(new SaidaProdutoDAO());
     }
 
-    //    private TEnviNFe gerartEnviNFe() {
-//        return new EnviNfe_v400(getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe();
-//    }
-//
-//    public String getXml(EnviNfeVO enviNfeVO) throws JAXBException {
-//        setEnviNfeVO(enviNfeVO);
-//        return ServiceUtilXml.objectToXml(gerartEnviNFe());
-//    }
-//
-//    public String getXml(SaidaProduto saidaProduto) throws Exception {
-//        return getXml(getEnviNfeVO(saidaProduto));
-//    }
-//
-//    public EnviNfeVO get_EnviNfeVO(Long nPed) {
-//        setSaidaProdutoDAO(new SaidaProdutoDAO());
-//        setSaidaProduto(getSaidaProdutoDAO().getById(SaidaProduto.class, nPed));
-//        return getEnviNfeVO();
-//    }
-//
-//    public EnviNfeVO get_EnviNfeVO(SaidaProduto saidaProduto) {
-//        setSaidaProduto(saidaProduto);
-//        return getEnviNfeVO();
-//    }
-//
-//    public EnviNfeVO get_EnviNfeVO() {
-//        gerarNotaFiscal();
-//        return getEnviNfeVO();
-//    }
 
     public void gerarNotaFiscal() {
-        setEnviNfeVO(new EnviNfeVO());
 
         getEnviNfeVO().setVersao(TCONFIG.getNfe().getVersao());
         getEnviNfeVO().setIdLote(Nfe_Service.factoryIdLote(getSaidaProduto().idProperty().getValue()));
         getEnviNfeVO().setIndSinc(TCONFIG.getNfe().getIndSinc());
+        getEnviNfeVO().setNfe(getNfeVO());
 
-
-        NfeVO nfeVO = new_NfeVO();
-        getEnviNfeVO().setNfe(nfeVO);
-
-        InfNfeVO infNfeVO = new_InfNfeVO();
-        nfeVO.setInfNfe(infNfeVO);
-
-        IdeVO ideVO = new_IdeVO();
-        infNfeVO.setId(ServiceValidarDado.gerarChaveNfe(ideVO));
-        infNfeVO.setIde(ideVO);
-
-        EmitVO emitVO = new_EmitVO(null);
-        infNfeVO.setEmit(emitVO);
-
-        DestVO destVO = new_DestVO(getSaidaProduto().clienteProperty().getValue());
-        infNfeVO.setDest(destVO);
-
+        getNfeVO().setInfNfe(getInfNfeVO());
+        getInfNfeVO().setVersao(TCONFIG.getNfe().getVersao());
+        getInfNfeVO().setIde(getIdeVO());
+        ideVO_write();
+        getInfNfeVO().setId(getMyNFe().chaveProperty().getValue());
+        getInfNfeVO().setEmit(getEmitVO());
+        emitVO_write();
+        getInfNfeVO().setDest(getDestVO());
+        destVO_write();
         Endereco destinatarioEntrega = null;
         if ((destinatarioEntrega = getSaidaProduto().clienteProperty().getValue().getEndereco(TipoEndereco.ENTREGA)) != null) {
-            EntregaVO entregaVO = new_EntregaVO(destinatarioEntrega, getSaidaProduto().clienteProperty().getValue());
-            infNfeVO.setEntrega(entregaVO);
+            setEntregaVO(new EntregaVO());
+            getInfNfeVO().setEntrega(getEntregaVO());
+            entregaVO_write(destinatarioEntrega);
         }
 
-        TotalVO totalVO = new TotalVO();
-        infNfeVO.setTotal(totalVO);
-        IcmsTotVO icmsTotVO = new IcmsTotVO();
-        totalVO.setIcmsTot(icmsTotVO);
-
-        List<DetVO> detVOList;
-        if ((detVOList = new_DetVOList(totalVO)) != null)
-            infNfeVO.setDetList(detVOList);
-
-        //************************************************************
-        //************************************************************
-        //************************************************************
-        //************************************************************
-        //************************DETVO
-        //************************************************************
-        //************************************************************
-        //************************************************************
-        //************************************************************
-        //************************************************************
-        //************************************************************
+        getInfNfeVO().setDetList(getDetVOList());
+        getTotalVO().setIcmsTot(getIcmsTotVO());
+        getInfNfeVO().setTotal(getTotalVO());
+        detVOList_write();
 
 
         settEnviNFe(new EnviNfe_v400(getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe());
 
     }
 
-    public NfeVO new_NfeVO() {
-        return new NfeVO();
-    }
 
-    public IdeVO new_IdeVO() {
-        IdeVO ideVO = new IdeVO();
+    public void ideVO_write() {
         boolean salvar = false;
-        SaidaProdutoNfe saidaProdutoNfe = getSaidaProduto().getSaidaProdutoNfeList().stream()
-                .filter(saidaProdutoNfe1 -> !saidaProdutoNfe1.isCancelada()).findFirst().orElse(null);
-        if (saidaProdutoNfe == null) {
-            SaidaProdutoNfe nfeTemp = new SaidaProdutoNfeDAO().getAll(SaidaProdutoNfe.class, null, "numero DESC")
-                    .stream().findFirst().orElse(null);
-            saidaProdutoNfe = new SaidaProdutoNfe();
-            getSaidaProduto().getSaidaProdutoNfeList().add(saidaProdutoNfe);
-            if (nfeTemp == null) {
-                nfeTemp.serieProperty().setValue(1);
-                nfeTemp.numeroProperty().setValue(0);
-            }
-            saidaProdutoNfe.impressaoFinNFeProperty().setValue(NfeImpressaoFinNFe.getList().stream()
+
+        setMyNFe(getSaidaProduto().getSaidaProdutoNfeList().stream()
+                .filter(saidaProdutoNfe1 -> !saidaProdutoNfe1.isCancelada()).findFirst().orElse(null));
+        if (getMyNFe() == null) {
+            salvar = true;
+            setMyNFe(new SaidaProdutoNfe());
+            getSaidaProduto().getSaidaProdutoNfeList().add(getMyNFe());
+
+            getMyNFe().impressaoFinNFeProperty().setValue(NfeImpressaoFinNFe.getList().stream()
                     .filter(impressaoFinNFe -> impressaoFinNFe.getCod() == TCONFIG.getNfe().getFinNFe())
                     .findFirst().orElse(NfeImpressaoFinNFe.NORMAL));
-            saidaProdutoNfe.pagamentoIndicadorProperty().setValue(NfeCobrancaDuplicataPagamentoIndicador.PRAZO);
-            saidaProdutoNfe.pagamentoMeioProperty().setValue(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
-            saidaProdutoNfe.saidaProdutoProperty().setValue(getSaidaProduto());
-            saidaProdutoNfe.statusSefazProperty().setValue(NfeStatusSefaz.DIGITACAO);
-            saidaProdutoNfe.naturezaOperacaoProperty().setValue(NfeDadosNaturezaOperacao.INTERNA);
-            saidaProdutoNfe.modeloProperty().setValue(NfeDadosModelo.MOD55);
-            saidaProdutoNfe.modFreteProperty().setValue(NfeTransporteModFrete.REMETENTE);
-            saidaProdutoNfe.serieProperty().setValue(nfeTemp.serieProperty().getValue());
-            saidaProdutoNfe.numeroProperty().setValue(nfeTemp.numeroProperty().getValue() + 1);
-            saidaProdutoNfe.cobrancaNumeroProperty().setValue(saidaProdutoNfe.numeroProperty().getValue().toString());
-            saidaProdutoNfe.pagamentoIndicadorProperty().setValue(NfeCobrancaDuplicataPagamentoIndicador.PRAZO);
-            saidaProdutoNfe.pagamentoMeioProperty().setValue(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
-            saidaProdutoNfe.dtHoraEmissaoProperty().setValue(getSaidaProduto().getDtCadastro());
-            saidaProdutoNfe.informacaoAdicionalProperty().setValue(
+            getMyNFe().pagamentoIndicadorProperty().setValue(NfeCobrancaDuplicataPagamentoIndicador.PRAZO);
+            getMyNFe().pagamentoMeioProperty().setValue(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
+            getMyNFe().saidaProdutoProperty().setValue(getSaidaProduto());
+            getMyNFe().statusSefazProperty().setValue(NfeStatusSefaz.DIGITACAO);
+            getMyNFe().naturezaOperacaoProperty().setValue(NfeDadosNaturezaOperacao.INTERNA);
+            getMyNFe().modeloProperty().setValue(NfeDadosModelo.MOD55);
+            getMyNFe().modFreteProperty().setValue(NfeTransporteModFrete.REMETENTE);
+
+            Pair<Integer, Integer> pair = getNumeroSerieUltimaNfe();
+            getMyNFe().serieProperty().setValue(pair.getKey());
+            getMyNFe().numeroProperty().setValue(pair.getValue() + 1);
+
+            getMyNFe().cobrancaNumeroProperty().setValue(getMyNFe().numeroProperty().getValue().toString());
+            getMyNFe().pagamentoIndicadorProperty().setValue(NfeCobrancaDuplicataPagamentoIndicador.PRAZO);
+            getMyNFe().pagamentoMeioProperty().setValue(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
+            getMyNFe().dtHoraEmissaoProperty().setValue(getSaidaProduto().getDtCadastro());
+            getMyNFe().informacaoAdicionalProperty().setValue(
                     String.format(TCONFIG.getNfe().getInfAdic(),
                             ServiceMascara.getMoeda(getSaidaProduto().getSaidaProdutoProdutoList().stream()
                                     .map(saidaProdutoProduto -> saidaProdutoProduto.vlrBrutoProperty().getValue()
@@ -164,62 +124,61 @@ public class Nfe {
                             (getSaidaProduto().contasAReceberProperty().getValue().dtVencimentoProperty().getValue() != null)
                                     ? String.format(" dt. Venc.: %s",
                                     getSaidaProduto().contasAReceberProperty().getValue()
-                                            .dtVencimentoProperty().getValue().format(Regex_Convert.DTF_DATA))
+                                            .dtVencimentoProperty().getValue().format(DTF_DATA))
                                     : "",
                             TCONFIG.getInfLoja().getBanco(),
                             TCONFIG.getInfLoja().getAgencia(), TCONFIG.getInfLoja().getContaCorrente())
                             .toUpperCase());
-            saidaProdutoNfe.xmlAssinaturaProperty().setValue(null);
-            saidaProdutoNfe.xmlProtNfeProperty().setValue(null);
+            getMyNFe().xmlAssinaturaProperty().setValue(null);
+            getMyNFe().xmlProtNfeProperty().setValue(null);
             if (getSaidaProduto().dtSaidaProperty().getValue()
                     .compareTo(getSaidaProduto().dtCadastroProperty().getValue().toLocalDate()) <= 0) {
-                saidaProdutoNfe.dtHoraSaidaProperty().setValue(getSaidaProduto()
+                getMyNFe().dtHoraSaidaProperty().setValue(getSaidaProduto()
                         .dtCadastroProperty().getValue());
             } else {
-                saidaProdutoNfe.dtHoraSaidaProperty().setValue(getSaidaProduto()
+                getMyNFe().dtHoraSaidaProperty().setValue(getSaidaProduto()
                         .dtSaidaProperty().getValue().atTime(8, 0, 0));
             }
-            saidaProdutoNfe.destinoOperacaoProperty().setValue(NfeDadosDestinoOperacao.INTERNA);
+            getMyNFe().destinoOperacaoProperty().setValue(NfeDadosDestinoOperacao.INTERNA);
             if (getSaidaProduto().clienteProperty().getValue().ieProperty().getValue().equals(""))
-                saidaProdutoNfe.consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.FINAL);
+                getMyNFe().consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.FINAL);
             else
-                saidaProdutoNfe.consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.NORMAL);
-            saidaProdutoNfe.indicadorPresencaProperty().setValue(NfeDadosIndicadorPresenca.TELEATENDIMENTO);
-            saidaProdutoNfe.impressaoLtProdutoProperty().setValue(false);
-            salvar = true;
+                getMyNFe().consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.NORMAL);
+            getMyNFe().indicadorPresencaProperty().setValue(NfeDadosIndicadorPresenca.TELEATENDIMENTO);
+            getMyNFe().impressaoLtProdutoProperty().setValue(false);
         }
 
-        ideVO.setcUF(String.valueOf(TCONFIG.getInfLoja().getCUF()));
-        ideVO.setNatOp(saidaProdutoNfe.naturezaOperacaoProperty().getValue().getDescricao());
-        ideVO.setMod(saidaProdutoNfe.modeloProperty().getValue().getDescricao());
-        ideVO.setSerie(saidaProdutoNfe.serieProperty().getValue().toString());
-        ideVO.setnNF(saidaProdutoNfe.numeroProperty().getValue().toString());
-        ideVO.setDhEmi(saidaProdutoNfe.dtHoraEmissaoProperty().getValue());
-        ideVO.setDhSaiEnt(saidaProdutoNfe.dtHoraSaidaProperty().getValue());
-        ideVO.setTpNF(String.valueOf(TCONFIG.getNfe().getTpNF()));
-        ideVO.setIdDest(String.valueOf(saidaProdutoNfe.destinoOperacaoProperty().getValue().getCod()));
-        ideVO.setcMunFG(String.valueOf(TCONFIG.getInfLoja().getCMunFG()));
-        ideVO.setTpImp((saidaProdutoNfe.impressaoTpImpProperty().getValue() != null)
-                ? String.valueOf(saidaProdutoNfe.impressaoTpImpProperty().getValue().getCod())
+        getIdeVO().setcUF(String.valueOf(TCONFIG.getInfLoja().getCUF()));
+        getIdeVO().setNatOp(getMyNFe().naturezaOperacaoProperty().getValue().getDescricao());
+        getIdeVO().setMod(getMyNFe().modeloProperty().getValue().getDescricao());
+        getIdeVO().setSerie(getMyNFe().serieProperty().getValue().toString());
+        getIdeVO().setnNF(getMyNFe().numeroProperty().getValue().toString());
+        getIdeVO().setDhEmi(getMyNFe().dtHoraEmissaoProperty().getValue());
+        getIdeVO().setDhSaiEnt(getMyNFe().dtHoraSaidaProperty().getValue());
+        getIdeVO().setTpNF(String.valueOf(TCONFIG.getNfe().getTpNF()));
+        getIdeVO().setIdDest(String.valueOf(getMyNFe().destinoOperacaoProperty().getValue().getCod()));
+        getIdeVO().setcMunFG(String.valueOf(TCONFIG.getInfLoja().getCMunFG()));
+        getIdeVO().setTpImp((getMyNFe().impressaoTpImpProperty().getValue() != null)
+                ? String.valueOf(getMyNFe().impressaoTpImpProperty().getValue().getCod())
                 : String.valueOf(TCONFIG.getNfe().getTpImp()));
-        ideVO.setTpEmis((saidaProdutoNfe.impressaoTpEmisProperty().getValue() != null)
-                ? String.valueOf(saidaProdutoNfe.impressaoTpEmisProperty().getValue().getCod())
+        getIdeVO().setTpEmis((getMyNFe().impressaoTpEmisProperty().getValue() != null)
+                ? String.valueOf(getMyNFe().impressaoTpEmisProperty().getValue().getCod())
                 : String.valueOf(TCONFIG.getNfe().getTpEmis()));
-        ideVO.setTpAmb(String.valueOf(TCONFIG.getNfe().getTpAmb()));
-        ideVO.setFinNFe((saidaProdutoNfe.impressaoFinNFeProperty().getValue() != null)
-                ? String.valueOf(saidaProdutoNfe.impressaoFinNFeProperty().getValue().getCod())
+        getIdeVO().setTpAmb(String.valueOf(TCONFIG.getNfe().getTpAmb()));
+        getIdeVO().setFinNFe((getMyNFe().impressaoFinNFeProperty().getValue() != null)
+                ? String.valueOf(getMyNFe().impressaoFinNFeProperty().getValue().getCod())
                 : String.valueOf(NfeImpressaoFinNFe.NORMAL.getCod()));
-        if (saidaProdutoNfe.consumidorFinalProperty().getValue().equals(NfeDadosIndicadorConsumidorFinal.NORMAL)
+        if (getMyNFe().consumidorFinalProperty().getValue().equals(NfeDadosIndicadorConsumidorFinal.NORMAL)
                 && getSaidaProduto().clienteProperty().getValue().ieProperty().getValue().equals(""))
-            saidaProdutoNfe.consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.FINAL);
-        ideVO.setIndFinal(String.valueOf(saidaProdutoNfe.consumidorFinalProperty().getValue().getCod()));
-        ideVO.setIndPres(String.valueOf(saidaProdutoNfe.indicadorPresencaProperty().getValue().getCod()));
-        ideVO.setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));
-        ideVO.setVerProc(TCONFIG.getNfe().getVerProc());
-        setImprimirLote(saidaProdutoNfe.impressaoLtProdutoProperty().getValue());
+            getMyNFe().consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.FINAL);
+        getIdeVO().setIndFinal(String.valueOf(getMyNFe().consumidorFinalProperty().getValue().getCod()));
+        getIdeVO().setIndPres(String.valueOf(getMyNFe().indicadorPresencaProperty().getValue().getCod()));
+        getIdeVO().setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));
+        getIdeVO().setVerProc(TCONFIG.getNfe().getVerProc());
+        setImprimirLote(getMyNFe().impressaoLtProdutoProperty().getValue());
 
         if (salvar) {
-            saidaProdutoNfe.chaveProperty().setValue(ServiceValidarDado.gerarChaveNfe(ideVO));
+            getMyNFe().chaveProperty().setValue(ServiceValidarDado.gerarChaveNfe(getIdeVO()));
             try {
                 getSaidaProdutoDAO().transactionBegin();
                 setSaidaProduto(getSaidaProdutoDAO().setTransactionPersist(getSaidaProduto()));
@@ -229,33 +188,25 @@ public class Nfe {
                 getSaidaProdutoDAO().transactionRollback();
             }
         }
-
-        return ideVO;
     }
 
-    public InfNfeVO new_InfNfeVO() {
-        InfNfeVO infNfeVO = new InfNfeVO();
-        infNfeVO.setVersao(TCONFIG.getNfe().getVersao());
-        infNfeVO.setEmit(new_EmitVO(null));
-
-        return infNfeVO;
-    }
-
-    public EmitVO new_EmitVO(Empresa emissor) {
-        EmitVO emitVO = new EmitVO();
+    public void emitVO_write() {
+        Empresa emissor = null;
         if (emissor == null)
             emissor = new EmpresaDAO().getById(Empresa.class, Long.valueOf(TCONFIG.getInfLoja().getId()));
+
         if (emissor.isPessoaJuridica())
-            emitVO.setCnpj(emissor.cnpjProperty().getValue());
+            getEmitVO().setCnpj(emissor.cnpjProperty().getValue());
         else
-            emitVO.setCpf(emissor.cnpjProperty().getValue());
-        emitVO.setxNome(emissor.getRazao(60));
-        emitVO.setxFant(emissor.getFantasia(60));
-        emitVO.setIE(emissor.ieProperty().getValue());
-        emitVO.setCRT(String.valueOf(TCONFIG.getNfe().getCRT()));
+            getEmitVO().setCpf(emissor.cnpjProperty().getValue());
+
+        getEmitVO().setxNome(emissor.getRazao(60));
+        getEmitVO().setxFant(emissor.getFantasia(60));
+        getEmitVO().setIE(emissor.ieProperty().getValue());
+        getEmitVO().setCRT(String.valueOf(TCONFIG.getNfe().getCRT()));
 
         EnderVO emitEnderVO = new EnderVO();
-        emitVO.setEnder(emitEnderVO);
+        getEmitVO().setEnder(emitEnderVO);
         Endereco emissorEndereco = emissor.getEndereco(TipoEndereco.PRINCIPAL);
 
         emitEnderVO.setxLgr(emissorEndereco.logradouroProperty().getValue());
@@ -269,35 +220,38 @@ public class Nfe {
         emitEnderVO.setcPais(TCONFIG.getNfe().getCPais());
         emitEnderVO.setxPais(TCONFIG.getNfe().getNPais());
         emitEnderVO.setFone(emissor.getFonePrincipal());
-
-        return emitVO;
     }
 
-    public DestVO new_DestVO(Empresa destinatario) {
-        DestVO destVO = new DestVO();
-//        if (destinatario == null)
+    public void destVO_write() {
+        Empresa destinatario = null;
         if (destinatario == null)
             if ((destinatario = getSaidaProduto().clienteProperty().getValue()) == null)
                 destinatario = new EmpresaDAO().getById(Empresa.class, Long.valueOf(TCONFIG.getInfLoja().getId()));
-        if (destinatario.isPessoaJuridica())
-            destVO.setCnpj(destinatario.cnpjProperty().getValue());
-        else
-            destVO.setCpf(destinatario.cnpjProperty().getValue());
-        destVO.setxNome(destinatario.getxNome(60));
-        if (destinatario.ieProperty().getValue().length() > 0)
-            destVO.setIndIEDest("1");
-        else
-            destVO.setIndIEDest("9");
-        destVO.setIE(destinatario.ieProperty().getValue());
-        if (destinatario.iSuframaProperty().getValue() != null)
-            destVO.setISUF(destinatario.iSuframaProperty().getValue());
-        if (destinatario.iMunicpipalProperty().getValue() != null)
-            destVO.setIM(destinatario.iMunicpipalProperty().getValue());
-        destVO.setEmail(destinatario.getEmailPrincipal());
 
+        if (destinatario.isPessoaJuridica())
+            getDestVO().setCnpj(destinatario.cnpjProperty().getValue());
+        else
+            getDestVO().setCpf(destinatario.cnpjProperty().getValue());
+
+        getDestVO().setxNome(destinatario.getxNome(60));
+
+        if (destinatario.ieProperty().getValue().length() > 0)
+            getDestVO().setIndIEDest("1");
+        else
+            getDestVO().setIndIEDest("9");
+
+        getDestVO().setIE(destinatario.ieProperty().getValue());
+
+        if (destinatario.iSuframaProperty().getValue() != null)
+            getDestVO().setISUF(destinatario.iSuframaProperty().getValue());
+
+        if (destinatario.iMunicpipalProperty().getValue() != null)
+            getDestVO().setIM(destinatario.iMunicpipalProperty().getValue());
+
+        getDestVO().setEmail(destinatario.getEmailPrincipal());
 
         EnderVO destEnderVO = new EnderVO();
-        destVO.setEnder(destEnderVO);
+        getDestVO().setEnder(destEnderVO);
         Endereco destinatarioEndereco = destinatario.getEndereco(TipoEndereco.PRINCIPAL);
 
         destEnderVO.setxLgr(destinatarioEndereco.logradouroProperty().getValue());
@@ -311,93 +265,106 @@ public class Nfe {
         destEnderVO.setcPais(TCONFIG.getNfe().getCPais());
         destEnderVO.setxPais(TCONFIG.getNfe().getNPais());
         destEnderVO.setFone(destinatario.getFonePrincipal());
-
-        return destVO;
     }
 
-    public EntregaVO new_EntregaVO(Endereco destinatarioEntrega, Empresa destinatario) {
-        EntregaVO entregaVO = new EntregaVO();
+    public void entregaVO_write(Endereco destinatarioEntrega) {
+        Empresa destinatario = getSaidaProduto().clienteProperty().getValue();
         if (destinatario == null)
             destinatario = getSaidaProduto().clienteProperty().getValue();
 
         if (destinatario.isPessoaJuridica())
-            entregaVO.setCnpj(destinatario.cnpjProperty().getValue());
+            getEntregaVO().setCnpj(destinatario.cnpjProperty().getValue());
         else
-            entregaVO.setCpf(destinatario.cnpjProperty().getValue());
-        entregaVO.setxNome(destinatario.getxNome(60));
+            getEntregaVO().setCpf(destinatario.cnpjProperty().getValue());
+        getEntregaVO().setxNome(destinatario.getxNome(60));
 
-        entregaVO.setxLgr(destinatarioEntrega.logradouroProperty().getValue());
-        entregaVO.setNro(destinatarioEntrega.numeroProperty().getValue());
-        entregaVO.setxCpl(destinatarioEntrega.complementoProperty().getValue());
-        entregaVO.setxBairro(destinatarioEntrega.bairroProperty().getValue());
-        entregaVO.setcMun(destinatarioEntrega.municipioProperty().getValue().ibge_codigoProperty().getValue());
-        entregaVO.setxMun(destinatarioEntrega.municipioProperty().getValue().descricaoProperty().getValue().toUpperCase());
-        entregaVO.setUF(destinatarioEntrega.municipioProperty().getValue().ufProperty().getValue().siglaProperty().getValue().toUpperCase());
-        entregaVO.setCEP(destinatarioEntrega.cepProperty().getValue());
-        entregaVO.setcPais(TCONFIG.getNfe().getCPais());
-        entregaVO.setxPais(TCONFIG.getNfe().getNPais());
-        entregaVO.setFone(destinatario.getFonePrincipal());
-
-        return entregaVO;
+        getEntregaVO().setxLgr(destinatarioEntrega.logradouroProperty().getValue());
+        getEntregaVO().setNro(destinatarioEntrega.numeroProperty().getValue());
+        getEntregaVO().setxCpl(destinatarioEntrega.complementoProperty().getValue());
+        getEntregaVO().setxBairro(destinatarioEntrega.bairroProperty().getValue());
+        getEntregaVO().setcMun(destinatarioEntrega.municipioProperty().getValue().ibge_codigoProperty().getValue());
+        getEntregaVO().setxMun(destinatarioEntrega.municipioProperty().getValue().descricaoProperty().getValue().toUpperCase());
+        getEntregaVO().setUF(destinatarioEntrega.municipioProperty().getValue().ufProperty().getValue().siglaProperty().getValue().toUpperCase());
+        getEntregaVO().setCEP(destinatarioEntrega.cepProperty().getValue());
+        getEntregaVO().setcPais(TCONFIG.getNfe().getCPais());
+        getEntregaVO().setxPais(TCONFIG.getNfe().getNPais());
+        getEntregaVO().setFone(destinatario.getFonePrincipal());
     }
 
-    public List<DetVO> new_DetVOList(TotalVO totalVO) {
-        final int[] nItem = {1};
-        if (getSaidaProduto().getSaidaProdutoProdutoList().size() > 0) {
-            List<DetVO> detVOList = new ArrayList<>();
-            getSaidaProduto().getSaidaProdutoProdutoList().stream()
-                    .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd))
-                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd))
-                    .forEach((aLong, saidaProdutoProdutos) -> {
-                        if (isImprimirLote())
-                            saidaProdutoProdutos.stream()
-                                    .sorted(Comparator.comparing(SaidaProdutoProduto::getLote))
-                                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote))
-                                    .forEach((s, saidaProdutoProdutos1) -> {
-                                        DetVO detVO = new DetVO();
-                                        detVO.setnItem(String.valueOf(nItem[0]++));
-                                        detVO.setProd(new_ProdVO(saidaProdutoProdutos1.get(0)));
-                                        detVO.getProd().setxProd(
-                                                String.format("%s Lt[%s] val.:%s",
-                                                        detVO.getProd().getxProd().substring(0,
-                                                                (detVO.getProd().getxProd().length() - (20 + s.length()))),
-                                                        s,
-                                                        saidaProdutoProdutos1.get(0).dtValidadeProperty().getValue().format(DTF_DATA)
-                                                )
-                                        );
-                                        for (int i = 1; i < saidaProdutoProdutos1.size(); i++) {
-                                            if (detVO.getProd().getCFOP().substring(1)
-                                                    .equals(saidaProdutoProdutos1.get(i).codigoCFOPProperty().getValue().getCod())) {
-                                                add_ProdVO(detVO.getProd(), saidaProdutoProdutos1.get(i));
-                                            } else {
-                                                detVO = new DetVO();
-                                                detVO.setnItem(String.valueOf(nItem[0]++));
-                                                detVO.setProd(new_ProdVO(saidaProdutoProdutos1.get(i)));
-                                                detVO.getProd().setxProd(
-                                                        String.format("%s Lt[%s] val.:%s",
-                                                                detVO.getProd().getxProd().substring(0,
-                                                                        (detVO.getProd().getxProd().length() - (20 + s.length()))),
-                                                                s,
-                                                                saidaProdutoProdutos1.get(i).dtValidadeProperty().getValue().format(DTF_DATA)
-                                                        )
-                                                );
-                                            }
-                                        }
-                                    });
-                    });
-            totalVO.getIcmsTot().setvNF(null);
-            return detVOList;
-        }
-        return null;
+    public void detVOList_write() {
+        if (getSaidaProduto().getSaidaProdutoProdutoList().size() <= 0) return;
+        List<DetVO> detVOList = new ArrayList<>();
+        getSaidaProduto().getSaidaProdutoProdutoList().stream()
+                .sorted(Comparator.comparing(SaidaProdutoProduto::getProdId)
+                        .thenComparing(SaidaProdutoProduto::getLote))
+                .collect(Collectors.groupingBy(SaidaProdutoProduto::getProdId))
+                .forEach((aLong, saidaProdutoProdutos) -> {
+//                        if (isImprimirLote())
+                    setDetVO(null);
+                    for (SaidaProdutoProduto saidProd : saidaProdutoProdutos) {
+                        new_ProdVO(saidProd);
+                    }
+//                            saidaProdutoProdutos.stream()
+//                                    .sorted(Comparator.comparing(SaidaProdutoProduto::getLote))
+//                                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote))
+//                                    .forEach((s, saidaProdutoProdutos1) -> {
+//                                        DetVO detVO = new DetVO();
+//                                        detVO.setnItem(String.valueOf(nItem[0]++));
+//                                        detVO.setProd(new_ProdVO(saidaProdutoProdutos1.get(0)));
+//                                        detVO.getProd().setxProd(
+//                                                String.format("%s Lt[%s] val.:%s",
+//                                                        detVO.getProd().getxProd().substring(0,
+//                                                                (detVO.getProd().getxProd().length() - (20 + s.length()))),
+//                                                        s,
+//                                                        saidaProdutoProdutos1.get(0).dtValidadeProperty().getValue().format(DTF_DATA)
+//                                                )
+//                                        );
+//                                        for (int i = 1; i < saidaProdutoProdutos1.size(); i++) {
+//                                            if (detVO[0].getProd().getCFOP().substring(1)
+//                                                    .equals(saidaProdutoProdutos1.get(i).codigoCFOPProperty().getValue().getCod())) {
+//                                                add_ProdVO(detVO[0].getProd(), saidaProdutoProdutos1.get(i));
+//                                            } else {
+//                                                detVO[0] = new DetVO();
+//                                                detVO[0].setnItem(String.valueOf(nItem[0]++));
+//                                                detVO[0].setProd(new_ProdVO(saidaProdutoProdutos1.get(i)));
+//                                                detVO[0].getProd().setxProd(
+//                                                        String.format("%s Lt[%s] val.:%s",
+//                                                                detVO[0].getProd().getxProd().substring(0,
+//                                                                        (detVO[0].getProd().getxProd().length() - (20 + s.length()))),
+//                                                                s,
+//                                                                saidaProdutoProdutos1.get(i).dtValidadeProperty().getValue().format(DTF_DATA)
+//                                                        )
+//                                                );
+//                                            }
+//                                        }
+//                                    });
+                });
+        totalVO.getIcmsTot().setvNF(null);
+
     }
 
-    private ProdVO new_ProdVO(SaidaProdutoProduto saidaProdutoProduto) {
-        Produto produto = saidaProdutoProduto.produtoProperty().getValue();
+    private void new_ProdVO(SaidaProdutoProduto saidProd) {
+        Produto produto = saidProd.produtoProperty().getValue();
         ProdVO prodVO = new ProdVO();
+
+        if (getDetVO() == null) {
+            setDetVO(new DetVO());
+            setnItem(getnItem() + 1);
+            getDetVO().setnItem(String.valueOf(getnItem()));
+            getDetVO().setProd(prodVO);
+            getDetVO().setImposto(newNfeImposto(produto));
+        }
 
         prodVO.setcProd(produto.codigoProperty().getValue());
         prodVO.setcEAN(produto.getCEAN());
-        prodVO.setxProd(produto.descricaoProperty().getValue());
+        String prodString = produto.descricaoProperty().getValue();
+        if (isImprimirLote()) {
+            prodString = String.format("%s Lt[%s] val.:%s",
+                    prodString,
+                    saidProd.loteProperty().getValue(),
+                    saidProd.dtValidadeProperty().getValue().format(DTF_DATA));
+        }
+        prodVO.setxProd(prodString);
         prodVO.setNCM(produto.ncmProperty().getValue());
         prodVO.setNVE("");
         prodVO.setCEST(produto.cestProperty().getValue());
@@ -405,68 +372,118 @@ public class Nfe {
         prodVO.setCNPJFab("");
         prodVO.setcBenef("");
         prodVO.setEXTIPI("");
-        prodVO.setCFOP("5" + saidaProdutoProduto.codigoCFOPProperty().getValue().getCod());
+        prodVO.setCFOP("5" + saidProd.codigoCFOPProperty().getValue().getCod());
         prodVO.setuCom(produto.unidadeComercialProperty().getValue().getDescricao());
-        BigDecimal qCom = new BigDecimal(saidaProdutoProduto.qtdProperty().getValue());
+        BigDecimal qCom = new BigDecimal(saidProd.qtdProperty().getValue());
         prodVO.setqCom(qCom);
-        prodVO.setvUnCom(saidaProdutoProduto.vlrUnitarioProperty().getValue());
-        prodVO.setvProd(saidaProdutoProduto.vlrBrutoProperty().getValue());
+        prodVO.setvUnCom(saidProd.vlrUnitarioProperty().getValue());
+        prodVO.setvProd(saidProd.vlrBrutoProperty().getValue());
         prodVO.setcEANTrib(produto.getCEAN());
         prodVO.setuTrib(produto.unidadeComercialProperty().getValue().getDescricao());
         prodVO.setqTrib(qCom);
-        prodVO.setvUnTrib(saidaProdutoProduto.vlrUnitarioProperty().getValue());
+        prodVO.setvUnTrib(saidProd.vlrUnitarioProperty().getValue());
         prodVO.setvFrete(null);
         prodVO.setvSeg(null);
-        if (saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-            prodVO.setvDesc(saidaProdutoProduto.vlrDescontoProperty().getValue());
+        if (saidProd.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
+            prodVO.setvDesc(saidProd.vlrDescontoProperty().getValue());
         prodVO.setvOutro(null);
         prodVO.setIndTot("1");
 
-        return prodVO;
-    }
-
-    private ProdVO add_ProdVO(ProdVO prodVO, SaidaProdutoProduto saidaProdutoProduto) {
-//        Produto produto = saidaProdutoProduto.produtoProperty().getValue();
-//        ProdVO prodVO = new ProdVO();
-
-//        prodVO.setcEAN(produto.getCEAN());
-//        prodVO.setxProd(produto.descricaoProperty().getValue());
-//        prodVO.setNCM(produto.ncmProperty().getValue());
-//        prodVO.setNVE("");
-//        prodVO.setCEST(produto.cestProperty().getValue());
-//        prodVO.setIndEscala("");
-//        prodVO.setCNPJFab("");
-//        prodVO.setcBenef("");
-//        prodVO.setEXTIPI("");
-//        prodVO.setCFOP("5" + saidaProdutoProduto.codigoCFOPProperty().getValue().getCod());
-//        prodVO.setuCom(produto.unidadeComercialProperty().getValue().getDescricao());
-        BigDecimal qCom = new BigDecimal(saidaProdutoProduto.qtdProperty().getValue()).add(prodVO.getqCom());
-        prodVO.setqCom(qCom);
-        prodVO.setvUnCom(saidaProdutoProduto.vlrUnitarioProperty().getValue());
-        prodVO.setvProd(saidaProdutoProduto.vlrBrutoProperty().getValue());
-//        prodVO.setcEANTrib(produto.getCEAN());
-//        prodVO.setuTrib(produto.unidadeComercialProperty().getValue().getDescricao());
-        prodVO.setqTrib(qCom);
-        prodVO.setvUnTrib(saidaProdutoProduto.vlrUnitarioProperty().getValue());
-        prodVO.setvFrete(null);
-        prodVO.setvSeg(null);
-        if (saidaProdutoProduto.vlrDescontoProperty().getValue().compareTo(BigDecimal.ZERO) > 0)
-            prodVO.setvDesc(saidaProdutoProduto.vlrDescontoProperty().getValue()
-                    .add(prodVO.getvDesc()));
-        prodVO.setvOutro(null);
-        prodVO.setIndTot("1");
-
-        return prodVO;
     }
 
 
-    public EnviNfeVO getEnviNfeVO() {
-        return enviNfeVO;
+    private static ImpostoVO newNfeImposto(Produto produto) {
+        ImpostoVO impostoVO = new ImpostoVO();
+        if (produto.fiscalIcmsProperty().getValue() != null) {
+            IcmsVO icmsVO = new IcmsVO();
+            impostoVO.setIcms(icmsVO);
+            switch (produto.fiscalIcmsProperty().getValue().idProperty().getValue().intValue()) {
+                case 0:
+                    Icms00VO icms00VO = new Icms00VO();
+                    icmsVO.setIcms00(icms00VO);
+                    icms00VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms00VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 10:
+                    Icms10VO icms10VO = new Icms10VO();
+                    icmsVO.setIcms10(icms10VO);
+                    icms10VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms10VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 20:
+                    Icms20VO icms20VO = new Icms20VO();
+                    icmsVO.setIcms20(icms20VO);
+                    icms20VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms20VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 30:
+                    Icms30VO icms30VO = new Icms30VO();
+                    icmsVO.setIcms30(icms30VO);
+                    icms30VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms30VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 40:
+                    Icms40_41_50VO icms404150VO = new Icms40_41_50VO();
+                    icmsVO.setIcms40_41_50(icms404150VO);
+                    icms404150VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms404150VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 50:
+                    Icms51VO icms51VO = new Icms51VO();
+                    icmsVO.setIcms51(icms51VO);
+                    icms51VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms51VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 60:
+                    Icms60VO icms60VO = new Icms60VO();
+                    icmsVO.setIcms60(icms60VO);
+                    icms60VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms60VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 70:
+                    Icms70VO icms70VO = new Icms70VO();
+                    icmsVO.setIcms70(icms70VO);
+                    icms70VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms70VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+                case 90:
+                    Icms90VO icms90VO = new Icms90VO();
+                    icmsVO.setIcms90(icms90VO);
+                    icms90VO.setOrig(produto.fiscalCstOrigemProperty().getValue().idProperty().getValue().toString());
+                    icms90VO.setCST(String.format("%02d", produto.fiscalIcmsProperty().getValue().idProperty().getValue()));
+                    break;
+            }
+        }
+
+        if (produto.fiscalPisProperty().getValue() != null) {
+            PisVO pisVO = new PisVO();
+            impostoVO.setPis(pisVO);
+            PisNTVO pisNTVO = new PisNTVO();
+            pisVO.setPisNT(pisNTVO);
+            pisNTVO.setCST(String.format("%02d", produto.fiscalPisProperty().getValue().idProperty().getValue()));
+        }
+
+        if (produto.fiscalCofinsProperty().getValue() != null) {
+            CofinsVO cofinsVO = new CofinsVO();
+            impostoVO.setCofins(cofinsVO);
+            CofinsNTVO cofinsNTVO = new CofinsNTVO();
+            cofinsVO.setCofinsNT(cofinsNTVO);
+            cofinsNTVO.setCST(String.format("%02d", produto.fiscalCofinsProperty().getValue().idProperty().getValue()));
+        }
+
+        return impostoVO;
     }
 
-    public void setEnviNfeVO(EnviNfeVO enviNfeVO) {
-        this.enviNfeVO = enviNfeVO;
+
+    private Pair<Integer, Integer> getNumeroSerieUltimaNfe() {
+        SaidaProdutoNfe nfeTemp = new SaidaProdutoNfeDAO().getAll(SaidaProdutoNfe.class, null, "numero DESC")
+                .stream().findFirst().orElse(null);
+        if (nfeTemp != null)
+            return new Pair<>(nfeTemp.serieProperty().getValue(), nfeTemp.numeroProperty().getValue());
+        else
+            return new Pair<>(1, 0);
     }
+
 
     public SaidaProduto getSaidaProduto() {
         return saidaProduto;
@@ -474,14 +491,6 @@ public class Nfe {
 
     public void setSaidaProduto(SaidaProduto saidaProduto) {
         this.saidaProduto = saidaProduto;
-    }
-
-    public SaidaProdutoNfe getSaidaProdutoNfe() {
-        return saidaProdutoNfe;
-    }
-
-    public void setSaidaProdutoNfe(SaidaProdutoNfe saidaProdutoNfe) {
-        this.saidaProdutoNfe = saidaProdutoNfe;
     }
 
     public SaidaProdutoDAO getSaidaProdutoDAO() {
@@ -492,6 +501,14 @@ public class Nfe {
         this.saidaProdutoDAO = saidaProdutoDAO;
     }
 
+    public SaidaProdutoNfe getMyNFe() {
+        return myNFe;
+    }
+
+    public void setMyNFe(SaidaProdutoNfe myNFe) {
+        this.myNFe = myNFe;
+    }
+
     public TEnviNFe gettEnviNFe() {
         return tEnviNFe;
     }
@@ -500,11 +517,147 @@ public class Nfe {
         this.tEnviNFe = tEnviNFe;
     }
 
+    public EnviNfeVO getEnviNfeVO() {
+        return enviNfeVO;
+    }
+
+    public void setEnviNfeVO(EnviNfeVO enviNfeVO) {
+        this.enviNfeVO = enviNfeVO;
+    }
+
+    public NfeVO getNfeVO() {
+        return nfeVO;
+    }
+
+    public void setNfeVO(NfeVO nfeVO) {
+        this.nfeVO = nfeVO;
+    }
+
+    public InfNfeVO getInfNfeVO() {
+        return infNfeVO;
+    }
+
+    public void setInfNfeVO(InfNfeVO infNfeVO) {
+        this.infNfeVO = infNfeVO;
+    }
+
+    public IdeVO getIdeVO() {
+        return ideVO;
+    }
+
+    public void setIdeVO(IdeVO ideVO) {
+        this.ideVO = ideVO;
+    }
+
+    public EmitVO getEmitVO() {
+        return emitVO;
+    }
+
+    public void setEmitVO(EmitVO emitVO) {
+        this.emitVO = emitVO;
+    }
+
+    public DestVO getDestVO() {
+        return destVO;
+    }
+
+    public void setDestVO(DestVO destVO) {
+        this.destVO = destVO;
+    }
+
+    public EntregaVO getEntregaVO() {
+        return entregaVO;
+    }
+
+    public void setEntregaVO(EntregaVO entregaVO) {
+        this.entregaVO = entregaVO;
+    }
+
+    public List<DetVO> getDetVOList() {
+        return detVOList;
+    }
+
+    public void setDetVOList(List<DetVO> detVOList) {
+        this.detVOList = detVOList;
+    }
+
+    public TotalVO getTotalVO() {
+        return totalVO;
+    }
+
+    public void setTotalVO(TotalVO totalVO) {
+        this.totalVO = totalVO;
+    }
+
+    public IcmsTotVO getIcmsTotVO() {
+        return icmsTotVO;
+    }
+
+    public void setIcmsTotVO(IcmsTotVO icmsTotVO) {
+        this.icmsTotVO = icmsTotVO;
+    }
+
+    public TranspVO getTranspVO() {
+        return transpVO;
+    }
+
+    public void setTranspVO(TranspVO transpVO) {
+        this.transpVO = transpVO;
+    }
+
+    public CobrVO getCobrVO() {
+        return cobrVO;
+    }
+
+    public void setCobrVO(CobrVO cobrVO) {
+        this.cobrVO = cobrVO;
+    }
+
+    public PagVO getPagVO() {
+        return pagVO;
+    }
+
+    public void setPagVO(PagVO pagVO) {
+        this.pagVO = pagVO;
+    }
+
+    public InfAdicVO getInfAdicVO() {
+        return infAdicVO;
+    }
+
+    public void setInfAdicVO(InfAdicVO infAdicVO) {
+        this.infAdicVO = infAdicVO;
+    }
+
+    public InfRespTecVO getInfRespTecVO() {
+        return infRespTecVO;
+    }
+
+    public void setInfRespTecVO(InfRespTecVO infRespTecVO) {
+        this.infRespTecVO = infRespTecVO;
+    }
+
     public boolean isImprimirLote() {
-        return imprimirLote;
+        return ImprimirLote;
     }
 
     public void setImprimirLote(boolean imprimirLote) {
-        this.imprimirLote = imprimirLote;
+        ImprimirLote = imprimirLote;
+    }
+
+    public DetVO getDetVO() {
+        return detVO;
+    }
+
+    public void setDetVO(DetVO detVO) {
+        this.detVO = detVO;
+    }
+
+    public int getnItem() {
+        return nItem;
+    }
+
+    public void setnItem(int nItem) {
+        this.nItem = nItem;
     }
 }

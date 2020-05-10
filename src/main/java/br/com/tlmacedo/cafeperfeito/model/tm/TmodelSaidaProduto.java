@@ -295,7 +295,7 @@ public class TmodelSaidaProduto {
         totalQtdVolumeProperty().setValue(getSaidaProdutoProdutoObservableList().stream()
                 .collect(Collectors.summingInt(SaidaProdutoProduto::getVolume)));
         totalQtdItemProperty().setValue(getSaidaProdutoProdutoObservableList().stream()
-                .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd)).size());
+                .collect(Collectors.groupingBy(SaidaProdutoProduto::getProdId)).size());
         totalQtdProdutoProperty().setValue(getSaidaProdutoProdutoObservableList().stream()
                 .collect(Collectors.summingInt(SaidaProdutoProduto::getQtd)));
         totalBrutoProperty().setValue(getSaidaProdutoProdutoObservableList().stream()
@@ -312,7 +312,7 @@ public class TmodelSaidaProduto {
     public void calculaDescontoCliente() {
         if (empresaProperty().getValue() == null) return;
         getSaidaProdutoProdutoObservableList().stream()
-                .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd))
+                .collect(Collectors.groupingBy(SaidaProdutoProduto::getProdId))
                 .forEach((aLong, saidaProdutosId) -> {
                     prazoProperty().setValue(empresaProperty().getValue().prazoProperty().getValue());
                     EmpresaCondicoes condicoes;
@@ -470,8 +470,8 @@ public class TmodelSaidaProduto {
             List<ProdutoEstoque> produtoEstoqueList = produtoEstoqueDAO.getAll(ProdutoEstoque.class,
                     String.format("qtd > 0"), "dtValidade, id");
             getSaidaProdutoProdutoObservableList().stream()
-                    .sorted(Comparator.comparing(SaidaProdutoProduto::getIdProd))
-                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getIdProd, LinkedHashMap::new, Collectors.toList()))
+                    .sorted(Comparator.comparing(SaidaProdutoProduto::getProdId))
+                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getProdId, LinkedHashMap::new, Collectors.toList()))
                     .forEach((aLong, saidaProdutoProdutos) -> {
                         saidaProdutoProdutos.stream()
                                 .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote, LinkedHashMap::new, Collectors.toList()))

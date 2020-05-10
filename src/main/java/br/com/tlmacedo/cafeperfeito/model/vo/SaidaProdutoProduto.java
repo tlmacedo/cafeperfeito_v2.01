@@ -274,11 +274,11 @@ public class SaidaProdutoProduto implements Serializable {
         this.produto.set(produto);
     }
 
-    @JsonIgnore
-    @Transient
-    public Long getIdProd() {
-        return produto.get().idProperty().getValue();
-    }
+//    @JsonIgnore
+//    @Transient
+//    public Long getIdProd() {
+//        return produto.get().idProperty().getValue();
+//    }
 
     @Transient
     public BigDecimal getVlrLiquido() {
@@ -324,27 +324,60 @@ public class SaidaProdutoProduto implements Serializable {
         this.volume.set(volume);
     }
 
+    @Transient
+    public long getProdId() {
+        return produtoProperty().getValue().idProperty().getValue();
+    }
+
+    public void setProdId(long prodId) {
+        this.produtoProperty().getValue().idProperty().setValue(prodId);
+    }
+
+    //    @Override
+//    public String toString() {
+//        return "SaidaProdutoProduto{" +
+//                "id=" + id +
+////                ", saidaProduto=" + saidaProduto +
+////                ", produto=" + produto +
+//                ", codigo=" + codigo +
+//                ", descricao=" + descricao +
+//                ", codigoCFOP=" + codigoCFOP +
+//                ", lote=" + lote +
+//                ", dtValidade=" + dtValidade +
+//                ", qtd=" + qtd +
+//                ", vlrEntrada=" + vlrEntrada +
+//                ", vlrEntradaBruto=" + vlrEntradaBruto +
+//                ", vlrUnitario=" + vlrUnitario +
+//                ", vlrBruto=" + vlrBruto +
+//                ", vlrDesconto=" + vlrDesconto +
+//                ", vlrLiquido=" + vlrLiquido +
+//                ", estoque=" + estoque +
+//                ", varejo=" + varejo +
+//                ", volume=" + volume +
+//                '}';
+//    }
+
     @Override
     public String toString() {
         return "SaidaProdutoProduto{" +
-                "id=" + id +
+                "id=" + id.getValue() +
 //                ", saidaProduto=" + saidaProduto +
 //                ", produto=" + produto +
-                ", codigo=" + codigo +
-                ", descricao=" + descricao +
-                ", codigoCFOP=" + codigoCFOP +
-                ", lote=" + lote +
-                ", dtValidade=" + dtValidade +
-                ", qtd=" + qtd +
-                ", vlrEntrada=" + vlrEntrada +
-                ", vlrEntradaBruto=" + vlrEntradaBruto +
-                ", vlrUnitario=" + vlrUnitario +
-                ", vlrBruto=" + vlrBruto +
-                ", vlrDesconto=" + vlrDesconto +
-                ", vlrLiquido=" + vlrLiquido +
-                ", estoque=" + estoque +
-                ", varejo=" + varejo +
-                ", volume=" + volume +
+                ", codigo=" + codigo.getValue() +
+                ", descricao=" + descricao.getValue() +
+                ", codigoCFOP=" + codigoCFOP.getValue() +
+                ", lote=" + lote.getValue() +
+                ", dtValidade=" + dtValidade.getValue() +
+                ", qtd=" + qtd.getValue() +
+                ", vlrEntrada=" + vlrEntrada.getValue() +
+                ", vlrEntradaBruto=" + vlrEntradaBruto.getValue() +
+                ", vlrUnitario=" + vlrUnitario.getValue() +
+                ", vlrBruto=" + vlrBruto.getValue() +
+                ", vlrDesconto=" + vlrDesconto.getValue() +
+                ", vlrLiquido=" + vlrLiquido.getValue() +
+                ", estoque=" + estoque.getValue() +
+                ", varejo=" + varejo.getValue() +
+                ", volume=" + volume.getValue() +
                 '}';
     }
 }
