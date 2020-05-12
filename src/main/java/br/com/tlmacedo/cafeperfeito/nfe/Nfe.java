@@ -24,35 +24,38 @@ import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONF
 
 public class Nfe {
 
-    private SaidaProduto saidaProduto;
-    private SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
-    private SaidaProdutoNfe myNFe = new SaidaProdutoNfe();
-    private boolean ImprimirLote = false;
-    private int nItem = 1;
-    private DetVO detVO;
-    private TEnviNFe tEnviNFe = new TEnviNFe();
-    private EnviNfeVO enviNfeVO = new EnviNfeVO();
-    private NfeVO nfeVO = new NfeVO();
-    private InfNfeVO infNfeVO = new InfNfeVO();
-    private IdeVO ideVO = new IdeVO();
-    private EmitVO emitVO = new EmitVO();
-    private DestVO destVO = new DestVO();
-    private EntregaVO entregaVO;
-    private List<DetVO> detVOList = new ArrayList<>();
-    private TotalVO totalVO = new TotalVO();
-    private IcmsTotVO icmsTotVO = new IcmsTotVO();
-    private TranspVO transpVO = new TranspVO();
-    private CobrVO cobrVO = new CobrVO();
-    private PagVO pagVO = new PagVO();
-    private InfAdicVO infAdicVO = new InfAdicVO();
-    private InfRespTecVO infRespTecVO = new InfRespTecVO();
+    private static SaidaProduto saidaProduto;
+    private static SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
+    private static SaidaProdutoNfe myNFe = new SaidaProdutoNfe();
+    private static boolean ImprimirLote = false;
+    private static int nItem = 1;
+    private static DetVO detVO;
+    private static TEnviNFe tEnviNFe = new TEnviNFe();
+    private static EnviNfeVO enviNfeVO = new EnviNfeVO();
+    private static NfeVO nfeVO = new NfeVO();
+    private static InfNfeVO infNfeVO = new InfNfeVO();
+    private static IdeVO ideVO = new IdeVO();
+    private static EmitVO emitVO = new EmitVO();
+    private static DestVO destVO = new DestVO();
+    private static EntregaVO entregaVO;
+    private static List<DetVO> detVOList = new ArrayList<>();
+    private static TotalVO totalVO = new TotalVO();
+    private static IcmsTotVO icmsTotVO = new IcmsTotVO();
+    private static TranspVO transpVO = new TranspVO();
+    private static CobrVO cobrVO = new CobrVO();
+    private static FatVO fatVO = new FatVO();
+    private static PagVO pagVO = new PagVO();
+    private static DetPagVO detPagVO = new DetPagVO();
+    private static InfAdicVO infAdicVO = new InfAdicVO();
+    private static InfRespTecVO infRespTecVO = new InfRespTecVO();
 
     public Nfe(SaidaProduto saidaProduto) {
         setSaidaProduto(saidaProduto);
     }
 
 
-    public void gerarNotaFiscal() {
+    public static void gerarNotaFiscal(SaidaProduto saidaProduto) {
+        setSaidaProduto(saidaProduto);
 
         getEnviNfeVO().setVersao(TCONFIG.getNfe().getVersao());
         getEnviNfeVO().setIdLote(Nfe_Service.factoryIdLote(getSaidaProduto().idProperty().getValue()));
@@ -80,13 +83,30 @@ public class Nfe {
         getInfNfeVO().setTotal(getTotalVO());
         detVOList_write();
 
+        getTranspVO().setModFrete(String.valueOf(getMyNFe().getModFrete().ordinal()));
+        getInfNfeVO().setTransp(getTranspVO());
+        if (getMyNFe().getModFrete().ordinal() < 3)
+            transpVO_write();
+
+        if (getIcmsTotVO().getvNF().compareTo(BigDecimal.ZERO) != 0)
+            cobrVO_write();
+
+        getPagVO().setDetPag(getDetPagVO());
+        getInfNfeVO().setPag(getPagVO());
+        detPagVO_write();
+
+        getInfNfeVO().setInfAdic(getInfAdicVO());
+        getInfAdicVO().setInfCpl(getMyNFe().informacaoAdicionalProperty().getValue());
+
+        getInfNfeVO().setInfRespTec(getInfRespTecVO());
+        infRespTecVO_write();
 
         settEnviNFe(new EnviNfe_v400(getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe());
 
     }
 
 
-    public void ideVO_write() {
+    private static void ideVO_write() {
         boolean salvar = false;
 
         setMyNFe(getSaidaProduto().getSaidaProdutoNfeList().stream()
@@ -190,7 +210,7 @@ public class Nfe {
         }
     }
 
-    public void emitVO_write() {
+    private static void emitVO_write() {
         Empresa emissor = null;
         if (emissor == null)
             emissor = new EmpresaDAO().getById(Empresa.class, Long.valueOf(TCONFIG.getInfLoja().getId()));
@@ -222,7 +242,7 @@ public class Nfe {
         emitEnderVO.setFone(emissor.getFonePrincipal());
     }
 
-    public void destVO_write() {
+    private static void destVO_write() {
         Empresa destinatario = null;
         if (destinatario == null)
             if ((destinatario = getSaidaProduto().clienteProperty().getValue()) == null)
@@ -267,7 +287,7 @@ public class Nfe {
         destEnderVO.setFone(destinatario.getFonePrincipal());
     }
 
-    public void entregaVO_write(Endereco destinatarioEntrega) {
+    private static void entregaVO_write(Endereco destinatarioEntrega) {
         Empresa destinatario = getSaidaProduto().clienteProperty().getValue();
         if (destinatario == null)
             destinatario = getSaidaProduto().clienteProperty().getValue();
@@ -291,69 +311,43 @@ public class Nfe {
         getEntregaVO().setFone(destinatario.getFonePrincipal());
     }
 
-    public void detVOList_write() {
+    private static void detVOList_write() {
         if (getSaidaProduto().getSaidaProdutoProdutoList().size() <= 0) return;
-        List<DetVO> detVOList = new ArrayList<>();
         getSaidaProduto().getSaidaProdutoProdutoList().stream()
                 .sorted(Comparator.comparing(SaidaProdutoProduto::getProdId)
                         .thenComparing(SaidaProdutoProduto::getLote))
                 .collect(Collectors.groupingBy(SaidaProdutoProduto::getProdId))
                 .forEach((aLong, saidaProdutoProdutos) -> {
-//                        if (isImprimirLote())
                     setDetVO(null);
                     for (SaidaProdutoProduto saidProd : saidaProdutoProdutos) {
                         new_ProdVO(saidProd);
                     }
-//                            saidaProdutoProdutos.stream()
-//                                    .sorted(Comparator.comparing(SaidaProdutoProduto::getLote))
-//                                    .collect(Collectors.groupingBy(SaidaProdutoProduto::getLote))
-//                                    .forEach((s, saidaProdutoProdutos1) -> {
-//                                        DetVO detVO = new DetVO();
-//                                        detVO.setnItem(String.valueOf(nItem[0]++));
-//                                        detVO.setProd(new_ProdVO(saidaProdutoProdutos1.get(0)));
-//                                        detVO.getProd().setxProd(
-//                                                String.format("%s Lt[%s] val.:%s",
-//                                                        detVO.getProd().getxProd().substring(0,
-//                                                                (detVO.getProd().getxProd().length() - (20 + s.length()))),
-//                                                        s,
-//                                                        saidaProdutoProdutos1.get(0).dtValidadeProperty().getValue().format(DTF_DATA)
-//                                                )
-//                                        );
-//                                        for (int i = 1; i < saidaProdutoProdutos1.size(); i++) {
-//                                            if (detVO[0].getProd().getCFOP().substring(1)
-//                                                    .equals(saidaProdutoProdutos1.get(i).codigoCFOPProperty().getValue().getCod())) {
-//                                                add_ProdVO(detVO[0].getProd(), saidaProdutoProdutos1.get(i));
-//                                            } else {
-//                                                detVO[0] = new DetVO();
-//                                                detVO[0].setnItem(String.valueOf(nItem[0]++));
-//                                                detVO[0].setProd(new_ProdVO(saidaProdutoProdutos1.get(i)));
-//                                                detVO[0].getProd().setxProd(
-//                                                        String.format("%s Lt[%s] val.:%s",
-//                                                                detVO[0].getProd().getxProd().substring(0,
-//                                                                        (detVO[0].getProd().getxProd().length() - (20 + s.length()))),
-//                                                                s,
-//                                                                saidaProdutoProdutos1.get(i).dtValidadeProperty().getValue().format(DTF_DATA)
-//                                                        )
-//                                                );
-//                                            }
-//                                        }
-//                                    });
                 });
-        totalVO.getIcmsTot().setvNF(null);
+        getIcmsTotVO().setvNF(getIcmsTotVO().getvProd().subtract(getIcmsTotVO().getvDesc()));
+        getTotalVO().getIcmsTot().setvNF(null);
 
     }
 
-    private void new_ProdVO(SaidaProdutoProduto saidProd) {
+    private static void new_ProdVO(SaidaProdutoProduto saidProd) {
+        ProdVO prodVO = null;
         Produto produto = saidProd.produtoProperty().getValue();
-        ProdVO prodVO = new ProdVO();
+        if (isImprimirLote()) {
+            setDetVO(null);
+        } else {
+
+        }
+
 
         if (getDetVO() == null) {
             setDetVO(new DetVO());
             setnItem(getnItem() + 1);
             getDetVO().setnItem(String.valueOf(getnItem()));
+            prodVO = new ProdVO();
             getDetVO().setProd(prodVO);
-            getDetVO().setImposto(newNfeImposto(produto));
+            prodImposto_write(produto);
+            getDetVOList().add(getDetVO());
         }
+        if (prodVO == null) return;
 
         prodVO.setcProd(produto.codigoProperty().getValue());
         prodVO.setcEAN(produto.getCEAN());
@@ -389,11 +383,19 @@ public class Nfe {
         prodVO.setvOutro(null);
         prodVO.setIndTot("1");
 
+        if (getDetVO().getProd().getvProd() != null)
+            getIcmsTotVO().setvProd(getIcmsTotVO().getvProd().add(getDetVO().getProd().getvProd()));
+        if (getDetVO().getProd().getvFrete() != null)
+            getIcmsTotVO().setvFrete(getIcmsTotVO().getvFrete().add(getDetVO().getProd().getvFrete()));
+        if (getDetVO().getProd().getvSeg() != null)
+            getIcmsTotVO().setvSeg(getIcmsTotVO().getvSeg().add(getDetVO().getProd().getvSeg()));
+        if (getDetVO().getProd().getvDesc() != null)
+            getIcmsTotVO().setvDesc(getIcmsTotVO().getvDesc().add(getDetVO().getProd().getvDesc()));
     }
 
-
-    private static ImpostoVO newNfeImposto(Produto produto) {
+    private static void prodImposto_write(Produto produto) {
         ImpostoVO impostoVO = new ImpostoVO();
+        getDetVO().setImposto(impostoVO);
         if (produto.fiscalIcmsProperty().getValue() != null) {
             IcmsVO icmsVO = new IcmsVO();
             impostoVO.setIcms(icmsVO);
@@ -470,12 +472,53 @@ public class Nfe {
             cofinsVO.setCofinsNT(cofinsNTVO);
             cofinsNTVO.setCST(String.format("%02d", produto.fiscalCofinsProperty().getValue().idProperty().getValue()));
         }
-
-        return impostoVO;
     }
 
+    private static void transpVO_write() {
+        TransportaVO transportaVO = new TransportaVO();
+        getTranspVO().setTransporta(transportaVO);
+        Empresa transportadora = getMyNFe().getTransportador();
+        if (transportadora.isPessoaJuridica())
+            transportaVO.setCNPJ(transportadora.getCnpj());
+        else
+            transportaVO.setCPF(transportadora.getCnpj());
+        transportaVO.setxNome(transportadora.getxNome(60));
 
-    private Pair<Integer, Integer> getNumeroSerieUltimaNfe() {
+        if (!transportadora.ieProperty().getValue().equals(""))
+            transportaVO.setIE(transportadora.ieProperty().getValue());
+
+        Endereco end = transportadora.getEndereco(TipoEndereco.PRINCIPAL);
+        transportaVO.setxEnder(transportadora.getEndereco(end));
+        transportaVO.setxMun(end.municipioProperty().getValue().descricaoProperty().getValue().toUpperCase());
+        transportaVO.setUF(end.municipioProperty().getValue().ufProperty().getValue().siglaProperty().getValue().toUpperCase());
+    }
+
+    private static void cobrVO_write() {
+        getInfNfeVO().setCobr(getCobrVO());
+        getCobrVO().setFat(getFatVO());
+
+        getFatVO().setnFat(!getSaidaProduto().idProperty().getValue().toString().equals("")
+                ? getSaidaProduto().idProperty().getValue().toString()
+                : getIdeVO().getnNF());
+        getFatVO().setvOrig(getIcmsTotVO().getvProd());
+        getFatVO().setvDesc(getIcmsTotVO().getvDesc());
+        getFatVO().setvLiq(getIcmsTotVO().getvNF());
+    }
+
+    private static void detPagVO_write() {
+        getDetPagVO().setIndPag(getMyNFe().pagamentoIndicadorProperty().getValue().getCod());
+        getDetPagVO().settPag(getMyNFe().pagamentoMeioProperty().getValue().getCod());
+        getDetPagVO().setvPag(getIcmsTotVO().getvNF());
+    }
+
+    private static void infRespTecVO_write() {
+        getInfRespTecVO().setCnpj(TCONFIG.getNfe().getInfRespTec().getCnpj());
+        getInfRespTecVO().setxContato(TCONFIG.getNfe().getInfRespTec().getXContato());
+        getInfRespTecVO().setEmail(TCONFIG.getNfe().getInfRespTec().getEmail());
+        getInfRespTecVO().setFone(TCONFIG.getNfe().getInfRespTec().getFone());
+    }
+
+    private static Pair<Integer, Integer> getNumeroSerieUltimaNfe() {
         SaidaProdutoNfe nfeTemp = new SaidaProdutoNfeDAO().getAll(SaidaProdutoNfe.class, null, "numero DESC")
                 .stream().findFirst().orElse(null);
         if (nfeTemp != null)
@@ -485,179 +528,195 @@ public class Nfe {
     }
 
 
-    public SaidaProduto getSaidaProduto() {
+    public static SaidaProduto getSaidaProduto() {
         return saidaProduto;
     }
 
-    public void setSaidaProduto(SaidaProduto saidaProduto) {
-        this.saidaProduto = saidaProduto;
+    public static void setSaidaProduto(SaidaProduto saidaProduto) {
+        Nfe.saidaProduto = saidaProduto;
     }
 
-    public SaidaProdutoDAO getSaidaProdutoDAO() {
+    public static SaidaProdutoDAO getSaidaProdutoDAO() {
         return saidaProdutoDAO;
     }
 
-    public void setSaidaProdutoDAO(SaidaProdutoDAO saidaProdutoDAO) {
-        this.saidaProdutoDAO = saidaProdutoDAO;
+    public static void setSaidaProdutoDAO(SaidaProdutoDAO saidaProdutoDAO) {
+        Nfe.saidaProdutoDAO = saidaProdutoDAO;
     }
 
-    public SaidaProdutoNfe getMyNFe() {
+    public static SaidaProdutoNfe getMyNFe() {
         return myNFe;
     }
 
-    public void setMyNFe(SaidaProdutoNfe myNFe) {
-        this.myNFe = myNFe;
+    public static void setMyNFe(SaidaProdutoNfe myNFe) {
+        Nfe.myNFe = myNFe;
     }
 
-    public TEnviNFe gettEnviNFe() {
-        return tEnviNFe;
-    }
-
-    public void settEnviNFe(TEnviNFe tEnviNFe) {
-        this.tEnviNFe = tEnviNFe;
-    }
-
-    public EnviNfeVO getEnviNfeVO() {
-        return enviNfeVO;
-    }
-
-    public void setEnviNfeVO(EnviNfeVO enviNfeVO) {
-        this.enviNfeVO = enviNfeVO;
-    }
-
-    public NfeVO getNfeVO() {
-        return nfeVO;
-    }
-
-    public void setNfeVO(NfeVO nfeVO) {
-        this.nfeVO = nfeVO;
-    }
-
-    public InfNfeVO getInfNfeVO() {
-        return infNfeVO;
-    }
-
-    public void setInfNfeVO(InfNfeVO infNfeVO) {
-        this.infNfeVO = infNfeVO;
-    }
-
-    public IdeVO getIdeVO() {
-        return ideVO;
-    }
-
-    public void setIdeVO(IdeVO ideVO) {
-        this.ideVO = ideVO;
-    }
-
-    public EmitVO getEmitVO() {
-        return emitVO;
-    }
-
-    public void setEmitVO(EmitVO emitVO) {
-        this.emitVO = emitVO;
-    }
-
-    public DestVO getDestVO() {
-        return destVO;
-    }
-
-    public void setDestVO(DestVO destVO) {
-        this.destVO = destVO;
-    }
-
-    public EntregaVO getEntregaVO() {
-        return entregaVO;
-    }
-
-    public void setEntregaVO(EntregaVO entregaVO) {
-        this.entregaVO = entregaVO;
-    }
-
-    public List<DetVO> getDetVOList() {
-        return detVOList;
-    }
-
-    public void setDetVOList(List<DetVO> detVOList) {
-        this.detVOList = detVOList;
-    }
-
-    public TotalVO getTotalVO() {
-        return totalVO;
-    }
-
-    public void setTotalVO(TotalVO totalVO) {
-        this.totalVO = totalVO;
-    }
-
-    public IcmsTotVO getIcmsTotVO() {
-        return icmsTotVO;
-    }
-
-    public void setIcmsTotVO(IcmsTotVO icmsTotVO) {
-        this.icmsTotVO = icmsTotVO;
-    }
-
-    public TranspVO getTranspVO() {
-        return transpVO;
-    }
-
-    public void setTranspVO(TranspVO transpVO) {
-        this.transpVO = transpVO;
-    }
-
-    public CobrVO getCobrVO() {
-        return cobrVO;
-    }
-
-    public void setCobrVO(CobrVO cobrVO) {
-        this.cobrVO = cobrVO;
-    }
-
-    public PagVO getPagVO() {
-        return pagVO;
-    }
-
-    public void setPagVO(PagVO pagVO) {
-        this.pagVO = pagVO;
-    }
-
-    public InfAdicVO getInfAdicVO() {
-        return infAdicVO;
-    }
-
-    public void setInfAdicVO(InfAdicVO infAdicVO) {
-        this.infAdicVO = infAdicVO;
-    }
-
-    public InfRespTecVO getInfRespTecVO() {
-        return infRespTecVO;
-    }
-
-    public void setInfRespTecVO(InfRespTecVO infRespTecVO) {
-        this.infRespTecVO = infRespTecVO;
-    }
-
-    public boolean isImprimirLote() {
+    public static boolean isImprimirLote() {
         return ImprimirLote;
     }
 
-    public void setImprimirLote(boolean imprimirLote) {
+    public static void setImprimirLote(boolean imprimirLote) {
         ImprimirLote = imprimirLote;
     }
 
-    public DetVO getDetVO() {
-        return detVO;
-    }
-
-    public void setDetVO(DetVO detVO) {
-        this.detVO = detVO;
-    }
-
-    public int getnItem() {
+    public static int getnItem() {
         return nItem;
     }
 
-    public void setnItem(int nItem) {
-        this.nItem = nItem;
+    public static void setnItem(int nItem) {
+        Nfe.nItem = nItem;
+    }
+
+    public static DetVO getDetVO() {
+        return detVO;
+    }
+
+    public static void setDetVO(DetVO detVO) {
+        Nfe.detVO = detVO;
+    }
+
+    public static TEnviNFe gettEnviNFe() {
+        return tEnviNFe;
+    }
+
+    public static void settEnviNFe(TEnviNFe tEnviNFe) {
+        Nfe.tEnviNFe = tEnviNFe;
+    }
+
+    public static EnviNfeVO getEnviNfeVO() {
+        return enviNfeVO;
+    }
+
+    public static void setEnviNfeVO(EnviNfeVO enviNfeVO) {
+        Nfe.enviNfeVO = enviNfeVO;
+    }
+
+    public static NfeVO getNfeVO() {
+        return nfeVO;
+    }
+
+    public static void setNfeVO(NfeVO nfeVO) {
+        Nfe.nfeVO = nfeVO;
+    }
+
+    public static InfNfeVO getInfNfeVO() {
+        return infNfeVO;
+    }
+
+    public static void setInfNfeVO(InfNfeVO infNfeVO) {
+        Nfe.infNfeVO = infNfeVO;
+    }
+
+    public static IdeVO getIdeVO() {
+        return ideVO;
+    }
+
+    public static void setIdeVO(IdeVO ideVO) {
+        Nfe.ideVO = ideVO;
+    }
+
+    public static EmitVO getEmitVO() {
+        return emitVO;
+    }
+
+    public static void setEmitVO(EmitVO emitVO) {
+        Nfe.emitVO = emitVO;
+    }
+
+    public static DestVO getDestVO() {
+        return destVO;
+    }
+
+    public static void setDestVO(DestVO destVO) {
+        Nfe.destVO = destVO;
+    }
+
+    public static EntregaVO getEntregaVO() {
+        return entregaVO;
+    }
+
+    public static void setEntregaVO(EntregaVO entregaVO) {
+        Nfe.entregaVO = entregaVO;
+    }
+
+    public static List<DetVO> getDetVOList() {
+        return detVOList;
+    }
+
+    public static void setDetVOList(List<DetVO> detVOList) {
+        Nfe.detVOList = detVOList;
+    }
+
+    public static TotalVO getTotalVO() {
+        return totalVO;
+    }
+
+    public static void setTotalVO(TotalVO totalVO) {
+        Nfe.totalVO = totalVO;
+    }
+
+    public static IcmsTotVO getIcmsTotVO() {
+        return icmsTotVO;
+    }
+
+    public static void setIcmsTotVO(IcmsTotVO icmsTotVO) {
+        Nfe.icmsTotVO = icmsTotVO;
+    }
+
+    public static TranspVO getTranspVO() {
+        return transpVO;
+    }
+
+    public static void setTranspVO(TranspVO transpVO) {
+        Nfe.transpVO = transpVO;
+    }
+
+    public static CobrVO getCobrVO() {
+        return cobrVO;
+    }
+
+    public static void setCobrVO(CobrVO cobrVO) {
+        Nfe.cobrVO = cobrVO;
+    }
+
+    public static FatVO getFatVO() {
+        return fatVO;
+    }
+
+    public static void setFatVO(FatVO fatVO) {
+        Nfe.fatVO = fatVO;
+    }
+
+    public static PagVO getPagVO() {
+        return pagVO;
+    }
+
+    public static void setPagVO(PagVO pagVO) {
+        Nfe.pagVO = pagVO;
+    }
+
+    public static DetPagVO getDetPagVO() {
+        return detPagVO;
+    }
+
+    public static void setDetPagVO(DetPagVO detPagVO) {
+        Nfe.detPagVO = detPagVO;
+    }
+
+    public static InfAdicVO getInfAdicVO() {
+        return infAdicVO;
+    }
+
+    public static void setInfAdicVO(InfAdicVO infAdicVO) {
+        Nfe.infAdicVO = infAdicVO;
+    }
+
+    public static InfRespTecVO getInfRespTecVO() {
+        return infRespTecVO;
+    }
+
+    public static void setInfRespTecVO(InfRespTecVO infRespTecVO) {
+        Nfe.infRespTecVO = infRespTecVO;
     }
 }
