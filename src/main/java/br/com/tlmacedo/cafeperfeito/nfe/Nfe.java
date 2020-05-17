@@ -6,6 +6,7 @@ import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import br.com.tlmacedo.cafeperfeito.service.ServiceMascara;
+import br.com.tlmacedo.cafeperfeito.service.ServiceUtilXml;
 import br.com.tlmacedo.cafeperfeito.service.ServiceValidarDado;
 import br.com.tlmacedo.nfe.model.vo.*;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
@@ -22,15 +23,16 @@ import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
+
 public class Nfe {
 
     private static SaidaProduto saidaProduto;
     private static SaidaProdutoDAO saidaProdutoDAO = new SaidaProdutoDAO();
     private static SaidaProdutoNfe myNFe = new SaidaProdutoNfe();
-    private static boolean ImprimirLote = false;
-    private static int nItem = 1;
+    private static boolean imprimirLote;
+    private static int nItem = 0;
     private static DetVO detVO;
-    private static TEnviNFe tEnviNFe = new TEnviNFe();
+    private static TEnviNFe tEnviNFe;
     private static EnviNfeVO enviNfeVO = new EnviNfeVO();
     private static NfeVO nfeVO = new NfeVO();
     private static InfNfeVO infNfeVO = new InfNfeVO();
@@ -49,8 +51,30 @@ public class Nfe {
     private static InfAdicVO infAdicVO = new InfAdicVO();
     private static InfRespTecVO infRespTecVO = new InfRespTecVO();
 
-    public Nfe(SaidaProduto saidaProduto) {
-        setSaidaProduto(saidaProduto);
+    public static String getNfe_Xml(Long nPed, boolean imprimirLote) throws Exception {
+        setImprimirLote(imprimirLote);
+        gerarNotaFiscal(getSaidaProdutoDAO().getById(SaidaProduto.class, nPed));
+        return getNfe_Xml();
+    }
+
+    public static String getNfe_Xml(SaidaProduto saidaProduto, boolean imprimirLote) throws Exception {
+        setImprimirLote(imprimirLote);
+        gerarNotaFiscal(saidaProduto);
+        return getNfe_Xml();
+    }
+
+    private static String getNfe_Xml(EnviNfeVO enviNfeVO, boolean imprimirLote) throws Exception {
+        setImprimirLote(imprimirLote);
+        setEnviNfeVO(enviNfeVO);
+        return getNfe_Xml();
+    }
+
+    private static String getNfe_Xml() throws Exception {
+        return ServiceUtilXml.objectToXml(gerartEnviNFe());
+    }
+
+    private static TEnviNFe gerartEnviNFe() throws Exception {
+        return new EnviNfe_v400(getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe();
     }
 
 
@@ -88,7 +112,7 @@ public class Nfe {
         if (getMyNFe().getModFrete().ordinal() < 3)
             transpVO_write();
 
-        if (getIcmsTotVO().getvNF().compareTo(BigDecimal.ZERO) != 0)
+        if (getTotalVO().getIcmsTot().getvNF().compareTo(BigDecimal.ZERO) != 0)
             cobrVO_write();
 
         getPagVO().setDetPag(getDetPagVO());
@@ -100,8 +124,6 @@ public class Nfe {
 
         getInfNfeVO().setInfRespTec(getInfRespTecVO());
         infRespTecVO_write();
-
-        settEnviNFe(new EnviNfe_v400(getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe());
 
     }
 
@@ -115,6 +137,7 @@ public class Nfe {
             salvar = true;
             setMyNFe(new SaidaProdutoNfe());
             getSaidaProduto().getSaidaProdutoNfeList().add(getMyNFe());
+
 
             getMyNFe().impressaoFinNFeProperty().setValue(NfeImpressaoFinNFe.getList().stream()
                     .filter(impressaoFinNFe -> impressaoFinNFe.getCod() == TCONFIG.getNfe().getFinNFe())
@@ -195,7 +218,7 @@ public class Nfe {
         getIdeVO().setIndPres(String.valueOf(getMyNFe().indicadorPresencaProperty().getValue().getCod()));
         getIdeVO().setProcEmi(String.valueOf(TCONFIG.getNfe().getProcEmi()));
         getIdeVO().setVerProc(TCONFIG.getNfe().getVerProc());
-        setImprimirLote(getMyNFe().impressaoLtProdutoProperty().getValue());
+        //setImprimirLote(getMyNFe().impressaoLtProdutoProperty().getValue());
 
         if (salvar) {
             getMyNFe().chaveProperty().setValue(ServiceValidarDado.gerarChaveNfe(getIdeVO()));
@@ -207,6 +230,9 @@ public class Nfe {
                 e.printStackTrace();
                 getSaidaProdutoDAO().transactionRollback();
             }
+        } else {
+            getIdeVO().setcNF(getMyNFe().getChave().substring(35, 43));
+            getIdeVO().setcDV(getMyNFe().getChave().substring(43, 44));
         }
     }
 
@@ -324,7 +350,7 @@ public class Nfe {
                     }
                 });
         getIcmsTotVO().setvNF(getIcmsTotVO().getvProd().subtract(getIcmsTotVO().getvDesc()));
-        getTotalVO().getIcmsTot().setvNF(null);
+        //getTotalVO().getIcmsTot().setvNF(null);
 
     }
 
@@ -334,7 +360,7 @@ public class Nfe {
         if (isImprimirLote()) {
             setDetVO(null);
         } else {
-
+            getDetVO();
         }
 
 
@@ -391,6 +417,7 @@ public class Nfe {
             getIcmsTotVO().setvSeg(getIcmsTotVO().getvSeg().add(getDetVO().getProd().getvSeg()));
         if (getDetVO().getProd().getvDesc() != null)
             getIcmsTotVO().setvDesc(getIcmsTotVO().getvDesc().add(getDetVO().getProd().getvDesc()));
+
     }
 
     private static void prodImposto_write(Produto produto) {
@@ -553,11 +580,11 @@ public class Nfe {
     }
 
     public static boolean isImprimirLote() {
-        return ImprimirLote;
+        return imprimirLote;
     }
 
     public static void setImprimirLote(boolean imprimirLote) {
-        ImprimirLote = imprimirLote;
+        Nfe.imprimirLote = imprimirLote;
     }
 
     public static int getnItem() {

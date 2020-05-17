@@ -6,8 +6,6 @@ import br.com.tlmacedo.nfe.model.vo.EnviNfeVO;
 import br.com.tlmacedo.nfe.v400.EnviNfe_v400;
 import br.inf.portalfiscal.xsd.nfe.enviNFe.TEnviNFe;
 
-import javax.xml.bind.JAXBException;
-
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.MY_ZONE_TIME;
 
 public class NFeXml {
@@ -17,7 +15,7 @@ public class NFeXml {
     private static EnviNfeVO enviNfeVO;
     private static String xmlNFe;
 
-    public static String getXml(EnviNfeVO enviNfeVO) throws JAXBException {
+    public static String getXml(EnviNfeVO enviNfeVO) throws Exception {
         setEnviNfeVO(enviNfeVO);
         return ServiceUtilXml.objectToXml(gerartEnviNFe());
     }
@@ -26,7 +24,7 @@ public class NFeXml {
         return getXml(NotaFiscal.getEnviNfeVO(saidaProduto));
     }
 
-    private static TEnviNFe gerartEnviNFe() {
+    private static TEnviNFe gerartEnviNFe() throws Exception {
         return new EnviNfe_v400(getEnviNfeVO(), MY_ZONE_TIME).gettEnviNFe();
     }
 
