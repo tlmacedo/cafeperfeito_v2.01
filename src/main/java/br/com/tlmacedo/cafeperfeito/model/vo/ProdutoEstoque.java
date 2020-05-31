@@ -1,6 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.service.ServiceAlertMensagem;
+import br.com.tlmacedo.service.ServiceAlertMensagem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 import org.hibernate.annotations.CreationTimestamp;

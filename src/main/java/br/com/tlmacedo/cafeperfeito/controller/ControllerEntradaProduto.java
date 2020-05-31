@@ -10,6 +10,7 @@ import br.com.tlmacedo.cafeperfeito.service.*;
 import br.com.tlmacedo.cafeperfeito.service.autoComplete.ServiceAutoCompleteComboBox;
 import br.com.tlmacedo.cafeperfeito.service.format.ServiceFormatDataPicker;
 import br.com.tlmacedo.cafeperfeito.view.ViewEntradaProduto;
+import br.com.tlmacedo.service.ServiceAlertMensagem;
 import br.inf.portalfiscal.xsd.cte.procCTe.CteProc;
 import br.inf.portalfiscal.xsd.cte.procCTe.TCTe;
 import br.inf.portalfiscal.xsd.nfe.procNFe.TNfeProc;
@@ -49,6 +50,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_NFE_TO_LOCAL_DATE;
+import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 /**
  * Created by IntelliJ IDEA.
@@ -261,7 +263,11 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                                     limpaCampos(getPainelViewEntradaProduto());
                                 }
                             } else {
-                                setAlertMensagem(new ServiceAlertMensagem());
+                                setAlertMensagem(new ServiceAlertMensagem(
+                                        TCONFIG.getTimeOut(),
+                                        ServiceVariaveisSistema.SPLASH_IMAGENS,
+                                        TCONFIG.getPersonalizacao().getStyleSheets()
+                                ));
                                 getAlertMensagem().setCabecalho("Entrada invalida");
                                 getAlertMensagem().setContentText("Verifique a entrada de produtos pois está invalida");
                                 getAlertMensagem().setStrIco("");

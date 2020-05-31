@@ -2,7 +2,10 @@ package br.com.tlmacedo.cafeperfeito.controller;
 
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.MenuPrincipalDAO;
+import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.MenuPrincipal;
+import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
+import br.com.tlmacedo.cafeperfeito.nfe.Nfe;
 import br.com.tlmacedo.cafeperfeito.service.ServiceComandoTecladoMouse;
 import br.com.tlmacedo.cafeperfeito.service.ServiceStatusBar;
 import br.com.tlmacedo.cafeperfeito.view.*;
@@ -29,6 +32,16 @@ import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONF
 
 
 public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
+
+    public ImageView imgTesteExecute;
+
+    public ImageView getImgTesteExecute() {
+        return imgTesteExecute;
+    }
+
+    public void setImgTesteExecute(ImageView imgTesteExecute) {
+        this.imgTesteExecute = imgTesteExecute;
+    }
 
     public BorderPane painelViewPrincipal;
     public TabPane tabPaneViewPrincipal;
@@ -98,6 +111,17 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
     public void escutarTecla() throws Exception {
         getImgMenuPrincipalExpande().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(true));
         getImgMenuPrincipalRetrair().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(false));
+        getImgTesteExecute().addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent ->
+                {
+                    try {
+                        System.out.printf("iniciando nova NF-e\n");
+                        new Nfe(new SaidaProdutoDAO().getById(SaidaProduto.class, 85L), true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+
 
         setEventHandlerPrincipal(new EventHandler<KeyEvent>() {
             @Override

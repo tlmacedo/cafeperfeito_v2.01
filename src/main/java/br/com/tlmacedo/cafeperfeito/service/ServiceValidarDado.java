@@ -6,6 +6,7 @@ import br.com.tlmacedo.cafeperfeito.model.vo.Recebimento;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import br.com.tlmacedo.nfe.model.vo.IdeVO;
+import br.com.tlmacedo.service.ServiceAlertMensagem;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
@@ -225,7 +226,11 @@ public class ServiceValidarDado {
         if (m.find())
             return true;
         if (getMsgFaill) {
-            ServiceAlertMensagem alertMensagem = new ServiceAlertMensagem();
+            ServiceAlertMensagem alertMensagem = new ServiceAlertMensagem(
+                    TCONFIG.getTimeOut(),
+                    ServiceVariaveisSistema.SPLASH_IMAGENS,
+                    TCONFIG.getPersonalizacao().getStyleSheets()
+            );
             alertMensagem.setCabecalho("Dados inválidos");
             alertMensagem.setStrIco("ic_msg_alerta_triangulo_white_24dp.png");
             alertMensagem.setContentText(String.format("%s, telefone informado: [%s], é inválido!",
