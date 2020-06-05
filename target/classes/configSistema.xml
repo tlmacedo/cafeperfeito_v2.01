@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sistema>
     <myLocale>pt_br</myLocale>
-    <timeOut>600</timeOut>
+    <timeOut>30</timeOut>
     <versao>2.01</versao>
     <sis>
         <connect_DB>
@@ -36,7 +36,6 @@
         <uf>AM</uf>
         <cUF>13</cUF>
         <municipio>Manaus</municipio>
-        <cMunFG>1302603</cMunFG>
         <ddd>92</ddd>
         <descMax>10.00</descMax>
         <banco>NuBank</banco>
@@ -71,14 +70,20 @@
         <portaSSl>443</portaSSl>
         <versao>4.00</versao>
         <indSinc>0</indSinc>
-        <nFeSerie>1</nFeSerie>
+        <natOp>0</natOp>
+        <mod>55</mod>
+        <serie>1</serie>
         <tpNF>1</tpNF>
+        <idDest>1</idDest>
+        <cMunFG>1302603</cMunFG>
         <tpImp>1</tpImp>
         <tpEmis>1</tpEmis>
         <tpAmb>2</tpAmb>
         <finNFe>1</finNFe>
+        <indPres>3</indPres>
         <procEmi>0</procEmi>
         <verProc>2.01</verProc>
+        <indPag>1</indPag>
         <cPais>1058</cPais>
         <nPais>BRASIL</nPais>
         <CRT>3</CRT>

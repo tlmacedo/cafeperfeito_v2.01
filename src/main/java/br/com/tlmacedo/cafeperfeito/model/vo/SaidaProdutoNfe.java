@@ -41,6 +41,7 @@ public class SaidaProdutoNfe implements Serializable {
     private StringProperty informacaoAdicional = new SimpleStringProperty();
     private StringProperty digVal = new SimpleStringProperty();
     private ObjectProperty<Blob> xmlAssinatura = new SimpleObjectProperty<>();
+    private ObjectProperty<Blob> xmlConsRecibo = new SimpleObjectProperty<>();
     private ObjectProperty<Blob> xmlProtNfe = new SimpleObjectProperty<>();
 
     public SaidaProdutoNfe() {
@@ -243,6 +244,7 @@ public class SaidaProdutoNfe implements Serializable {
         this.modFrete.set(modFrete);
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     public Empresa getTransportador() {
         return transportadorProperty().get();
@@ -337,6 +339,20 @@ public class SaidaProdutoNfe implements Serializable {
 
     public void setXmlAssinatura(Blob xmlAssinatura) {
         this.xmlAssinatura.set(xmlAssinatura);
+    }
+
+    @JsonIgnore
+    @SuppressWarnings("JpaAttributeTypeInspection")
+    public Blob getXmlConsRecibo() {
+        return xmlConsRecibo.get();
+    }
+
+    public ObjectProperty<Blob> xmlConsReciboProperty() {
+        return xmlConsRecibo;
+    }
+
+    public void setXmlConsRecibo(Blob xmlConsRecibo) {
+        this.xmlConsRecibo.set(xmlConsRecibo);
     }
 
     @JsonIgnore

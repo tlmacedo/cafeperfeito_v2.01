@@ -7,6 +7,7 @@ import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import br.com.tlmacedo.nfe.model.vo.IdeVO;
 import br.com.tlmacedo.service.ServiceAlertMensagem;
+import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
@@ -20,13 +21,14 @@ import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.REGEX_TELEFO
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 
 public class ServiceValidarDado {
-    static final int[] pesoCpf = {11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
-    static final int[] pesoCnpj = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-    static final int[] pesoChaveNfeCte = {4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9,
+    private static final int[] pesoCpf = {11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+    private static final int[] pesoCnpj = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+    private static final int[] pesoChaveNfeCte = {4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9,
             8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-    static final int[] pesoCafe = {3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-    static Pattern p, pt, pd;
-    static Matcher m, mt, md;
+    private static final int[] pesoCafe = {3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+    private static Pattern p, pt, pd;
+    private static Matcher m, mt, md;
+    private static Pair CHAVE_NFE;
 
     public static boolean isCnpjCpfValido(String value) {
         value = value.replaceAll("\\W", "");
@@ -103,44 +105,40 @@ public class ServiceValidarDado {
         return dv.equals(calculaDv(base, pesoCafe));
     }
 
-    public static String gerarChaveNfe(IdeVO ideVO) {
-        ideVO.setcNF(String.format("%04d%02d%02d", ideVO.getDhEmi().getYear(),
-                ideVO.getDhEmi().getMonthValue(),
-                ideVO.getDhEmi().getDayOfMonth()));
+    public static String getChaveNfe(SaidaProdutoNfe saidaProdutoNfe) {
+        String base = gera_BaseChaveNfe(
+                String.format("%02d", TCONFIG.getInfLoja().getCUF()),
+                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().toLocalDate(),
+                TCONFIG.getInfLoja().getCnpj(),
+                String.format("%02d", saidaProdutoNfe.getModelo().getCod()),
+                String.format("%03d", saidaProdutoNfe.serieProperty().getValue()),
+                String.format("%09d", saidaProdutoNfe.numeroProperty().getValue()),
+                String.format("%d", saidaProdutoNfe.impressaoTpEmisProperty().getValue().ordinal())
+        );
+        return String.format("%s%d", base, nfeDv(base));
+    }
 
-        String chave = String.format("%s%s%s%s%s%s%s%s",
-                ideVO.getcUF(),
-                String.format("%02d%02d", ideVO.getDhEmi().getYear() % 100,
-                        ideVO.getDhEmi().getMonthValue()),
+    public static String getChaveNfe(IdeVO ideVO) {
+        String base = gera_BaseChaveNfe(
+                String.format("%02d", ideVO.getcUF()),
+                ideVO.getDhEmi().toLocalDate(),
                 TCONFIG.getInfLoja().getCnpj(),
                 String.format("%02d", Integer.parseInt(ideVO.getMod())),
                 String.format("%03d", Integer.parseInt(ideVO.getSerie())),
                 String.format("%09d", Integer.parseInt(ideVO.getnNF())),
-                String.format(ideVO.getTpEmis()),
-                ideVO.getcNF());
-
-        ideVO.setcDV(String.valueOf(nfeDv(chave)));
-        return String.format("%s%s",
-                chave,
-                ideVO.getcDV());
+                String.format("%d", Integer.parseInt(ideVO.getTpEmis()))
+        );
+        return String.format("%s%d", base, nfeDv(base));
     }
 
-    public static String gerarChaveNfe(SaidaProdutoNfe saidaProdutoNfe) {
-        String cUF = String.format("%02d", TCONFIG.getInfLoja().getCUF());
+    private static String gera_BaseChaveNfe(String cUF, LocalDate dtEmissao, String cnpj, String mod, String serie, String nNF, String tpEmis) {
         String aAMM = String.format("%02d%02d",
-                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getYear() % 100,
-                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getMonthValue());
-        String cnpj = TCONFIG.getInfLoja().getCnpj();
-        String mod = String.format("%02d", saidaProdutoNfe.getModelo().getCod());
-        String serie = String.format("%03d", saidaProdutoNfe.serieProperty().getValue());
-        String nNF = String.format("%09d", saidaProdutoNfe.numeroProperty().getValue());
-        String tpEmis = String.format("%d", TCONFIG.getNfe().getTpEmis());
-        String cNF = String.format("%04d%02d%02d",
-                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getYear(),
-                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getMonthValue(),
-                saidaProdutoNfe.dtHoraEmissaoProperty().getValue().getDayOfMonth());
+                dtEmissao.getMonthValue(),
+                dtEmissao.getDayOfMonth());
+        String cNF = String.format("%04d%s",
+                dtEmissao.getYear(), aAMM);
 
-        String chave = String.format("%s%s%s%s%s%s%s%s",
+        return String.format("%s%s%s%s%s%s%s%s",
                 cUF,
                 aAMM,
                 cnpj,
@@ -149,11 +147,6 @@ public class ServiceValidarDado {
                 nNF,
                 tpEmis,
                 cNF);
-
-        String cDV = String.valueOf(nfeDv(chave));
-        return String.format("%s%s",
-                chave,
-                cDV);
     }
 
 //    public static WebTipo isEmailHomePageValido(final String value, boolean getMsgFaill) {

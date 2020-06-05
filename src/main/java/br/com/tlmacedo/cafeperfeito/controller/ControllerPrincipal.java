@@ -5,6 +5,7 @@ import br.com.tlmacedo.cafeperfeito.model.dao.MenuPrincipalDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.MenuPrincipal;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
+import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
 import br.com.tlmacedo.cafeperfeito.nfe.Nfe;
 import br.com.tlmacedo.cafeperfeito.service.ServiceComandoTecladoMouse;
 import br.com.tlmacedo.cafeperfeito.service.ServiceStatusBar;
@@ -108,19 +109,22 @@ public class ControllerPrincipal implements Initializable, ModeloCafePerfeito {
     }
 
     @Override
-    public void escutarTecla() throws Exception {
+    public void escutarTecla() {
         getImgMenuPrincipalExpande().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(true));
         getImgMenuPrincipalRetrair().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> expandeAllMenuPrincipal(false));
-        getImgTesteExecute().addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent ->
-                {
-                    try {
-                        System.out.printf("iniciando nova NF-e\n");
-                        new Nfe(new SaidaProdutoDAO().getById(SaidaProduto.class, 85L), true);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        getImgTesteExecute().addEventHandler(MouseEvent.MOUSE_CLICKED,
+                mouseEvent -> {
+                    SaidaProduto saidaProduto = new SaidaProdutoDAO().getById(SaidaProduto.class, 85L);
+                    SaidaProdutoNfe saidaProdutoNfe;
+                    if ((saidaProdutoNfe = saidaProduto.getSaidaProdutoNfeList().stream()
+                            .filter(saidaProdutoNfe1 -> !saidaProdutoNfe1.isCancelada())
+                            .findFirst().orElse(null)) == null) {
+                        saidaProdutoNfe = new SaidaProdutoNfe();
+                        saidaProdutoNfe.saidaProdutoProperty().setValue(saidaProduto);
+                        saidaProduto.getSaidaProdutoNfeList().add(saidaProdutoNfe);
                     }
-                }
-        );
+                    new Nfe(saidaProdutoNfe, true);
+                });
 
 
         setEventHandlerPrincipal(new EventHandler<KeyEvent>() {

@@ -1,5 +1,6 @@
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoDAO;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
+import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
 import br.com.tlmacedo.cafeperfeito.nfe.Nfe;
 import br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,14 +18,19 @@ public class TesteGroupSaidaLoteProduto {
         new ServiceVariaveisSistema().getVariaveisSistema();
         setPedido(new SaidaProdutoDAO().getById(SaidaProduto.class, getnPed()));
 
-        System.out.printf("iniciando123 nova NF-e\n");
-        new Nfe(new SaidaProdutoDAO().getById(SaidaProduto.class, 85L), true);
+        System.out.printf("iniciando nova NF-e\n");
+        SaidaProdutoNfe saidaProdutoNfe;
+        if ((saidaProdutoNfe = getPedido().getSaidaProdutoNfeList().stream()
+                .filter(saidaProdutoNfe1 -> !saidaProdutoNfe1.isCancelada())
+                .findFirst().orElse(null)) == null) {
+            saidaProdutoNfe = new SaidaProdutoNfe();
+            saidaProdutoNfe.saidaProdutoProperty().setValue(getPedido());
+            getPedido().getSaidaProdutoNfeList().add(saidaProdutoNfe);
+        }
+        new Nfe(saidaProdutoNfe, true);
 
 
     }
-
-
-
 
 
     public static Long getnPed() {
