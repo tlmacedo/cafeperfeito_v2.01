@@ -12,10 +12,10 @@ public enum NfeImpressaoFinNFe {
     AJUSTE(3, "NF-e de ajuste"),
     DEVOLUCAO(4, "Devolução de mercadoria");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeImpressaoFinNFe(int cod, String descricao) {
+    private NfeImpressaoFinNFe(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -31,7 +31,7 @@ public enum NfeImpressaoFinNFe {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

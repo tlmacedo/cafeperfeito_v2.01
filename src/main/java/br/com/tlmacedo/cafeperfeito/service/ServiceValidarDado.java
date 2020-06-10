@@ -7,7 +7,6 @@ import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
 import br.com.tlmacedo.cafeperfeito.model.vo.UsuarioLogado;
 import br.com.tlmacedo.nfe.model.vo.IdeVO;
 import br.com.tlmacedo.service.ServiceAlertMensagem;
-import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
@@ -28,7 +27,6 @@ public class ServiceValidarDado {
     private static final int[] pesoCafe = {3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
     private static Pattern p, pt, pd;
     private static Matcher m, mt, md;
-    private static Pair CHAVE_NFE;
 
     public static boolean isCnpjCpfValido(String value) {
         value = value.replaceAll("\\W", "");
@@ -110,11 +108,12 @@ public class ServiceValidarDado {
                 String.format("%02d", TCONFIG.getInfLoja().getCUF()),
                 saidaProdutoNfe.dtHoraEmissaoProperty().getValue().toLocalDate(),
                 TCONFIG.getInfLoja().getCnpj(),
-                String.format("%02d", saidaProdutoNfe.getModelo().getCod()),
+                String.format("%02d", saidaProdutoNfe.getModelo()),
                 String.format("%03d", saidaProdutoNfe.serieProperty().getValue()),
                 String.format("%09d", saidaProdutoNfe.numeroProperty().getValue()),
-                String.format("%d", saidaProdutoNfe.impressaoTpEmisProperty().getValue().ordinal())
+                String.format("%d", saidaProdutoNfe.impressaoTpEmisProperty().getValue())
         );
+        System.out.printf("base_Chave_Nfe: [%s]\n", base);
         return String.format("%s%d", base, nfeDv(base));
     }
 
@@ -133,8 +132,8 @@ public class ServiceValidarDado {
 
     private static String gera_BaseChaveNfe(String cUF, LocalDate dtEmissao, String cnpj, String mod, String serie, String nNF, String tpEmis) {
         String aAMM = String.format("%02d%02d",
-                dtEmissao.getMonthValue(),
-                dtEmissao.getDayOfMonth());
+                dtEmissao.getYear() % 100,
+                dtEmissao.getMonthValue());
         String cNF = String.format("%04d%s",
                 dtEmissao.getYear(), aAMM);
 

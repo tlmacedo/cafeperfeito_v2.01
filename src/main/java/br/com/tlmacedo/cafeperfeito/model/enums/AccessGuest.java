@@ -17,10 +17,10 @@ public enum AccessGuest {
     USUARIO(88, "Usuário"),
     ENTREGADOR(99, "Entregador");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private AccessGuest(int cod, String descricao) {
+    private AccessGuest(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -36,7 +36,7 @@ public enum AccessGuest {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

@@ -20,10 +20,10 @@ public enum PagamentoModalidade {
     BAIXA_DEBITO(10, "Débito baixado"),
     DEBITO(11, "Débito");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private PagamentoModalidade(int cod, String descricao) {
+    private PagamentoModalidade(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -39,7 +39,7 @@ public enum PagamentoModalidade {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

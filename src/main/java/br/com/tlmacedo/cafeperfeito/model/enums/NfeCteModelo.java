@@ -13,21 +13,21 @@ public enum NfeCteModelo {
     MOD57(57, "57"),
     MOD65(65, "Nfc-e");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeCteModelo(int cod, String descricao) {
+    private NfeCteModelo(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
 
-    public static NfeCteModelo toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (NfeCteModelo tipo : NfeCteModelo.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
+//    public static NfeCteModelo toEnum(Integer cod) {
+//        if (cod == null) return null;
+//        for (NfeCteModelo tipo : NfeCteModelo.values())
+//            if (cod.equals(tipo.getCod()))
+//                return tipo;
+//        throw new IllegalArgumentException("Id inválido");
+//    }
 
     public static List<NfeCteModelo> getList() {
         List list = Arrays.asList(NfeCteModelo.values());
@@ -40,7 +40,7 @@ public enum NfeCteModelo {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

@@ -16,7 +16,7 @@ public enum UndComercialProduto {
     DUZIA(6, "DZ"),
     LATA(7, "LT");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
     private UndComercialProduto(Integer cod, String descricao) {
@@ -35,7 +35,7 @@ public enum UndComercialProduto {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

@@ -14,10 +14,10 @@ public enum NfeTransporteModFrete {
     DESTINATARIO(4, "Transporte Próprio por conta do Destinatário"),
     SEM_OCORRENCIA(9, "Sem Ocorrência de Transporte");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeTransporteModFrete(int cod, String descricao) {
+    private NfeTransporteModFrete(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -33,7 +33,7 @@ public enum NfeTransporteModFrete {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

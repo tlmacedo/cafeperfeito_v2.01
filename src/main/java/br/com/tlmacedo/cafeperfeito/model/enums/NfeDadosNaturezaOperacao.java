@@ -11,12 +11,20 @@ public enum NfeDadosNaturezaOperacao {
     EXTERNA(1, "FORA DO ESTADO"),
     EXTERIOR(2, "FORA DO PAÍS");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeDadosNaturezaOperacao(int cod, String descricao) {
+    private NfeDadosNaturezaOperacao(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
+    }
+
+    public static NfeDadosNaturezaOperacao toEnum(Integer cod) {
+        if (cod == null) return null;
+        for (NfeDadosNaturezaOperacao tipo : NfeDadosNaturezaOperacao.values())
+            if (cod.equals(tipo.getCod()))
+                return tipo;
+        throw new IllegalArgumentException("Id inválido");
     }
 
     public static List<NfeDadosNaturezaOperacao> getList() {
@@ -30,7 +38,7 @@ public enum NfeDadosNaturezaOperacao {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

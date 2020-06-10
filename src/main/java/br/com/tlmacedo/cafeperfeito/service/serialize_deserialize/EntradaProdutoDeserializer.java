@@ -4,9 +4,6 @@ import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.FiscalFreteSituacaoTributariaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.FiscalTributosSefazAmDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.ProdutoDAO;
-import br.com.tlmacedo.cafeperfeito.model.enums.CteTomadorServico;
-import br.com.tlmacedo.cafeperfeito.model.enums.NfeCteModelo;
-import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoEntrada;
 import br.com.tlmacedo.cafeperfeito.model.vo.*;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -78,7 +75,7 @@ public class EntradaProdutoDeserializer extends StdDeserializer<EntradaProduto> 
             entradaNfe.setChave(nodeNfe.get("chave").asText());
             entradaNfe.setNumero(nodeNfe.get("numero").asText());
             entradaNfe.setSerie(nodeNfe.get("serie").asText());
-            entradaNfe.setModelo(NfeCteModelo.toEnum(nodeNfe.get("modelo").intValue()));
+            entradaNfe.setModelo(nodeNfe.get("modelo").intValue());
             entradaNfe.setDtEmissao(LocalDate.parse(nodeNfe.get("dataEmissao").asText(), DTF_DATA));
             entradaNfe.setDtEntrada(LocalDate.parse(nodeNfe.get("dataEntrada").asText(), DTF_DATA));
             entradaNfe.setFornecedor(new EmpresaDAO().getById(Empresa.class, nodeNfe.get("emissor").get("id").longValue()));
@@ -111,8 +108,8 @@ public class EntradaProdutoDeserializer extends StdDeserializer<EntradaProduto> 
                 entradaCte.setNumero(nodeCte.get("numero").asText());
                 entradaCte.setSerie(nodeCte.get("serie").asText());
                 entradaCte.setQtdVolume(nodeCte.get("qtdVolume").intValue());
-                entradaCte.setTomadorServico(CteTomadorServico.toEnum(nodeCte.get("tomadorServico").intValue()));
-                entradaCte.setModelo(NfeCteModelo.toEnum(nodeCte.get("modelo").intValue()));
+                entradaCte.setTomadorServico(nodeCte.get("tomadorServico").intValue());
+                entradaCte.setModelo(nodeCte.get("modelo").intValue());
                 entradaCte.setVlrCte(nodeCte.get("vlrCte").decimalValue().setScale(2));
                 entradaCte.setPesoBruto(nodeCte.get("pesoBruto").decimalValue().setScale(2));
                 entradaCte.setVlrFreteBruto(nodeCte.get("vlrFreteBruto").decimalValue().setScale(2));
@@ -150,25 +147,9 @@ public class EntradaProdutoDeserializer extends StdDeserializer<EntradaProduto> 
                 produtoEntrada.setProduto(new ProdutoDAO().getById(Produto.class, getProduto.get("produto_id").longValue()));
                 produtoList.add(produtoEntrada);
             }
-                        /*
-    private LongProperty id = new SimpleLongProperty();
-    private StringProperty codigo = new SimpleStringProperty();
-    private StringProperty descricao = new SimpleStringProperty();
-    private StringProperty lote = new SimpleStringProperty();
-    private ObjectProperty<LocalDate> validade = new SimpleObjectProperty<>();
-    private IntegerProperty qtd = new SimpleIntegerProperty();
-    private ObjectProperty<BigDecimal> vlrFabrica = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrBruto = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrDesconto = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrImposto = new SimpleObjectProperty<>();
-    private ObjectProperty<BigDecimal> vlrLiquido = new SimpleObjectProperty<>();
-    private IntegerProperty estoque = new SimpleIntegerProperty();
-    private IntegerProperty varejo = new SimpleIntegerProperty();
-    private IntegerProperty volume = new SimpleIntegerProperty();
-                         */
 
         EntradaProduto entradaProduto = new EntradaProduto();
-        entradaProduto.situacaoProperty().setValue(SituacaoEntrada.toEnum(situacao));
+        entradaProduto.situacaoProperty().setValue(situacao);
         entradaProduto.lojaProperty().setValue(loja);
         entradaProduto.entradaNfeProperty().setValue(entradaNfe);
         entradaProduto.entradaCteProperty().setValue(entradaCte);

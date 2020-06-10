@@ -10,7 +10,7 @@ public enum TipoEmailHomePage {
     HOME_PAGE(0, "Home page"),
     EMAIL(1, "email");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
     private TipoEmailHomePage(Integer cod, String descricao) {
@@ -29,7 +29,7 @@ public enum TipoEmailHomePage {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

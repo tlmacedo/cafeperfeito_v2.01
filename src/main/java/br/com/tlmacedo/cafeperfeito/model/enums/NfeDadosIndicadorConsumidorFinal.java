@@ -10,10 +10,10 @@ public enum NfeDadosIndicadorConsumidorFinal {
     NORMAL(0, "Normal"),
     FINAL(1, "Consumidor final");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeDadosIndicadorConsumidorFinal(int cod, String descricao) {
+    private NfeDadosIndicadorConsumidorFinal(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -29,7 +29,7 @@ public enum NfeDadosIndicadorConsumidorFinal {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

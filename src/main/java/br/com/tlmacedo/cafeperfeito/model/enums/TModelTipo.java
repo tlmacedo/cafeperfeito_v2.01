@@ -13,10 +13,10 @@ public enum TModelTipo {
     PEDIDO_RECIBO(3, "Pedido recibo"),
     PEDIDO_NFE(4, "Pedido nfe");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private TModelTipo(int cod, String descricao) {
+    private TModelTipo(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -32,7 +32,7 @@ public enum TModelTipo {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

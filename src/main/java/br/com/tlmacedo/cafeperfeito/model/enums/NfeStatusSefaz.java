@@ -21,10 +21,10 @@ public enum NfeStatusSefaz {
     CONSULTA_CAD_UMA_OCORRENCIA(111, "Consulta cadastro com uma ocorrência"),
     CONSULTA_CAD_VAIRAS_OCORRENCIAS(112, "Consulta cadastro com mais de uma ocorrência");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeStatusSefaz(int cod, String descricao) {
+    private NfeStatusSefaz(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -40,7 +40,7 @@ public enum NfeStatusSefaz {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

@@ -11,10 +11,10 @@ public enum NfeDadosDestinoOperacao {
     EXTERNA(2, "Operação interestadual"),
     EXTERIOR(3, "Operação com exterior");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeDadosDestinoOperacao(int cod, String descricao) {
+    private NfeDadosDestinoOperacao(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -30,7 +30,7 @@ public enum NfeDadosDestinoOperacao {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

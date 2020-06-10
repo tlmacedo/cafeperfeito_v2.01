@@ -966,27 +966,27 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 getSaidaProduto().getSaidaProdutoNfeList().add(saidaProdutoNfeProperty().getValue());
 
                 saidaProdutoNfeProperty().getValue().canceladaProperty().setValue(false);
-                saidaProdutoNfeProperty().getValue().statusSefazProperty().setValue(NfeStatusSefaz.DIGITACAO);
-                saidaProdutoNfeProperty().getValue().naturezaOperacaoProperty().setValue(getCboNfeDadosNaturezaOperacao().getSelectionModel().getSelectedItem());
-                saidaProdutoNfeProperty().getValue().modeloProperty().setValue(getCboNfeDadosModelo().getSelectionModel().getSelectedItem());
+                saidaProdutoNfeProperty().getValue().statusSefazProperty().setValue(NfeStatusSefaz.DIGITACAO.getCod());
+                saidaProdutoNfeProperty().getValue().naturezaOperacaoProperty().setValue(getCboNfeDadosNaturezaOperacao().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().modeloProperty().setValue(getCboNfeDadosModelo().getSelectionModel().getSelectedItem().getCod());
                 saidaProdutoNfeProperty().getValue().serieProperty().setValue(Integer.valueOf(getTxtNfeDadosSerie().getText()));
                 saidaProdutoNfeProperty().getValue().numeroProperty().setValue(Integer.valueOf(getTxtNfeDadosNumero().getText()));
                 saidaProdutoNfeProperty().getValue().dtHoraEmissaoProperty().setValue(getDtpNfeDadosDtEmissao().getValue()
                         .atTime(LocalTime.parse(getTxtNfeDadosHoraEmissao().getText())));
                 saidaProdutoNfeProperty().getValue().dtHoraSaidaProperty().setValue(getDtpNfeDadosDtSaida().getValue()
                         .atTime(LocalTime.parse(getTxtNfeDadosHoraSaida().getText())));
-                saidaProdutoNfeProperty().getValue().destinoOperacaoProperty().setValue(getCboNfeDadosDestinoOperacao().getSelectionModel().getSelectedItem());
-                saidaProdutoNfeProperty().getValue().impressaoTpImpProperty().setValue(getCboNfeImpressaoTpImp().getSelectionModel().getSelectedItem());
-                saidaProdutoNfeProperty().getValue().impressaoTpEmisProperty().setValue(getCboNfeImpressaoTpEmis().getSelectionModel().getSelectedItem());
-                saidaProdutoNfeProperty().getValue().impressaoFinNFeProperty().setValue(getCboNfeImpressaoFinNFe().getSelectionModel().getSelectedItem());
+                saidaProdutoNfeProperty().getValue().destinoOperacaoProperty().setValue(getCboNfeDadosDestinoOperacao().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().impressaoTpImpProperty().setValue(getCboNfeImpressaoTpImp().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().impressaoTpEmisProperty().setValue(getCboNfeImpressaoTpEmis().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().impressaoFinNFeProperty().setValue(getCboNfeImpressaoFinNFe().getSelectionModel().getSelectedItem().getCod());
                 saidaProdutoNfeProperty().getValue().impressaoLtProdutoProperty().setValue(getChkPrintLoteProdutos().isSelected());
-                saidaProdutoNfeProperty().getValue().consumidorFinalProperty().setValue(getCboNfeDadosIndicadorConsumidorFinal().getSelectionModel().getSelectedItem());
-                saidaProdutoNfeProperty().getValue().indicadorPresencaProperty().setValue(getCboNfeDadosIndicadorPresenca().getSelectionModel().getSelectedItem());
-                saidaProdutoNfeProperty().getValue().modFreteProperty().setValue(getCboNfeTransporteModFrete().getSelectionModel().getSelectedItem());
+                saidaProdutoNfeProperty().getValue().consumidorFinalProperty().setValue(getCboNfeDadosIndicadorConsumidorFinal().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().indicadorPresencaProperty().setValue(getCboNfeDadosIndicadorPresenca().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().modFreteProperty().setValue(getCboNfeTransporteModFrete().getSelectionModel().getSelectedItem().getCod());
                 saidaProdutoNfeProperty().getValue().transportadorProperty().setValue(getCboNfeTransporteTransportadora().getSelectionModel().getSelectedItem());
                 saidaProdutoNfeProperty().getValue().cobrancaNumeroProperty().setValue(getCboNfeCobrancaDuplicataNumeros().getSelectionModel().getSelectedItem().getDescricao());
-                saidaProdutoNfeProperty().getValue().pagamentoIndicadorProperty().setValue(getCboNfeCobrancaPagamentoIndicador().getSelectionModel().getSelectedItem());
-                saidaProdutoNfeProperty().getValue().pagamentoMeioProperty().setValue(getCboNfeCobrancaPagamentoMeio().getSelectionModel().getSelectedItem());
+                saidaProdutoNfeProperty().getValue().pagamentoIndicadorProperty().setValue(getCboNfeCobrancaPagamentoIndicador().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().pagamentoMeioProperty().setValue(getCboNfeCobrancaPagamentoMeio().getSelectionModel().getSelectedItem().getCod());
                 saidaProdutoNfeProperty().getValue().informacaoAdicionalProperty().setValue(getTxaNfeInformacoesAdicionais().getText().trim());
 
                 saidaProdutoNfeProperty().getValue().chaveProperty().setValue(ServiceValidarDado.getChaveNfe(saidaProdutoNfeProperty().getValue()));

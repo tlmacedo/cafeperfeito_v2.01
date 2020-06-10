@@ -5,7 +5,7 @@ public enum StatusBarSaidaProduto {
     DIGITACAO(0, "[F1-Novo]  [F2-Finalizar venda]  [F6-Cliente]  [F7-Pesquisa produto]  [F8-Itens venda]  [F9-nfe]  [F10-Print Lote NFe]  [F12-Sair]"),
     FINALIZADA(1, "[F12-Sair]");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
     private StatusBarSaidaProduto(Integer cod, String descricao) {
@@ -13,7 +13,7 @@ public enum StatusBarSaidaProduto {
         this.descricao = descricao;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

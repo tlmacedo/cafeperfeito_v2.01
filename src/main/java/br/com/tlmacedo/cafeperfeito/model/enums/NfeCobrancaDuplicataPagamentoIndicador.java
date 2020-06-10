@@ -10,10 +10,10 @@ public enum NfeCobrancaDuplicataPagamentoIndicador {
     AVISTA(0, "Pagamento à Vista"),
     PRAZO(1, "Pagamento à Prazo");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeCobrancaDuplicataPagamentoIndicador(int cod, String descricao) {
+    private NfeCobrancaDuplicataPagamentoIndicador(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -29,7 +29,7 @@ public enum NfeCobrancaDuplicataPagamentoIndicador {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

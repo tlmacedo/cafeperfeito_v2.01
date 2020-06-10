@@ -10,10 +10,10 @@ public enum ClassificacaoJuridica {
     PESSOAFISICA(0, "Física"),
     PESSOAJURIDICA(1, "Jurídica");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private ClassificacaoJuridica(int cod, String descricao) {
+    private ClassificacaoJuridica(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -29,7 +29,7 @@ public enum ClassificacaoJuridica {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

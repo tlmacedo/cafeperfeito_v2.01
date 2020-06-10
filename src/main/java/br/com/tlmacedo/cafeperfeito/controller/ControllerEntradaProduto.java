@@ -1030,7 +1030,7 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
             setEntradaProduto(new EntradaProduto());
 
             getEntradaProduto().setEntradaProdutoProdutoList(getEntradaProdutoProdutoObservableList());
-            getEntradaProduto().setSituacao(SituacaoEntrada.DIGITACAO);
+            getEntradaProduto().setSituacao(SituacaoEntrada.DIGITACAO.getCod());
             getEntradaProduto().setLoja(getCboNfeLojaDestino().getValue());
             getEntradaProduto().setUsuarioCadastro(UsuarioLogado.getUsuario());
 
@@ -1040,7 +1040,7 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
             nfe.chaveProperty().setValue(getTxtNfeChave().getText().trim().replaceAll("\\D", ""));
             nfe.numeroProperty().setValue(getTxtNfeNumero().getText().trim().replaceAll("\\D", ""));
             nfe.serieProperty().setValue(getTxtNfeSerie().getText().trim().replaceAll("\\D", ""));
-            nfe.modeloProperty().setValue(getCboNfeModelo().getSelectionModel().getSelectedItem());
+            nfe.modeloProperty().setValue(getCboNfeModelo().getSelectionModel().getSelectedItem().getCod());
             nfe.fornecedorProperty().setValue(getCboNfeFornecedor().getSelectionModel().getSelectedItem());
             nfe.setDtEmissao(getDtpNfeEmissao().getValue());
             nfe.setDtEntrada(getDtpNfeEntrada().getValue());
@@ -1063,10 +1063,10 @@ public class ControllerEntradaProduto implements Initializable, ModeloCafePerfei
                 getEntradaProduto().entradaCteProperty().setValue(cte);
                 cte.entradaProdutoProperty().setValue(getEntradaProduto());
                 cte.chaveProperty().setValue(getTxtCteChave().getText().trim().replaceAll("\\D", ""));
-                cte.tomadorServicoProperty().setValue(getCboCteTomadorServico().getSelectionModel().getSelectedItem());
+                cte.tomadorServicoProperty().setValue(getCboCteTomadorServico().getSelectionModel().getSelectedItem().getCod());
                 cte.numeroProperty().setValue(getTxtCteNumero().getText().trim().replaceAll("\\D", ""));
                 cte.serieProperty().setValue(getTxtCteSerie().getText().trim().replaceAll("\\D", ""));
-                cte.modeloProperty().setValue(getCboCteModelo().getSelectionModel().getSelectedItem());
+                cte.modeloProperty().setValue(getCboCteModelo().getSelectionModel().getSelectedItem().getCod());
                 cte.dtEmissaoProperty().setValue(getDtpCteEmissao().getValue());
                 cte.transportadoraProperty().setValue(getCboCteTransportadora().getSelectionModel().getSelectedItem());
                 cte.situacaoTributariaProperty().setValue(getCboCteSistuacaoTributaria().getSelectionModel().getSelectedItem());

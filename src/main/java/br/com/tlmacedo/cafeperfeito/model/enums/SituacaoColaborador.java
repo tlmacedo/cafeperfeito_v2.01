@@ -10,10 +10,10 @@ public enum SituacaoColaborador {
     DESATIVADO(0, "Desativado"),
     ATIVO(1, "Ativo");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private SituacaoColaborador(int cod, String descricao) {
+    private SituacaoColaborador(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -29,7 +29,7 @@ public enum SituacaoColaborador {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

@@ -1,6 +1,5 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.model.enums.NfeCteModelo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 
@@ -18,7 +17,7 @@ public class EntradaNfe implements Serializable {
     private StringProperty chave = new SimpleStringProperty();
     private StringProperty numero = new SimpleStringProperty();
     private StringProperty serie = new SimpleStringProperty();
-    private ObjectProperty<NfeCteModelo> modelo = new SimpleObjectProperty<>();
+    private IntegerProperty modelo = new SimpleIntegerProperty();
     private ObjectProperty<Empresa> fornecedor = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDate> dtEmissao = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDate> dtEntrada = new SimpleObjectProperty<>();
@@ -94,16 +93,16 @@ public class EntradaNfe implements Serializable {
         this.serie.set(serie);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeCteModelo getModelo() {
+    @Column(length = 1, nullable = false)
+    public int getModelo() {
         return modelo.get();
     }
 
-    public ObjectProperty<NfeCteModelo> modeloProperty() {
+    public IntegerProperty modeloProperty() {
         return modelo;
     }
 
-    public void setModelo(NfeCteModelo modelo) {
+    public void setModelo(int modelo) {
         this.modelo.set(modelo);
     }
 

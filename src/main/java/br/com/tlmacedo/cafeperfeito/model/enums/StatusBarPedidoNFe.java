@@ -4,7 +4,7 @@ public enum StatusBarPedidoNFe {
 
     DIGITACAO(0, "[Insert-Nova NFe]  [Ctrl+P-Imprimir recibo]  [Ctrl+N-Imprimir NFe]  [F4-Editar NFe]  [F6-Cliente]  [F7-Pesquisa]  [F8-Datas]  [F9-Pedidos]  [F12-Sair]");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
     private StatusBarPedidoNFe(Integer cod, String descricao) {
@@ -12,7 +12,7 @@ public enum StatusBarPedidoNFe {
         this.descricao = descricao;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

@@ -14,10 +14,10 @@ public enum NfeImpressaoTpImp {
     NFCE(4, "DANFE NFC-e"),
     NFCE_MSG(5, "DANFE NFC-e em msg eletrônica");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeImpressaoTpImp(int cod, String descricao) {
+    private NfeImpressaoTpImp(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -33,7 +33,7 @@ public enum NfeImpressaoTpImp {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

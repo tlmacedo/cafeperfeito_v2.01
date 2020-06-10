@@ -16,10 +16,10 @@ public enum NfeImpressaoTpEmis {
     SVC_RS(7, "Contingência SVC-RS (SEFAZ Virtual de Contingência do RS)"),
     OFF(9, "Contingência off-line da NFC-e");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeImpressaoTpEmis(int cod, String descricao) {
+    private NfeImpressaoTpEmis(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -35,7 +35,7 @@ public enum NfeImpressaoTpEmis {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

@@ -21,10 +21,10 @@ public enum EnumsTasks {
     NFE_TRANSMITIR(11, "transmitindo NFe"),
     NFE_RETORNO(12, "consultando retorno");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private EnumsTasks(int cod, String descricao) {
+    private EnumsTasks(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -40,7 +40,7 @@ public enum EnumsTasks {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

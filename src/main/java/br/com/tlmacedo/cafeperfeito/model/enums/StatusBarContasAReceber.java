@@ -4,7 +4,7 @@ public enum StatusBarContasAReceber {
 
     DIGITACAO(0, "[Insert-Novo recebimento]  [Ctrl+P-Imprimir recibo]  [F4-Editar recebimento]  [F6-Cliente]  [F7-Pesquisa]  [F8-Datas]  [F9-Contas]  [F12-Sair]");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
     private StatusBarContasAReceber(Integer cod, String descricao) {
@@ -12,7 +12,7 @@ public enum StatusBarContasAReceber {
         this.descricao = descricao;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

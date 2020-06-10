@@ -42,7 +42,7 @@ public class EntradaProdutoSerializer extends StdSerializer<EntradaProduto> {
 
             jgen.writeStartObject();
             jgen.writeNumberField("id", entradaProduto.getId());
-            jgen.writeNumberField("situacao", entradaProduto.getSituacao().getCod());
+            jgen.writeNumberField("situacao", entradaProduto.getSituacao());
 
             Empresa loja = entradaProduto.getLoja();
             jgen.writeObjectFieldStart("loja");
@@ -58,7 +58,7 @@ public class EntradaProdutoSerializer extends StdSerializer<EntradaProduto> {
             jgen.writeStringField("chave", entradaNfe.getChave());
             jgen.writeStringField("numero", entradaNfe.getNumero());
             jgen.writeStringField("serie", entradaNfe.getSerie());
-            jgen.writeNumberField("modelo", entradaNfe.getModelo().getCod());
+            jgen.writeNumberField("modelo", entradaNfe.getModelo());
             jgen.writeStringField("dataEmissao", entradaNfe.getDtEmissao().format(DTF_DATA));
             jgen.writeStringField("dataEntrada", entradaNfe.getDtEntrada().format(DTF_DATA));
 
@@ -97,8 +97,8 @@ public class EntradaProdutoSerializer extends StdSerializer<EntradaProduto> {
                 jgen.writeStringField("numero", entradaCte.getNumero());
                 jgen.writeStringField("serie", entradaCte.getSerie());
                 jgen.writeNumberField("qtdVolume", entradaCte.getQtdVolume());
-                jgen.writeNumberField("tomadorServico", entradaCte.getTomadorServico().getCod());
-                jgen.writeNumberField("modelo", entradaCte.getModelo().getCod());
+                jgen.writeNumberField("tomadorServico", entradaCte.getTomadorServico());
+                jgen.writeNumberField("modelo", entradaCte.getModelo());
                 jgen.writeNumberField("vlrCte", entradaCte.getVlrCte());
                 jgen.writeNumberField("pesoBruto", entradaCte.getPesoBruto());
                 jgen.writeNumberField("vlrFreteBruto", entradaCte.getVlrFreteBruto());

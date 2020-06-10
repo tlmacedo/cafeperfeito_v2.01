@@ -14,7 +14,7 @@ public enum TipoEndereco {
     RESIDENCIAL(4, "Residencial"),
     RECADO(5, "Recado");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
     private TipoEndereco(Integer cod, String descricao) {
@@ -33,7 +33,7 @@ public enum TipoEndereco {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

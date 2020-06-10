@@ -53,10 +53,10 @@ public enum ContasFluxoCaixa {
     OUTRA_SAIDA_11(42, "Outras Saídas 11");
 
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private ContasFluxoCaixa(int cod, String descricao) {
+    private ContasFluxoCaixa(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -72,7 +72,7 @@ public enum ContasFluxoCaixa {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

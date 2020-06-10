@@ -13,21 +13,21 @@ public enum CteTomadorServico {
     RECEBEDOR(2, "Recebedor"),
     DESTINATARIO(3, "Destinatário");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private CteTomadorServico(int cod, String descricao) {
+    private CteTomadorServico(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
 
-    public static CteTomadorServico toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (CteTomadorServico tipo : CteTomadorServico.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
+//    public static CteTomadorServico toEnum(Integer cod) {
+//        if (cod == null) return null;
+//        for (CteTomadorServico tipo : CteTomadorServico.values())
+//            if (cod.equals(tipo.getCod()))
+//                return tipo;
+//        throw new IllegalArgumentException("Id inválido");
+//    }
 
     public static List<CteTomadorServico> getList() {
         List list = Arrays.asList(CteTomadorServico.values());
@@ -40,7 +40,7 @@ public enum CteTomadorServico {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

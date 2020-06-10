@@ -15,7 +15,7 @@ public enum TipoCodigoCFOP {
     TESTE(912, "teste"),
     AVARIA(927, "avaria");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
     private TipoCodigoCFOP(Integer cod, String descricao) {
@@ -34,7 +34,7 @@ public enum TipoCodigoCFOP {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

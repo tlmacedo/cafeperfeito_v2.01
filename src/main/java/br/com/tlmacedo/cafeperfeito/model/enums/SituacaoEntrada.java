@@ -12,21 +12,21 @@ public enum SituacaoEntrada {
     INCLUIDO(2, "Incluido"),
     FATURADO(3, "Faturado");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private SituacaoEntrada(int cod, String descricao) {
+    private SituacaoEntrada(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
 
-    public static SituacaoEntrada toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (SituacaoEntrada tipo : SituacaoEntrada.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
+//    public static SituacaoEntrada toEnum(Integer cod) {
+//        if (cod == null) return null;
+//        for (SituacaoEntrada tipo : SituacaoEntrada.values())
+//            if (cod.equals(tipo.getCod()))
+//                return tipo;
+//        throw new IllegalArgumentException("Id inválido");
+//    }
 
     public static List<SituacaoEntrada> getList() {
         List list = Arrays.asList(SituacaoEntrada.values());
@@ -39,7 +39,7 @@ public enum SituacaoEntrada {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

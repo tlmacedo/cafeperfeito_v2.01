@@ -19,21 +19,21 @@ public enum StatusBarEntradaProduto {
     INCLUIDO(3, "[F1-Novo]  [F2-Faturar entrada]  [F12-Sair]"),
     FATURADO(4, "[F1-Novo  [F12-Sair]");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private StatusBarEntradaProduto(int cod, String descricao) {
+    private StatusBarEntradaProduto(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
 
-    public static StatusBarEntradaProduto toEnum(Integer cod) {
-        if (cod == null) return null;
-        for (StatusBarEntradaProduto tipo : StatusBarEntradaProduto.values())
-            if (cod.equals(tipo.getCod()))
-                return tipo;
-        throw new IllegalArgumentException("Id inválido");
-    }
+//    public static StatusBarEntradaProduto toEnum(Integer cod) {
+//        if (cod == null) return null;
+//        for (StatusBarEntradaProduto tipo : StatusBarEntradaProduto.values())
+//            if (cod.equals(tipo.getCod()))
+//                return tipo;
+//        throw new IllegalArgumentException("Id inválido");
+//    }
 
     public static List<StatusBarEntradaProduto> getList() {
         List list = Arrays.asList(StatusBarEntradaProduto.values());
@@ -46,12 +46,17 @@ public enum StatusBarEntradaProduto {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 
     public String getDescricao() {
         return descricao;
+    }
+
+    @Override
+    public String toString() {
+        return getDescricao();
     }
 
 //    @Override

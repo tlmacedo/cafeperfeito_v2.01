@@ -12,10 +12,10 @@ public enum NfeCobrancaDuplicataNumero {
     N003(3, "3"),
     N004(4, "4");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeCobrancaDuplicataNumero(int cod, String descricao) {
+    private NfeCobrancaDuplicataNumero(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -31,7 +31,7 @@ public enum NfeCobrancaDuplicataNumero {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

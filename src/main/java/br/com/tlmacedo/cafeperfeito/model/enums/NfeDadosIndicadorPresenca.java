@@ -15,10 +15,10 @@ public enum NfeDadosIndicadorPresenca {
     FORA_ESTABELECIMENTO(5, "Operação presencial, fora do estabelecimento"),
     OUTROS(9, "Operação não presencial, outros");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private NfeDadosIndicadorPresenca(int cod, String descricao) {
+    private NfeDadosIndicadorPresenca(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -34,7 +34,7 @@ public enum NfeDadosIndicadorPresenca {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

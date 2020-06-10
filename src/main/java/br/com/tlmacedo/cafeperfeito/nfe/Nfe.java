@@ -2,7 +2,10 @@ package br.com.tlmacedo.cafeperfeito.nfe;
 
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
-import br.com.tlmacedo.cafeperfeito.model.enums.*;
+import br.com.tlmacedo.cafeperfeito.model.enums.NfeCobrancaDuplicataPagamentoMeio;
+import br.com.tlmacedo.cafeperfeito.model.enums.NfeDadosIndicadorConsumidorFinal;
+import br.com.tlmacedo.cafeperfeito.model.enums.NfeStatusSefaz;
+import br.com.tlmacedo.cafeperfeito.model.enums.NfeTransporteModFrete;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProdutoNfe;
@@ -34,6 +37,11 @@ public class Nfe {
     public Nfe(SaidaProdutoNfe saidaProdutoNfe, boolean imprimeLote) {
         setSaidaProdutoNfe(saidaProdutoNfe);
 
+        setnFev400(new NFev400(null, ALERT_MENSAGEM,
+                MY_ZONE_TIME, (TCONFIG.getNfe().getTpAmb() == 1), true));
+        if (!getnFev400().validCertificate())
+            return;
+
         if (saidaProdutoNfe.idProperty().getValue() == 0)
             newSaidaProdutoNfe(imprimeLote);
 
@@ -45,11 +53,6 @@ public class Nfe {
             setXml(getSaidaProdutoNfe().getXmlAssinatura().toString());
         else
             setXml(null);
-
-        setnFev400(new NFev400(null, ALERT_MENSAGEM,
-                MY_ZONE_TIME, (TCONFIG.getNfe().getTpAmb() == 1), true));
-        if (!getnFev400().validCertificate())
-            return;
 
         if (getXml() != null)
             getnFev400().newNFev400(getXml());
@@ -76,6 +79,8 @@ public class Nfe {
             System.out.printf("\npegando_meu_xmlProtNfe:\n%s\n\n", getnFev400().getXmlProtNfe());
             if (getnFev400().getXmlProtNfe() != null)
                 getSaidaProdutoNfe().setXmlProtNfe(new SerialBlob(getnFev400().getXmlProtNfe().getBytes()));
+
+            setSaidaProdutoNfe(new SaidaProdutoNfeDAO().merger(getSaidaProdutoNfe()));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -87,13 +92,9 @@ public class Nfe {
         SaidaProduto saidaProduto = getSaidaProdutoNfe().saidaProdutoProperty().getValue();
 
         getSaidaProdutoNfe().canceladaProperty().setValue(false);
-        getSaidaProdutoNfe().statusSefazProperty().setValue(NfeStatusSefaz.DIGITACAO);
-        getSaidaProdutoNfe().naturezaOperacaoProperty().setValue(NfeDadosNaturezaOperacao.getList().stream()
-                .filter(nfeDadosNaturezaOperacao -> nfeDadosNaturezaOperacao.getCod() == TCONFIG.getNfe().getNatOp())
-                .findFirst().get());
-        getSaidaProdutoNfe().modeloProperty().setValue(NfeDadosModelo.getList().stream()
-                .filter(nfeDadosModelo -> nfeDadosModelo.getCod() == TCONFIG.getNfe().getMod())
-                .findFirst().get());
+        getSaidaProdutoNfe().statusSefazProperty().setValue(NfeStatusSefaz.DIGITACAO.getCod());
+        getSaidaProdutoNfe().naturezaOperacaoProperty().setValue(TCONFIG.getNfe().getNatOp());
+        getSaidaProdutoNfe().modeloProperty().setValue(TCONFIG.getNfe().getMod());
 
         addNumeroSerieUltimaNfe();
         getSaidaProdutoNfe().dtHoraEmissaoProperty().setValue(saidaProduto.dtCadastroProperty().getValue());
@@ -105,33 +106,21 @@ public class Nfe {
             getSaidaProdutoNfe().dtHoraSaidaProperty().setValue(saidaProduto
                     .dtSaidaProperty().getValue().atTime(8, 0, 0));
         }
-        getSaidaProdutoNfe().destinoOperacaoProperty().setValue(NfeDadosDestinoOperacao.getList().stream()
-                .filter(nfeDadosDestinoOperacao -> nfeDadosDestinoOperacao.getCod() == TCONFIG.getNfe().getIdDest())
-                .findFirst().get());
-        getSaidaProdutoNfe().impressaoTpImpProperty().setValue(NfeImpressaoTpImp.getList().stream()
-                .filter(nfeImpressaoTpImp -> nfeImpressaoTpImp.getCod() == TCONFIG.getNfe().getTpImp())
-                .findFirst().get());
-        getSaidaProdutoNfe().impressaoTpEmisProperty().setValue(NfeImpressaoTpEmis.getList().stream()
-                .filter(nfeImpressaoTpEmis -> nfeImpressaoTpEmis.getCod() == TCONFIG.getNfe().getTpImp())
-                .findFirst().get());
-        getSaidaProdutoNfe().impressaoFinNFeProperty().setValue(NfeImpressaoFinNFe.getList().stream()
-                .filter(impressaoFinNFe -> impressaoFinNFe.getCod() == TCONFIG.getNfe().getFinNFe())
-                .findFirst().get());
+        getSaidaProdutoNfe().destinoOperacaoProperty().setValue(TCONFIG.getNfe().getIdDest());
+        getSaidaProdutoNfe().impressaoTpImpProperty().setValue(TCONFIG.getNfe().getTpImp());
+        getSaidaProdutoNfe().impressaoTpEmisProperty().setValue(TCONFIG.getNfe().getTpImp());
+        getSaidaProdutoNfe().impressaoFinNFeProperty().setValue(TCONFIG.getNfe().getFinNFe());
         getSaidaProdutoNfe().impressaoLtProdutoProperty().setValue(imprimeLote);
         if (saidaProduto.clienteProperty().getValue().ieProperty().getValue().equals(""))
-            getSaidaProdutoNfe().consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.FINAL);
+            getSaidaProdutoNfe().consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.FINAL.getCod());
         else
-            getSaidaProdutoNfe().consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.NORMAL);
-        getSaidaProdutoNfe().indicadorPresencaProperty().setValue(NfeDadosIndicadorPresenca.getList().stream()
-                .filter(nfeDadosIndicadorPresenca -> nfeDadosIndicadorPresenca.getCod() == TCONFIG.getNfe().getIndPres())
-                .findFirst().get());
-        getSaidaProdutoNfe().modFreteProperty().setValue(NfeTransporteModFrete.REMETENTE);
+            getSaidaProdutoNfe().consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.NORMAL.getCod());
+        getSaidaProdutoNfe().indicadorPresencaProperty().setValue(TCONFIG.getNfe().getIndPres());
+        getSaidaProdutoNfe().modFreteProperty().setValue(NfeTransporteModFrete.REMETENTE.getCod());
         getSaidaProdutoNfe().transportadorProperty().setValue(emissor);
         getSaidaProdutoNfe().cobrancaNumeroProperty().setValue(getSaidaProdutoNfe().numeroProperty().getValue().toString());
-        getSaidaProdutoNfe().pagamentoIndicadorProperty().setValue(NfeCobrancaDuplicataPagamentoIndicador.getList().stream()
-                .filter(nfeCobrancaDuplicataPagamentoIndicador -> nfeCobrancaDuplicataPagamentoIndicador.getCod() == TCONFIG.getNfe().getIndPag())
-                .findFirst().get());
-        getSaidaProdutoNfe().pagamentoMeioProperty().setValue(NfeCobrancaDuplicataPagamentoMeio.OUTROS);
+        getSaidaProdutoNfe().pagamentoIndicadorProperty().setValue(TCONFIG.getNfe().getIndPag());
+        getSaidaProdutoNfe().pagamentoMeioProperty().setValue(NfeCobrancaDuplicataPagamentoMeio.OUTROS.getCod());
         getSaidaProdutoNfe().informacaoAdicionalProperty().setValue(
                 String.format(TCONFIG.getNfe().getInfAdic(),
                         ServiceMascara.getMoeda(saidaProduto.getSaidaProdutoProdutoList().stream()
@@ -161,7 +150,7 @@ public class Nfe {
 
     private void addNumeroSerieUltimaNfe() {
         SaidaProdutoNfe nfeTemp;
-        int num = 1, serie = 1;
+        int num = 606, serie = 1;
         if ((nfeTemp = new SaidaProdutoNfeDAO().getAll(SaidaProdutoNfe.class, null, "numero DESC")
                 .stream().findFirst().orElse(null)) != null) {
             num = nfeTemp.numeroProperty().getValue() + 1;

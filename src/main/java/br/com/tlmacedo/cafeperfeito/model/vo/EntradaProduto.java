@@ -1,11 +1,7 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.model.enums.SituacaoEntrada;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -29,7 +25,7 @@ public class EntradaProduto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private LongProperty id = new SimpleLongProperty();
-    private ObjectProperty<SituacaoEntrada> situacao = new SimpleObjectProperty<>();
+    private IntegerProperty situacao = new SimpleIntegerProperty();
 
     private ObjectProperty<Empresa> loja = new SimpleObjectProperty<>();
 
@@ -58,16 +54,16 @@ public class EntradaProduto implements Serializable {
         this.id.set(id);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public SituacaoEntrada getSituacao() {
+    @Column(length = 1, nullable = false)
+    public int getSituacao() {
         return situacao.get();
     }
 
-    public ObjectProperty<SituacaoEntrada> situacaoProperty() {
+    public IntegerProperty situacaoProperty() {
         return situacao;
     }
 
-    public void setSituacao(SituacaoEntrada situacao) {
+    public void setSituacao(int situacao) {
         this.situacao.set(situacao);
     }
 

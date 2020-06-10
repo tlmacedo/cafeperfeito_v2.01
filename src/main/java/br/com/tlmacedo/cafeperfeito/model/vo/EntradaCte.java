@@ -1,7 +1,5 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
-import br.com.tlmacedo.cafeperfeito.model.enums.CteTomadorServico;
-import br.com.tlmacedo.cafeperfeito.model.enums.NfeCteModelo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 
@@ -18,10 +16,10 @@ public class EntradaCte implements Serializable {
     private LongProperty id = new SimpleLongProperty();
     private ObjectProperty<EntradaProduto> entradaProduto = new SimpleObjectProperty<>();
     private StringProperty chave = new SimpleStringProperty();
-    private ObjectProperty<CteTomadorServico> tomadorServico = new SimpleObjectProperty<>();
+    private IntegerProperty tomadorServico = new SimpleIntegerProperty();
     private StringProperty numero = new SimpleStringProperty();
     private StringProperty serie = new SimpleStringProperty();
-    private ObjectProperty<NfeCteModelo> modelo = new SimpleObjectProperty<>();
+    private IntegerProperty modelo = new SimpleIntegerProperty();
     private ObjectProperty<LocalDate> dtEmissao = new SimpleObjectProperty<>();
     private ObjectProperty<Empresa> transportadora = new SimpleObjectProperty<>();
     private ObjectProperty<FiscalFreteSituacaoTributaria> situacaoTributaria = new SimpleObjectProperty<>();
@@ -78,16 +76,16 @@ public class EntradaCte implements Serializable {
         this.chave.set(chave);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public CteTomadorServico getTomadorServico() {
+    @Column(length = 1, nullable = false)
+    public int getTomadorServico() {
         return tomadorServico.get();
     }
 
-    public ObjectProperty<CteTomadorServico> tomadorServicoProperty() {
+    public IntegerProperty tomadorServicoProperty() {
         return tomadorServico;
     }
 
-    public void setTomadorServico(CteTomadorServico tomadorServico) {
+    public void setTomadorServico(int tomadorServico) {
         this.tomadorServico.set(tomadorServico);
     }
 
@@ -117,16 +115,16 @@ public class EntradaCte implements Serializable {
         this.serie.set(serie);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeCteModelo getModelo() {
+    @Column(length = 2, nullable = false)
+    public int getModelo() {
         return modelo.get();
     }
 
-    public ObjectProperty<NfeCteModelo> modeloProperty() {
+    public IntegerProperty modeloProperty() {
         return modelo;
     }
 
-    public void setModelo(NfeCteModelo modelo) {
+    public void setModelo(int modelo) {
         this.modelo.set(modelo);
     }
 

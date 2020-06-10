@@ -12,7 +12,7 @@ public enum RelatorioTipo {
     RECIBO(0, String.format("/relatorio_v2.01/recibo_v%s.jasper", TCONFIG.getVersao())),
     NFE(1, String.format("/relatorio_v2.01/danfe_v%s.jasper", TCONFIG.getVersao()));
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
     private RelatorioTipo(Integer cod, String descricao) {
@@ -31,7 +31,7 @@ public enum RelatorioTipo {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

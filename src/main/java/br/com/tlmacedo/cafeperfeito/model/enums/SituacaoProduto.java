@@ -15,10 +15,10 @@ public enum SituacaoProduto {
     PROPRIO(5, "Próprio"),
     CANCELADO(6, "Cancelado");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private SituacaoProduto(int cod, String descricao) {
+    private SituacaoProduto(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -34,7 +34,7 @@ public enum SituacaoProduto {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

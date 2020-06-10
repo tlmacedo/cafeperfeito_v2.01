@@ -15,10 +15,10 @@ public enum SituacaoCadastroEmpresa {
     INAPTA(5, "Inapta"),
     BAIXADA(6, "Baixada");
 
-    private int cod;
+    private Integer cod;
     private String descricao;
 
-    private SituacaoCadastroEmpresa(int cod, String descricao) {
+    private SituacaoCadastroEmpresa(Integer cod, String descricao) {
         this.cod = cod;
         this.descricao = descricao;
     }
@@ -34,7 +34,7 @@ public enum SituacaoCadastroEmpresa {
         return list;
     }
 
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 

@@ -1,7 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.model.vo;
 
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
-import br.com.tlmacedo.cafeperfeito.model.enums.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.*;
 
@@ -19,25 +18,25 @@ public class SaidaProdutoNfe implements Serializable {
     private BooleanProperty cancelada = new SimpleBooleanProperty(false);
     private ObjectProperty<SaidaProduto> saidaProduto = new SimpleObjectProperty<>();
     private StringProperty chave = new SimpleStringProperty();
-    private ObjectProperty<NfeStatusSefaz> statusSefaz = new SimpleObjectProperty<>();
-    private ObjectProperty<NfeDadosNaturezaOperacao> naturezaOperacao = new SimpleObjectProperty<>();
-    private ObjectProperty<NfeDadosModelo> modelo = new SimpleObjectProperty<>();
+    private IntegerProperty statusSefaz = new SimpleIntegerProperty();
+    private IntegerProperty naturezaOperacao = new SimpleIntegerProperty();
+    private IntegerProperty modelo = new SimpleIntegerProperty();
     private IntegerProperty serie = new SimpleIntegerProperty();
     private IntegerProperty numero = new SimpleIntegerProperty();
     private ObjectProperty<LocalDateTime> dtHoraEmissao = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> dtHoraSaida = new SimpleObjectProperty<>();
-    private ObjectProperty<NfeDadosDestinoOperacao> destinoOperacao = new SimpleObjectProperty<>();
-    private ObjectProperty<NfeImpressaoTpImp> impressaoTpImp = new SimpleObjectProperty<>();
-    private ObjectProperty<NfeImpressaoTpEmis> impressaoTpEmis = new SimpleObjectProperty<>();
-    private ObjectProperty<NfeImpressaoFinNFe> impressaoFinNFe = new SimpleObjectProperty<>();
+    private IntegerProperty destinoOperacao = new SimpleIntegerProperty();
+    private IntegerProperty impressaoTpImp = new SimpleIntegerProperty();
+    private IntegerProperty impressaoTpEmis = new SimpleIntegerProperty();
+    private IntegerProperty impressaoFinNFe = new SimpleIntegerProperty();
     private BooleanProperty impressaoLtProduto = new SimpleBooleanProperty(false);
-    private ObjectProperty<NfeDadosIndicadorConsumidorFinal> consumidorFinal = new SimpleObjectProperty<>();
-    private ObjectProperty<NfeDadosIndicadorPresenca> indicadorPresenca = new SimpleObjectProperty<>();
-    private ObjectProperty<NfeTransporteModFrete> modFrete = new SimpleObjectProperty<>();
+    private IntegerProperty consumidorFinal = new SimpleIntegerProperty();
+    private IntegerProperty indicadorPresenca = new SimpleIntegerProperty();
+    private IntegerProperty modFrete = new SimpleIntegerProperty();
     private ObjectProperty<Empresa> transportador;
     private StringProperty cobrancaNumero = new SimpleStringProperty();
-    private ObjectProperty<NfeCobrancaDuplicataPagamentoIndicador> pagamentoIndicador = new SimpleObjectProperty<>();
-    private ObjectProperty<NfeCobrancaDuplicataPagamentoMeio> pagamentoMeio = new SimpleObjectProperty<>();
+    private IntegerProperty pagamentoIndicador = new SimpleIntegerProperty();
+    private IntegerProperty pagamentoMeio = new SimpleIntegerProperty();
     private StringProperty informacaoAdicional = new SimpleStringProperty();
     private StringProperty digVal = new SimpleStringProperty();
     private ObjectProperty<Blob> xmlAssinatura = new SimpleObjectProperty<>();
@@ -101,42 +100,42 @@ public class SaidaProdutoNfe implements Serializable {
         this.chave.set(chave);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeStatusSefaz getStatusSefaz() {
+    @Column(length = 3, nullable = false)
+    public int getStatusSefaz() {
         return statusSefaz.get();
     }
 
-    public ObjectProperty<NfeStatusSefaz> statusSefazProperty() {
+    public IntegerProperty statusSefazProperty() {
         return statusSefaz;
     }
 
-    public void setStatusSefaz(NfeStatusSefaz statusSefaz) {
+    public void setStatusSefaz(int statusSefaz) {
         this.statusSefaz.set(statusSefaz);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeDadosNaturezaOperacao getNaturezaOperacao() {
+    @Column(length = 1, nullable = false)
+    public int getNaturezaOperacao() {
         return naturezaOperacao.get();
     }
 
-    public ObjectProperty<NfeDadosNaturezaOperacao> naturezaOperacaoProperty() {
+    public IntegerProperty naturezaOperacaoProperty() {
         return naturezaOperacao;
     }
 
-    public void setNaturezaOperacao(NfeDadosNaturezaOperacao naturezaOperacao) {
+    public void setNaturezaOperacao(int naturezaOperacao) {
         this.naturezaOperacao.set(naturezaOperacao);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeDadosModelo getModelo() {
+    @Column(length = 2, nullable = false)
+    public int getModelo() {
         return modelo.get();
     }
 
-    public ObjectProperty<NfeDadosModelo> modeloProperty() {
+    public IntegerProperty modeloProperty() {
         return modelo;
     }
 
-    public void setModelo(NfeDadosModelo modelo) {
+    public void setModelo(int modelo) {
         this.modelo.set(modelo);
     }
 
@@ -192,55 +191,55 @@ public class SaidaProdutoNfe implements Serializable {
         this.dtHoraSaida.set(dtHoraSaida);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeDadosDestinoOperacao getDestinoOperacao() {
+    @Column(length = 1, nullable = false)
+    public int getDestinoOperacao() {
         return destinoOperacao.get();
     }
 
-    public ObjectProperty<NfeDadosDestinoOperacao> destinoOperacaoProperty() {
+    public IntegerProperty destinoOperacaoProperty() {
         return destinoOperacao;
     }
 
-    public void setDestinoOperacao(NfeDadosDestinoOperacao destinoOperacao) {
+    public void setDestinoOperacao(int destinoOperacao) {
         this.destinoOperacao.set(destinoOperacao);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeDadosIndicadorConsumidorFinal getConsumidorFinal() {
+    @Column(length = 1, nullable = false)
+    public int getConsumidorFinal() {
         return consumidorFinal.get();
     }
 
-    public ObjectProperty<NfeDadosIndicadorConsumidorFinal> consumidorFinalProperty() {
+    public IntegerProperty consumidorFinalProperty() {
         return consumidorFinal;
     }
 
-    public void setConsumidorFinal(NfeDadosIndicadorConsumidorFinal consumidorFinal) {
+    public void setConsumidorFinal(int consumidorFinal) {
         this.consumidorFinal.set(consumidorFinal);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeDadosIndicadorPresenca getIndicadorPresenca() {
+    @Column(length = 2, nullable = false)
+    public int getIndicadorPresenca() {
         return indicadorPresenca.get();
     }
 
-    public ObjectProperty<NfeDadosIndicadorPresenca> indicadorPresencaProperty() {
+    public IntegerProperty indicadorPresencaProperty() {
         return indicadorPresenca;
     }
 
-    public void setIndicadorPresenca(NfeDadosIndicadorPresenca indicadorPresenca) {
+    public void setIndicadorPresenca(int indicadorPresenca) {
         this.indicadorPresenca.set(indicadorPresenca);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeTransporteModFrete getModFrete() {
+    @Column(length = 2, nullable = false)
+    public int getModFrete() {
         return modFrete.get();
     }
 
-    public ObjectProperty<NfeTransporteModFrete> modFreteProperty() {
+    public IntegerProperty modFreteProperty() {
         return modFrete;
     }
 
-    public void setModFrete(NfeTransporteModFrete modFrete) {
+    public void setModFrete(int modFrete) {
         this.modFrete.set(modFrete);
     }
 
@@ -273,29 +272,29 @@ public class SaidaProdutoNfe implements Serializable {
         this.cobrancaNumero.set(cobrancaNumero);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeCobrancaDuplicataPagamentoIndicador getPagamentoIndicador() {
+    @Column(length = 1, nullable = false)
+    public int getPagamentoIndicador() {
         return pagamentoIndicador.get();
     }
 
-    public ObjectProperty<NfeCobrancaDuplicataPagamentoIndicador> pagamentoIndicadorProperty() {
+    public IntegerProperty pagamentoIndicadorProperty() {
         return pagamentoIndicador;
     }
 
-    public void setPagamentoIndicador(NfeCobrancaDuplicataPagamentoIndicador pagamentoIndicador) {
+    public void setPagamentoIndicador(int pagamentoIndicador) {
         this.pagamentoIndicador.set(pagamentoIndicador);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeCobrancaDuplicataPagamentoMeio getPagamentoMeio() {
+    @Column(length = 2, nullable = false)
+    public int getPagamentoMeio() {
         return pagamentoMeio.get();
     }
 
-    public ObjectProperty<NfeCobrancaDuplicataPagamentoMeio> pagamentoMeioProperty() {
+    public IntegerProperty pagamentoMeioProperty() {
         return pagamentoMeio;
     }
 
-    public void setPagamentoMeio(NfeCobrancaDuplicataPagamentoMeio pagamentoMeio) {
+    public void setPagamentoMeio(int pagamentoMeio) {
         this.pagamentoMeio.set(pagamentoMeio);
     }
 
@@ -312,8 +311,6 @@ public class SaidaProdutoNfe implements Serializable {
         this.informacaoAdicional.set(informacaoAdicional);
     }
 
-    //    @JsonIgnore
-//    @SuppressWarnings("JpaAttributeTypeInspection")
     @Column(length = 28, unique = true)
     public String getDigVal() {
         return digVal.get();
@@ -369,42 +366,42 @@ public class SaidaProdutoNfe implements Serializable {
         this.xmlProtNfe.set(xmlProtNfe);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeImpressaoTpImp getImpressaoTpImp() {
+    @Column(length = 1, nullable = false)
+    public int getImpressaoTpImp() {
         return impressaoTpImp.get();
     }
 
-    public ObjectProperty<NfeImpressaoTpImp> impressaoTpImpProperty() {
+    public IntegerProperty impressaoTpImpProperty() {
         return impressaoTpImp;
     }
 
-    public void setImpressaoTpImp(NfeImpressaoTpImp impressaoTpImp) {
+    public void setImpressaoTpImp(int impressaoTpImp) {
         this.impressaoTpImp.set(impressaoTpImp);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeImpressaoTpEmis getImpressaoTpEmis() {
+    @Column(length = 1, nullable = false)
+    public int getImpressaoTpEmis() {
         return impressaoTpEmis.get();
     }
 
-    public ObjectProperty<NfeImpressaoTpEmis> impressaoTpEmisProperty() {
+    public IntegerProperty impressaoTpEmisProperty() {
         return impressaoTpEmis;
     }
 
-    public void setImpressaoTpEmis(NfeImpressaoTpEmis impressaoTpEmis) {
+    public void setImpressaoTpEmis(int impressaoTpEmis) {
         this.impressaoTpEmis.set(impressaoTpEmis);
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NfeImpressaoFinNFe getImpressaoFinNFe() {
+    @Column(length = 1, nullable = false)
+    public int getImpressaoFinNFe() {
         return impressaoFinNFe.get();
     }
 
-    public ObjectProperty<NfeImpressaoFinNFe> impressaoFinNFeProperty() {
+    public IntegerProperty impressaoFinNFeProperty() {
         return impressaoFinNFe;
     }
 
-    public void setImpressaoFinNFe(NfeImpressaoFinNFe impressaoFinNFe) {
+    public void setImpressaoFinNFe(int impressaoFinNFe) {
         this.impressaoFinNFe.set(impressaoFinNFe);
     }
 
