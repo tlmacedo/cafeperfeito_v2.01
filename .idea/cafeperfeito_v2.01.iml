@@ -94,5 +94,6 @@
     <orderEntry type="library" name="nfe_v400" level="project" />
     <orderEntry type="library" name="xsdCte_pl300nt2018_002" level="project" />
     <orderEntry type="library" name="alertMensagem" level="project" />
+    <orderEntry type="library" name="xsdConfigNFe" level="project" />
   </component>
 </module>
