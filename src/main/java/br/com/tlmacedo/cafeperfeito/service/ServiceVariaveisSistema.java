@@ -30,6 +30,7 @@ public class ServiceVariaveisSistema {
             UsuarioDAO usuarioDAO = new UsuarioDAO();
             UsuarioLogado.setUsuario(usuarioDAO.getById(Usuario.class, 1L));
         }
+        new ServiceVariaveisNFe().getVariaveisNFe();
     }
 
     public void getVariaveisSistema() {

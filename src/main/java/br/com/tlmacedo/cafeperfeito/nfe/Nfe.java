@@ -3,8 +3,6 @@ package br.com.tlmacedo.cafeperfeito.nfe;
 import br.com.tlmacedo.cafeperfeito.model.dao.EmpresaDAO;
 import br.com.tlmacedo.cafeperfeito.model.dao.SaidaProdutoNfeDAO;
 import br.com.tlmacedo.cafeperfeito.model.enums.NfeCobrancaDuplicataPagamentoMeio;
-import br.com.tlmacedo.cafeperfeito.model.enums.NfeDadosIndicadorConsumidorFinal;
-import br.com.tlmacedo.cafeperfeito.model.enums.NfeStatusSefaz;
 import br.com.tlmacedo.cafeperfeito.model.enums.NfeTransporteModFrete;
 import br.com.tlmacedo.cafeperfeito.model.vo.Empresa;
 import br.com.tlmacedo.cafeperfeito.model.vo.SaidaProduto;
@@ -92,7 +90,7 @@ public class Nfe {
         SaidaProduto saidaProduto = getSaidaProdutoNfe().saidaProdutoProperty().getValue();
 
         getSaidaProdutoNfe().canceladaProperty().setValue(false);
-        getSaidaProdutoNfe().statusSefazProperty().setValue(NfeStatusSefaz.DIGITACAO.getCod());
+        getSaidaProdutoNfe().statusSefazProperty().setValue(1);
         getSaidaProdutoNfe().naturezaOperacaoProperty().setValue(TCONFIG.getNfe().getNatOp());
         getSaidaProdutoNfe().modeloProperty().setValue(TCONFIG.getNfe().getMod());
 
@@ -112,9 +110,9 @@ public class Nfe {
         getSaidaProdutoNfe().impressaoFinNFeProperty().setValue(TCONFIG.getNfe().getFinNFe());
         getSaidaProdutoNfe().impressaoLtProdutoProperty().setValue(imprimeLote);
         if (saidaProduto.clienteProperty().getValue().ieProperty().getValue().equals(""))
-            getSaidaProdutoNfe().consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.FINAL.getCod());
+            getSaidaProdutoNfe().consumidorFinalProperty().setValue(1);
         else
-            getSaidaProdutoNfe().consumidorFinalProperty().setValue(NfeDadosIndicadorConsumidorFinal.NORMAL.getCod());
+            getSaidaProdutoNfe().consumidorFinalProperty().setValue(0);
         getSaidaProdutoNfe().indicadorPresencaProperty().setValue(TCONFIG.getNfe().getIndPres());
         getSaidaProdutoNfe().modFreteProperty().setValue(NfeTransporteModFrete.REMETENTE.getCod());
         getSaidaProdutoNfe().transportadorProperty().setValue(emissor);

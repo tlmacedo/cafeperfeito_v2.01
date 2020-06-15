@@ -1,5 +1,6 @@
 package br.com.tlmacedo.cafeperfeito.controller;
 
+import br.com.cafeperfeito.xsd.configNFe.config.*;
 import br.com.tlmacedo.cafeperfeito.interfaces.ModeloCafePerfeito;
 import br.com.tlmacedo.cafeperfeito.model.dao.*;
 import br.com.tlmacedo.cafeperfeito.model.enums.*;
@@ -41,6 +42,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.tlmacedo.cafeperfeito.interfaces.Regex_Convert.DTF_DATA;
+import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisNFe.MYINFNFE;
 import static br.com.tlmacedo.cafeperfeito.service.ServiceVariaveisSistema.TCONFIG;
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -71,24 +73,24 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
     public TitledPane tpnNfe;
     public Tab tabNfeDados;
-    public ComboBox<NfeDadosNaturezaOperacao> cboNfeDadosNaturezaOperacao;
+    public ComboBox<NatOp> cboNfeDadosNaturezaOperacao;
     public TextField txtNfeDadosNumero;
     public TextField txtNfeDadosSerie;
-    public ComboBox<NfeDadosModelo> cboNfeDadosModelo;
+    public ComboBox<Mod> cboNfeDadosModelo;
     public DatePicker dtpNfeDadosDtEmissao;
     public TextField txtNfeDadosHoraEmissao;
     public DatePicker dtpNfeDadosDtSaida;
     public TextField txtNfeDadosHoraSaida;
-    public ComboBox<NfeDadosDestinoOperacao> cboNfeDadosDestinoOperacao;
-    public ComboBox<NfeDadosIndicadorConsumidorFinal> cboNfeDadosIndicadorConsumidorFinal;
-    public ComboBox<NfeDadosIndicadorPresenca> cboNfeDadosIndicadorPresenca;
+    public ComboBox<IdDest> cboNfeDadosDestinoOperacao;
+    public ComboBox<IndFinal> cboNfeDadosIndicadorConsumidorFinal;
+    public ComboBox<IndPres> cboNfeDadosIndicadorPresenca;
     public CheckBox chkPrintLoteProdutos;
 
 
     public Tab tabNfeImpressao;
-    public ComboBox<NfeImpressaoTpImp> cboNfeImpressaoTpImp;
-    public ComboBox<NfeImpressaoTpEmis> cboNfeImpressaoTpEmis;
-    public ComboBox<NfeImpressaoFinNFe> cboNfeImpressaoFinNFe;
+    public ComboBox<TpImp> cboNfeImpressaoTpImp;
+    public ComboBox<TpEmis> cboNfeImpressaoTpEmis;
+    public ComboBox<FinNFe> cboNfeImpressaoFinNFe;
 
     public Tab tabNfeTransporta;
     public ComboBox<NfeTransporteModFrete> cboNfeTransporteModFrete;
@@ -97,7 +99,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
     public Tab tabNfeCobranca;
     public ComboBox<NfeCobrancaDuplicataNumero> cboNfeCobrancaDuplicataNumeros;
     public TextField txtNfeCobrancaDuplicataValor;
-    public ComboBox<NfeCobrancaDuplicataPagamentoIndicador> cboNfeCobrancaPagamentoIndicador;
+    public ComboBox<IndPag> cboNfeCobrancaPagamentoIndicador;
     public ComboBox<NfeCobrancaDuplicataPagamentoMeio> cboNfeCobrancaPagamentoMeio;
     public TextField txtNfeCobrancaPagamentoValor;
 
@@ -545,30 +547,32 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
 
                             case COMBOS_PREENCHER:
                                 loadListaEmpresas();
-
                                 getCboNfeDadosNaturezaOperacao().setItems(
-                                        Arrays.stream(NfeDadosNaturezaOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                        MYINFNFE.getIde().getNatOps().getNatOp().stream().collect(Collectors.toCollection(FXCollections::observableArrayList))
+                                );
+//                                getCboNfeDadosNaturezaOperacao().setItems(
+//                                        Arrays.stream(NfeDadosNaturezaOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeDadosModelo().setItems(
-                                        Arrays.stream(NfeDadosModelo.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                        MYINFNFE.getIde().getMods().getMod().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeDadosDestinoOperacao().setItems(
-                                        Arrays.stream(NfeDadosDestinoOperacao.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                        MYINFNFE.getIde().getIdDests().getIdDest().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeDadosIndicadorConsumidorFinal().setItems(
-                                        Arrays.stream(NfeDadosIndicadorConsumidorFinal.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                        MYINFNFE.getIde().getIndFinals().getIndFinal().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeDadosIndicadorPresenca().setItems(
-                                        Arrays.stream(NfeDadosIndicadorPresenca.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                        MYINFNFE.getIde().getIndPress().getIndPres().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeImpressaoTpImp().setItems(
-                                        Arrays.stream(NfeImpressaoTpImp.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                        MYINFNFE.getIde().getTpImps().getTpImp().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeImpressaoTpEmis().setItems(
-                                        Arrays.stream(NfeImpressaoTpEmis.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                        MYINFNFE.getIde().getTpEmiss().getTpEmis().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeImpressaoFinNFe().setItems(
-                                        Arrays.stream(NfeImpressaoFinNFe.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                        MYINFNFE.getIde().getFinNFes().getFinNFe().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeTransporteModFrete().setItems(
                                         Arrays.stream(NfeTransporteModFrete.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
@@ -577,7 +581,7 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                                         Arrays.stream(NfeCobrancaDuplicataNumero.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeCobrancaPagamentoIndicador().setItems(
-                                        Arrays.stream(NfeCobrancaDuplicataPagamentoIndicador.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+                                        MYINFNFE.getIde().getIndPags().getIndPag().stream().collect(Collectors.toCollection(FXCollections::observableArrayList)));
 
                                 getCboNfeCobrancaPagamentoMeio().setItems(
                                         Arrays.stream(NfeCobrancaDuplicataPagamentoMeio.values()).collect(Collectors.toCollection(FXCollections::observableArrayList)));
@@ -966,26 +970,27 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
                 getSaidaProduto().getSaidaProdutoNfeList().add(saidaProdutoNfeProperty().getValue());
 
                 saidaProdutoNfeProperty().getValue().canceladaProperty().setValue(false);
-                saidaProdutoNfeProperty().getValue().statusSefazProperty().setValue(NfeStatusSefaz.DIGITACAO.getCod());
-                saidaProdutoNfeProperty().getValue().naturezaOperacaoProperty().setValue(getCboNfeDadosNaturezaOperacao().getSelectionModel().getSelectedItem().getCod());
-                saidaProdutoNfeProperty().getValue().modeloProperty().setValue(getCboNfeDadosModelo().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().statusSefazProperty().setValue(MYINFNFE.getSefaz().getStatuss().getStatus().stream()
+                        .filter(status -> status.getSimplificada().toLowerCase().equals("digitacao")).findFirst().get().getId());
+                saidaProdutoNfeProperty().getValue().naturezaOperacaoProperty().setValue(getCboNfeDadosNaturezaOperacao().getSelectionModel().getSelectedItem().getId());
+                saidaProdutoNfeProperty().getValue().modeloProperty().setValue(getCboNfeDadosModelo().getSelectionModel().getSelectedItem().getId());
                 saidaProdutoNfeProperty().getValue().serieProperty().setValue(Integer.valueOf(getTxtNfeDadosSerie().getText()));
                 saidaProdutoNfeProperty().getValue().numeroProperty().setValue(Integer.valueOf(getTxtNfeDadosNumero().getText()));
                 saidaProdutoNfeProperty().getValue().dtHoraEmissaoProperty().setValue(getDtpNfeDadosDtEmissao().getValue()
                         .atTime(LocalTime.parse(getTxtNfeDadosHoraEmissao().getText())));
                 saidaProdutoNfeProperty().getValue().dtHoraSaidaProperty().setValue(getDtpNfeDadosDtSaida().getValue()
                         .atTime(LocalTime.parse(getTxtNfeDadosHoraSaida().getText())));
-                saidaProdutoNfeProperty().getValue().destinoOperacaoProperty().setValue(getCboNfeDadosDestinoOperacao().getSelectionModel().getSelectedItem().getCod());
-                saidaProdutoNfeProperty().getValue().impressaoTpImpProperty().setValue(getCboNfeImpressaoTpImp().getSelectionModel().getSelectedItem().getCod());
-                saidaProdutoNfeProperty().getValue().impressaoTpEmisProperty().setValue(getCboNfeImpressaoTpEmis().getSelectionModel().getSelectedItem().getCod());
-                saidaProdutoNfeProperty().getValue().impressaoFinNFeProperty().setValue(getCboNfeImpressaoFinNFe().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().destinoOperacaoProperty().setValue(getCboNfeDadosDestinoOperacao().getSelectionModel().getSelectedItem().getId());
+                saidaProdutoNfeProperty().getValue().impressaoTpImpProperty().setValue(getCboNfeImpressaoTpImp().getSelectionModel().getSelectedItem().getId());
+                saidaProdutoNfeProperty().getValue().impressaoTpEmisProperty().setValue(getCboNfeImpressaoTpEmis().getSelectionModel().getSelectedItem().getId());
+                saidaProdutoNfeProperty().getValue().impressaoFinNFeProperty().setValue(getCboNfeImpressaoFinNFe().getSelectionModel().getSelectedItem().getId());
                 saidaProdutoNfeProperty().getValue().impressaoLtProdutoProperty().setValue(getChkPrintLoteProdutos().isSelected());
-                saidaProdutoNfeProperty().getValue().consumidorFinalProperty().setValue(getCboNfeDadosIndicadorConsumidorFinal().getSelectionModel().getSelectedItem().getCod());
-                saidaProdutoNfeProperty().getValue().indicadorPresencaProperty().setValue(getCboNfeDadosIndicadorPresenca().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().consumidorFinalProperty().setValue(getCboNfeDadosIndicadorConsumidorFinal().getSelectionModel().getSelectedItem().getId());
+                saidaProdutoNfeProperty().getValue().indicadorPresencaProperty().setValue(getCboNfeDadosIndicadorPresenca().getSelectionModel().getSelectedItem().getId());
                 saidaProdutoNfeProperty().getValue().modFreteProperty().setValue(getCboNfeTransporteModFrete().getSelectionModel().getSelectedItem().getCod());
                 saidaProdutoNfeProperty().getValue().transportadorProperty().setValue(getCboNfeTransporteTransportadora().getSelectionModel().getSelectedItem());
                 saidaProdutoNfeProperty().getValue().cobrancaNumeroProperty().setValue(getCboNfeCobrancaDuplicataNumeros().getSelectionModel().getSelectedItem().getDescricao());
-                saidaProdutoNfeProperty().getValue().pagamentoIndicadorProperty().setValue(getCboNfeCobrancaPagamentoIndicador().getSelectionModel().getSelectedItem().getCod());
+                saidaProdutoNfeProperty().getValue().pagamentoIndicadorProperty().setValue(getCboNfeCobrancaPagamentoIndicador().getSelectionModel().getSelectedItem().getId());
                 saidaProdutoNfeProperty().getValue().pagamentoMeioProperty().setValue(getCboNfeCobrancaPagamentoMeio().getSelectionModel().getSelectedItem().getCod());
                 saidaProdutoNfeProperty().getValue().informacaoAdicionalProperty().setValue(getTxaNfeInformacoesAdicionais().getText().trim());
 
@@ -1415,11 +1420,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.tabNfeDados = tabNfeDados;
     }
 
-    public ComboBox<NfeDadosNaturezaOperacao> getCboNfeDadosNaturezaOperacao() {
+    public ComboBox<NatOp> getCboNfeDadosNaturezaOperacao() {
         return cboNfeDadosNaturezaOperacao;
     }
 
-    public void setCboNfeDadosNaturezaOperacao(ComboBox<NfeDadosNaturezaOperacao> cboNfeDadosNaturezaOperacao) {
+    public void setCboNfeDadosNaturezaOperacao(ComboBox<NatOp> cboNfeDadosNaturezaOperacao) {
         this.cboNfeDadosNaturezaOperacao = cboNfeDadosNaturezaOperacao;
     }
 
@@ -1439,11 +1444,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.txtNfeDadosSerie = txtNfeDadosSerie;
     }
 
-    public ComboBox<NfeDadosModelo> getCboNfeDadosModelo() {
+    public ComboBox<Mod> getCboNfeDadosModelo() {
         return cboNfeDadosModelo;
     }
 
-    public void setCboNfeDadosModelo(ComboBox<NfeDadosModelo> cboNfeDadosModelo) {
+    public void setCboNfeDadosModelo(ComboBox<Mod> cboNfeDadosModelo) {
         this.cboNfeDadosModelo = cboNfeDadosModelo;
     }
 
@@ -1479,27 +1484,27 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.txtNfeDadosHoraSaida = txtNfeDadosHoraSaida;
     }
 
-    public ComboBox<NfeDadosDestinoOperacao> getCboNfeDadosDestinoOperacao() {
+    public ComboBox<IdDest> getCboNfeDadosDestinoOperacao() {
         return cboNfeDadosDestinoOperacao;
     }
 
-    public void setCboNfeDadosDestinoOperacao(ComboBox<NfeDadosDestinoOperacao> cboNfeDadosDestinoOperacao) {
+    public void setCboNfeDadosDestinoOperacao(ComboBox<IdDest> cboNfeDadosDestinoOperacao) {
         this.cboNfeDadosDestinoOperacao = cboNfeDadosDestinoOperacao;
     }
 
-    public ComboBox<NfeDadosIndicadorConsumidorFinal> getCboNfeDadosIndicadorConsumidorFinal() {
+    public ComboBox<IndFinal> getCboNfeDadosIndicadorConsumidorFinal() {
         return cboNfeDadosIndicadorConsumidorFinal;
     }
 
-    public void setCboNfeDadosIndicadorConsumidorFinal(ComboBox<NfeDadosIndicadorConsumidorFinal> cboNfeDadosIndicadorConsumidorFinal) {
+    public void setCboNfeDadosIndicadorConsumidorFinal(ComboBox<IndFinal> cboNfeDadosIndicadorConsumidorFinal) {
         this.cboNfeDadosIndicadorConsumidorFinal = cboNfeDadosIndicadorConsumidorFinal;
     }
 
-    public ComboBox<NfeDadosIndicadorPresenca> getCboNfeDadosIndicadorPresenca() {
+    public ComboBox<IndPres> getCboNfeDadosIndicadorPresenca() {
         return cboNfeDadosIndicadorPresenca;
     }
 
-    public void setCboNfeDadosIndicadorPresenca(ComboBox<NfeDadosIndicadorPresenca> cboNfeDadosIndicadorPresenca) {
+    public void setCboNfeDadosIndicadorPresenca(ComboBox<IndPres> cboNfeDadosIndicadorPresenca) {
         this.cboNfeDadosIndicadorPresenca = cboNfeDadosIndicadorPresenca;
     }
 
@@ -1511,27 +1516,27 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.tabNfeImpressao = tabNfeImpressao;
     }
 
-    public ComboBox<NfeImpressaoTpImp> getCboNfeImpressaoTpImp() {
+    public ComboBox<TpImp> getCboNfeImpressaoTpImp() {
         return cboNfeImpressaoTpImp;
     }
 
-    public void setCboNfeImpressaoTpImp(ComboBox<NfeImpressaoTpImp> cboNfeImpressaoTpImp) {
+    public void setCboNfeImpressaoTpImp(ComboBox<TpImp> cboNfeImpressaoTpImp) {
         this.cboNfeImpressaoTpImp = cboNfeImpressaoTpImp;
     }
 
-    public ComboBox<NfeImpressaoTpEmis> getCboNfeImpressaoTpEmis() {
+    public ComboBox<TpEmis> getCboNfeImpressaoTpEmis() {
         return cboNfeImpressaoTpEmis;
     }
 
-    public void setCboNfeImpressaoTpEmis(ComboBox<NfeImpressaoTpEmis> cboNfeImpressaoTpEmis) {
+    public void setCboNfeImpressaoTpEmis(ComboBox<TpEmis> cboNfeImpressaoTpEmis) {
         this.cboNfeImpressaoTpEmis = cboNfeImpressaoTpEmis;
     }
 
-    public ComboBox<NfeImpressaoFinNFe> getCboNfeImpressaoFinNFe() {
+    public ComboBox<FinNFe> getCboNfeImpressaoFinNFe() {
         return cboNfeImpressaoFinNFe;
     }
 
-    public void setCboNfeImpressaoFinNFe(ComboBox<NfeImpressaoFinNFe> cboNfeImpressaoFinNFe) {
+    public void setCboNfeImpressaoFinNFe(ComboBox<FinNFe> cboNfeImpressaoFinNFe) {
         this.cboNfeImpressaoFinNFe = cboNfeImpressaoFinNFe;
     }
 
@@ -1583,11 +1588,11 @@ public class ControllerSaidaProduto implements Initializable, ModeloCafePerfeito
         this.txtNfeCobrancaDuplicataValor = txtNfeCobrancaDuplicataValor;
     }
 
-    public ComboBox<NfeCobrancaDuplicataPagamentoIndicador> getCboNfeCobrancaPagamentoIndicador() {
+    public ComboBox<IndPag> getCboNfeCobrancaPagamentoIndicador() {
         return cboNfeCobrancaPagamentoIndicador;
     }
 
-    public void setCboNfeCobrancaPagamentoIndicador(ComboBox<NfeCobrancaDuplicataPagamentoIndicador> cboNfeCobrancaPagamentoIndicador) {
+    public void setCboNfeCobrancaPagamentoIndicador(ComboBox<IndPag> cboNfeCobrancaPagamentoIndicador) {
         this.cboNfeCobrancaPagamentoIndicador = cboNfeCobrancaPagamentoIndicador;
     }
 
